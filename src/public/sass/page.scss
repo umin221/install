@@ -5,5 +5,10 @@
     left: 0;
     right: 0;
     bottom: 0;
+    overflow: hidden;
+  }
+  .mint-header ~ .mint-content {
+    position: relative;
+    top: $header-height;
   }
 }

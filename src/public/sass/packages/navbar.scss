@@ -1,0 +1,14 @@
+$border-width: 3px;
+
+div.mint-navbar {
+  padding-bottom: $border-width;
+  .mint-tab-item {
+    padding: 12px 0;
+    .mint-tab-item-label {
+      font-size: $font-size-default;
+    }
+  }
+  .mint-tab-item.is-selected {
+    border-width: $border-width;
+  }
+}
