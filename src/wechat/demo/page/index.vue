@@ -3,7 +3,7 @@
     <mt-header fixed title="demo">
       <fallback slot="left">返回</fallback>
       <mt-button slot="right">
-        <router-link to="detail">下一页</router-link>
+        <router-link to="icon">图库</router-link>
       </mt-button>
     </mt-header>
 

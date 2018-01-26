@@ -1,48 +1,45 @@
 <template>
   <div>
-    <mt-header fixed title="委外">
-      <fallback slot="left">返回</fallback>
+    <mt-header fixed title="委外人员管理">
+      <fallback slot="left"></fallback>
       <mt-button slot="right">
         <router-link to="detail">下一页</router-link>
       </mt-button>
     </mt-header>
 
-    <mt-cell title="标题文字" is-link>
-      <span style="color: green">这里是元素</span>
-    </mt-cell>
+    <div class="mint-content">
+      <mt-navbar v-model="selected">
+        <mt-tab-item id="1">已注册</mt-tab-item>
+        <mt-tab-item id="2">已失效</mt-tab-item>
+      </mt-navbar>
 
-    <mt-tab-container v-model="active" :swipeable="true">
-      <mt-tab-container-item id="tab-container1">
-        <mt-cell v-for="n in 20" :key="n" title="tab-container 111" @click.native="getList"></mt-cell>
-      </mt-tab-container-item>
-      <mt-tab-container-item id="tab-container2">
-        <mt-cell v-for="n in 5" :key="n" title="tab-container 2"></mt-cell>
-      </mt-tab-container-item>
-      <mt-tab-container-item id="tab-container3">
-        <mt-cell v-for="n in 7" :key="n" title="tab-container 3"></mt-cell>
-      </mt-tab-container-item>
-    </mt-tab-container>
+      <!-- tab-container -->
+      <mt-tab-container v-model="selected">
+        <mt-tab-container-item id="1">
+          <mt-cell title="合作伙伴名称：恒通安装公司" label="合作伙伴负责人：李立三 07100028" is-link></mt-cell>
+        </mt-tab-container-item>
+        <mt-tab-container-item id="2">
+          <mt-cell title="合作伙伴名称：恒通安装公司" label="合作伙伴负责人：李三 2222221" is-link></mt-cell>
+        </mt-tab-container-item>
+      </mt-tab-container>
+      </mt-cell>
+    </div>
+
   </div>
 </template>
 
 <script type="application/javascript">
-  import api from '../api/api';
   import {mapState, mapActions} from 'vuex';
 
   const NameSpace = 'index';
   export default {
     name: NameSpace,
     created: () => {
-      api.get({
-        key: 'getList',
-        callback: function(data) {
-          console.log(data);
-        }
-      });
     },
     data: () => {
       return {
-        active: 'tab-container1'
+        active: 'tab-container1',
+        selected: '1'
       };
     },
     computed: {
