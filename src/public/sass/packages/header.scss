@@ -1,0 +1,16 @@
+header.mint-header {
+  font-size: $font-size-default;
+  height: $header-height;
+
+  .mint-header-title {
+    font-size: $font-size-large;
+  }
+
+  .mintui::before {
+    font-size: $font-size-icon;
+  }
+
+  .mint-button {
+    height: $header-height;
+  }
+}
