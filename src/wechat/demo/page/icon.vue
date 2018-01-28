@@ -15,13 +15,37 @@
   };
 </script>
 
-<style type="sass">
-
-  .mint-content {
-    font-family: "mintui" !important;
+<style>
     .icon1::before {
+      font-family: "mintui";
       content: '\E601';
       font-size: 20px;
     }
-  }
+
+    .icon2::before {
+      font-family: "mintui";
+      content: '\E602';
+      font-size: 20px;
+    }
+
+    .icon3::before {
+      font-family: "mintui";
+      content: '\E603';
+      font-size: 20px;
+    }
+    .icon4::before {
+      font-family: "mintui";
+      content: '\E604';
+      font-size: 20px;
+    }
+    .icon5::before {
+      font-family: "mintui";
+      content: '\E605';
+      font-size: 20px;
+    }
+    .icon6::before {
+      font-family: "mintui";
+      content: '\E606';
+      font-size: 20px;
+    }
 </style>
