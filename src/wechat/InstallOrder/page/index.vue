@@ -8,11 +8,11 @@
     <mt-cell title="标题文字" is-link>
       <span style="color: green">这里是元素</span>
     </mt-cell>
-    <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" ref="loadmore">
+   <!-- <mt-loadmore :top-method="loadTop" :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" ref="loadmore">
       <ul>
         <li v-for="item in listObj">{{ item.vul }}</li>
       </ul>
-    </mt-loadmore>
+    </mt-loadmore>-->
   </div>
 </template>
 

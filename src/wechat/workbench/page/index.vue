@@ -6,7 +6,7 @@
     <mt-cell title="标题文字" is-link>
       <span style="color: green">这里是元素</span>
     </mt-cell>
-    <mt-cell  v-for="(item, index) in listObj" :title="item.vul"  @click.native="getList" is-link>
+    <mt-cell  v-for="(item, index) in listObj" :key="index" :title="item.vul"  @click.native="getList" is-link>
       <img slot="icon" src="" width="24" height="24">
     </mt-cell>
   </div>
