@@ -1,7 +1,7 @@
 <template>
   <div>
     <mt-header fixed title="标题">
-      <fallback slot="left">返回</fallback>
+      <fallback slot="left"></fallback>
     </mt-header>
 
     <mt-cell title="标题文字" is-link>
