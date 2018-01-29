@@ -14,13 +14,10 @@
         <mt-tab-item id="3">已完成</mt-tab-item>
       </mt-navbar>
       <loadmore :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" ref="load">
-        <mt-cell v-for="{item, index} in list" :key="index" is-link>
-          <div slot="title">合作伙伴名称</div>
-          <div>恒通安装公司</div>
-          <div slot="title">合作伙伴负责人</div>
-          <div>李立三 07100028</div>
-          <div slot="title">联系电话</div>
-          <div>18688889999</div>
+        <mt-cell v-for="item in list" :key="item.id" is-link to="detail?index=1">
+          <div slot="title" class="list-text"><span>订单编码:</span><span>{{item.savrsNo}}</span></div>
+          <div slot="title" class="list-text"><span>销售类型:</span><span>{{item.type}}</span></div>
+          <div slot="title" class="list-text"><span>项目名称:</span><span>{{item.name}}</span></div>
         </mt-cell>
       </loadmore>
     </div>
@@ -36,19 +33,19 @@
   export default {
     name: NameSpace,
     created: () => {
-      for (var i = 0; i < 10; i++) {
-        this.list.push(i);
-      }
     },
     data: () => {
       return {
-        active: 'tab-container1',
         searchKey: false,
         searchValue: '',
         selected: '1',
         allLoaded: '',
         topStatus: '',
-        list: []
+        list: [
+          {id: '1', type: '工程', savrsNo: 'AZ201706010001001', name: 'XXXXXXX'},
+          {id: '2', type: '工程', savrsNo: 'AZ201706010001002', name: 'ZZZZZZ'},
+          {id: '3', type: '工程', savrsNo: 'AZ201706010001003', name: 'QQQQQQQ'}
+        ]
       };
     },
     computed: {
@@ -63,29 +60,13 @@
       search() {
         Toast(this.searchValue);
       },
+      getDetail() { // 详情
+      },
       // 顶部加载
       loadTop() {
-        let me = this;
-        setTimeout(function() {
-          for (var i = 5; i > 0; i--) {
-            me.list.unshift(i);
-          }
-          me.$refs.load.onTopLoaded();
-        }, 1000);
       },
       // 底部加载
       loadBottom() {
-        let me = this;
-        setTimeout(function() {
-          if (me.list.length < 50) {
-            for (var i = 5; i > 0; i--) {
-              me.list.push(i);
-            }
-          } else {
-            me.$refs.load.allLoaded = true;
-          }
-          me.$refs.load.onBottomLoaded();
-        }, 1000);
       }
     },
     components: {
@@ -99,5 +80,8 @@
   }
   .list-img {
     color: #A2BBFC;
+  }
+  .list-text {
+    line-height: 30px;
   }
 </style>

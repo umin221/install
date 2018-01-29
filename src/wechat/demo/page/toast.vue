@@ -58,7 +58,8 @@
     }
   };
 </script>
-<style>
+<style lang="scss">
+  .toastCon {
     .mint-button--normal {
       display: inline-block;
       padding: 0 12px;
@@ -70,4 +71,5 @@
       content: '\E602';
       font-size: 20px;
     }
+  }
 </style>

@@ -3,7 +3,7 @@
     <mt-header fixed title="Indicator">
       <fallback slot="left"></fallback>
     </mt-header>
-    <div style="margin-top: 100px;">
+    <div style="margin-top: 100px;" class="IndicatorCon">
       <mt-button type="default" @click.native="handleClick(1)">点击弹出 Indicator</mt-button>
       <mt-button type="default" @click.native="handleClick(2)">点击弹出 spinner</mt-button>
       <mt-button type="default" @click.native="handleClick(3)">点击弹出有蚊子的 Indicator</mt-button>
@@ -59,16 +59,18 @@
     }
   };
 </script>
-<style>
-  .mint-button--normal {
-    display: inline-block;
-    padding: 0 12px;
-    width: 96%;
-    margin: 15px 10px;
-  }
-  .icon-success {
-    font-family: "mintui";
-    content: '\E602';
-    font-size: 20px;
+<style lang="scss">
+  .IndicatorCon {
+    .mint-button--normal {
+      display: inline-block;
+      padding: 0 12px;
+      width: 96%;
+      margin: 15px 10px;
+    }
+    .icon-success {
+      font-family: "mintui";
+      content: '\E602';
+      font-size: 20px;
+    }
   }
 </style>
