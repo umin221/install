@@ -2,7 +2,7 @@
   <div>
     <mt-header fixed title="Toast">
     </mt-header>
-    <div style="margin-top: 100px;">
+    <div style="margin-top: 100px;" class="toastCon">
       <mt-button type="default" @click.native="handleClick(1)">点击弹出</mt-button>
       <mt-button type="default" @click.native="handleClick(2)">点击弹出带有 icon 的 Toast</mt-button>
       <mt-button type="default" @click.native="handleClick(3)">自定义 Toast 位置</mt-button>
@@ -58,15 +58,15 @@
   };
 </script>
 <style>
-  .mint-button--normal {
-    display: inline-block;
-    padding: 0 12px;
-    width: 96%;
-    margin: 15px 10px;
-  }
-  .icon-success {
-    font-family: "mintui";
-    content: '\E602';
-    font-size: 20px;
-  }
+    .mint-button--normal {
+      display: inline-block;
+      padding: 0 12px;
+      width: 96%;
+      margin: 15px 10px;
+    }
+    .icon-success {
+      font-family: "mintui";
+      content: '\E602';
+      font-size: 20px;
+    }
 </style>
