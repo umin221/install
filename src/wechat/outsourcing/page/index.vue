@@ -2,8 +2,8 @@
   <div>
     <mt-header fixed title="委外人员管理">
       <fallback slot="left"></fallback>
-      <mt-button slot="right">
-        <router-link to="detail">下一页</router-link>
+      <mt-button slot="right" icon="search">
+        <router-link to="detail"></router-link>
       </mt-button>
     </mt-header>
 

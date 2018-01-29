@@ -6,24 +6,57 @@
  */
 import Vue from 'vue';
 import Router from 'vue-router';
-import Index from '../page/index';
-import Detail from '../page/detail';
-import Icon from '../page/icon';
 
 Vue.use(Router);
 
 export default new Router({
   routes: [{
-    path: '/',
+    path: '/', // 首页列表
     name: 'index',
-    component: Index
+    component(resolve) {
+      require(['../page/index'], resolve);
+    }
   }, {
-    path: '/detail',
+    path: '/detail', // 测试页面
     name: 'detail',
-    component: Detail
+    component(resolve) {
+      require(['../page/detail'], resolve);
+    }
   }, {
-    path: '/icon',
+    path: '/icon', // 图标清单
     name: 'icon',
-    component: Icon
+    component(resolve) {
+      require(['../page/icon'], resolve);
+    }
+  }, {
+    path: '/loading', // 拖动加载
+    name: 'loading',
+    component(resolve) {
+      require(['../page/loading'], resolve);
+    }
+  }, {
+    path: '/toast', // 弱 toast 提醒
+    name: 'toast',
+    component(resolve) {
+      require(['../page/toast'], resolve);
+    }
+  }, {
+    path: '/indicator', // 加载框
+    name: 'indicator',
+    component(resolve) {
+      require(['../page/indicator'], resolve);
+    }
+  }, {
+    path: '/messageBox', // 对话框
+    name: 'messageBox',
+    component(resolve) {
+      require(['../page/messageBox'], resolve);
+    }
+  }, {
+    path: '/actionSheet', // 操作表
+    name: 'actionSheet',
+    component(resolve) {
+      require(['../page/actionSheet'], resolve);
+    }
   }]
 });
