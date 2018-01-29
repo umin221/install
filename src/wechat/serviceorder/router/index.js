@@ -6,14 +6,21 @@
  */
 import Vue from 'vue';
 import Router from 'vue-router';
-import Index from '../page/index';
 
 Vue.use(Router);
 
 export default new Router({
   routes: [{
-    path: '/',
+    path: '/', // 首页列表
     name: 'index',
-    component: Index
+    component(resolve) {
+      require(['../page/index'], resolve);
+    }
+  }, {
+    path: '/addService', // 创建维修服务
+    name: 'addService',
+    component(resolve) {
+      require(['../page/addService'], resolve);
+    }
   }]
 });

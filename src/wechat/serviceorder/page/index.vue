@@ -2,8 +2,9 @@
   <div>
     <mt-header fixed :title="headTitle">
       <fallback slot="left"></fallback>
-      <mt-button slot="right" icon="more">
-      </mt-button>
+      <router-link  to="addService" slot="right">
+        <mt-button icon="more"></mt-button>
+      </router-link>
     </mt-header>
     <div class="mint-content">
       <mt-navbar v-model="active">
@@ -12,7 +13,7 @@
       <mt-tab-container v-model="active" :swipeable="true">
         <mt-tab-container-item id="tab-container1">
           <mt-loadmore :top-method="loadTop" @top-status-change="handleTopChange" ref="loadmore">
-            <mt-cell v-for="item in list" @click.native="getList" :key="item.sevrs" >
+            <mt-cell v-for="item in list" @click.native="getList" :key="item.sevrs" is-link>
               <div>
                 <div>{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
                 <div>{{item.date}}:{{item.dates}}</div>
@@ -24,19 +25,17 @@
         </mt-tab-container-item>
         <mt-tab-container-item id="tab-container2">
           <mt-loadmore :top-method="loadTop" @top-status-change="handleTopChange" ref="loadmore">
-            <mt-cell v-for="item in list" @click.native="getList"  :key="item.sevrs">
-              <div>
+            <mt-cell v-for="item in list" @click.native="getList" :key="item.sevrs" is-link>
                 <div>{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
                 <div>{{item.date}}:{{item.dates}}</div>
                 <div>{{item.type}}:{{item.types}}</div>
                 <div style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:100%;">{{item.addr}}:{{item.addrs}}</div>
-              </div>
             </mt-cell>
           </mt-loadmore>
         </mt-tab-container-item>
         <mt-tab-container-item id="tab-container3">
           <mt-loadmore :top-method="loadTop" @top-status-change="handleTopChange" ref="loadmore">
-            <mt-cell v-for="item in list" @click.native="getList" :key="item.sevrs">
+            <mt-cell v-for="item in list" @click.native="getList" :key="item.sevrs" is-link>
               <div>
                 <div>{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
                 <div>{{item.date}}:{{item.dates}}</div>
@@ -53,7 +52,6 @@
 <script type="application/javascript">
   import api from '../api/api';
   import {mapState, mapActions} from 'vuex';
-
   const NameSpace = 'index';
   export default {
     name: NameSpace,
@@ -95,6 +93,9 @@
       loadTop() {
         console.log(this);
         this.$refs.loadmore.onTopLoaded();
+      },
+      addService() {
+        console.log(111);
       }
     }
   };
