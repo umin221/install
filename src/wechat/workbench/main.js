@@ -8,7 +8,7 @@ import Vue from 'vue';
 import router from './router';
 import 'public/js/base/main';
 import 'public/js/base/mint';
-import fallback from 'public/components/fallback';
+import fallback from 'public/components/cus-fallback';
 import App from '../../App';
 import store from './store';
 import './filters'; // Vue Filter
