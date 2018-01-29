@@ -20,11 +20,12 @@
   </div>
 </template>
 
-<script type="es6">
+<script type="application/javascript">
   import loadmore from 'public/components/cus-loadmore';
 
   export default {
     name: 'loading',
+    // 初始化
     created() {
       for (var i = 0; i < 10; i++) {
         this.list.push(i);
@@ -38,6 +39,7 @@
       };
     },
     methods: {
+      // 顶部加载
       loadTop() {
         let me = this;
         setTimeout(function() {
@@ -47,6 +49,7 @@
           me.$refs.load.onTopLoaded();
         }, 1000);
       },
+      // 底部加载
       loadBottom() {
         let me = this;
         setTimeout(function() {
