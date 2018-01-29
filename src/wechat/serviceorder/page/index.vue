@@ -2,68 +2,54 @@
   <div>
     <mt-header fixed :title="headTitle">
       <fallback slot="left"></fallback>
-      <mt-button slot="right">
+      <mt-button slot="right" icon="more">
       </mt-button>
     </mt-header>
-
-    <mt-cell title="标题文字" is-link>
-      <span style="color: green">这里是元素</span>
-    </mt-cell>
-
-    <mt-navbar v-model="active">
-      <mt-tab-item v-for="tab in tabList" :id="tab.id">{{tab.name}}</mt-tab-item>
-    </mt-navbar>
-
-    <mt-tab-container v-model="active" :swipeable="true">
-      <mt-tab-container-item id="tab-container1">
-        <mt-loadmore :top-method="loadTop" @top-status-change="handleTopChange" ref="loadmore">
-          <mt-cell v-for="item in list" @click.native="getList" class="listHeader">
-            <div>
-              <div>{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
-              <div>{{item.date}}:{{item.dates}}</div>
-              <div>{{item.type}}:{{item.types}}</div>
-              <div style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:100%;">{{item.addr}}:{{item.addrs}}</div>
-            </div>
-          </mt-cell>
-        </mt-loadmore>
-      </mt-tab-container-item>
-      <mt-tab-container-item id="tab-container2">
-        <mt-loadmore :top-method="loadTop" @top-status-change="handleTopChange" ref="loadmore">
-          <mt-cell v-for="item in list" @click.native="getList"  class="listHeader">
-            <div>
-              <div>{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
-              <div>{{item.date}}:{{item.dates}}</div>
-              <div>{{item.type}}:{{item.types}}</div>
-              <div style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:100%;">{{item.addr}}:{{item.addrs}}</div>
-            </div>
-          </mt-cell>
-        </mt-loadmore>
-      </mt-tab-container-item>
-      <mt-tab-container-item id="tab-container3">
-        <mt-loadmore :top-method="loadTop" @top-status-change="handleTopChange" ref="loadmore">
-          <mt-cell v-for="item in list" @click.native="getList" class="listHeader">
-            <div>
-              <div>{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
-              <div>{{item.date}}:{{item.dates}}</div>
-              <div>{{item.type}}:{{item.types}}</div>
-              <div style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:100%;">{{item.addr}}:{{item.addrs}}</div>
-            </div>
-          </mt-cell>
-        </mt-loadmore>
-      </mt-tab-container-item>
-    </mt-tab-container>
+    <div class="mint-content">
+      <mt-navbar v-model="active">
+        <mt-tab-item v-for="tab in tabList" :id="tab.id" :key="tab.id">{{tab.name}}</mt-tab-item>
+      </mt-navbar>
+      <mt-tab-container v-model="active" :swipeable="true">
+        <mt-tab-container-item id="tab-container1">
+          <mt-loadmore :top-method="loadTop" @top-status-change="handleTopChange" ref="loadmore">
+            <mt-cell v-for="item in list" @click.native="getList" :key="item.sevrs" >
+              <div>
+                <div>{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
+                <div>{{item.date}}:{{item.dates}}</div>
+                <div>{{item.type}}:{{item.types}}</div>
+                <div style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:100%;">{{item.addr}}:{{item.addrs}}</div>
+              </div>
+            </mt-cell>
+          </mt-loadmore>
+        </mt-tab-container-item>
+        <mt-tab-container-item id="tab-container2">
+          <mt-loadmore :top-method="loadTop" @top-status-change="handleTopChange" ref="loadmore">
+            <mt-cell v-for="item in list" @click.native="getList"  :key="item.sevrs">
+              <div>
+                <div>{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
+                <div>{{item.date}}:{{item.dates}}</div>
+                <div>{{item.type}}:{{item.types}}</div>
+                <div style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:100%;">{{item.addr}}:{{item.addrs}}</div>
+              </div>
+            </mt-cell>
+          </mt-loadmore>
+        </mt-tab-container-item>
+        <mt-tab-container-item id="tab-container3">
+          <mt-loadmore :top-method="loadTop" @top-status-change="handleTopChange" ref="loadmore">
+            <mt-cell v-for="item in list" @click.native="getList" :key="item.sevrs">
+              <div>
+                <div>{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
+                <div>{{item.date}}:{{item.dates}}</div>
+                <div>{{item.type}}:{{item.types}}</div>
+                <div style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:100%;">{{item.addr}}:{{item.addrs}}</div>
+              </div>
+            </mt-cell>
+          </mt-loadmore>
+        </mt-tab-container-item>
+      </mt-tab-container>
+    </div>
   </div>
 </template>
-<style scoped>
-  mt-tab-container{
-    font-size: 2rem;
-  }
-  .listHeader{
-    display: block!important;
-    height: 100px;
-  }
-</style>
-
 <script type="application/javascript">
   import api from '../api/api';
   import {mapState, mapActions} from 'vuex';
