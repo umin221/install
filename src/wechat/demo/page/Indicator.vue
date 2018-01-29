@@ -1,6 +1,7 @@
 <template>
   <div>
     <mt-header fixed title="Indicator">
+      <fallback slot="left"></fallback>
     </mt-header>
     <div style="margin-top: 100px;">
       <mt-button type="default" @click.native="handleClick(1)">点击弹出 Indicator</mt-button>

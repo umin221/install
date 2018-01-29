@@ -1,6 +1,7 @@
 <template>
   <div>
     <mt-header fixed title="Message box">
+      <fallback slot="left"></fallback>
     </mt-header>
     <div style="margin-top: 100px;">
       <mt-button type="default" @click.native="handleClick(1)">打开 alter 提示框</mt-button>

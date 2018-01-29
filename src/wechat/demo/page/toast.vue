@@ -1,6 +1,7 @@
 <template>
   <div>
     <mt-header fixed title="Toast">
+      <fallback slot="left"></fallback>
     </mt-header>
     <div style="margin-top: 100px;" class="toastCon">
       <mt-button type="default" @click.native="handleClick(1)">点击弹出</mt-button>

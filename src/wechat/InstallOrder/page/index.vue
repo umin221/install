@@ -13,31 +13,42 @@
         <mt-tab-item id="2">处理中</mt-tab-item>
         <mt-tab-item id="3">已完成</mt-tab-item>
       </mt-navbar>
+      <loadmore :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" ref="load">
+        <mt-cell v-for="{item, index} in list" :key="index" is-link>
+          <div slot="title">合作伙伴名称</div>
+          <div>恒通安装公司</div>
+          <div slot="title">合作伙伴负责人</div>
+          <div>李立三 07100028</div>
+          <div slot="title">联系电话</div>
+          <div>18688889999</div>
+        </mt-cell>
+      </loadmore>
     </div>
   </div>
 </template>
 
 <script type="application/javascript">
   // import api from '../api/api';
+  import loadmore from 'public/components/cus-loadmore';
   import {mapState, mapActions} from 'vuex';
   import { Toast } from 'mint-ui';
   const NameSpace = 'index';
   export default {
     name: NameSpace,
     created: () => {
-      /* api.get({
-        key: 'getList',
-        callback: function(data) {
-          console.log(data);
-        }
-      });*/
+      for (var i = 0; i < 10; i++) {
+        this.list.push(i);
+      }
     },
     data: () => {
       return {
         active: 'tab-container1',
         searchKey: false,
         searchValue: '',
-        selected: '1'
+        selected: '1',
+        allLoaded: '',
+        topStatus: '',
+        list: []
       };
     },
     computed: {
@@ -51,7 +62,34 @@
       ...mapActions(NameSpace, ['getList']),
       search() {
         Toast(this.searchValue);
+      },
+      // 顶部加载
+      loadTop() {
+        let me = this;
+        setTimeout(function() {
+          for (var i = 5; i > 0; i--) {
+            me.list.unshift(i);
+          }
+          me.$refs.load.onTopLoaded();
+        }, 1000);
+      },
+      // 底部加载
+      loadBottom() {
+        let me = this;
+        setTimeout(function() {
+          if (me.list.length < 50) {
+            for (var i = 5; i > 0; i--) {
+              me.list.push(i);
+            }
+          } else {
+            me.$refs.load.allLoaded = true;
+          }
+          me.$refs.load.onBottomLoaded();
+        }, 1000);
       }
+    },
+    components: {
+      loadmore
     }
   };
 </script>

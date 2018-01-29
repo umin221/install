@@ -1,6 +1,7 @@
 <template>
   <div>
     <mt-header fixed title="Action sheet">
+      <fallback slot="left"></fallback>
     </mt-header>
     <div style="margin-top: 100px;">
       <mt-button type="default" @click.native="sheetVisible = true">点击上拉 action sheet</mt-button>
