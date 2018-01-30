@@ -24,7 +24,7 @@
   const NameSpace = 'index';
   export default {
     name: NameSpace,
-//    created: () => {
+//    created() {
 //      api.get({
 //        key: 'getList',
 //        callback: function(data) {
