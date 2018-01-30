@@ -17,7 +17,7 @@ export default new Router({
       require(['../page/index'], resolve);
     }
   }, {
-    path: '/detail', // 测试页面
+    path: '/test', // 测试页面
     name: 'detail',
     component(resolve) {
       require(['../page/detail'], resolve);

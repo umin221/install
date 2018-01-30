@@ -1,7 +1,7 @@
-import pro from './project.js';
+import config from './config.json';
 
-let name = pro['name'];
+let name = config['name'];
 
-global['config'] = pro;
+global['config'] = config;
 global['context'] = name;
 global[name] = {};

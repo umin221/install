@@ -4,6 +4,7 @@
  * @description 工具库
  */
 import axios from 'axios';
+import {Toast} from 'mint-ui';
 
 (function(context) {
 
@@ -27,9 +28,18 @@ import axios from 'axios';
      */
     ajax(option) {
       axios(option).then((response) => {
-        option.callback(response.data);
+        option.success(response.data);
       }).catch((error) => {
-        option.callback(error);
+        if (option.error) {
+          option.error(error);
+        } else {
+          // eslint-disable-next-line
+          Toast({
+            message: '获取数据失败',
+            position: 'bottom',
+            duration: 2000
+          });
+        }
       });
     };
 

@@ -1,0 +1,20 @@
+@font-face {
+  font-family: "xSimple-icon";
+  src: url("../assets/xsimple.ttf") format("truetype");
+}
+
+.xs-icon {
+  font-family: "xSimple-icon" !important;
+  font-style: normal;
+  font-size: 1rem;
+}
+
+.icon-back:before {
+  content: '\A001';
+}
+.icon-add:before {
+  content: '\A025';
+}
+.icon-search:before {
+  content: '\A010';
+}

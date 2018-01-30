@@ -26,11 +26,10 @@
     data() {
       return {
         topStatus: '',
-        allLoaded: false,
         bottomStatus: ''
       };
     },
-		props: ['loadTop', 'loadBottom'],
+		props: ['loadTop', 'loadBottom', 'allLoaded'],
 		methods: {
       handleTopChange(status) {
         this.topStatus = status;
@@ -48,22 +47,26 @@
 	};
 </script>
 
-<style>
-  .mint-loadmore-top span {
-    display: inline-block;
-    transition: .2s linear;
-    vertical-align: middle;
-  }
-  .mint-loadmore-top span.is-rotate {
-    transform: rotate(180deg);
+<style lang="scss">
+  .mint-loadmore-top {
+    span {
+      display: inline-block;
+      transition: .2s linear;
+      vertical-align: middle;
+    }
+    span.is-rotate {
+      transform: rotate(180deg);
+    }
   }
 
-  .mint-loadmore-bottom span {
-    display: inline-block;
-    transition: .2s linear;
-    vertical-align: middle;
-  }
-  .mint-loadmore-bottom span.is-rotate {
+  .mint-loadmore-bottom {
+    span {
+      display: inline-block;
+      transition: .2s linear;
+      vertical-align: middle;
+    }
+    span.is-rotate {
       transform: rotate(180deg);
+    }
   }
 </style>

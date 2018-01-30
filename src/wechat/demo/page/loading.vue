@@ -6,7 +6,7 @@
 
     <div class="mint-content">
       <loadmore :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" ref="load">
-        <mt-cell v-for="{item, index} in list" :key="index" is-link>
+        <mt-cell class="multiple" v-for="{item, index} in list" :key="index" is-link>
           <div slot="title">合作伙伴名称</div>
           <div>恒通安装公司</div>
           <div slot="title">合作伙伴负责人</div>

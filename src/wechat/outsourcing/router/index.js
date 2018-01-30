@@ -6,19 +6,27 @@
  */
 import Vue from 'vue';
 import Router from 'vue-router';
-import Index from '../page/index';
-import Detail from '../page/detail';
 
 Vue.use(Router);
 
 export default new Router({
-  routes: [{
+  routes: [{ // 首页
     path: '/',
     name: 'index',
-    component: Index
-  }, {
+    component(resolve) {
+      require(['../page/index'], resolve);
+    }
+  }, { // 创建/编辑/查看 委外团队详情
     path: '/detail',
     name: 'detail',
-    component: Detail
+    component(resolve) {
+      require(['../page/detail'], resolve);
+    }
+  }, { // 搜索
+    path: '/search',
+    name: 'search',
+    component(resolve) {
+      require(['../page/search'], resolve);
+    }
   }]
 });

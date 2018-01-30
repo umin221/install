@@ -1,0 +1,22 @@
+{
+  "getList": {
+    "pendingList": [{
+      "id": 1,
+      "title": "恒通安装公司-pd",
+      "contact": "李立三 07100028",
+      "phone": "18688889999"
+    }],
+    "validList": [{
+      "id": 1,
+      "title": "恒通安装公司-vl",
+      "contact": "李立三 07100028",
+      "phone": "18688889999"
+    }],
+    "invalidList": [{
+      "id": 2,
+      "title": "恒通安装公司1-il",
+      "contact": "李立三 07100033",
+      "phone": "186888833"
+    }]
+  }
+}

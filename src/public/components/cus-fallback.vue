@@ -1,6 +1,6 @@
 <template>
   <div class="fallback">
-    <mt-button icon="back" @click="bind(callback)"><slot></slot></mt-button>
+    <mt-button @click="bind(callback)"><i class="xs-icon icon-back"><slot></slot></i></mt-button>
 	</div>
 
 </template>

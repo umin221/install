@@ -13,11 +13,8 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
-        value: ''
       },
       actions: {
-        getList() {
-        }
       }
     }
   }
