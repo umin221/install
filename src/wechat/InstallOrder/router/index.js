@@ -22,5 +22,11 @@ export default new Router({
     component(resolve) {
       require(['../page/detail'], resolve);
     }
+  }, {
+    path: '/xttd', // 协同页面页面
+    name: 'xttd',
+    component(resolve) {
+      require(['../page/xttd'], resolve);
+    }
   }]
 });
