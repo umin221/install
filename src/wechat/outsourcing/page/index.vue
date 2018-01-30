@@ -31,9 +31,9 @@
                      @click.native="toDetail"
                      v-for="item in pendingList"
                      is-link>
-              <div slot="title">合作伙伴名称: {{item.title}}</div>
-              <div slot="title">合作伙伴负责人: {{item.contact}}</div>
-              <div slot="title">联系电话: {{item.phone}}</div>
+              <div class="mint-cell-title" slot="title">合作伙伴名称: {{item.title}}</div>
+              <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item.contact}}</div>
+              <div class="mint-cell-sub-title" slot="title">联系电话: {{item.phone}}</div>
             </mt-cell>
           </loadmore>
         </mt-tab-container-item>
@@ -45,9 +45,9 @@
                      @click.native="toDetail"
                      v-for="item in validList"
                      is-link>
-              <div slot="title">合作伙伴名称: {{item.title}}</div>
-              <div slot="title">合作伙伴负责人: {{item.contact}}</div>
-              <div slot="title">联系电话: {{item.phone}}</div>
+              <div class="mint-cell-title" slot="title">合作伙伴名称: {{item.title}}</div>
+              <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item.contact}}</div>
+              <div class="mint-cell-sub-title" slot="title">联系电话: {{item.phone}}</div>
             </mt-cell>
           </loadmore>
         </mt-tab-container-item>
@@ -58,9 +58,9 @@
                    @click.native="toDetail"
                    v-for="item in invalidList"
                    is-link>
-            <div slot="title">合作伙伴名称: {{item.title}}</div>
-            <div slot="title">合作伙伴负责人: {{item.contact}}</div>
-            <div slot="title">联系电话: {{item.phone}}</div>
+            <div class="mint-cell-title" slot="title">合作伙伴名称: {{item.title}}</div>
+            <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item.contact}}</div>
+            <div class="mint-cell-sub-title" slot="title">联系电话: {{item.phone}}</div>
           </mt-cell>
         </mt-tab-container-item>
       </mt-tab-container>

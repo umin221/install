@@ -7,12 +7,12 @@
     <div class="mint-content">
       <loadmore :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" ref="load">
         <mt-cell class="multiple" v-for="{item, index} in list" :key="index" is-link>
-          <div slot="title">合作伙伴名称</div>
-          <div>恒通安装公司</div>
-          <div slot="title">合作伙伴负责人</div>
-          <div>李立三 07100028</div>
-          <div slot="title">联系电话</div>
-          <div>18688889999</div>
+          <div class="mint-cell-title" slot="title">合作伙伴名称</div>
+          <div class="mint-cell-sub-title">恒通安装公司</div>
+          <div class="mint-cell-sub-title" slot="title">合作伙伴负责人</div>
+          <div class="mint-cell-sub-title">李立三 07100028</div>
+          <div class="mint-cell-sub-title" slot="title">联系电话</div>
+          <div class="mint-cell-sub-title">18688889999</div>
         </mt-cell>
       </loadmore>
     </div>

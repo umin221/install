@@ -11,6 +11,17 @@
     padding: 10px;
     background-image: none;
 
+    .mint-cell-title {
+      font-size: $font-size-default;
+      color: $black-base;
+    }
+
+    .mint-cell-sub-title {
+      margin-top: .3rem;
+      font-size: $font-size-small;
+      color: $gray-minor;
+    }
+
     .mint-cell-value {
       display: block;
     }
