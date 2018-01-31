@@ -23,11 +23,11 @@
           <div slot="title" class="list-text"><span>安装数量:</span><span>500</span></div>
         </mt-cell>
       </div>
-      <!--<div style="height: 0.5rem;background: #eaeaea;"></div>
+      <div style="height: 0.5rem;background: #eaeaea;"></div>
       <div class="mint-content-info">
         <mt-cell>
         </mt-cell>
-      </div>-->
+      </div>
     </div>
   </div>
 </template>
