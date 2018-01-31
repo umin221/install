@@ -28,5 +28,11 @@ export default new Router({
     component(resolve) {
       require(['../page/xttd'], resolve);
     }
+  }, {
+    path: '/updateState', // 更新状态页面
+    name: 'updateState',
+    component(resolve) {
+      require(['../page/updateState'], resolve);
+    }
   }]
 });

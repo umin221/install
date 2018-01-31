@@ -4,22 +4,22 @@
       <fallback slot="left"></fallback>
     </mt-header>
     <div class="mint-content">
-      <!--<mt-cell title="标题文字">
-        <span>icon 是图片</span>
+      <mt-cell title="张xxx">
+        <span>销售员</span>
         <img slot="icon" src="" width="24" height="24">
       </mt-cell>
-      <mt-cell title="标题文字">
-        <span>icon 是图片</span>
-        <img slot="icon" src=" width="24" height="24">
-      </mt-cell>
-      <mt-cell title="标题文字">
-        <span>icon 是图片</span>
+      <mt-cell title="张xxx">
+        <span>门厂技术工程师</span>
         <img slot="icon" src="" width="24" height="24">
       </mt-cell>
-      <mt-cell title="标题文字">
-        <span>icon 是图片</span>
+      <mt-cell title="张xxx">
+        <span>安装主管</span>
         <img slot="icon" src="" width="24" height="24">
-      </mt-cell>-->
+      </mt-cell>
+      <mt-cell title="张xxx" is-link>
+        <span>安装工程师</span>
+        <img slot="icon" src="" width="24" height="24">
+      </mt-cell>
     </div>
   </div>
 </template>
