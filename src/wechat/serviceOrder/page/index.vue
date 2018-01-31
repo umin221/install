@@ -6,63 +6,63 @@
         <mt-button icon="more"></mt-button>
       </router-link>
     </mt-header>
-    <div class="mint-content">
+    <div class="mint-content indexService">
       <mt-navbar v-model="active">
         <mt-tab-item v-for="tab in tabList" :id="tab.id" :key="tab.id">{{tab.name}}</mt-tab-item>
       </mt-navbar>
       <mt-tab-container v-model="active" :swipeable="true">
-        <mt-tab-container-item id="tab-container1">
-          <mt-loadmore :top-method="loadTop" @top-status-change="handleTopChange" ref="loadmore">
-            <mt-cell v-for="item in list" @click.native="getList" :key="item.sevrs" is-link>
+        <mt-tab-container-item v-for="tabItem in tabList"  :id="tabItem.id">
+          <loadmore :loadTop="loadTop" ref="load">
+            <mt-cell v-for="item in list" to="serviceDetail" :key="item.sevrs" is-link>
               <div>
-                <div>{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
-                <div>{{item.date}}:{{item.dates}}</div>
-                <div>{{item.type}}:{{item.types}}</div>
-                <div style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:100%;">{{item.addr}}:{{item.addrs}}</div>
+                <div class="listContent">{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
+                <div class="listContent">{{item.date}}:{{item.dates}}</div>
+                <div class="listContent">{{item.type}}:{{item.types}}</div>
+                <div class="listContent" style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:100%;">{{item.addr}}:{{item.addrs}}</div>
               </div>
             </mt-cell>
-          </mt-loadmore>
-        </mt-tab-container-item>
-        <mt-tab-container-item id="tab-container2">
-          <mt-loadmore :top-method="loadTop" @top-status-change="handleTopChange" ref="loadmore">
-            <mt-cell v-for="item in list" @click.native="getList" :key="item.sevrs" is-link>
-                <div>{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
-                <div>{{item.date}}:{{item.dates}}</div>
-                <div>{{item.type}}:{{item.types}}</div>
-                <div style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:100%;">{{item.addr}}:{{item.addrs}}</div>
-            </mt-cell>
-          </mt-loadmore>
-        </mt-tab-container-item>
-        <mt-tab-container-item id="tab-container3">
-          <mt-loadmore :top-method="loadTop" @top-status-change="handleTopChange" ref="loadmore">
-            <mt-cell v-for="item in list" @click.native="getList" :key="item.sevrs" is-link>
-              <div>
-                <div>{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
-                <div>{{item.date}}:{{item.dates}}</div>
-                <div>{{item.type}}:{{item.types}}</div>
-                <div style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:100%;">{{item.addr}}:{{item.addrs}}</div>
-              </div>
-            </mt-cell>
-          </mt-loadmore>
+          </loadmore>
         </mt-tab-container-item>
       </mt-tab-container>
     </div>
   </div>
 </template>
+<style lang="scss">
+  @mixin disFlex (){
+    display: flex;
+    justify-content:center;
+    align-items: center;
+  }
+  .indexService{
+    .mint-tab-container{
+      .mint-tab-container-wrap{
+        .mint-tab-container-item{
+          .mint-loadmore{
+            .mint-loadmore-content{
+              .mint-cell{
+                height: 5rem;
+                border-bottom:5px solid gainsboro ;
+                @include disFlex();
+                .address{
+                  overflow: hidden;
+                  white-space: nowrap;
+                  text-overflow:ellipsis;
+                  width:80%;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+</style>
 <script type="application/javascript">
-  import api from '../api/api';
   import {mapState, mapActions} from 'vuex';
+  import loadmore from 'public/components/cus-loadmore';
   const NameSpace = 'index';
   export default {
     name: NameSpace,
-    created: () => {
-      api.get({
-        key: 'getList',
-        callback: function(data) {
-          console.log(data);
-        }
-      });
-    },
     data: () => {
       return {
         active: 'tab-container1',
@@ -87,16 +87,14 @@
     },
     methods: {
       ...mapActions(NameSpace, ['getList']),
-      handleTopChange(status) {
-        console.log(status);
-      },
-      loadTop() {
-        console.log(this);
-        this.$refs.loadmore.onTopLoaded();
-      },
-      addService() {
-        console.log(111);
+      loadTop(value) {
+        let _self = this;
+        console.log(_self);
+        _self.$refs.load[0].onTopLoaded();
       }
+    },
+    components: {
+      loadmore
     }
   };
 </script>

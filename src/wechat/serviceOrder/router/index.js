@@ -22,5 +22,11 @@ export default new Router({
     component(resolve) {
       require(['../page/addService'], resolve);
     }
+  }, {
+    path: '/serviceDetail', // 创建维修服务
+    name: 'serviceDetail',
+    component(resolve) {
+      require(['../page/serviceDetail'], resolve);
+    }
   }]
 });

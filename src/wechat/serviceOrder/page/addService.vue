@@ -32,6 +32,11 @@
     .block{
       .mint-cell-wrapper{
         display: block!important;
+        .mint-cell-value{
+          textarea{
+            resize: none;
+          }
+        }
       }
     }
     .textRight{
@@ -62,9 +67,6 @@
       }
     }
   }
-
-
-
 </style>
 <script>
   export default {
