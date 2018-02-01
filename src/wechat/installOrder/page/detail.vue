@@ -34,14 +34,14 @@
           <div slot="title" class="list-text"><span class="list-text-span">锁体部分* 真锁</span></div>
         </mt-cell>
         <div class="mint-sx-div">
-          <mt-cell title="SZ6010指纹锁"  @click.native="getList" is-link>
+          <mt-cell title="SZ6010指纹锁"  @click.native="" is-link>
             <span style="width: 120px">开向：左内开</span>
             <span>数量：200</span>
           </mt-cell>
         </div>
       </div>
       <div style="height: 0.5rem;background: #eaeaea;"></div>
-      <div class="mint-content-info">
+      <div class="mint-content-info" @click.nataive="updateState">
         <mt-cell>
         </mt-cell>
       </div>
@@ -118,6 +118,10 @@
       butXttd() {
         var self = this;
         self.$router.push('xttd');
+      },
+      updateState() {
+        var self = this;
+        self.$router.push('updateState');
       }
     }
   };
