@@ -11,7 +11,7 @@
         <mt-tab-item v-for="tab in tabList" :id="tab.id" :key="tab.id">{{tab.name}}</mt-tab-item>
       </mt-navbar>
       <mt-tab-container v-model="active" :swipeable="true">
-        <mt-tab-container-item v-for="tabItem in tabList"  :id="tabItem.id">
+        <mt-tab-container-item v-for="tabItem in tabList" :key="tabItem.id" :id="tabItem.id">
           <loadmore :loadTop="loadTop" ref="load">
             <mt-cell v-for="item in list" to="serviceDetail" :key="item.sevrs" is-link>
               <div>
