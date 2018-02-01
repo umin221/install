@@ -44,7 +44,9 @@
         </div>
       </div>
       <div class="submitButton">
-        <mt-button size="normal" type="danger" >派单</mt-button>
+        <router-link  to="dateControl" slot="right">
+          <mt-button size="normal" type="danger" >派单</mt-button>
+        </router-link>
       </div>
     </div>
   </div>
@@ -91,6 +93,8 @@
           .mint-tab-container-wrap{
             .mint-tab-container-item{
               background: white;
+              padding: 0.5rem;
+
               .mt-Detail-info{
                 div{
                   line-height: 1.5rem;
@@ -131,12 +135,21 @@
       return {
         active: 'tab-container1',
         headTitle: '维修工单详情',
+        popupVisible: false,
         tabList: [
           {name: '基础信息', id: 'tab-container1'},
           {name: '维修记录', id: 'tab-container2'},
           {name: '流程记录', id: 'tab-container3'}
         ]
       };
+    },
+    methods: {
+      clickShow() {
+        console.log(this.popupVisible);
+        this.popupVisible = true;
+      }
+    },
+    components: {
     }
   };
 </script>

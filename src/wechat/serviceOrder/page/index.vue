@@ -18,7 +18,7 @@
                 <div class="listContent">{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
                 <div class="listContent">{{item.date}}:{{item.dates}}</div>
                 <div class="listContent">{{item.type}}:{{item.types}}</div>
-                <div class="listContent" style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:100%;">{{item.addr}}:{{item.addrs}}</div>
+                <div class="listContent" style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:80%;">{{item.addr}}:{{item.addrs}}</div>
               </div>
             </mt-cell>
           </loadmore>
@@ -40,8 +40,7 @@
           .mint-loadmore{
             .mint-loadmore-content{
               .mint-cell{
-                height: 5rem;
-                border-bottom:5px solid gainsboro ;
+                height: 5rem;;
                 @include disFlex();
                 .address{
                   overflow: hidden;
