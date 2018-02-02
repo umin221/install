@@ -41,9 +41,84 @@
         </div>
       </div>
       <div style="height: 0.5rem;background: #eaeaea;"></div>
+      <div class="content-lc">
+        <div class="stage_li">
+          <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 72px;" data-scroll="8">
+            <div class="mui-scroll" style="height: 50px;">
+              <a>
+                <div class="icon">
+
+                  <span class="point mui-icon"><span></span></span>
+                  <span class="right line l_grey"></span>
+                </div>
+                <div class="name present">
+                  商机确认
+                </div>
+              </a><a>
+              <div class="icon">
+                <span class="left line l_grey"></span>
+                <span class="point mui-icon p_grey"><span></span></span>
+                <span class="right line l_grey"></span>
+              </div>
+              <div class="name grey">
+                投标阶段
+              </div>
+            </a><a>
+              <div class="icon">
+                <span class="left line l_grey"></span>
+                <span class="point mui-icon p_grey"><span></span></span>
+                <span class="right line l_grey"></span>
+              </div>
+              <div class="name grey">
+                投标阶段
+              </div>
+            </a><a>
+              <div class="icon">
+                <span class="left line l_grey"></span>
+                <span class="point mui-icon p_grey"><span></span></span>
+                <span class="right line l_grey"></span>
+              </div>
+              <div class="name grey">
+                投标阶段
+              </div>
+            </a><a>
+              <div class="icon">
+                <span class="left line l_grey"></span>
+                <span class="point mui-icon p_grey"><span></span></span>
+                <span class="right line l_grey"></span>
+              </div>
+              <div class="name grey">
+                需求调研
+              </div>
+            </a>
+              <a>
+              <div class="icon">
+                <span class="left line l_grey"></span>
+                <span class="point mui-icon p_grey"><span></span></span>
+
+              </div>
+              <div class="name grey">
+                商务谈判
+              </div>
+            </a>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="mint-content-info" @click.nataive="updateState">
-        <mt-cell>
-        </mt-cell>
+          <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
+            <ul class="content">
+              <li class="bd-radius">
+                <span class="icon"></span>
+              </li>
+              <li style="margin-right: 8px">{{item.option}}</li>
+              <div class="content-div">
+                <div>111</div>
+                <div>222</div>
+                <div>333</div>
+              </div>
+            </ul>
+          </div>
       </div>
     </div>
   </div>
@@ -84,6 +159,206 @@
     .mint-sx-div {
       margin-left: 0.5rem;
     }
+
+    /*流程*/
+    .crm-zyList {
+      overflow: hidden;
+    }
+    .crm-zyList ul {
+      padding-left: 0;
+    }
+    .crm-zyList ul li {
+      list-style: none;
+    }
+    .crm-zyList .content {
+      position: relative;
+      border-left: 1px solid #dddddd;
+      padding-bottom: 40px;
+      margin: 0 30px;
+      padding-left: 20px;
+    }
+    .crm-zyList .content .bd-radius {
+      background: #fff;
+      position: absolute;
+      left: -20px;
+      top: 0px;
+    }
+    .crm-zyList .icon{
+      border-radius: 26px;
+      background: #2485E2;
+      color: #fff;
+      padding: 3px 9px;
+      margin-left: 11px;
+      font-size: 12px;
+      top: 10px;
+    }
+    .crm-zyList .content :nth-of-type(2) {
+      font-size: 14px;
+      margin-top: 5px;
+      color: #999;
+      line-height: 27px;
+    }
+    .content-div {
+      border: 1px solid red;
+      border-radius: 5px;
+      padding: 10px;
+    }
+    /*横线滚动*/
+    .stage_li {
+      width: 100%;
+      position: relative;
+    }
+
+    .stage_li > p.title {
+      margin: 0;
+      padding: 16px 0 17px 15px;
+      color: #333;
+      font-size: 15px;
+      line-height: 15px;
+    }
+
+    .stage_li > span.bu_stage {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #d61518;
+      font-size: 14px;
+      padding-right: 15px;
+    }
+
+    .stage_li > span.bu_stage > span {
+      font-size: 12px;
+      line-height: 20px;
+      position: absolute;
+      right: 0;
+    }
+
+    .stage_li > .mui-scroll-wrapper a {
+      display: inline-block !important;
+      margin: 0 !important;
+      height: 50px;
+      width: 74px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div {
+      text-align: center;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.date {
+      font-size: 10px;
+      color: #777;
+      line-height: 10px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon {
+      height: 28px;
+      padding: 7px 0;
+      position: relative;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.point {
+      width: 14px;
+      height: 14px;
+      background: #8bc17c;
+      border-radius: 7px;
+      -webkit-border-radius: 7px;
+      -moz-border-radius: 7px;
+      font-size: 8px;
+      position: absolute;
+      left: 30px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.point > span {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #8bc17c;
+      border-radius: 6px;
+      -webkit-border-radius: 6px;
+      -moz-border-radius: 6px;
+      top: 1px;
+      left: 1px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.close {
+      background: #d61518 !important;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.close > span {
+      background: #fff;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.close > span:before {
+      content: "\A148";
+      color: #d61518;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      font-size: 8px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.finish > span:before {
+      content: "\A131";
+      color: #8bc17c;
+      position: absolute;
+      top: 2px;
+      left: 1px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.present {
+      background: #8bc17c;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.present > span {
+      background: #fff;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.p_grey {
+      background: #efefef;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.p_grey > span {
+      background: #efefef;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.l_grey {
+      background: #efefef !important;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.line {
+      position: absolute;
+      width: 30px;
+      height: 2px;
+      display: inline-block;
+      background: #8bc17c;
+      top: 13px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.left {
+      left: 0;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.right {
+      right: 0;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.name {
+      font-size: 12px;
+      color: #333;
+      line-height: 12px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.present {
+      color: #8bc17c;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.close {
+      color: #d61518;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.grey {
+      color: #cccccc;
+    }
   }
 </style>
 <script type="application/javascript">
@@ -95,8 +370,19 @@
     data: () => {
       return {
         value: '',
-        is_show_sx: true,
-        active: 'tab-container'
+        is_show_sx: false,
+        active: 'tab-container',
+        processDate: [{
+          option: '开孔锁签收'
+        }, {
+          option: '图纸签收'
+        }, {
+          option: '开孔批次'
+        }, {
+          option: '门厂发运'
+        }, {
+          option: '挂门验收'
+        }]
       };
     },
     beforeRouteEnter(to, from, next) {
