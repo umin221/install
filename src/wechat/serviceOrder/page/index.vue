@@ -2,17 +2,16 @@
   <div>
     <mt-header fixed :title="headTitle">
       <fallback slot="left"></fallback>
-      <router-link  to="addService" slot="right">
-        <mt-button icon="more"></mt-button>
-      </router-link>
+      <mt-button v-if="role === true" icon="more" slot="right" @click.native="clickAdd"></mt-button>
+      <mt-button v-else icon="search" slot="right"></mt-button>
     </mt-header>
-    <div class="mint-content indexService">
+    <div v-if="role === true" class="mint-content indexService">
       <mt-navbar v-model="active">
         <mt-tab-item v-for="tab in tabList" :id="tab.id" :key="tab.id">{{tab.name}}</mt-tab-item>
       </mt-navbar>
-      <mt-tab-container v-model="active" :swipeable="true">
-        <mt-tab-container-item v-for="tabItem in tabList" :key="tabItem.id" :id="tabItem.id">
-          <loadmore :loadTop="loadTop" ref="load">
+      <loadmore :loadTop="loadTop" ref="load">
+        <mt-tab-container v-model="active" :swipeable="true">
+          <mt-tab-container-item v-for="tabItem in tabList" :key="tabItem.id" :id="tabItem.id">
             <mt-cell v-for="item in list" to="serviceDetail" :key="item.sevrs" is-link>
               <div>
                 <div class="listContent">{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
@@ -21,9 +20,21 @@
                 <div class="listContent" style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:80%;">{{item.addr}}:{{item.addrs}}</div>
               </div>
             </mt-cell>
-          </loadmore>
-        </mt-tab-container-item>
-      </mt-tab-container>
+          </mt-tab-container-item>
+        </mt-tab-container>
+      </loadmore>
+    </div>
+    <div v-else-if="role === false" class="mint-content customService" >
+      <loadmore :loadTop="loadTop" ref="load">
+        <mt-cell v-for="item in list" :to="{path:'/serviceDetail',query:{name:name,age:age}}" :key="item.sevrs" is-link>
+          <div>
+            <div class="listContent">{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
+            <div class="listContent">{{item.date}}:{{item.dates}}</div>
+            <div class="listContent">{{item.type}}:{{item.types}}</div>
+            <div class="listContent" style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:80%;">{{item.addr}}:{{item.addrs}}</div>
+          </div>
+        </mt-cell>
+      </loadmore>
     </div>
   </div>
 </template>
@@ -40,7 +51,7 @@
           .mint-loadmore{
             .mint-loadmore-content{
               .mint-cell{
-                height: 5rem;;
+                height: 4rem;
                 @include disFlex();
                 .address{
                   overflow: hidden;
@@ -64,6 +75,9 @@
     name: NameSpace,
     data: () => {
       return {
+        name: '名字',
+        age: 11,
+        role: true,
         active: 'tab-container1',
         headTitle: '维修工单列表',
         tabList: [
@@ -89,7 +103,10 @@
       loadTop(value) {
         let _self = this;
         console.log(_self);
-        _self.$refs.load[0].onTopLoaded();
+        _self.$refs.load.onTopLoaded();
+      },
+      clickAdd() {
+        this.$router.push({path: '/addService'});
       }
     },
     components: {

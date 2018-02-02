@@ -197,9 +197,7 @@
           if (nothave) {
             this.isXiu.push(false);
           }
-
         }
-
       },
       returnNow() {
         this.daysUL = [];
@@ -210,7 +208,7 @@
         this.selectIndex = index;
         this.isSelected = [];
         this.params.selectDay = this.formatDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
-        console.log(this);
+        console.log(this.params);
         for (let i = 0; i < 42; i++) {
           if (index === i) {
             this.isSelected.push(true);
@@ -265,7 +263,6 @@
     width:2.7rem;
     list-style-type:none;
     text-align: center;
-    margin-top: 5px;
     line-height:  2rem;
     cursor:pointer;
   }
@@ -281,7 +278,6 @@
     width:2.7rem;
     list-style-type:none;
     text-align: center;
-    margin-top: 5px;
     line-height:  2rem;
     cursor:pointer;
   }
