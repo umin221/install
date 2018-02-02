@@ -46,7 +46,7 @@
           <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 72px;">
             <div class="mui-scroll" style="height: 65px;overflow: -webkit-paged-x;">
               <a>
-                <div class="icon">
+                <div class="icon" @click="updateState">
 
                   <span class="point mui-icon"><span></span></span>
                   <span class="right line l_grey"></span>
@@ -105,20 +105,20 @@
           </div>
         </div>
       </div>
-      <div class="mint-content-info" @click.nataive="updateState">
-          <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
-            <ul class="content">
-              <li class="bd-radius">
-                <span class="icon"></span>
-              </li>
-              <li style="margin-right: 8px">{{item.option}}</li>
-              <div class="content-div">
-                <div>111</div>
-                <div>222</div>
-                <div>333</div>
-              </div>
-            </ul>
-          </div>
+      <div class="mint-content-info">
+        <div class="crm-zyList" v-for="(item, index) in processDate" :key="index" @click.nataive="routerPage(index)">
+          <ul class="content">
+            <li class="bd-radius">
+              <span class="icon"></span>
+            </li>
+            <li style="margin-right: 8px">{{item.option}}</li>
+            <div class="content-div">
+              <div>111</div>
+              <div>222</div>
+              <div>333</div>
+            </div>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -408,6 +408,14 @@
       updateState() {
         var self = this;
         self.$router.push('updateState');
+      },
+      routerPage(index) {
+        var self = this;
+        if (index === 0) {
+          self.$router.push('sign');
+        } else {
+          self.$router.push('batch');
+        }
       }
     }
   };
