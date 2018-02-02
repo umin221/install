@@ -43,8 +43,8 @@
       <div style="height: 0.5rem;background: #eaeaea;"></div>
       <div class="content-lc">
         <div class="stage_li">
-          <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 72px;" data-scroll="8">
-            <div class="mui-scroll" style="height: 50px;">
+          <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 72px;">
+            <div class="mui-scroll" style="height: 65px;overflow: -webkit-paged-x;">
               <a>
                 <div class="icon">
 

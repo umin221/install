@@ -34,5 +34,23 @@ export default new Router({
     component(resolve) {
       require(['../page/updateState'], resolve);
     }
+  }, {
+    path: '/sign', // 签收页面
+    name: 'sign',
+    component(resolve) {
+      require(['../page/sign'], resolve);
+    }
+  }, {
+    path: '/batch', // 批次页面
+    name: 'batch',
+    component(resolve) {
+      require(['../page/batch'], resolve);
+    }
+  }, {
+    path: '/journal', // 日志页面
+    name: 'journal',
+    component(resolve) {
+      require(['../page/journal'], resolve);
+    }
   }]
 });

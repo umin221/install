@@ -1,19 +1,23 @@
 <template>
   <div>
-    <mt-header fixed title="状态更新">
+    <mt-header fixed title="titleVal">
       <fallback slot="left"></fallback>
     </mt-header>
-    <div class="mint-content updateState">
-      <mt-cell>
-        <div slot="title" class="list-text"><span style="color:red">*</span>关闭原因</div>
+    <div class="mint-content sign">
+      <mt-cell is-link >
+        <div slot="title" class="list-text"><span style="color:red">*</span>是否涉及开孔锁签收<input placeholder="是"/></div>
       </mt-cell>
-      <mt-field label="" placeholder="请输入关闭原因" type="textarea" rows="8"></mt-field>
+      <mt-field label="签收数量" placeholder="1" type="number"></mt-field>
+      <mt-field label="备注说明"  type="textarea" rows="4"></mt-field>
+      <mt-cell>
+        <div slot="title" class="list-text"><span style="color:red">*</span>附件：签收单据归档</div>
+      </mt-cell>
       <div class="button-cla"><mt-button type="primary" @click.native="handleClick()">提交</mt-button></div>
     </div>
   </div>
 </template>
 <style lang="scss">
-  .updateState {
+  .sign {
     .mint-cell-value textarea{
       border: 1px solid #d9d9d9;
       border-radius: 0.1rem;
@@ -29,6 +33,9 @@
       padding: 0 12px;
       width: 5rem;
     }
+    input {
+      text-align: right!important;
+    }
   }
 </style>
 <script type="application/javascript">
@@ -36,10 +43,13 @@
     name: 'detail',
     created: () => {
       console.dir(1);
+      var self = this;
+      self.titleVal = '开孔锁签收';
     },
     data: () => {
       return {
         value: '',
+        titleVal: '开孔锁签收',
         active: 'tab-container'
       };
     },
@@ -54,9 +64,6 @@
       butXttd() {
         var self = this;
         self.$router.go('/xttd');
-      },
-      handleClick() {
-        history.go(-1);
       }
     }
   };
