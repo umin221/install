@@ -13,7 +13,7 @@
         <mt-tab-container v-model="active" :swipeable="true">
           <mt-tab-container-item v-for="tabItem in tabList" :key="tabItem.id" :id="tabItem.id">
             <mt-cell v-for="item in list" to="serviceDetail" :key="item.sevrs" is-link>
-              <div>
+              <div style="line-height:1rem;height:4rem;">
                 <div class="listContent">{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
                 <div class="listContent">{{item.date}}:{{item.dates}}</div>
                 <div class="listContent">{{item.type}}:{{item.types}}</div>

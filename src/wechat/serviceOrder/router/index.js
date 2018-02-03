@@ -29,10 +29,16 @@ export default new Router({
       require(['../page/serviceDetail'], resolve);
     }
   }, {
-    path: '/dateControl', // 创建维修服务
+    path: '/dateControl',
     name: 'dateControl',
     component(resolve) {
       require(['../page/dateControl'], resolve);
+    }
+  }, {
+    path: '/add',
+    name: 'add',
+    component(resolve) {
+      require(['../page/add'], resolve);
     }
   }]
 });
