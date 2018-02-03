@@ -106,13 +106,13 @@
         </div>
       </div>
       <div class="mint-content-info">
-        <div class="crm-zyList" v-for="(item, index) in processDate" :key="index" @click.nataive="routerPage(index)">
+        <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
           <ul class="content">
-            <li class="bd-radius">
+            <li class="bd-radius"  @click.nataive="routerPage(index)">
               <span class="icon"></span>
             </li>
             <li style="margin-right: 8px">{{item.option}}</li>
-            <div class="content-div">
+            <div class="content-div"  @click.nataive="sporadic(index)">
               <div>111</div>
               <div>222</div>
               <div>333</div>
@@ -415,6 +415,13 @@
           self.$router.push('sign');
         } else {
           self.$router.push('batch');
+        }
+      },
+      sporadic(index) {
+        var self = this;
+        if (index === 0) {
+        } else {
+          self.$router.push('sporadic');
         }
       }
     }

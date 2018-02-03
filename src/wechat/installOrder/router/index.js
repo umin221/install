@@ -52,5 +52,23 @@ export default new Router({
     component(resolve) {
       require(['../page/journal'], resolve);
     }
+  }, {
+    path: '/sporadic', // 零星真锁安装页面
+    name: 'sporadic',
+    component(resolve) {
+      require(['../page/sporadic'], resolve);
+    }
+  }, {
+    path: '/scanCode', // 零星真锁安装扫码页面
+    name: 'scanCode',
+    component(resolve) {
+      require(['../page/scanCode'], resolve);
+    }
+  }, {
+    path: '/zsBatch', // 真锁安装新增页面
+    name: 'zsBatch',
+    component(resolve) {
+      require(['../page/zsBatch'], resolve);
+    }
   }]
 });

@@ -3,21 +3,24 @@
     <mt-header fixed :title="titleVal">
       <fallback slot="left"></fallback>
     </mt-header>
-    <div class="mint-content sign">
+    <div class="mint-content scanCode">
       <mt-cell is-link >
-        <div slot="title" class="list-text"><span style="color:red">*</span>是否涉及开孔锁签收<input placeholder="是"/></div>
+        <div slot="title" class="list-text"><span style="color:red">*</span>省市区</div>
       </mt-cell>
-      <mt-field label="签收数量" placeholder="1" type="number"></mt-field>
-      <mt-field label="备注说明"  type="textarea" rows="4"></mt-field>
+      <mt-cell title="安装详细地址"></mt-cell>
+      <mt-field label=""  type="textarea" rows="4"></mt-field>
       <mt-cell>
-        <div slot="title" class="list-text"><span style="color:red">*</span>附件：签收单据归档</div>
+        <div slot="title" class="list-text"><span style="color:red">*</span>产品条形码</div>
+      </mt-cell>
+      <mt-cell is-link >
+        <div slot="title" class="list-text"><span style="color:red">*</span>产品型号</div>
       </mt-cell>
       <div class="button-cla"><mt-button type="primary" @click.native="handleClick()">提交</mt-button></div>
     </div>
   </div>
 </template>
 <style lang="scss">
-  .sign {
+  .scanCode {
     .mint-cell-value textarea{
       border: 1px solid #d9d9d9;
       border-radius: 0.1rem;
@@ -47,7 +50,7 @@
     data: () => {
       return {
         value: '',
-        titleVal: '开孔锁签收',
+        titleVal: '扫码录入',
         active: 'tab-container'
       };
     },
@@ -61,7 +64,7 @@
     methods: {
       butXttd() {
         var self = this;
-        self.$router.go('/xttd');
+        self.$router.push('scanCode');
       }
     }
   };

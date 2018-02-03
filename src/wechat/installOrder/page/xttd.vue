@@ -47,7 +47,7 @@
     methods: {
       butXttd() {
         var self = this;
-        self.$router.go('/xttd');
+        self.$router.push('');
       }
     }
   };

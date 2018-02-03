@@ -1,6 +1,6 @@
 <template>
   <div>
-    <mt-header fixed title="titleVal">
+    <mt-header fixed :title="titleVal">
       <fallback slot="left"></fallback>
     </mt-header>
     <div class="mint-content batch">
