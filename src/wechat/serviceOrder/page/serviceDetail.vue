@@ -3,7 +3,10 @@
     <div class="continer">
       <mt-header fixed :title="headTitle">
         <fallback slot="left"></fallback>
+        <mt-button slot="right" @click.native="openConfirm">关闭</mt-button>
       </mt-header>
+
+
       <div class="mint-content service-detail">
         <div class="detail-title">
           <div class="mt-Detail-title">产品编号：ST101721213<span class="user-state">用户已提交</span></div>
@@ -38,59 +41,86 @@
               </div>
             </mt-tab-container-item>
             <mt-tab-container-item id="tab-container3">
-              <mt-cell v-for="n in 6" :key="n" :title="'选项 ' + n" />
+                <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
+                  <ul class="content">
+                    <li class="bd-radius">
+                      <span class="icon"></span>
+                    </li>
+                    <li style="margin-right: 8px">{{item.option}}</li>
+                    <div class="content-div">
+                      <div>2018-2-1 20:00</div>
+                    </div>
+                  </ul>
+                </div>
             </mt-tab-container-item>
           </mt-tab-container>
         </div>
       </div>
       <div class="submitButton">
-          <mt-button size="normal" @click.native="clickShow" type="danger" >派单</mt-button>
+        <mt-button v-if="role" v-show="!isCall" size="normal" @click.native="changeBtnStote" type="danger" >电话联系客户</mt-button>
+        <mt-button v-else size="normal" type="danger" >派单</mt-button>
+        <div class="callPlan" v-if="isCall">
+          <mt-button size="normal" type="default" @click.native="callSolve" >电话已解决</mt-button>
+          <mt-button size="normal" @click.native="clickShow" type="danger" >预约维修计划</mt-button>
+        </div>
       </div>
       <!--弹出日历-->
+      <add :showBox1="showBox" @my-enter="boxEnter" @my-close="boxClose" :options1="option"></add>
 
 
-
-      <mt-popup v-model="popupVisible4" position="bottom" class="mint-popup-4">
+      <mt-popup v-model="popupVisible4" position="bottom" popup-transition="popup-fade" class="mint-popup-4">
+        <!--头部按钮-->
         <div class="alertDate">
           <div class="headerButton">
-            <div class="cancelBtn">取消</div>
+            <div class="cancelBtn" @click="cancle">取消</div>
             <div class="enterBtn">确认</div>
           </div>
+
+          <!--选择年月和日期-->
           <div class="dateContent">
             <div class="month">
-              <i class="el-icon-left" @click="pickPre(currentYear,currentMonth)"><</i>
+              <i class="el-icon-left" v-show="leftBunHide" @click="pickPre(currentYear,currentMonth)"><</i>
               <span>{{ currentYear }} 年 {{ currentMonth }} 月</span>
               <i class="el-icon-right" @click="pickNext(currentYear,currentMonth)">></i>
             </div>
             <!-- 日期 -->
             <div class="bodyDiv">
               <ul class="weekdays">
-                <li>一</li>
-                <li>二</li>
-                <li>三</li>
-                <li>四</li>
-                <li>五</li>
-                <li style="color:#0A0A0A">六</li>
-                <li style="color:#0A0A0A">日</li>
+                <li>周一</li>
+                <li>周二</li>
+                <li>周三</li>
+                <li>周四</li>
+                <li>周五</li>
+                <li style="color:darkred">周六</li>
+                <li style="color:darkred">周日</li>
               </ul>
-              <mt-swipe :auto="0" :show-indicators="false">
-                <mt-swipe-item class="days" v-for="(value,index1) in daysUL">
-                  <li @click="pick(day,index+index1*7)" v-for="(day, index) in value" :class="[{'ban':isBan[index+index1*7]},{'xiu':isXiu[index+index1*7]}]" >
-                    <!--本月-->
-                    <span v-if="day.getMonth()+1 != currentMonth" class="other-month" :class="{'selected':isSelected[index+index1*7]}">{{ day.getDate() }}</span>
-                    <span v-else :class="{'selected':isSelected[index+index1*7]}">
-                    <!--今天-->
-                    <span v-if="day.getFullYear() == new Date().getFullYear() && day.getMonth() == new Date().getMonth() && day.getDate() == new Date().getDate()" class="active">{{ day.getDate() }}</span>
-                    <span v-else>{{ day.getDate() }}</span>
-                    </span>
-                  </li>
+              <mt-swipe :auto="0" :show-indicators="false" :speed="50" :continuous="false">
+                <mt-swipe-item class="days" v-for="(value,index1) in daysUL" :key="index1">
+                  <ul>
+                    <li  v-for="(day, index) in value" :key="index" @click="pick(day,index+index1*7)">
+                      <!--本月-->
+                      <span v-if="day.getMonth()+1 != currentMonth" class="other-month" :class="{'selected':isSelected[index+index1*7]}">{{ day.getDate() }}</span>
+                      <span v-else :class="{'selected':isSelected[index+index1*7]}">
+                      <!--今天-->
+                      <span v-if="day.getFullYear() == new Date().getFullYear() && day.getMonth() == new Date().getMonth() && day.getDate() == new Date().getDate()" class="active">{{ day.getDate() }}</span>
+                      <span v-else>{{ day.getDate() }}</span>
+                      </span>
+                    </li>
+                  </ul>
                 </mt-swipe-item>
               </mt-swipe>
             </div>
           </div>
+          <!--选择时间-->
+          <div class="timeTable">
+            <table>
+              <tr v-for="(Am, index1) in am" :key="index1">
+                <td v-for="(time, index) in Am.time" :key="index" @click="selectedTime(index+index1*8)" :class="{'selectedT':isTimeSelected[index+index1*8]}">{{time}}</td>
+              </tr>
+            </table>
+          </div>
         </div>
       </mt-popup>
-
     </div>
   </div>
 </template>
@@ -141,6 +171,48 @@
             .mint-tab-container-item{
               background: white;
               padding: 0.5rem;
+              .crm-zyList {
+                overflow: hidden;
+              }
+              .crm-zyList ul {
+                padding-left: 0;
+              }
+              .crm-zyList ul li {
+                list-style: none;
+              }
+              .crm-zyList .content {
+                position: relative;
+                border-left: 1px solid #dddddd;
+                padding-bottom: 10px;
+                margin: 0 30px;
+                padding-left: 20px;
+              }
+              .crm-zyList .content .bd-radius {
+                background: #fff;
+                position: absolute;
+                left: -20px;
+                top: 0px;
+              }
+              .crm-zyList .icon{
+                border-radius: 26px;
+                background: #2485E2;
+                color: #fff;
+                padding: 1px 9px;
+                margin-left: 11px;
+                font-size: 12px;
+                top: 10px;
+              }
+              .crm-zyList .content :nth-of-type(2) {
+                font-size: 14px;
+                margin-top: 5px;
+                color: #999;
+                line-height: 27px;
+              }
+              .content-div {
+                border-radius: 5px;
+                padding: 10px;
+                font-size: 0.15rem;
+              }
 
               .mt-Detail-info{
                 div{
@@ -160,20 +232,25 @@
         }
       }
     }
+
     /*底部按钮*/
     .submitButton {
       @include disFlex();
-      position: absolute;
-      bottom: 1rem;
+      position: fixed;
+      bottom: 0;
       width: 100%;
+      height: 3rem;
+      background: white;
+      line-height: 3rem;
+      opacity: 0.7;
       button {
-        width: 200px;
+        width: 7rem;
         border-radius: 1rem;
       }
     }
     .mint-popup-4{
       width: 100%;
-      height: 20rem;
+      height: 22rem;
       background: white;
       .alertDate{
         width: 100%;
@@ -229,17 +306,54 @@
             height: 2rem !important;
             .mint-swipe-items-wrap{
               .days{
-                display: flex;
-                width: 100%;
-                li{
-                  flex: 1;
-                  font-size: 0.7rem;
-                  width:2.7rem;
-                  list-style-type:none;
-                  text-align: center;
-                  line-height:  2rem;
-                  cursor:pointer;
+                ul{
+                  display: flex;
+                  li{
+                    flex: 1;
+                    font-size: 0.7rem;
+                    width:2.7rem;
+                    list-style-type:none;
+                    text-align: center;
+                    line-height:  2rem;
+                    cursor:pointer;
+                    .other-month {
+                      color: #EEC591;
+                    }
+                    .active {
+                      display: inline-block;
+                      width: 2rem;
+                      height: 2rem;
+                      color: #fff;
+                      background-color: #324057;
+                    }
+                    .selected{
+                      display: inline-block;
+                      width: 2rem;
+                      height: 2rem;
+                      color: #fff;
+                      background-color: #1E90FF!important;
+                    }
+                  }
                 }
+              }
+            }
+          }
+        }
+        .timeTable{
+          background: gainsboro;
+          table{
+            width: 100%;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            background: white;
+            tr{
+              td{
+                width: 12.5%;
+                height: 2rem;
+                text-align: center;
+              }
+              .selectedT{
+                background: gainsboro;
               }
             }
           }
@@ -249,21 +363,38 @@
   }
 </style>
 <script>
+  import add from './add';
+  import { MessageBox } from 'mint-ui';
   export default {
     name: 'serviceDetail',
     created() {
-      console.log(this);
     },
     data: () => {
       return {
         active: 'tab-container1',
         headTitle: '维修工单详情',
         popupVisible4: false,
+        role: true,
+        isCall: false,
+        showBox: false,
         tabList: [
           {name: '基础信息', id: 'tab-container1'},
           {name: '维修记录', id: 'tab-container2'},
           {name: '流程记录', id: 'tab-container3'}
         ],
+        option: ['客户不接受维修报价', '已自行解决', '暂不影响使用', '其他'],
+        leftBunHide: false,
+        processDate: [{
+          option: '预约已受理，等待安装师傅预约安装。如有疑问请咨询【0755-88880000】'
+        }, {
+          option: 'xxx已提交预约申请'
+        }, {
+          option: 'xxx已提交预约申请'
+        }, {
+          option: 'xxx已提交预约申请'
+        }, {
+          option: 'xxx已提交预约申请'
+        }],
         currentYear: 1970,   // 年份
         currentMonth: 1,  // 月份
         currentDay: 1,    // 日期
@@ -276,39 +407,77 @@
           type: ''
         },
         isSelected: [],
-        isBan: [],
-        isXiu: [],
-        restDays: {
-          year: '',
-          month: '',
-          day: '',
-          resttype: '',
-          restdate: ''
-        },
-        restDaysList: [],
         banList: [],
         xiuList: [],
-        selectIndex: ''
+        selectIndex: '',
+        initAm: '00:00',
+        am: [],
+        isTimeSelected: []
       };
     },
     methods: {
-      clickShow() {
-        this.popupVisible4 = true;
-        this.initData(null);
+      boxClose(msg) {               // 关闭取消事件
+        this.showBox = false;
+        console.log(msg);
       },
-      pickPre(year, month) {
-        this.daysUL = [];
-        this.isSelected = [];
-        const d = new Date(this.formatDate(year, month, 1));
+      boxEnter(msg) {               // 关闭确认
+        this.showBox = false;
+        console.log(msg);
+      },
+      openConfirm() {               // 点击关闭弹出层
+        let self = this;
+        self.showBox = true;
+      },
+      changeBtnStote() {            // 改变按钮状态
+        let self = this;
+        self.isCall = true;
+      },
+      clickShow() {                 // 点击显示日历
+        let self = this;
+        self.popupVisible4 = true;
+        self.initData(null);
+        self.initTableTime();
+      },
+      cancle() {                    // 日历取消事件
+        this.popupVisible4 = false;
+      },
+      pickPre(year, month) {        // 点击切换上个月
+        let self = this;
+        let mon = new Date().getMonth() + 1;
+        let myYear = new Date().getFullYear();
+        self.daysUL = [];
+        self.isSelected = [];
+        const d = new Date(self.formatDate(year, month, 1));
         d.setDate(0);
-        this.initData(this.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
+        self.initData(self.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
+        if (mon === self.currentMonth && myYear === self.currentYear) {
+          self.leftBunHide = false;
+        }
       },
-      pickNext(year, month) {
-        this.daysUL = [];
-        this.isSelected = [];
-        const d = new Date(this.formatDate(year, month, 1));
+      pickNext(year, month) {     // 点击切换下个月
+        let self = this;
+        let myMon = new Date().getMonth() + 1;
+        self.daysUL = [];
+        self.isSelected = [];
+        const d = new Date(self.formatDate(year, month, 1));
         d.setDate(42);
-        this.initData(this.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
+        self.initData(self.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
+        if (myMon !== self.currentMonth) {
+          self.leftBunHide = true;
+        }
+      },
+      pick(date, index) {             // 选择日期
+        this.selectIndex = index;
+        this.isSelected = [];
+        this.params.selectDay = this.formatDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
+        console.log(this.params);
+        for (let i = 0; i < 42; i++) {
+          if (index === i) {
+            this.isSelected.push(true);
+            continue;
+          }
+          this.isSelected.push(false);
+        }
       },
       formatDate(year, month, day) {
         const y = year;
@@ -318,8 +487,7 @@
         if (d < 10) d = `0${d}`;
         return `${y}-${m}-${d}`;
       },
-
-      initData(cur) {
+      initData(cur) {            // 日历初始化
         let date = '';
         if (cur) {
           date = new Date(cur);
@@ -332,7 +500,6 @@
         this.currentWeek = date.getDay();
         date.setDate(1);
         this.firstWeek = date.getDay();
-
         if (this.firstWeek === 0) {
           this.firstWeek = 7;
         }
@@ -359,9 +526,53 @@
             this.days = [];
           }
         }
+      },
+      initTableTime() {             // 时间表格初始化
+        if (this.am.length === 0) {
+          let arr = [];
+          let time = '';
+          let obj = {};
+          for (let i = 0;i < 6; i++) {
+            for (let i = 0;i <= 7;i++) {
+              time = this.changeTime(this.initAm);
+              arr.push(time);
+              this.initAm = time;
+            }
+            this.initAm = time;
+            obj = {time: arr};
+            this.am.push(obj);
+            obj = {};
+            arr = [];
+          }
+        }
+      },
+      changeTime(value) {
+        let x = '2010-09-28 ' + value;
+        let time = new Date(x.replace('-', '/'));
+        const b = 30;
+        time.setMinutes(time.getMinutes() + b, time.getSeconds(), 0);
+        time = time.toString().split(' ')[4].slice(0, 5);
+        return time;
+      },
+      selectedTime(index) {             // 选择时间
+        let self = this;
+        self.isTimeSelected = [];
+        for (let i = 0; i < 48; i++) {
+          if (index === i) {
+            self.isTimeSelected.push(true);
+            continue;
+          }
+          self.isTimeSelected.push(false);
+        }
+      },
+      callSolve() {
+        MessageBox.confirm('远程电话沟通客户已解决，确认提交？?', '').then(action => {
+          console.log(1111);
+        });
       }
     },
     components: {
+      add
     }
   };
 </script>
