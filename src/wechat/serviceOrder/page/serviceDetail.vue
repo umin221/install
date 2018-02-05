@@ -6,7 +6,6 @@
         <mt-button slot="right" @click.native="openConfirm">关闭</mt-button>
       </mt-header>
 
-
       <div class="mint-content service-detail">
         <div class="detail-title">
           <div class="mt-Detail-title">产品编号：ST101721213<span class="user-state">用户已提交</span></div>
@@ -388,12 +387,6 @@
           option: '预约已受理，等待安装师傅预约安装。如有疑问请咨询【0755-88880000】'
         }, {
           option: 'xxx已提交预约申请'
-        }, {
-          option: 'xxx已提交预约申请'
-        }, {
-          option: 'xxx已提交预约申请'
-        }, {
-          option: 'xxx已提交预约申请'
         }],
         currentYear: 1970,   // 年份
         currentMonth: 1,  // 月份
@@ -407,8 +400,6 @@
           type: ''
         },
         isSelected: [],
-        banList: [],
-        xiuList: [],
         selectIndex: '',
         initAm: '00:00',
         am: [],
@@ -435,8 +426,13 @@
       clickShow() {                 // 点击显示日历
         let self = this;
         self.popupVisible4 = true;
-        self.initData(null);
-        self.initTableTime();
+        console.log();
+        if (self.daysUL.length === 0) {
+          self.initData(null);
+        }
+        if (this.am.length === 0) {
+          self.initTableTime();
+        }
       },
       cancle() {                    // 日历取消事件
         this.popupVisible4 = false;
@@ -505,8 +501,6 @@
         }
         const str = this.formatDate(this.currentYear, this.currentMonth, 1);
         this.days.length = 0;
-
-        // 今天是周日，放在第一行第7个位置，前面6个 这里默认显示一周，如果需要显示一个月，则第二个循环为 i<= 42- this.firstWeek
         for (let i = this.firstWeek - 1; i >= 0; i -= 1) {
           const d = new Date(str);
           d.setDate(d.getDate() - i);
@@ -528,22 +522,20 @@
         }
       },
       initTableTime() {             // 时间表格初始化
-        if (this.am.length === 0) {
-          let arr = [];
-          let time = '';
-          let obj = {};
-          for (let i = 0;i < 6; i++) {
-            for (let i = 0;i <= 7;i++) {
-              time = this.changeTime(this.initAm);
-              arr.push(time);
-              this.initAm = time;
-            }
+        let arr = [];
+        let time = '';
+        let obj = {};
+        for (let i = 0;i < 6; i++) {
+          for (let i = 0;i <= 7;i++) {
+            time = this.changeTime(this.initAm);
+            arr.push(time);
             this.initAm = time;
-            obj = {time: arr};
-            this.am.push(obj);
-            obj = {};
-            arr = [];
           }
+          this.initAm = time;
+          obj = {time: arr};
+          this.am.push(obj);
+          obj = {};
+          arr = [];
         }
       },
       changeTime(value) {
