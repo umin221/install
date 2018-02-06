@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="continer">
+    <div class="service-continer">
       <mt-header fixed :title="headTitle">
         <fallback slot="left"></fallback>
         <mt-button slot="right" @click.native="openConfirm">关闭</mt-button>
@@ -55,24 +55,26 @@
           </mt-tab-container>
         </div>
       </div>
-      <div class="submitButton">
-        <mt-button v-if="role" v-show="!isCall" size="normal" @click.native="changeBtnStote" type="danger" >电话联系客户</mt-button>
-        <mt-button v-else size="normal" type="danger" >派单</mt-button>
-        <div class="callPlan" v-if="isCall">
+      <div v-if="!role" class="submitButton">
+        <mt-button size="normal" type="danger" >派单</mt-button>
+      </div>
+      <div v-else-if="role" class="submitButton">
+        <mt-button v-if="isCall === 'lxkh'"  size="normal" @click.native="changeBtnStote" type="danger" >电话联系客户</mt-button>
+        <div v-else-if="isCall === 'yyjh'" class="callPlan">
           <mt-button size="normal" type="default" @click.native="callSolve" >电话已解决</mt-button>
           <mt-button size="normal" @click.native="clickShow" type="danger" >预约维修计划</mt-button>
         </div>
+        <mt-button v-if="isCall === 'gdcz'"  size="normal" @click="popupVisible1 = !popupVisible1" type="danger" >工单操作</mt-button>
       </div>
       <!--弹出日历-->
-      <add :showBox1="showBox" @my-enter="boxEnter" @my-close="boxClose" :options1="option"></add>
+      <close :showBox1="showBox" @my-enter="boxEnter" @my-close="boxClose" :options1="option"></close>
 
-
-      <mt-popup v-model="popupVisible4" position="bottom" popup-transition="popup-fade" class="mint-popup-4">
+      <mt-popup v-model="popupVisible" position="bottom" popup-transition="popup-fade" class="mint-popup-1">
         <!--头部按钮-->
         <div class="alertDate">
           <div class="headerButton">
-            <div class="cancelBtn" @click="cancle">取消</div>
-            <div class="enterBtn">确认</div>
+            <div class="cancelBtn" @click="popupVisible = !popupVisible">取消</div>
+            <div class="enterBtn" @click="enter">确认</div>
           </div>
 
           <!--选择年月和日期-->
@@ -120,249 +122,19 @@
           </div>
         </div>
       </mt-popup>
+
+      <!--工单操作-->
+      <mt-popup v-model="popupVisible1" position="bottom" popup-transition="popup-fade" class="mint-popup-2">
+        <mt-cell v-for="(item, index) in HandleList" :title="item.name" :key="index">
+          <mt-button @enter="clickPosition">{{item.key}}</mt-button>
+        </mt-cell>
+        <div class="cancelHandle" @click="popupVisible1 = !popupVisible1">取消</div>
+      </mt-popup>
     </div>
   </div>
 </template>
-<style lang="scss">
-  *{
-    margin: 0;
-    padding: 0;
-  }
-  @mixin disFlex (){
-    display: flex;
-    justify-content:center;
-    align-items: center;
-  }
-  @mixin remove-decoration (){
-    text-decoration: none;
-    color: lightblue;
-  }
-  .continer{
-    position: relative;
-    height:100%;
-    .service-detail{
-      background: #F2F2F2;
-      .detail-title{
-        position: relative;
-        padding: 0.5rem;
-        height: 6rem;
-        font-size: 0.7rem;
-        background: white;
-        .mt-Detail-title{
-          line-height: 1.5rem;
-          .user-state{
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            color: red;
-          }
-          .detail-call{
-            @include remove-decoration();
-          }
-        }
-      }
-      .detail-content{
-        position: relative;
-        margin-top: 0.5rem;
-        font-size: 0.7rem;
-        .mint-tab-container{
-          .mint-tab-container-wrap{
-            .mint-tab-container-item{
-              background: white;
-              padding: 0.5rem;
-              .crm-zyList {
-                overflow: hidden;
-              }
-              .crm-zyList ul {
-                padding-left: 0;
-              }
-              .crm-zyList ul li {
-                list-style: none;
-              }
-              .crm-zyList .content {
-                position: relative;
-                border-left: 1px solid #dddddd;
-                padding-bottom: 10px;
-                margin: 0 30px;
-                padding-left: 20px;
-              }
-              .crm-zyList .content .bd-radius {
-                background: #fff;
-                position: absolute;
-                left: -20px;
-                top: 0px;
-              }
-              .crm-zyList .icon{
-                border-radius: 26px;
-                background: #2485E2;
-                color: #fff;
-                padding: 1px 9px;
-                margin-left: 11px;
-                font-size: 12px;
-                top: 10px;
-              }
-              .crm-zyList .content :nth-of-type(2) {
-                font-size: 14px;
-                margin-top: 5px;
-                color: #999;
-                line-height: 27px;
-              }
-              .content-div {
-                border-radius: 5px;
-                padding: 10px;
-                font-size: 0.15rem;
-              }
-
-              .mt-Detail-info{
-                div{
-                  line-height: 1.5rem;
-                  .detail-call{
-                    @include remove-decoration();
-                  }
-                }
-              }
-              .service-record{
-                height: 5rem;
-                line-height: 5rem;
-                text-align: center;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    /*底部按钮*/
-    .submitButton {
-      @include disFlex();
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      height: 3rem;
-      background: white;
-      line-height: 3rem;
-      opacity: 0.7;
-      button {
-        width: 7rem;
-        border-radius: 1rem;
-      }
-    }
-    .mint-popup-4{
-      width: 100%;
-      height: 22rem;
-      background: white;
-      .alertDate{
-        width: 100%;
-        .headerButton{
-          height: 2rem;
-          line-height: 2rem;
-          border-bottom: 1px solid gainsboro;
-          div{
-            color: darkred;
-            font-size: 0.7rem;
-          }
-          .cancelBtn{
-            float: left;
-            margin-left: 0.5rem;
-          }
-          .enterBtn{
-            float: right;
-            margin-right: 0.5rem;
-          }
-        }
-        .dateContent{
-          height: 6rem;
-          border-bottom: 1px solid gainsboro;
-          .month{
-            text-align: center;
-            line-height: 2rem;
-            font-size: 0.7rem;
-            i{
-              font: 500 1.2rem sans-serif;
-              color: #888;
-            }
-            .el-icon-left{
-              float: left;
-            }
-            .el-icon-right{
-              float: right;
-            }
-          }
-          .bodyDiv
-            .weekdays{
-              display: flex;
-              li{
-                flex: 1;
-                font-size: 0.7rem;
-                width:2.7rem;
-                list-style-type:none;
-                text-align: center;
-                line-height:  2rem;
-                cursor:pointer;
-              }
-            }
-          .mint-swipe{
-            height: 2rem !important;
-            .mint-swipe-items-wrap{
-              .days{
-                ul{
-                  display: flex;
-                  li{
-                    flex: 1;
-                    font-size: 0.7rem;
-                    width:2.7rem;
-                    list-style-type:none;
-                    text-align: center;
-                    line-height:  2rem;
-                    cursor:pointer;
-                    .other-month {
-                      color: #EEC591;
-                    }
-                    .active {
-                      display: inline-block;
-                      width: 2rem;
-                      height: 2rem;
-                      color: #fff;
-                      background-color: #324057;
-                    }
-                    .selected{
-                      display: inline-block;
-                      width: 2rem;
-                      height: 2rem;
-                      color: #fff;
-                      background-color: #1E90FF!important;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        .timeTable{
-          background: gainsboro;
-          table{
-            width: 100%;
-            font-size: 0.7rem;
-            margin-top: 0.5rem;
-            background: white;
-            tr{
-              td{
-                width: 12.5%;
-                height: 2rem;
-                text-align: center;
-              }
-              .selectedT{
-                background: gainsboro;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-</style>
 <script>
-  import add from './add';
+  import close from './close';
   import { MessageBox } from 'mint-ui';
   export default {
     name: 'serviceDetail',
@@ -372,9 +144,10 @@
       return {
         active: 'tab-container1',
         headTitle: '维修工单详情',
-        popupVisible4: false,
+        popupVisible: false,
+        popupVisible1: false,
         role: true,
-        isCall: false,
+        isCall: 'lxkh',
         showBox: false,
         tabList: [
           {name: '基础信息', id: 'tab-container1'},
@@ -403,7 +176,14 @@
         selectIndex: '',
         initAm: '00:00',
         am: [],
-        isTimeSelected: []
+        isTimeSelected: [],
+        HandleList: [
+          {name: '出发', key: '签到'},
+          {name: '到达', key: '签到'},
+          {name: '记录故障', key: '填写'},
+          {name: '完工确认', key: '填写'},
+          {name: '结束', key: '确认'}
+        ]
       };
     },
     methods: {
@@ -421,12 +201,11 @@
       },
       changeBtnStote() {            // 改变按钮状态
         let self = this;
-        self.isCall = true;
+        self.isCall = 'yyjh';
       },
       clickShow() {                 // 点击显示日历
         let self = this;
-        self.popupVisible4 = true;
-        console.log();
+        self.popupVisible = true;
         if (self.daysUL.length === 0) {
           self.initData(null);
         }
@@ -434,8 +213,12 @@
           self.initTableTime();
         }
       },
-      cancle() {                    // 日历取消事件
-        this.popupVisible4 = false;
+      cancel() {                    // 日历取消事件
+        this.popupVisible = false;
+      },
+      enter() {                     // 日历确定
+        this.popupVisible = false;
+        this.isCall = 'gdcz';
       },
       pickPre(year, month) {        // 点击切换上个月
         let self = this;
@@ -561,10 +344,260 @@
         MessageBox.confirm('远程电话沟通客户已解决，确认提交？?', '').then(action => {
           console.log(1111);
         });
+      },
+      clickPosition(value1) {
+        console.log(value1);
       }
     },
     components: {
-      add
+      close
     }
   };
 </script>
+<style lang="scss">
+  *{
+    margin: 0;
+    padding: 0;
+  }
+  @mixin disFlex (){
+    display: flex;
+    justify-content:center;
+    align-items: center;
+  }
+  @mixin remove-decoration (){
+    text-decoration: none;
+    color: lightblue;
+  }
+  .service-continer{
+    position: relative;
+    height:100%;
+    .service-detail{
+      background: #F2F2F2;
+      .detail-title{
+        position: relative;
+        padding: 0.5rem;
+        height: 6rem;
+        font-size: 0.7rem;
+        background: white;
+        .mt-Detail-title{
+          line-height: 1.5rem;
+          .user-state{
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            color: red;
+          }
+          .detail-call{
+            @include remove-decoration();
+          }
+        }
+      }
+      .detail-content{
+        position: relative;
+        margin-top: 0.5rem;
+        font-size: 0.7rem;
+        .mint-tab-container{
+          .mint-tab-container-wrap{
+            .mint-tab-container-item{
+              background: white;
+              padding: 0.5rem;
+              .crm-zyList {
+                overflow: hidden;
+              }
+              .crm-zyList ul {
+                padding-left: 0;
+              }
+              .crm-zyList ul li {
+                list-style: none;
+              }
+              .crm-zyList .content {
+                position: relative;
+                border-left: 1px solid #dddddd;
+                padding-bottom: 10px;
+                margin: 0 30px;
+                padding-left: 20px;
+              }
+              .crm-zyList .content .bd-radius {
+                background: #fff;
+                position: absolute;
+                left: -20px;
+                top: 0px;
+              }
+              .crm-zyList .icon{
+                border-radius: 26px;
+                background: #2485E2;
+                color: #fff;
+                padding: 1px 9px;
+                margin-left: 11px;
+                font-size: 12px;
+                top: 10px;
+              }
+              .crm-zyList .content :nth-of-type(2) {
+                font-size: 14px;
+                margin-top: 5px;
+                color: #999;
+                line-height: 27px;
+              }
+              .content-div {
+                border-radius: 5px;
+                padding: 10px;
+                font-size: 0.15rem;
+              }
+
+              .mt-Detail-info{
+                div{
+                  line-height: 1.5rem;
+                  .detail-call{
+                    @include remove-decoration();
+                  }
+                }
+              }
+              .service-record{
+                height: 5rem;
+                line-height: 5rem;
+                text-align: center;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    /*底部按钮*/
+    .submitButton {
+      @include disFlex();
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      height: 3rem;
+      background: white;
+      line-height: 3rem;
+      opacity: 0.7;
+      button {
+        width: 7rem;
+        border-radius: 1rem;
+      }
+    }
+    .mint-popup-1{
+      width: 100%;
+      height: 22rem;
+      background: white;
+      .alertDate{
+        width: 100%;
+        .headerButton{
+          height: 2rem;
+          line-height: 2rem;
+          border-bottom: 1px solid gainsboro;
+          div{
+            color: darkred;
+            font-size: 0.7rem;
+          }
+          .cancelBtn{
+            float: left;
+            margin-left: 0.5rem;
+          }
+          .enterBtn{
+            float: right;
+            margin-right: 0.5rem;
+          }
+        }
+        .dateContent{
+          height: 6rem;
+          border-bottom: 1px solid gainsboro;
+          .month{
+            text-align: center;
+            line-height: 2rem;
+            font-size: 0.7rem;
+            i{
+              font: 500 1.2rem sans-serif;
+              color: #888;
+            }
+            .el-icon-left{
+              float: left;
+            }
+            .el-icon-right{
+              float: right;
+            }
+          }
+          .bodyDiv
+          .weekdays{
+            display: flex;
+            li{
+              flex: 1;
+              font-size: 0.7rem;
+              width:2.7rem;
+              list-style-type:none;
+              text-align: center;
+              line-height:  2rem;
+              cursor:pointer;
+            }
+          }
+          .mint-swipe{
+            height: 2rem !important;
+            .mint-swipe-items-wrap{
+              .days{
+                ul{
+                  display: flex;
+                  li{
+                    flex: 1;
+                    font-size: 0.7rem;
+                    width:2.7rem;
+                    list-style-type:none;
+                    text-align: center;
+                    line-height:  2rem;
+                    cursor:pointer;
+                    .other-month {
+                      color: #EEC591;
+                    }
+                    .active {
+                      display: inline-block;
+                      width: 2rem;
+                      height: 2rem;
+                      color: #fff;
+                      background-color: #324057;
+                    }
+                    .selected{
+                      display: inline-block;
+                      width: 2rem;
+                      height: 2rem;
+                      color: #fff;
+                      background-color: #1E90FF!important;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        .timeTable{
+          background: gainsboro;
+          table{
+            width: 100%;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            background: white;
+            tr{
+              td{
+                width: 12.5%;
+                height: 2rem;
+                text-align: center;
+              }
+              .selectedT{
+                background: gainsboro;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .mint-popup-2{
+      width: 100%;
+      .cancelHandle{
+        line-height: 2.5rem;
+        text-align: center;
+        border-top: 1px solid gainsboro;
+      }
+    }
+  }
+</style>

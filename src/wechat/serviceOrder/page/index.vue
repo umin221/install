@@ -2,7 +2,9 @@
   <div>
     <mt-header fixed :title="headTitle">
       <fallback slot="left"></fallback>
-      <mt-button v-if="role === true" icon="more" slot="right" @click.native="clickAdd"></mt-button>
+      <mt-button v-if="role" slot="right" @click.native="clickAdd">
+        <i class="xs-icon icon-add"></i>
+      </mt-button>
       <mt-button v-else icon="search" slot="right"></mt-button>
     </mt-header>
     <div v-if="role === true" class="mint-content indexService">
@@ -10,7 +12,7 @@
         <mt-tab-item v-for="tab in tabList" :id="tab.id" :key="tab.id">{{tab.name}}</mt-tab-item>
       </mt-navbar>
       <loadmore :loadTop="loadTop" ref="load">
-        <mt-tab-container v-model="active" :swipeable="true">
+        <mt-tab-container v-model="active">
           <mt-tab-container-item v-for="tabItem in tabList" :key="tabItem.id" :id="tabItem.id">
             <mt-cell v-for="item in list" to="serviceDetail" :key="item.sevrs" is-link>
               <div style="line-height:1rem;height:4rem;">
@@ -69,10 +71,21 @@
 </style>
 <script type="application/javascript">
   import {mapState, mapActions} from 'vuex';
+  import api from '../api/api';
   import loadmore from 'public/components/cus-loadmore';
   const NameSpace = 'index';
   export default {
     name: NameSpace,
+    created() {
+      api.get({
+        key: 'getList',
+        data: {
+        },
+        callback: function(data) {
+          console.log(data);
+        }
+      });
+    },
     data: () => {
       return {
         name: '名字',

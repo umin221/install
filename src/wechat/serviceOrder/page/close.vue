@@ -38,7 +38,7 @@
 </style>
 <script>
   export default {
-    name: 'add',
+    name: 'close',
     props: ['showBox1', 'options1'],
     data() {
       return {

@@ -35,10 +35,10 @@ export default new Router({
       require(['../page/dateControl'], resolve);
     }
   }, {
-    path: '/add',
-    name: 'add',
+    path: '/close',
+    name: 'close',
     component(resolve) {
-      require(['../page/add'], resolve);
+      require(['../page/close'], resolve);
     }
   }]
 });
