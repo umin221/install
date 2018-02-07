@@ -1,5 +1,12 @@
 .mint-field {
+
+  .mint-cell-title {
+    color: $label-color;
+  }
+
   .mint-cell-value {
+    color: $value-color;
+
     input[readonly] {
       text-align: right;
     }
@@ -7,6 +14,7 @@
 }
 
 .mint-field.require {
+
   .mint-cell-title:before {
     content: "*";
     color: $red-base;

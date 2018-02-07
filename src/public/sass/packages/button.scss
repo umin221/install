@@ -1,5 +1,10 @@
 header.mint-header {
+
   .mint-button {
     min-width: 1.5rem;
   }
+}
+
+button.mint-button--primary {
+  background-color: $theme-color;
 }
