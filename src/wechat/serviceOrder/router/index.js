@@ -40,5 +40,11 @@ export default new Router({
     component(resolve) {
       require(['../page/close'], resolve);
     }
+  }, {
+    path: '/faultRecord',
+    name: 'faultRecord',
+    component(resolve) {
+      require(['../page/faultRecord'], resolve);
+    }
   }]
 });
