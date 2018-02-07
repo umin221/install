@@ -83,5 +83,6 @@
   }
   .list-text {
     line-height: 30px;
+    font-size: 0.7rem!important;
   }
 </style>

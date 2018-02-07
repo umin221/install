@@ -47,10 +47,10 @@
     }
     .crm-zyList .icon{
       border-radius: 26px;
-      background: #2485E2;
+      background: #8bc17c;
       color: #fff;
-      padding: 3px 9px;
-      margin-left: 11px;
+      padding: 1px 7px;
+      margin-left: 13px;
       font-size: 12px;
       top: 10px;
     }

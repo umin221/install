@@ -70,5 +70,11 @@ export default new Router({
     component(resolve) {
       require(['../page/zsBatch'], resolve);
     }
+  }, {
+    path: '/lock', // 锁芯页面
+    name: 'lock',
+    component(resolve) {
+      require(['../page/lock'], resolve);
+    }
   }]
 });

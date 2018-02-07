@@ -6,7 +6,7 @@
     <div class="mint-content mint-content-datail">
       <div class="mint-content-info">
         <mt-cell>
-          <div slot="title" class="list-text"><span class="list-text-span">订单编码</span><span>AZ11111000</span></div>
+          <div slot="title" class="list-text" style="margin-top: 10px;"><span class="list-text-span">订单编码</span><span>AZ11111000</span></div>
           <div slot="title" class="list-text"><span class="list-text-span">项目名称</span><span>西南药都生态城-龙泉花园</span></div>
           <div slot="title" class="list-text"><span class="list-text-span">销售类型</span><span>工程</span></div>
           <div slot="title" class="list-text"><span class="list-text-span">安装数量</span><span>500</span></div>
@@ -21,11 +21,11 @@
         <div slot="title" class="list-text"><span class="list-text-span">锁芯部分</span></div>
       </mt-cell>
         <div class="mint-sx-div">
-          <mt-cell title="SZ6010指纹锁"  @click.native="getList" is-link>
+          <mt-cell title="SZ6010指纹锁"  @click.native="getLock" is-link>
             <span style="width: 120px">开向：左内开</span>
             <span>数量：200</span>
           </mt-cell>
-          <mt-cell title="SZ6011指纹锁"  @click.native="getList" is-link>
+          <mt-cell title="SZ6011指纹锁"  @click.native="getLock" is-link>
             <span style="width: 120px">开向：左内开</span>
             <span>数量：100</span>
           </mt-cell>
@@ -34,7 +34,7 @@
           <div slot="title" class="list-text"><span class="list-text-span">锁体部分* 真锁</span></div>
         </mt-cell>
         <div class="mint-sx-div">
-          <mt-cell title="SZ6010指纹锁"  @click.native="" is-link>
+          <mt-cell title="SZ6010指纹锁"  @click.native="getLock" is-link>
             <span style="width: 120px">开向：左内开</span>
             <span>数量：200</span>
           </mt-cell>
@@ -125,6 +125,9 @@
 </template>
 <style lang="scss">
   .mint-content-datail {
+    .mint-cell-wrapper {
+      font-size: 0.7rem!important;
+    }
     .mint-cell-title {
     }
     .list-text-span {
@@ -133,7 +136,7 @@
     }
     .mint-content-xl {
       text-align: center;
-      color: #A2BBFC;
+      color: #0772c1;
       font-size: 0.15rem;
     }
     .xl::before {
@@ -153,7 +156,7 @@
       display: initial;
       text-align: center;
       border-radius: 0.25rem;
-      color: #A2BBFC;
+      color: #0772c1;
       font-size: 0.15rem;
     }
     .mint-sx-div {
@@ -173,7 +176,7 @@
     .crm-zyList .content {
       position: relative;
       border-left: 1px solid #dddddd;
-      padding-bottom: 40px;
+      padding-bottom: 10px;
       margin: 0 30px;
       padding-left: 20px;
     }
@@ -185,10 +188,10 @@
     }
     .crm-zyList .icon{
       border-radius: 26px;
-      background: #2485E2;
+      background: #8bc17c;
       color: #fff;
-      padding: 3px 9px;
-      margin-left: 11px;
+      padding: 1px 7px;
+      margin-left: 13px;
       font-size: 12px;
       top: 10px;
     }
@@ -199,9 +202,9 @@
       line-height: 27px;
     }
     .content-div {
-      border: 1px solid red;
       border-radius: 5px;
       padding: 10px;
+      font-size: 0.5rem;
     }
     /*横线滚动*/
     .stage_li {
@@ -350,6 +353,9 @@
 
     .stage_li > .mui-scroll-wrapper a > div.present {
       color: #8bc17c;
+      margin: 0px 12px 0px 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #0772c1;
     }
 
     .stage_li > .mui-scroll-wrapper a > div.close {
@@ -423,6 +429,10 @@
         } else {
           self.$router.push('sporadic');
         }
+      },
+      getLock() {
+        var self = this;
+        self.$router.push('lock');
       }
     }
   };

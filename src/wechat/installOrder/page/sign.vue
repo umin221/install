@@ -2,9 +2,10 @@
   <div>
     <mt-header fixed :title="titleVal">
       <fallback slot="left"></fallback>
+      <mt-button slot="right" @click.native="editKey = false">编辑</mt-button>
     </mt-header>
     <div class="mint-content sign">
-      <mt-cell is-link >
+      <mt-cell is-link>
         <div slot="title" class="list-text"><span style="color:red">*</span>是否涉及开孔锁签收<input placeholder="是"/></div>
       </mt-cell>
       <mt-field label="签收数量" placeholder="1" type="number"></mt-field>
@@ -47,6 +48,7 @@
     data: () => {
       return {
         value: '',
+        editKey: true,
         titleVal: '开孔锁签收',
         active: 'tab-container'
       };
