@@ -79,8 +79,6 @@
     created() {
       api.get({
         key: 'getList',
-        data: {
-        },
         callback: function(data) {
           console.log(data);
         }
