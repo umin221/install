@@ -1,72 +1,119 @@
 <template>
-  <div>
+  <div style="background-color: #ebebeb;">
     <mt-header fixed :title="headTitle">
       <fallback slot="left"></fallback>
-      <mt-button v-if="role" slot="right" @click.native="clickAdd">
-        <i class="xs-icon icon-add"></i>
-      </mt-button>
-      <mt-button v-else icon="search" slot="right"></mt-button>
+      <router-link v-if="!role" to="addService" slot="right">
+        <mt-button>
+          <i class="xs-icon icon-add"></i>
+        </mt-button>
+      </router-link>
+      <router-link v-if="role" to="search" slot="right">
+        <mt-button >
+          <i class="xs-icon icon-search"></i>
+        </mt-button>
+      </router-link>
     </mt-header>
     <div v-if="role === true" class="mint-content indexService">
-      <mt-navbar v-model="active">
-        <mt-tab-item v-for="tab in tabList" :id="tab.id" :key="tab.id">{{tab.name}}</mt-tab-item>
+      <mt-navbar v-model="selected">
+        <mt-tab-item id="pending">待审批</mt-tab-item>
+        <mt-tab-item id="valid">已生效</mt-tab-item>
+        <mt-tab-item id="invalid">已失效</mt-tab-item>
       </mt-navbar>
-      <loadmore :loadTop="loadTop" ref="load">
-        <mt-tab-container v-model="active">
-          <mt-tab-container-item v-for="tabItem in tabList" :key="tabItem.id" :id="tabItem.id">
-            <mt-cell v-for="item in list" to="serviceDetail" :key="item.sevrs" is-link>
-              <div style="line-height:1rem;height:4rem;">
-                <div class="listContent">{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
-                <div class="listContent">{{item.date}}:{{item.dates}}</div>
-                <div class="listContent">{{item.type}}:{{item.types}}</div>
-                <div class="listContent" style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:80%;">{{item.addr}}:{{item.addrs}}</div>
-              </div>
-            </mt-cell>
-          </mt-tab-container-item>
-        </mt-tab-container>
-      </loadmore>
+      <mt-tab-container v-model="selected">
+        <mt-tab-container-item id="pending">
+          <loadmore ref="load" :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" :allLoaded="true">
+            <div class="list-content" v-for="(item,index) in list" @click="toDetail(item['SR Number'])" :key="index">
+              <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}<mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge></div>
+              <mt-cell class="multiple" is-link>
+                <div class="my-cell-sub" slot="title">申请时间: {{item.Created}}</div>
+                <div class="my-cell-sub" slot="title">优先级: {{item.Priority}}</div>
+                <div class="my-cell-sub" slot="title">地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}</div>
+              </mt-cell>
+            </div>
+          </loadmore>
+        </mt-tab-container-item>
+        <mt-tab-container-item id="valid">
+          <loadmore ref="load" :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" :allLoaded="true">
+            <div class="list-content" v-for="(item,index) in list" @click="toDetail(item['SR Number'])" :key="index">
+              <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}<mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge></div>
+              <mt-cell class="multiple" is-link>
+                <div class="my-cell-sub" slot="title">申请时间: {{item.Created}}</div>
+                <div class="my-cell-sub" slot="title">优先级: {{item.Priority}}</div>
+                <div class="my-cell-sub" slot="title">地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}</div>
+              </mt-cell>
+            </div>
+          </loadmore>
+        </mt-tab-container-item>
+
+        <mt-tab-container-item id="invalid">
+          <loadmore ref="load" :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" :allLoaded="true">
+            <div class="list-content" v-for="(item,index) in list" @click="toDetail(item['SR Number'])" :key="index">
+              <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}<mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge></div>
+              <mt-cell class="multiple" is-link>
+                <div class="my-cell-sub" slot="title">申请时间: {{item.Created}}</div>
+                <div class="my-cell-sub" slot="title">优先级: {{item.Priority}}</div>
+                <div class="my-cell-sub" slot="title">地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}</div>
+              </mt-cell>
+            </div>
+          </loadmore>
+        </mt-tab-container-item>
+      </mt-tab-container>
     </div>
     <div v-else-if="role === false" class="mint-content customService" >
       <loadmore :loadTop="loadTop" ref="load">
-        <mt-cell v-for="item in list" :to="{path:'/serviceDetail',query:{name:name,age:age}}" :key="item.sevrs" is-link>
-          <div>
-            <div class="listContent">{{item.sevrs}}:{{item.savrsNo}}<span>{{item.store}}</span></div>
-            <div class="listContent">{{item.date}}:{{item.dates}}</div>
-            <div class="listContent">{{item.type}}:{{item.types}}</div>
-            <div class="listContent" style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis;width:80%;">{{item.addr}}:{{item.addrs}}</div>
-          </div>
-        </mt-cell>
+        <div class="list-content" v-for="(item,index) in list" @click="toDetail(item['SR Number'],item['Contact Id'])" :key="index">
+          <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}<mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge></div>
+          <mt-cell class="multiple" is-link>
+            <div class="my-cell-sub" slot="title">申请时间: {{item.Created}}</div>
+            <div class="my-cell-sub" slot="title">优先级: {{item.Priority}}</div>
+            <div class="my-cell-sub" slot="title">地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}</div>
+          </mt-cell>
+        </div>
       </loadmore>
     </div>
   </div>
 </template>
 <style lang="scss">
-  @mixin disFlex (){
-    display: flex;
-    justify-content:center;
-    align-items: center;
-  }
-  .indexService{
-    .mint-tab-container{
-      .mint-tab-container-wrap{
-        .mint-tab-container-item{
-          .mint-loadmore{
-            .mint-loadmore-content{
-              .mint-cell{
-                height: 4rem;
-                @include disFlex();
-                .address{
-                  overflow: hidden;
-                  white-space: nowrap;
-                  text-overflow:ellipsis;
-                  width:80%;
-                }
-              }
-            }
-          }
+  .indexService,.customService{
+    .mint-loadmore{
+      .mint-loadmore-content{
+        padding: 0 10px ;
+        .mint-cell{
+          height: 100px;
         }
       }
     }
+  }
+  .list-content{
+    background: white;
+    padding: 0 1rem;
+    margin-top: 0.5rem;
+    .my-title{
+      font-size: 0.7rem;
+      line-height: 2rem;
+      background-position: bottom;
+      .badge-status{
+        line-height: 0.75rem;
+        width: 2.7rem;
+        margin-top: 0.5rem;
+      }
+    }
+    .multiple{
+      background-position: unset;
+      .mint-cell-wrapper{
+        padding: 0;
+      .mint-cell-title{
+        .my-cell-sub{
+          line-height: 1.5rem;
+          font-size: 0.6rem;
+        }
+      }
+      }
+    }
+  }
+  .badge-status{
+    float: right;
+    padding: 0 5px;
   }
 </style>
 <script type="application/javascript">
@@ -77,33 +124,29 @@
   export default {
     name: NameSpace,
     created() {
+      let me = this;
       api.get({
         key: 'getList',
-        callback: function(data) {
-          console.log(data);
+        data: {
+          'body': {
+            'OutputIntObjectName': 'Base KL Service Request Interface BO',
+            'SearchSpec': '[Service Request.Owner]="16113009"'
+          }
+        },
+        success: function(data) {
+          me.list = data.SiebelMessage['Service Request'];
+          console.log(me.list);
         }
       });
     },
     data: () => {
       return {
-        name: '名字',
-        age: 11,
-        role: true,
-        active: 'tab-container1',
+        selected: 'pending',
+        role: false,
         headTitle: '维修工单列表',
-        tabList: [
-          {name: '待处理', id: 'tab-container1'},
-          {name: '处理中', id: 'tab-container2'},
-          {name: '已完成', id: 'tab-container3'}
-        ],
-        list: [
-          {store: '未分配', sevrs: '服务编号', date: '申请日期', type: '产品类型', addr: '地址', savrsNo: 'AZ201706010001001', dates: '2018-1-26 14:00', types: '密码锁', addrs: '广东省，深圳市，南山区，科技园，联想大厦12楼'},
-          {store: '未分配', sevrs: '服务编号', date: '申请日期', type: '产品类型', addr: '地址', savrsNo: 'AZ201706010001001', dates: '2018-1-26 14:00', types: '密码锁', addrs: '广东省，深圳市，南山区，科技园，联想大厦12楼'},
-          {store: '未分配', sevrs: '服务编号', date: '申请日期', type: '产品类型', addr: '地址', savrsNo: 'AZ201706010001001', dates: '2018-1-26 14:00', types: '密码锁', addrs: '广东省，深圳市，南山区，科技园，联想大厦12楼'},
-          {store: '未分配', sevrs: '服务编号', date: '申请日期', type: '产品类型', addr: '地址', savrsNo: 'AZ201706010001001', dates: '2018-1-26 14:00', types: '密码锁', addrs: '广东省，深圳市，南山区，科技园，联想大厦12楼'},
-          {store: '未分配', sevrs: '服务编号', date: '申请日期', type: '产品类型', addr: '地址', savrsNo: 'AZ201706010001001', dates: '2018-1-26 14:00', types: '密码锁', addrs: '广东省，深圳市，南山区，科技园，联想大厦12楼'},
-          {store: '未分配', sevrs: '服务编号', date: '申请日期', type: '产品类型', addr: '地址', savrsNo: 'AZ201706010001001', dates: '2018-1-26 14:00', types: '密码锁', addrs: '广东省，深圳市，南山区，科技园，联想大厦12楼'}
-        ]
+        topStatus: '',
+        list: [],
+        number: []
       };
     },
     computed: {
@@ -111,13 +154,31 @@
     },
     methods: {
       ...mapActions(NameSpace, ['getList']),
-      loadTop(value) {
-        let _self = this;
-        console.log(_self);
-        _self.$refs.load.onTopLoaded();
+      toSearch() {
+        this.$router.push({path: '/search'});
+      },
+      loadTop() {
+        let me = this;
+        console.log(me.$refs.load);
+        me.$refs.load.onTopLoaded();
+      }, // 底部加载
+      loadBottom() {
+        let me = this;
+        setTimeout(function() {
+          me.$refs.load.onBottomLoaded();
+        }, 1000);
       },
       clickAdd() {
         this.$router.push({path: '/addService'});
+      },
+      toDetail(type, name) {
+        this.$router.push({
+          name: 'serviceDetail',
+          query: {
+            type: type,
+            id: name
+          }
+        });
       }
     },
     components: {

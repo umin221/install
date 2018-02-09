@@ -46,5 +46,17 @@ export default new Router({
     component(resolve) {
       require(['../page/faultRecord'], resolve);
     }
+  }, {
+    path: '/search',
+    name: 'search',
+    component(resolve) {
+      require(['../page/search'], resolve);
+    }
+  }, {
+    path: '/contact',
+    name: 'contact',
+    component(resolve) {
+      require(['../page/contact'], resolve);
+    }
   }]
 });

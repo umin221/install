@@ -8,10 +8,10 @@
 
       <div class="mint-content service-detail">
         <div class="detail-title">
-          <div class="mt-Detail-title">产品编号：ST101721213<span class="user-state">用户已提交</span></div>
+          <div class="mt-Detail-title">产品编号：{{ServiceRequest.Product}}<span class="user-state">用户已提交</span></div>
           <div class="mt-Detail-title">产品类型：指纹锁</div>
-          <div class="mt-Detail-title">联系人：李先生</div>
-          <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call">13823456789</a></div>
+          <div class="mt-Detail-title">联系人：{{contact['Last Name']}}</div>
+          <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call">{{contact['Cellular Phone #']}}</a></div>
         </div>
         <div class="detail-content">
           <mt-navbar v-model="active">
@@ -20,14 +20,14 @@
           <mt-tab-container v-model="active">
             <mt-tab-container-item id="tab-container1">
               <div class="mt-Detail-info">
-                <div>产品条形码：<a href="javascript:void(0);" class="detail-call">ST101721213</a></div>
-                <div>产品型号：指纹锁</div>
-                <div>申请时间：2017-06-06</div>
-                <div>客户预约时间：2017-06-06 14:00:00</div>
-                <div>实际预约时间：2017-06-06 14:00:00</div>
-                <div>地址：广东省 深圳市 南山区 xxx</div>
+                <div>产品条形码：<a href="javascript:void(0);" class="detail-call">{{ServiceRequest['KL SN']}}</a></div>
+                <div>产品型号：{{ServiceRequest['KL Product Model']}}</div>
+                <div>申请时间：{{ServiceRequest['Created']}}</div>
+                <div>客户预约时间：{{ServiceRequest['KL Product Model']}}</div>
+                <div>实际预约时间：{{ServiceRequest['CEM Planned Start Date']}}</div>
+                <div>地址：{{contact['Personal Province']}}{{contact['Personal City']}}{{contact['Personal Street Address']}}</div>
                 <div>问题说明：
-                  <div>门锁打不开</div>
+                  <div>{{ServiceRequest['KL Product Model']}}</div>
                 </div>
                 <div>相关照片：
                   <div><img src="" alt="" height="100"></div>
@@ -56,7 +56,7 @@
         </div>
       </div>
       <div v-if="!role" class="submitButton">
-        <mt-button size="normal" type="danger" >派单</mt-button>
+        <mt-button size="normal" type="danger" @click="toContact" >派单</mt-button>
       </div>
       <div v-else-if="role" class="submitButton">
         <mt-button v-if="isCall === 'lxkh'"  size="normal" @click.native="changeBtnStote" type="danger" >电话联系客户</mt-button>
@@ -135,10 +135,37 @@
 </template>
 <script>
   import close from './close';
+  import api from '../api/api';
   import { MessageBox } from 'mint-ui';
   export default {
     name: 'serviceDetail',
     created() {
+      let me = this;
+      me.srNumber = me.$route.query.type;
+      me.contactId = me.$route.query.id;
+      api.get({
+        key: 'getList',
+        data: {
+          'body': {
+            'OutputIntObjectName': 'Base KL Service Request Interface BO',
+            'SearchSpec': '[Service Request.SR Number]=' + '"' + me.srNumber + '"'
+          }
+        },
+        success: function(data) {
+          me.ServiceRequest = data.SiebelMessage['Service Request'];
+        }
+      });
+      api.get({
+//        key: 'getContact',
+        url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/KL Contact Interface BO/Contact/' + me.contactId,
+        method: 'GET',
+        data: {
+        },
+        success: function(data) {
+          me.contact = data;
+          console.log(me.contact);
+        }
+      });
     },
     data: () => {
       return {
@@ -146,7 +173,15 @@
         headTitle: '维修工单详情',
         popupVisible: false,
         popupVisible1: false,
-        role: true,
+        ServiceRequest: {},
+        contact: {},
+        srNumber: '',
+        contactName: '',
+//        Product: '',              // 产品编号
+//        ProductModel: '',        // 产品型号
+//        ContactName: '',         // 联系人
+        Created: '',
+        role: false,
         isCall: 'lxkh',
         showBox: false,
         tabList: [
@@ -347,6 +382,11 @@
       },
       clickPosition(value1) {
         console.log(value1);
+      },
+      toContact() {
+        this.$router.push({
+          name: 'contact'
+        });
       }
     },
     components: {
