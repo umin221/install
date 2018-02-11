@@ -35,7 +35,7 @@ export default new Router({
       require(['../page/dateControl'], resolve);
     }
   }, {
-    path: '/close',
+    path: '/close',          // 关闭工单弹出层
     name: 'close',
     component(resolve) {
       require(['../page/close'], resolve);

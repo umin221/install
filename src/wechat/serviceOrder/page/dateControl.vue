@@ -1,49 +1,72 @@
 <template>
-  <div>
-    <mt-header fixed :title="headTitle">
-      <fallback slot="left"></fallback>
-    </mt-header>
-    <div class="date mint-content">
-      <!-- 年份 月份 -->
-      <div class="month">
-        <i class="el-icon-arrow" @click="pickPre(currentYear,currentMonth)"><</i>
-        <span>{{ currentYear }} 年 {{ currentMonth }} 月</span>
-        <i class="el-icon-arrow" @click="pickNext(currentYear,currentMonth)">></i>
+    <!--头部按钮-->
+    <div class="alertDate">
+      <div class="headerButton">
+        <div class="cancelBtn" @click="cancel">取消</div>
+        <div class="enterBtn" @click="enter">确认</div>
       </div>
-      <!-- 星期 -->
-      <ul class="weekdays">
-        <li>一</li>
-        <li>二</li>
-        <li>三</li>
-        <li>四</li>
-        <li>五</li>
-        <li style="color:#0A0A0A">六</li>
-        <li style="color:#0A0A0A">日</li>
-      </ul>
-      <!-- 日期 -->
-      <div class="bodyDiv">
-        <ul class="days" v-for="(value,index1) in daysUL">
-          <li @click="pick(day,index+index1*7)" v-for="(day, index) in value" :class="[{'ban':isBan[index+index1*7]},{'xiu':isXiu[index+index1*7]}]" >
-            <!--本月-->
-            <span v-if="day.getMonth()+1 != currentMonth" class="other-month" :class="{'selected':isSelected[index+index1*7]}">{{ day.getDate() }}</span>
-            <span v-else :class="{'selected':isSelected[index+index1*7]}">
-          <!--今天-->
-          <span v-if="day.getFullYear() == new Date().getFullYear() && day.getMonth() == new Date().getMonth() && day.getDate() == new Date().getDate()" class="active">{{ day.getDate() }}</span>
-          <span v-else>{{ day.getDate() }}</span>
-          </span>
-          </li>
-        </ul>
+
+      <!--选择年月和日期-->
+      <div class="dateContent">
+        <div class="month">
+          <i class="el-icon-left" v-show="leftBunHide" @click="pickPre(currentYear,currentMonth)"><</i>
+          <span>{{ currentYear }} 年 {{ currentMonth }} 月</span>
+          <i class="el-icon-right" @click="pickNext(currentYear,currentMonth)">></i>
+        </div>
+        <!-- 日期 -->
+        <div class="bodyDiv">
+          <ul class="weekdays">
+            <li>周一</li>
+            <li>周二</li>
+            <li>周三</li>
+            <li>周四</li>
+            <li>周五</li>
+            <li style="color:darkred">周六</li>
+            <li style="color:darkred">周日</li>
+          </ul>
+          <mt-swipe :auto="0" :show-indicators="false" :speed="50" :continuous="false">
+            <mt-swipe-item class="days" v-for="(value,index1) in daysUL" :key="index1">
+              <ul>
+                <li  v-for="(day, index) in value" :key="index" @click="pick(day,index+index1*7)">
+                  <!--本月-->
+                  <span v-if="day.getMonth()+1 != currentMonth" class="other-month" :class="{'selected':isSelected[index+index1*7]}">{{ day.getDate() }}</span>
+                  <span v-else :class="{'selected':isSelected[index+index1*7]}">
+                    <!--今天-->
+                    <span v-if="day.getFullYear() == new Date().getFullYear() && day.getMonth() == new Date().getMonth() && day.getDate() == new Date().getDate()" class="active1">{{ day.getDate() }}</span>
+                    <span v-else>{{ day.getDate() }}</span>
+                  </span>
+                </li>
+              </ul>
+            </mt-swipe-item>
+          </mt-swipe>
+        </div>
+      </div>
+      <!--选择时间-->
+      <div class="timeTable">
+        <table>
+          <tr v-for="(Am, index1) in am" :key="index1">
+            <td v-for="(time, index) in Am.time" :key="index" @click="selectedTime(index+index1*8)" :class="{'selectedT':isTimeSelected[index+index1*8]}">{{time}}</td>
+          </tr>
+        </table>
       </div>
     </div>
-  </div>
 </template>
 <script>
   export default {
     name: 'date',
-
+    props: ['showBox2'],
+    created() {
+      let self = this;
+      self.initData(null);
+      if (self.daysUL.length === 0) {
+        self.initData(null);
+      }
+      if (this.am.length === 0) {
+        self.initTableTime();
+      }
+    },
     data() {
       return {
-        headTitle: '工作计划',
         currentYear: 1970,   // 年份
         currentMonth: 1,  // 月份
         currentDay: 1,    // 日期
@@ -53,30 +76,66 @@
         daysUL: [],
         params: {
           selectDay: '',
+          Time1: '',
+          Time2: '',
           type: ''
         },
+        leftBunHide: false,
         isSelected: [],
-        isBan: [],
-        isXiu: [],
-        restDays: {
-          year: '',
-          month: '',
-          day: '',
-          resttype: '',
-          restdate: ''
-        },
-        restDaysList: [],
-        banList: [],
-        xiuList: [],
-        selectIndex: ''
+        selectIndex: '',
+        initAm: '00:00',
+        am: [],
+        num: 0,
+        isTimeSelected: []
       };
     },
-
-    created() {
-      this.initData(null);
-    },
-
     methods: {
+      cancel() {                    // 日历取消事件
+        let self = this;
+        self.$emit('my-cancel', this.params);
+      },
+      enter() {                     // 日历确定
+        let self = this;
+        self.$emit('my-enter', this.params);
+      },
+      pickPre(year, month) {        // 点击切换上个月
+        let self = this;
+        let mon = new Date().getMonth() + 1;
+        let myYear = new Date().getFullYear();
+        self.daysUL = [];
+        self.isSelected = [];
+        const d = new Date(self.formatDate(year, month, 1));
+        d.setDate(0);
+        self.initData(self.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
+        if (mon === self.currentMonth && myYear === self.currentYear) {
+          self.leftBunHide = false;
+        }
+      },
+      pickNext(year, month) {     // 点击切换下个月
+        let self = this;
+        let myMon = new Date().getMonth() + 1;
+        self.daysUL = [];
+        self.isSelected = [];
+        const d = new Date(self.formatDate(year, month, 1));
+        d.setDate(42);
+        self.initData(self.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
+        if (myMon !== self.currentMonth) {
+          self.leftBunHide = true;
+        }
+      },
+      pick(date, index) {             // 选择日期
+        this.selectIndex = index;
+        this.isSelected = [];
+        this.params.selectDay = this.formatDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
+        console.log(this.params);
+        for (let i = 0; i < 42; i++) {
+          if (index === i) {
+            this.isSelected.push(true);
+            continue;
+          }
+          this.isSelected.push(false);
+        }
+      },
       formatDate(year, month, day) {
         const y = year;
         let m = month;
@@ -85,8 +144,7 @@
         if (d < 10) d = `0${d}`;
         return `${y}-${m}-${d}`;
       },
-
-      initData(cur) {
+      initData(cur) {            // 日历初始化
         let date = '';
         if (cur) {
           date = new Date(cur);
@@ -99,14 +157,11 @@
         this.currentWeek = date.getDay();
         date.setDate(1);
         this.firstWeek = date.getDay();
-
         if (this.firstWeek === 0) {
           this.firstWeek = 7;
         }
         const str = this.formatDate(this.currentYear, this.currentMonth, 1);
         this.days.length = 0;
-
-        // 今天是周日，放在第一行第7个位置，前面6个 这里默认显示一周，如果需要显示一个月，则第二个循环为 i<= 42- this.firstWeek
         for (let i = this.firstWeek - 1; i >= 0; i -= 1) {
           const d = new Date(str);
           d.setDate(d.getDate() - i);
@@ -126,183 +181,186 @@
             this.days = [];
           }
         }
+        console.log(this.daysUL);
       },
-      setRestOrWork(type) {
-        if (this.onlySelect()) {
-          this.params.type = type;
-        }
-      },
-      cancel() {
-      },
-      // 上一個月   传入当前年份和月份
-      pickPre(year, month) {
-        this.daysUL = [];
-        this.isSelected = [];
-        const d = new Date(this.formatDate(year, month, 1));
-        d.setDate(0);
-        this.initData(this.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
-      },
-
-      // 下一個月   传入当前年份和月份
-      pickNext(year, month) {
-        this.daysUL = [];
-        this.isSelected = [];
-        const d = new Date(this.formatDate(year, month, 1));
-        d.setDate(42);
-        this.initData(this.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
-      },
-      dealResult(currentYear, currentMonth) {
-        this.banList = [];
-        this.xiuList = [];
-        this.isBan = [];
-        this.isXiu = [];
-        let zhouji = new Date(this.formatDate(currentYear, currentMonth, 1)).getDay();
-        if (zhouji === 0) {
-          zhouji = 7;
-        }
-        for (let i = 0; i < this.restDaysList.length;i++) {
-          this.restDays = this.restDaysList[i];
-          if (this.restDays.resttype === 'W') {
-            let ban = this.restDays.day - 1 + (zhouji - 1);
-            this.banList.push(ban);
+      initTableTime() {             // 时间表格初始化
+        let arr = [];
+        let time = '';
+        let obj = {};
+        for (let i = 0;i < 6; i++) {
+          for (let i = 0;i <= 7;i++) {
+            time = this.changeTime(this.initAm);
+            arr.push(time);
+            this.initAm = time;
           }
-          if (this.restDays.resttype === 'R') {
-            let xiu = this.restDays.day - 1 + (zhouji - 1);
-            this.xiuList.push(xiu);
-          }
+          this.initAm = time;
+          obj = {time: arr};
+          this.am.push(obj);
+          obj = {};
+          arr = [];
         }
-        for (let m = 0; m < 42; m++) {    // banlist 里面放置的都是在日历上处于几号位，而不是工作日的日期，
-          let nothave = true;           // 所以得把这些位置号拎出来，给它们于不同的样式
-          for (let k = 0; k < this.banList.length; k++) {
-            if (m === this.banList[k]) {
-              this.isBan.push(true);
-              nothave = false;
-              break;
+      },
+      changeTime(value) {
+        let x = '2010-09-28 ' + value;
+        let time = new Date(x.replace('-', '/'));
+        const b = 30;
+        time.setMinutes(time.getMinutes() + b, time.getSeconds(), 0);
+        time = time.toString().split(' ')[4].slice(0, 5);
+        return time;
+      },
+      selectedTime(index) {             // 选择时间
+        let self = this;
+        let seleat = '';
+        if (self.num === 2) {
+          self.isTimeSelected = [];
+          self.num = 0;
+          self.params.Time1 = '';
+          self.params.Time2 = '';
+        }
+        if (self.isTimeSelected.length) {
+          for (let i = 0; i < 48; i++) {
+            if (index === i) {
+              self.isTimeSelected[i] = true;
+              seleat = Math.floor(index / 8);
+              self.num = self.num + 1;
+            } else {
+              self.isTimeSelected.push(false);
             }
           }
-          if (nothave) {
-            this.isBan.push(false);
-          }
-
-        }
-        for (let n = 0; n < 42; n++) {   // 同上，来处理休息日
-          let nothave = true;
-          for (let k = 0; k < this.xiuList.length; k++) {
-            if (n === this.xiuList[k]) {
-              this.isXiu.push(true);
-              nothave = false;
-              break;
+        } else {
+          for (let i = 0; i < 48; i++) {
+            if (index === i) {
+              self.isTimeSelected.push(true);
+              seleat = Math.floor(index / 8);
+              self.num = self.num + 1;
+            } else {
+              self.isTimeSelected.push(false);
             }
           }
-          if (nothave) {
-            this.isXiu.push(false);
-          }
         }
-      },
-      returnNow() {
-        this.daysUL = [];
-        this.initData(null);
-      },
-      // 当前选择日期
-      pick(date, index) {
-        this.selectIndex = index;
-        this.isSelected = [];
-        this.params.selectDay = this.formatDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
-        console.log(this.params);
-        for (let i = 0; i < 42; i++) {
-          if (index === i) {
-            this.isSelected.push(true);
-            continue;
-          }
-          this.isSelected.push(false);
+        if (self.num === 1) {
+          self.params.Time1 = self.am[seleat].time[index - seleat * 8];
+        } else if (self.num === 2) {
+          self.params.Time2 = self.am[seleat].time[index - seleat * 8];
         }
-      },
-      onlySelect() {
-        if (this.params.selectDay === '') {
-          this.$message({
-            message: '请选择日期',
-            type: 'warning'
-          });
-          return false;
-        }
-        return true;
       }
     }
   };
-
 </script>
-
-<style scoped>
+<style lang="scss">
   *{
     margin: 0;
     padding: 0;
   }
-  .date {
-    color: #333;
-    float: left;
+  .mint-popup-1{
     width: 100%;
-  }
-  .button>div{
-    margin-top:70px;
-  }
-  .month {
-    font-size: 0.7rem;
-    text-align: center;
-    width: 100%;
-    border-bottom: 1px solid gainsboro;
-  }
-  .weekdays {
-    opacity: 0.6;
-    display: flex;
-    font-size: 0.7rem;
-    border-bottom: 1px solid gainsboro;
-  }
-  .weekdays>li{
-    flex: 1;
-    font-size: 0.7rem;
-    width:2.7rem;
-    list-style-type:none;
-    text-align: center;
-    line-height:  2rem;
-    cursor:pointer;
-  }
-  .bodyDiv{
-    border-bottom: 1px solid gainsboro;
-  }
-  .days {
-    display: flex;
-  }
-  .days>li {
-    flex: 1;
-    font-size: 0.7rem;
-    width:2.7rem;
-    list-style-type:none;
-    text-align: center;
-    line-height:  2rem;
-    cursor:pointer;
-  }
-  .selected{
-    display: inline-block;
-    width: 2rem;
-    height: 2rem;
-    color: #fff;
-    background-color: #1E90FF;
-  }
-  .active {
-    display: inline-block;
-    width: 2rem;
-    height: 2rem;
-    color: #fff;
-    background-color: #324057;
-  }
-  i{
-    cursor:pointer
-  }
-  .el-icon-arrow{
-    font: 500 20px sans-serif;
-    color: #888;
-  }
-  .other-month {
-    color: #EEC591;
+    height: 22rem;
+    background: white;
+    .alertDate{
+      width: 100%;
+      .headerButton{
+        height: 2rem;
+        line-height: 2rem;
+        border-bottom: 1px solid gainsboro;
+        div{
+          color: darkred;
+          font-size: 0.7rem;
+        }
+        .cancelBtn{
+          float: left;
+          margin-left: 0.5rem;
+        }
+        .enterBtn{
+          float: right;
+          margin-right: 0.5rem;
+        }
+      }
+      .dateContent{
+        height: 6rem;
+        border-bottom: 1px solid gainsboro;
+        .month{
+          text-align: center;
+          line-height: 2rem;
+          font-size: 0.7rem;
+          i{
+            font: 500 1.2rem sans-serif;
+            color: #888;
+          }
+          .el-icon-left{
+            float: left;
+          }
+          .el-icon-right{
+            float: right;
+          }
+        }
+        .weekdays{
+          display: flex;
+          li{
+            flex: 1;
+            font-size: 0.7rem;
+            width:2.7rem;
+            list-style-type:none;
+            text-align: center;
+            line-height:  2rem;
+            cursor:pointer;
+          }
+        }
+        .mint-swipe{
+          height: 2rem !important;
+          .mint-swipe-items-wrap{
+            .days{
+              ul{
+                display: flex;
+                li{
+                  flex: 1;
+                  font-size: 0.7rem;
+                  width:2.7rem;
+                  list-style-type:none;
+                  text-align: center;
+                  line-height:  2rem;
+                  cursor:pointer;
+                  .other-month {
+                    color: #EEC591;
+                  }
+                  .active1 {
+                    display: inline-block;
+                    width: 2rem;
+                    height: 2rem;
+                    color: #fff;
+                    background-color: #324057;
+                  }
+                  .selected{
+                    display: inline-block;
+                    width: 2rem;
+                    height: 2rem;
+                    color: #fff;
+                    background-color: #1E90FF!important;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      .timeTable{
+        background: gainsboro;
+        table{
+          width: 100%;
+          font-size: 0.7rem;
+          margin-top: 0.5rem;
+          background: white;
+          tr{
+            td{
+              width: 12.5%;
+              height: 2rem;
+              text-align: center;
+            }
+            .selectedT{
+              background: gainsboro;
+            }
+          }
+        }
+      }
+    }
   }
 </style>
