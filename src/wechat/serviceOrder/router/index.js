@@ -35,7 +35,7 @@ export default new Router({
       require(['../page/dateControl'], resolve);
     }
   }, {
-    path: '/close',
+    path: '/close',          // 关闭工单弹出层
     name: 'close',
     component(resolve) {
       require(['../page/close'], resolve);
@@ -45,6 +45,18 @@ export default new Router({
     name: 'faultRecord',
     component(resolve) {
       require(['../page/faultRecord'], resolve);
+    }
+  }, {
+    path: '/search',
+    name: 'search',
+    component(resolve) {
+      require(['../page/search'], resolve);
+    }
+  }, {
+    path: '/contact',
+    name: 'contact',
+    component(resolve) {
+      require(['../page/contact'], resolve);
     }
   }]
 });
