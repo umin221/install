@@ -1,5 +1,5 @@
 <template>
-  <div class="fallback">
+  <div class="cus-fallback">
     <mt-button @click="bind(callback)"><i class="xs-icon icon-back"><slot></slot></i></mt-button>
 	</div>
 
@@ -7,7 +7,7 @@
 
 <script type="es6">
 	export default {
-		name: 'fallback',
+		name: 'cus-fallback',
 		props: ['callback', 'transition'],
 		methods: {
 			bind(callback) {

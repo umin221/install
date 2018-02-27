@@ -22,7 +22,7 @@
 
 <script type="es6">
 	export default {
-		name: 'loadmore',
+		name: 'cust-loadmore',
     data() {
       return {
         topStatus: '',

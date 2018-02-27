@@ -5,6 +5,8 @@ header.mint-header {
   }
 }
 
-button.mint-button--primary {
-  background-color: $theme-color;
+button {
+  &.mint-button--primary {
+    background-color: $theme-color;
+  }
 }
