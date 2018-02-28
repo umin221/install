@@ -9,6 +9,7 @@ div.mint-navbar {
   -webkit-box-align: center;
 
   padding-bottom: $border-width;
+  @include border;
 
   .mint-tab-item {
     padding: .55rem 0;

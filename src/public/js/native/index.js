@@ -27,12 +27,20 @@ import {Toast} from 'mint-ui';
      * @param option
      */
     ajax(option) {
-      axios(option).then((response) => {
+      let param = Object.assign({
+        headers: {
+          'Authorization': 'Basic ' + btoa('XIEXW:XIEXW')
+        },
+        timeout: 30000,
+        method: 'get'
+      }, option);
+      axios(param).then((response) => {
         option.success(response.data);
       }).catch((error) => {
         if (option.error) {
           option.error(error);
         } else {
+          console.error(error);
           // eslint-disable-next-line
           Toast({
             message: '获取数据失败',
