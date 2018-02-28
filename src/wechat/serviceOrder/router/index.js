@@ -29,7 +29,7 @@ export default new Router({
       require(['../page/serviceDetail'], resolve);
     }
   }, {
-    path: '/dateControl',
+    path: '/dateControl',   // 日历组件
     name: 'dateControl',
     component(resolve) {
       require(['../page/dateControl'], resolve);
@@ -41,22 +41,22 @@ export default new Router({
       require(['../page/close'], resolve);
     }
   }, {
-    path: '/faultRecord',
-    name: 'faultRecord',
-    component(resolve) {
-      require(['../page/faultRecord'], resolve);
-    }
-  }, {
-    path: '/search',
+    path: '/search',        // 列表搜索
     name: 'search',
     component(resolve) {
       require(['../page/search'], resolve);
     }
   }, {
-    path: '/contact',
+    path: '/contact',       // 选择联系人
     name: 'contact',
     component(resolve) {
       require(['../page/contact'], resolve);
+    }
+  }, {
+    path: '/saveFault',    // 故障记录
+    name: 'saveFault',
+    component(resolve) {
+      require(['../page/saveFault'], resolve);
     }
   }]
 });

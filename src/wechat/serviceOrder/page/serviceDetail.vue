@@ -8,10 +8,10 @@
 
       <div class="mint-content service-detail">
         <div class="detail-title">
-          <div class="mt-Detail-title">产品编号：{{ServiceRequest.Product}}<span class="user-state">用户已提交</span></div>
+          <div class="mt-Detail-title">产品编号：{{ServiceRequest.Product}}<span class="user-state">{{ServiceRequest.Status}}</span></div>
           <div class="mt-Detail-title">产品类型：指纹锁</div>
-          <div class="mt-Detail-title">联系人：{{contact['Last Name']}}</div>
-          <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call">{{contact['Cellular Phone #']}}</a></div>
+          <div class="mt-Detail-title">联系人：{{ServiceRequest['Contact Last Name']}}</div>
+          <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call">{{ServiceRequest['KL Contact Mobile Phone']}}</a></div>
         </div>
         <div class="detail-content">
           <mt-navbar v-model="active">
@@ -23,11 +23,11 @@
                 <div>产品条形码：<a href="javascript:void(0);" class="detail-call">{{ServiceRequest['KL SN']}}</a></div>
                 <div>产品型号：{{ServiceRequest['KL Product Model']}}</div>
                 <div>申请时间：{{ServiceRequest['Created']}}</div>
-                <div>客户预约时间：{{ServiceRequest['KL Product Model']}}</div>
+                <div>客户预约时间：{{ServiceRequest['CEM Planned Start Date']}}</div>
                 <div>实际预约时间：{{ServiceRequest['CEM Planned Start Date']}}</div>
-                <div>地址：{{contact['Personal Province']}}{{contact['Personal City']}}{{contact['Personal Street Address']}}</div>
+                <div>地址：{{ServiceRequest['Personal City']}}{{ServiceRequest['Personal Street Address']}}</div>
                 <div>问题说明：
-                  <div>{{ServiceRequest['KL Product Model']}}</div>
+                  <div>{{ServiceRequest['Description']}}</div>
                 </div>
                 <div>相关照片：
                   <div><img src="" alt="" height="100"></div>
@@ -45,9 +45,9 @@
                     <li class="bd-radius">
                       <span class="icon"></span>
                     </li>
-                    <li style="margin-right: 8px">{{item.option}}</li>
+                    <li style="margin-right: 8px">{{item.Note}}</li>
                     <div class="content-div">
-                      <div>2018-2-1 20:00</div>
+                      <div>{{item.Created}}</div>
                     </div>
                   </ul>
                 </div>
@@ -75,8 +75,24 @@
 
       <!--工单操作-->
       <mt-popup v-model="popupVisible1" position="bottom" popup-transition="popup-fade" class="mint-popup-2">
-        <mt-cell v-for="(item, index) in HandleList" :title="item.name" :key="index">
-          <mt-button @enter="clickPosition">{{item.key}}</mt-button>
+        <mt-cell class="setOut" title="出发" >
+          <mt-button @click="clickPosition('setOut')">签到</mt-button>
+        </mt-cell>
+        <mt-cell title="到达">
+          <mt-button @click="clickPosition('reach')">签到</mt-button>
+        </mt-cell>
+        <mt-cell title="记录故障">
+          <router-link to="saveFault">
+            <mt-button>填写</mt-button>
+          </router-link>
+        </mt-cell>
+        <mt-cell title="完工确认">
+          <router-link to="saveFault">
+            <mt-button>填写</mt-button>
+          </router-link>
+        </mt-cell>
+        <mt-cell class="completeEnd" title="结束">
+          <mt-button @click.native="completeEnd">确认</mt-button>
         </mt-cell>
         <div class="cancelHandle" @click="popupVisible1 = !popupVisible1">取消</div>
       </mt-popup>
@@ -99,24 +115,33 @@
         data: {
           'body': {
             'OutputIntObjectName': 'Base KL Service Request Interface BO',
-            'SearchSpec': '[Service Request.SR Number]=' + '"' + me.srNumber + '"'
+            'SearchSpec': '[Service Request.SR Number]= "' + me.srNumber + '"'
           }
         },
         success: function(data) {
-          me.ServiceRequest = data.SiebelMessage['Service Request'];
+          let Note = null;
+          me.ServiceRequest = data.SiebelMessage['Service Request'] || {};
+          Note = me.ServiceRequest['FIN Service Request Notes'];
+          if (Note) {
+            if (Object.prototype.toString.call(Note) !== '[object Array]') {
+              console.log(111);
+              me.processDate.push(Note);
+            } else {
+              me.processDate = Note;
+            }
+          } else {
+            me.processDate = [{Note: '暂无数据'}];
+          }
         }
       });
-      api.get({
-//        key: 'getContact',
-        url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/KL Contact Interface BO/Contact/' + me.contactId,
-        method: 'GET',
-        data: {
-        },
-        success: function(data) {
-          me.contact = data;
-          console.log(me.contact);
-        }
-      });
+//      api.get({
+//        key: 'getDetail',
+//        method: 'GET',
+//        success: function(data) {
+//          me.ServiceRequest = data;
+//          console.log(me.ServiceRequest);
+//        }
+//      });
     },
     data: () => {
       return {
@@ -139,18 +164,7 @@
           {name: '流程记录', id: 'tab-container3'}
         ],
         option: ['客户不接受维修报价', '已自行解决', '暂不影响使用', '其他'],
-        processDate: [{
-          option: '预约已受理，等待安装师傅预约安装。如有疑问请咨询【0755-88880000】'
-        }, {
-          option: 'xxx已提交预约申请'
-        }],
-        HandleList: [
-          {name: '出发', key: '签到'},
-          {name: '到达', key: '签到'},
-          {name: '记录故障', key: '填写'},
-          {name: '完工确认', key: '填写'},
-          {name: '结束', key: '确认'}
-        ]
+        processDate: []
       };
     },
     methods: {
@@ -184,133 +198,28 @@
         this.isCall = 'gdcz';
         console.log(num);
       },
-//      pickPre(year, month) {        // 点击切换上个月
-//        let self = this;
-//        let mon = new Date().getMonth() + 1;
-//        let myYear = new Date().getFullYear();
-//        self.daysUL = [];
-//        self.isSelected = [];
-//        const d = new Date(self.formatDate(year, month, 1));
-//        d.setDate(0);
-//        self.initData(self.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
-//        if (mon === self.currentMonth && myYear === self.currentYear) {
-//          self.leftBunHide = false;
-//        }
-//      },
-//      pickNext(year, month) {     // 点击切换下个月
-//        let self = this;
-//        let myMon = new Date().getMonth() + 1;
-//        self.daysUL = [];
-//        self.isSelected = [];
-//        const d = new Date(self.formatDate(year, month, 1));
-//        d.setDate(42);
-//        self.initData(self.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
-//        if (myMon !== self.currentMonth) {
-//          self.leftBunHide = true;
-//        }
-//      },
-//      pick(date, index) {             // 选择日期
-//        this.selectIndex = index;
-//        this.isSelected = [];
-//        this.params.selectDay = this.formatDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
-//        console.log(this.params);
-//        for (let i = 0; i < 42; i++) {
-//          if (index === i) {
-//            this.isSelected.push(true);
-//            continue;
-//          }
-//          this.isSelected.push(false);
-//        }
-//      },
-//      formatDate(year, month, day) {
-//        const y = year;
-//        let m = month;
-//        if (m < 10) m = `0${m}`;
-//        let d = day;
-//        if (d < 10) d = `0${d}`;
-//        return `${y}-${m}-${d}`;
-//      },
-//      initData(cur) {            // 日历初始化
-//        let date = '';
-//        if (cur) {
-//          date = new Date(cur);
-//        } else {
-//          date = new Date();
-//        }
-//        this.currentDay = date.getDate();
-//        this.currentYear = date.getFullYear();
-//        this.currentMonth = date.getMonth() + 1;
-//        this.currentWeek = date.getDay();
-//        date.setDate(1);
-//        this.firstWeek = date.getDay();
-//        if (this.firstWeek === 0) {
-//          this.firstWeek = 7;
-//        }
-//        const str = this.formatDate(this.currentYear, this.currentMonth, 1);
-//        this.days.length = 0;
-//        for (let i = this.firstWeek - 1; i >= 0; i -= 1) {
-//          const d = new Date(str);
-//          d.setDate(d.getDate() - i);
-//          this.days.push(d);
-//        }
-//        if (this.days.length % 7 === 0) {
-//          this.daysUL.push(this.days);
-//          this.days = [];
-//        }
-//
-//        for (let i = 1; i <= 35 - this.firstWeek; i += 1) {
-//          const d = new Date(str);
-//          d.setDate(d.getDate() + i);
-//          this.days.push(d);
-//          if (this.days.length % 7 === 0) {
-//            this.daysUL.push(this.days);
-//            this.days = [];
-//          }
-//        }
-//      },
-//      initTableTime() {             // 时间表格初始化
-//        let arr = [];
-//        let time = '';
-//        let obj = {};
-//        for (let i = 0;i < 6; i++) {
-//          for (let i = 0;i <= 7;i++) {
-//            time = this.changeTime(this.initAm);
-//            arr.push(time);
-//            this.initAm = time;
-//          }
-//          this.initAm = time;
-//          obj = {time: arr};
-//          this.am.push(obj);
-//          obj = {};
-//          arr = [];
-//        }
-//      },
-//      changeTime(value) {
-//        let x = '2010-09-28 ' + value;
-//        let time = new Date(x.replace('-', '/'));
-//        const b = 30;
-//        time.setMinutes(time.getMinutes() + b, time.getSeconds(), 0);
-//        time = time.toString().split(' ')[4].slice(0, 5);
-//        return time;
-//      },
-//      selectedTime(index) {             // 选择时间
-//        let self = this;
-//        self.isTimeSelected = [];
-//        for (let i = 0; i < 48; i++) {
-//          if (index === i) {
-//            self.isTimeSelected.push(true);
-//            continue;
-//          }
-//          self.isTimeSelected.push(false);
-//        }
-//      },
       callSolve() {
         MessageBox.confirm('远程电话沟通客户已解决，确认提交？?', '').then(action => {
           console.log(1111);
         });
       },
       clickPosition(value1) {
-        console.log(value1);
+        api.get({
+          key: 'getaddr',
+          data: {
+            'datetime': 1511971200,
+            'useridlist': ['james', 'paul']
+          },
+          success: function(data) {
+            console.log(data);
+          }
+        });
+      },
+      completeEnd() {
+        MessageBox({
+          title: '提示',
+          message: '维修完成您辛苦了！'
+        });
       },
       toContact() {
         this.$router.push({
@@ -562,11 +471,36 @@
     /*}*/
 
     .mint-popup-2{
-      width: 100%;
+      width: 90%;
+      background-color: inherit !important;
+      .mint-cell{
+        padding: 0 0.5rem;
+        line-height: 2.5rem;
+        .mint-cell-wrapper {
+          line-height: inherit;
+          .mint-cell-value .mint-button {
+            height: 1.25rem;
+            background-color: $theme-color;
+            color: #ffffff;
+            font-size: 0.75rem;
+            width: 4rem;
+            border-radius: 0.6rem;
+          }
+        }
+      }
+      .setOut{
+        border-radius: 0.5rem 0.5rem 0 0;
+      }
+      .completeEnd{
+        border-radius: 0 0 0.5rem 0.5rem;
+      }
       .cancelHandle{
         line-height: 2.5rem;
         text-align: center;
         border-top: 1px solid gainsboro;
+        background-color: #ffffff;
+        margin: 0.5rem 0;
+        border-radius: 0.5rem;
       }
     }
   }

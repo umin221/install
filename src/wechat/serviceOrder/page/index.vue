@@ -47,7 +47,7 @@
 
         <mt-tab-container-item id="invalid">
           <loadmore ref="load" :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" :allLoaded="true">
-            <div class="list-content" v-for="(item,index) in list" @click="toDetail(item['SR Number'])" :key="index">
+            <div class="list-content" v-for="(item,index) in list" @click="toDetail(item['id'])" :key="index">
               <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}<mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge></div>
               <mt-cell class="multiple" is-link>
                 <div class="my-cell-sub" slot="title">申请时间: {{item.Created}}</div>

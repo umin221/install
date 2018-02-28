@@ -5,8 +5,8 @@
     </mt-header>
     <div class="mint-content addService">
       <div class="addform">
+        <mt-field label="联系电话" type="text" placeholder="请输入联系电话" v-model.trim="callPhone" class="textRight require"></mt-field>
         <mt-field label="报修联系人" type="text" placeholder="请输入联系人" v-model="ContactName" class="textRight require"></mt-field>
-        <mt-field label="联系电话" type="text" placeholder="请输入联系电话" v-model="callPhone" class="textRight require"></mt-field>
         <mt-cell class="require mint-field" title="联系人类型" placeholder="请选择" is-link>{{Type}}</mt-cell>
         <mt-cell class="require mint-field" title="省市区" placeholder="请选择"  is-link></mt-cell>
         <mt-field class="block require" label="详细地址" placeholder="请输入详细地址..." type="textarea" rows="2"></mt-field>
@@ -24,6 +24,9 @@
           <span>更多</span>
         </div>
       </div>
+      <ul class="search-list">
+        <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item['Cellular Phone #'],item['Last Name'])">{{item['Cellular Phone #']}} {{item['Last Name']}}</li>
+      </ul>
       <div class="submitButton">
         <mt-button size="normal" type="danger" @click="submit">提交</mt-button>
       </div>
@@ -31,6 +34,10 @@
   </div>
 </template>
 <style lang="scss">
+  *{
+    margin: 0;
+    padding: 0;
+  }
   @mixin disFlex (){
     display: flex;
     justify-content:center;
@@ -50,7 +57,21 @@
         }
       }
     }
-
+    .search-list{
+      z-index: 1;
+      position: absolute;
+      top: 1.8rem;
+      background: white;
+      width: 100%;
+      list-style: none;
+      box-shadow: 1px 1px 5px #ededed;
+      -webkit-box-shadow: 1px 1px 5px #ededed;
+    }
+    .search-list>li{
+      line-height: 1.5rem;
+      text-align: center;
+      color: #777;
+    }
     .textRight{
       .mint-cell-wrapper{
         .mint-cell-value{
@@ -99,6 +120,13 @@
 </style>
 <script>
   import api from '../api/api';
+  const delay = (function() {
+    let timer = 0;
+    return function(callback, ms) {
+      clearTimeout(timer);
+      timer = setTimeout(callback, ms);
+    };
+  })();
   export default {
     name: 'addService',
     created() {
@@ -107,6 +135,7 @@
       return {
         hideMore: false,
         ContactName: '',
+        ContactId: '',
         callPhone: '',
         Type: '',
         Area: '',
@@ -114,7 +143,8 @@
         Priority: '',
         Description: '',
         ProductFlag: '',
-        startDate: ''
+        startDate: '',
+        search: []
       };
     },
     methods: {
@@ -126,35 +156,65 @@
         let me = this;
         console.log(me.callPhone);
         api.get({
-          url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/KL Contact Interface BO/Contact/?searchspec=[Cellular Phone %23] = ' + me.callPhone,
+          key: 'getContact1',
           method: 'GET',
-          data: {
-          },
           success: function(data) {
+            console.log(1);
             console.log(data);
+            me.ContactId = data.items.Id;
+//            api.get({
+//              key: 'getAdd',
+//              data: {
+//                body: {
+//                  SiebelMessage: {
+//                    'MessageId': '',
+//                    'MessageType': 'Integration Object',
+//                    'IntObjectName': 'Base KL Service Request Interface BO',
+//                    'IntObjectFormat': 'Siebel Hierarchical',
+//                    'ListOfBase KL Service Request Interface BO': {
+//                      'Service Request': {
+//                        'Id': '1',
+//                        'Contact Id': me.ContactId,
+//                        'Contact Last Name': me.ContactName,
+//                        'Area': '其它问题',
+//                        'Sub-Area': '有一定影响力的社会人士',            // 故障现象2
+//                        'Priority': '',            // 优先级
+//                        'Description': '',        // 客服说明
+//                        'Product Warranty Flag': '',  // 报修期限
+//                        'CEM Planned Start Date': '', // 客户预约时间
+//                        'KL Product Model': '',     // 产品型号
+//                        'KL Cutoff Date': '',       // 移交日期
+//                        'KL SN': ''                   // 产品条形码
+//                      }
+//                    }
+//                  }
+//                }
+//              },
+//              success: function(data) {
+//                console.log(11);
+//                console.log(data);
+//              }
+//            });
+            console.log(me.ContactName);
             api.get({
-              key: 'getAdd',
+              key: 'getaddContact',
+              method: 'POST',
               data: {
-                body: {
-                  SiebelMessage: {
-                    'MessageId': '',
+                'body': {
+                  'SiebelMessage': {
+                    'MessageId': '222',
                     'MessageType': 'Integration Object',
-                    'IntObjectName': 'Base KL Service Request Interface BO',
+                    'IntObjectName': 'Base KL Contact Interface BO',
                     'IntObjectFormat': 'Siebel Hierarchical',
-                    'ListOfBase KL Service Request Interface BO': {
-                      'Service Request': {
-                        'Id': '1',
-                        'Contact Id': data.item[0].Id,
-                        'Contact Last Name': me.ContactName,
-                        'Area': '其它问题',
-                        'Sub-Area': '有一定影响力的社会人士',            // 故障现象2
-                        'Priority': '',            // 优先级
-                        'Description': '',        // 客服说明
-                        'Product Warranty Flag': '',  // 报修期限
-                        'CEM Planned Start Date': '', // 客户预约时间
-                        'KL Product Model': '',     // 产品型号
-                        'KL Cutoff Date': '',       // 移交日期
-                        'KL SN': ''                   // 产品条形码
+                    'ListOfBase KL Contact Interface BO': {
+                      'Contact': {
+                        'Id': '222',
+                        'M/F': '男',
+                        'Type': '业主',
+                        'Last Name': me.ContactName,
+                        'Work Phone #': me.callPhone,
+                        'Job Title': 'Job Title',
+                        'KL Department': 'KL Department'
                       }
                     }
                   }
@@ -164,41 +224,74 @@
                 console.log(data);
               }
             });
-          },
-          error: function(data) {
-            console.log(data);
-            if (data) {
-              api.get({
-                url: 'http://192.168.166.8:9001/siebel-rest/v1.0/service/EAI Siebel Adapter/Upsert',
-                method: 'POST',
-                data: {
-                  'body': {
-                    'SiebelMessage': {
-                      'MessageId': '',
-                      'MessageType': 'Integration Object',
-                      'IntObjectName': 'Base KL Contact Interface BO',
-                      'IntObjectFormat': 'Siebel Hierarchical',
-                      'ListOfBase KL Contact Interface BO': {
-                        'Contact': {
-                          'Id': '17763756438',
-                          'M/F': '男',
-                          'Type': '业主',
-                          'Last Name': me.ContactName,
-                          'Work Phone #': '17763756438',
-                          'Job Title': 'Job Title',
-                          'KL Department': 'KL Department'
-                        }
-                      }
-                    }
-                  }
-                },
-                success: function(data) {
-                  console.log(data);
-                }
-              });
-            }
           }
+//          error: function(data) {
+//            console.log(2);
+//            console.log(data);
+//            if (data) {
+//              api.get({
+//                url: 'http://192.168.166.8:9001/siebel-rest/v1.0/service/EAI Siebel Adapter/Upsert',
+//                method: 'POST',
+//                data: {
+//                  'body': {
+//                    'SiebelMessage': {
+//                      'MessageId': '',
+//                      'MessageType': 'Integration Object',
+//                      'IntObjectName': 'Base KL Contact Interface BO',
+//                      'IntObjectFormat': 'Siebel Hierarchical',
+//                      'ListOfBase KL Contact Interface BO': {
+//                        'Contact': {
+//                          'Id': '17763756438',
+//                          'M/F': '男',
+//                          'Type': '业主',
+//                          'Last Name': me.ContactName,
+//                          'Work Phone #': '17763756438',
+//                          'Job Title': 'Job Title',
+//                          'KL Department': 'KL Department'
+//                        }
+//                      }
+//                    }
+//                  }
+//                },
+//                success: function(data) {
+//                  console.log(data);
+//                }
+//              });
+//            }
+//          }
         });
+      },
+      async fetchData(val) {
+        let me = this;
+        if (me.callPhone) {
+          api.get({
+            url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/KL Contact Interface BO/Contact/?searchspec=[Cellular Phone %23] = ' + me.callPhone + '',
+            method: 'GET',
+            success: function(data) {
+              console.log(data);
+              me.search = data.items;
+            }
+          });
+        } else {
+          me.search = [];
+        }
+      },
+      selectCaLL(callNur, name) {
+        console.log(callNur);
+        console.log(name);
+        let me = this;
+        if (callNur && name) {
+          me.callPhone = callNur;
+          me.ContactName = name;
+          me.search = [];
+        }
+      }
+    },
+    watch: {
+      callPhone() {
+        delay(() => {
+          this.fetchData();
+        }, 300);
       }
     }
   };
