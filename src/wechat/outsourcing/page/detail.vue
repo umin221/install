@@ -41,17 +41,17 @@
     </div>
 
     <button-group>
-      <mt-button type="primary" class="single"
-        v-show="type==='add'"
-        @click.native="submitFn">提交</mt-button>
-      <mt-button type="primary" class="single"
-        v-show="state==='valid'"
-        v-text="read? '新增联系人' : '失效'"
-        @click.native="submitFn"></mt-button>
-      <mt-button type="primary" class="single"
-        v-show="read && state==='invalid'"
-        @click="type='add'">重新启动</mt-button>
-    </button-group>
+  <mt-button type="primary" class="single"
+             v-show="type==='add'"
+             @click.native="submitFn">提交</mt-button>
+  <mt-button type="primary" class="single"
+             v-show="state==='valid'"
+             v-text="read? '新增联系人' : '失效'"
+             @click.native="submitFn"></mt-button>
+  <mt-button type="primary" class="single"
+             v-show="read && state==='invalid'"
+             @click="type='add'">重新启动</mt-button>
+</button-group>
   </div>
 </template>
 
