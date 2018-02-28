@@ -1,22 +1,41 @@
 .mint-field {
 
+  &.require {
+    .mint-cell-title:before {
+      content: "*";
+      color: $red-base;
+    }
+  }
+
   .mint-cell-title {
-    color: $label-color;
+    color: $gray-minor;
+    font-size: $font-size-default;
   }
 
   .mint-cell-value {
-    color: $value-color;
-
-    input[readonly] {
-      text-align: right;
-    }
+    color: $black-base;
+    font-size: $font-size-default;
   }
 }
 
-.mint-field.require {
+.readonly {
+  .mint-field {
+    min-height: 34px;
 
-  .mint-cell-title:before {
-    content: "*";
-    color: $red-base;
+    .mint-cell-wrapper {
+      background-image: none;
+
+      .mint-cell-title {
+        font-size: $font-size-small;
+      }
+
+      .mint-cell-value {
+        font-size: $font-size-small;
+      }
+
+      ::-webkit-input-placeholder {
+        font-size: 0;
+      }
+    }
   }
 }

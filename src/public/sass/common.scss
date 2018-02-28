@@ -1,3 +1,12 @@
 body {
   margin: 0;
 }
+
+.readonly {
+  &input, textarea {
+    @include readonly;
+  }
+  input, textarea {
+    @include readonly;
+  }
+}

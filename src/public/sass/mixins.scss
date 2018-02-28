@@ -41,3 +41,19 @@
     clear: both;
   }
 }
+
+// Element border
+@mixin border($position: bottom) {
+  background-image: -webkit-linear-gradient(top,#eaeaea,#eaeaea 50%,transparent 0);
+  background-image: linear-gradient(180deg,#eaeaea,#eaeaea 50%,transparent 0);
+  background-size: 120% 1px;
+  background-repeat: no-repeat;
+  background-position: $position;
+  background-origin: content-box;
+  -webkit-box-align: center;
+}
+
+// Readonly
+@mixin readonly() {
+  pointer-events: none;
+}

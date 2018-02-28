@@ -112,10 +112,10 @@
               <span class="icon"></span>
             </li>
             <li style="margin-right: 8px">{{item.option}}</li>
-            <div class="content-div"  @click.nataive="sporadic(index)">
-              <div>111</div>
-              <div>222</div>
-              <div>333</div>
+            <div class="content-div" v-if="index===2"  @click.nataive="sporadic(index)">
+              <div>批次</div>
+              <div>已开孔/开孔批次</div>
+              <div>时间</div>
             </div>
           </ul>
         </div>
@@ -125,9 +125,9 @@
 </template>
 <style lang="scss">
   .mint-content-datail {
-    .mint-cell-wrapper {
+    /*.mint-cell-wrapper {
       font-size: 0.7rem!important;
-    }
+    }*/
     .mint-cell-title {
     }
     .list-text-span {
@@ -202,6 +202,7 @@
       line-height: 27px;
     }
     .content-div {
+      border: 1px solid #81B92C;
       border-radius: 5px;
       padding: 10px;
       font-size: 0.5rem;
