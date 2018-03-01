@@ -9,9 +9,9 @@
       <!--选择年月和日期-->
       <div class="dateContent">
         <div class="month">
-          <i class="el-icon-left" v-show="leftBunHide" @click="pickPre(currentYear,currentMonth)"><</i>
+          <i class="xs-icon icon-back" v-show="leftBunHide" @click="pickPre(currentYear,currentMonth)"></i>
           <span>{{ currentYear }} 年 {{ currentMonth }} 月</span>
-          <i class="el-icon-right" @click="pickNext(currentYear,currentMonth)">></i>
+          <i class="xs-icon icon-next" @click="pickNext(currentYear,currentMonth)"></i>
         </div>
         <!-- 日期 -->
         <div class="bodyDiv">
@@ -86,7 +86,8 @@
         initAm: '00:00',
         am: [],
         num: 0,
-        isTimeSelected: []
+        isTimeSelected: [],
+        isMyDay: false
       };
     },
     methods: {
@@ -146,6 +147,9 @@
       },
       initData(cur) {            // 日历初始化
         let date = '';
+        let Year = new Date().getFullYear();
+        let Month = new Date().getMonth();
+        let Day = new Date().getDate();
         if (cur) {
           date = new Date(cur);
         } else {
@@ -167,6 +171,7 @@
           d.setDate(d.getDate() - i);
           this.days.push(d);
         }
+        console.log(this.days);
         if (this.days.length % 7 === 0) {
           this.daysUL.push(this.days);
           this.days = [];
@@ -177,7 +182,19 @@
           d.setDate(d.getDate() + i);
           this.days.push(d);
           if (this.days.length % 7 === 0) {
-            this.daysUL.push(this.days);
+            if (!this.isMyDay) {
+              for (let j = 0; j < this.days.length;j++) {
+                if (this.days[j].getFullYear() === Year && this.days[j].getMonth() === Month && this.days[j].getDate() === Day) {
+                  console.log(Year + ' ' + Month + ' ' + Day);
+                  this.daysUL.push(this.days);
+                  this.isMyDay = true;
+                } else {
+                  console.log('其他');
+                }
+              }
+            } else {
+              this.daysUL.push(this.days);
+            }
             this.days = [];
           }
         }
@@ -282,15 +299,16 @@
           text-align: center;
           line-height: 2rem;
           font-size: 0.7rem;
+          position: relative;
           i{
-            font: 500 1.2rem sans-serif;
-            color: #888;
+            position: absolute;
+            top: 0;
           }
-          .el-icon-left{
-            float: left;
+          .icon-next{
+            right: 0.5rem;
           }
-          .el-icon-right{
-            float: right;
+          .icon-back{
+            left: 0.5rem;
           }
         }
         .weekdays{

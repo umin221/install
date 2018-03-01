@@ -61,8 +61,8 @@
       <button-group>
         <mt-button v-if="isCall === 'lxkh'" type="primary" class="single" @click.native="changeBtnStote"  >电话联系客户</mt-button>
         <div v-else-if="isCall === 'yyjh'" class="callPlan">
-          <mt-button  type="primary" class="single"  @click.native="callSolve" >电话已解决</mt-button>
-          <mt-button type="primary" class="single" @click.native="clickShow"  >预约维修计划</mt-button>
+          <mt-button  type="primary" class="single flax"  @click.native="callSolve" >电话已解决</mt-button>
+          <mt-button type="primary" class="single flax" @click.native="clickShow"  >预约维修计划</mt-button>
         </div>
         <mt-button v-if="isCall === 'gdcz'"  type="primary" class="single" @click="popupVisible1 = !popupVisible1" >工单操作</mt-button>
       </button-group>
@@ -202,10 +202,10 @@
         console.log(val);
       },
       enter(val) {                     // 日历确定
-        let num = parseInt(val.Time1, 0);
+//        let num = parseInt(val.Time1, 0);
         this.showBox2 = false;
-        this.isCall = 'gdcz';
-        console.log(num);
+//        this.isCall = 'gdcz';
+        console.log(val);
       },
       callSolve() {
         MessageBox.confirm('远程电话沟通客户已解决，确认提交？?', '').then(action => {
@@ -261,7 +261,7 @@
     position: relative;
     height:100%;
     .service-detail{
-      background: #F2F2F2;
+      height: 84%;
       .detail-title{
         position: relative;
         padding: 0.5rem;
@@ -285,10 +285,12 @@
         position: relative;
         margin-top: 0.5rem;
         font-size: 0.7rem;
+        height: 80%;
+        background-color: #ffffff;
+        overflow: auto;
         .mint-tab-container{
           .mint-tab-container-wrap{
             .mint-tab-container-item{
-              background: white;
               padding: 0.5rem;
               .crm-zyList {
                 overflow: hidden;
@@ -351,7 +353,16 @@
         }
       }
     }
-
+    .cus-group-button{
+      .callPlan{
+        display: flex;
+        justify-content: space-around;
+        button{
+          margin: 0.3rem 0;
+          width: 40%;
+        }
+      }
+    }
     /*底部按钮*/
     /*.mint-popup-1{*/
       /*width: 100%;*/
