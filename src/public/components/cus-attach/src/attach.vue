@@ -3,7 +3,9 @@
 
     <title-group v-if="title">合同附件</title-group>
 
-    <div class="cus-attach co-flex co-wp">
+    <empty v-show="empty" tips="暂无附件"></empty>
+
+    <div v-show="!empty" class="cus-attach co-flex co-wp">
       <div v-show="edit"
         @click="addFn">
         <img src="../assets/add.png"/>
@@ -28,6 +30,11 @@
 
   export default {
     name: 'cus-attach',
+    props: {
+      attach: Array,
+      edit: Boolean,
+      title: String
+    },
     data: () => {
       return {
         actions: [{
@@ -44,10 +51,10 @@
         sheetVisible: false
       }
     },
-    props: {
-      attach: Array,
-      edit: Boolean,
-      title: String
+    computed: {
+      empty() {
+        return !this.edit && !this.attach.length;
+      }
     },
     methods: {
       // 添加文件
@@ -68,18 +75,20 @@
     background-color: #fff;
 
     .cus-attach {
-      padding: 0 10px;
+      font-size: $font-size-small;
+      color: $gray-minor;
+      padding: 10px;
 
       div {
         position: relative;
         text-align: center;
-        padding: 19px 0;
+        padding: 5px 0;
         width: 25%;
 
         span {
           position: absolute;
-          top: 6px;
-          right: 6px;
+          top: -8px;
+          right: 2px;
         }
 
         img {

@@ -28,5 +28,11 @@ export default new Router({
     component(resolve) {
       require(['../page/search'], resolve);
     }
+  }, { // 联系人
+    path: '/contact',
+    name: 'contact',
+    component(resolve) {
+      require(['../page/contact'], resolve);
+    }
   }]
 });

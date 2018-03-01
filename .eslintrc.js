@@ -19,8 +19,10 @@ module.exports = {
     'jasmine': false
   },
   globals: {
-    'define': true,
-    'xSimple': true
+    'KND': true,
+    'config': true,
+    'Indicator': true,
+    'Toast': true
   },
   rules: {
     'accessor-pairs': 2,
