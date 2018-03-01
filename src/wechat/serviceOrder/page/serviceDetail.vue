@@ -58,14 +58,22 @@
       <div v-if="!role" class="submitButton">
         <mt-button size="normal" type="danger" @click="toContact" >派单</mt-button>
       </div>
-      <div v-else-if="role" class="submitButton">
-        <mt-button v-if="isCall === 'lxkh'"  size="normal" @click.native="changeBtnStote" type="danger" >电话联系客户</mt-button>
+      <button-group>
+        <mt-button v-if="isCall === 'lxkh'" type="primary" class="single" @click.native="changeBtnStote"  >电话联系客户</mt-button>
         <div v-else-if="isCall === 'yyjh'" class="callPlan">
-          <mt-button size="normal" type="default" @click.native="callSolve" >电话已解决</mt-button>
-          <mt-button size="normal" @click.native="clickShow" type="danger" >预约维修计划</mt-button>
+          <mt-button  type="primary" class="single"  @click.native="callSolve" >电话已解决</mt-button>
+          <mt-button type="primary" class="single" @click.native="clickShow"  >预约维修计划</mt-button>
         </div>
-        <mt-button v-if="isCall === 'gdcz'"  size="normal" @click="popupVisible1 = !popupVisible1" type="danger" >工单操作</mt-button>
-      </div>
+        <mt-button v-if="isCall === 'gdcz'"  type="primary" class="single" @click="popupVisible1 = !popupVisible1" >工单操作</mt-button>
+      </button-group>
+      <!--<div v-else-if="role" class="submitButton">-->
+        <!--<mt-button v-if="isCall === 'lxkh'"  size="normal" @click.native="changeBtnStote" type="danger" >电话联系客户</mt-button>-->
+        <!--<div v-else-if="isCall === 'yyjh'" class="callPlan">-->
+          <!--<mt-button size="normal" type="default" @click.native="callSolve" >电话已解决</mt-button>-->
+          <!--<mt-button size="normal" @click.native="clickShow" type="danger" >预约维修计划</mt-button>-->
+        <!--</div>-->
+        <!--<mt-button v-if="isCall === 'gdcz'"  size="normal" @click="popupVisible1 = !popupVisible1" type="danger" >工单操作</mt-button>-->
+      <!--</div>-->
       <!--弹出日历-->
       <mt-popup v-model="showBox2" position="bottom" popup-transition="popup-fade" class="mint-popup-1">
         <dateControl @my-cancel="cancel" @my-enter="enter"></dateControl>
@@ -104,6 +112,7 @@
   import dateControl from './dateControl';
   import api from '../api/api';
   import { MessageBox } from 'mint-ui';
+  import buttonGroup from 'public/components/cus-button-group';
   export default {
     name: 'serviceDetail',
     created() {
@@ -229,7 +238,8 @@
     },
     components: {
       close,
-      dateControl
+      dateControl,
+      buttonGroup
     }
   };
 </script>
@@ -343,20 +353,6 @@
     }
 
     /*底部按钮*/
-    .submitButton {
-      @include disFlex();
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      height: 3rem;
-      background: white;
-      line-height: 3rem;
-      opacity: 0.7;
-      button {
-        width: 7rem;
-        border-radius: 1rem;
-      }
-    }
     /*.mint-popup-1{*/
       /*width: 100%;*/
       /*height: 22rem;*/
