@@ -18,11 +18,11 @@
 
       <mt-navbar v-model="selected">
         <mt-tab-item id="pending"
-          @click.native="getList('待审批')">待审批</mt-tab-item>
+          @click.native="!pending && getPartners('待审批')">待审批</mt-tab-item>
         <mt-tab-item id="valid"
-          @click.native="getList('有效')">已生效</mt-tab-item>
+          @click.native="!valid && getPartners('有效')">已生效</mt-tab-item>
         <mt-tab-item id="invalid"
-          @click.native="getList('失效')">已失效</mt-tab-item>
+          @click.native="!invalid && getPartners('失效')">已失效</mt-tab-item>
       </mt-navbar>
 
       <!-- tab-container -->
@@ -81,9 +81,10 @@
   const NameSpace = 'index';
   export default {
     name: NameSpace,
+    components: {loadmore, cusCell},
     // 数据初始化
     created() {
-      this.getList();
+      this.getPartners();
     },
     data: () => {
       return {
@@ -104,7 +105,7 @@
       ...mapState(NameSpace, ['pending', 'valid', 'invalid']),
     },
     methods: {
-      ...mapActions(NameSpace, ['getList']),
+      ...mapActions(NameSpace, ['getPartners']),
       // 顶部加载
       loadTop() {
         var me = this;
@@ -131,7 +132,6 @@
           }
         });
       }
-    },
-    components: {loadmore, cusCell}
+    }
   };
 </script>

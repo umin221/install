@@ -4,7 +4,6 @@
  * @description 工具库
  */
 import axios from 'axios';
-import {Toast} from 'mint-ui';
 
 (function(context) {
 
@@ -15,7 +14,7 @@ import {Toast} from 'mint-ui';
     };
 
     /**
-     *
+     * 获取用户信息
      * @returns {string}
      */
     getLoginInfo() {
@@ -23,29 +22,49 @@ import {Toast} from 'mint-ui';
     };
 
     /**
-     *
+     * 异步请求
      * @param option
      */
     ajax(option) {
-      let param = Object.assign({
+      // tips
+      Indicator.open({
+        spinnerType: 'fading-circle'
+      });
+      // post data
+      let setting = Object.assign({
         headers: {
           'Authorization': 'Basic ' + btoa('XIEXW:XIEXW')
         },
         timeout: 30000,
         method: 'get'
       }, option);
-      axios(param).then((response) => {
+      // url valid
+      if (!/^http/i.test(option.url)) {
+        setting.url = config.host + config.context + setting.url;
+      };
+      // get data
+      axios(setting).then((response) => {
+        Indicator.close();
+        let data = response.data;
+        // Error 字段判断是否存在系统异常
+        if (data.ERROR) {
+          Toast({
+            message: '出了点小情况，请稍后再试。<' + data.ERROR + '>'
+          });
+        }
+        // callback
         option.success(response.data);
       }).catch((error) => {
+        Indicator.close();
         if (option.error) {
           option.error(error);
         } else {
-          console.error(error);
-          // eslint-disable-next-line
+          console.log(error);
+          let message = error.response && error.response.data.ERROR;
           Toast({
-            message: '获取数据失败',
+            message: message || '获取数据失败',
             position: 'bottom',
-            duration: 2000
+            duration: 4000
           });
         }
       });

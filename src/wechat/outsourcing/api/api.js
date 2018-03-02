@@ -1,25 +1,44 @@
 let apiList = {
   // 委外列表
-  getList: (option) => {
-    return Object.assign({
-      url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/Channel Partner/Channel Partner/?searchspec=[KL Partner Status] = "' + option.status + '"&PageSize=10&StartRowNum=0'
-    }, option);
+  getPartners: (option) => {
+    return {
+      url: 'data/Channel Partner/Channel Partner/?searchspec=[KL Partner Status] = "' + option.data.status + '"&PageSize=10&StartRowNum=0'
+    };
   },
 
   // 委外详情
-  getDetail: (option) => {
-    return Object.assign({
+  findPartner: (option) => {
+    return {
       method: 'post',
-      url: 'http://192.168.166.8:9001/siebel-rest/v1.0/service/EAI Siebel Adapter/Query/?OutputIntObjectName=Base Channel Partner&PrimaryRowId=' + option.id,
+      url: 'service/EAI Siebel Adapter/Query/?OutputIntObjectName=Base Channel Partner&PrimaryRowId=' + option.data.id,
       data: {}
-    }, option);
+    };
+  },
+
+  // 添加委外团队
+  addPartner: (option) => {
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Upsert',
+      data: {
+        'body': {
+          'SiebelMessage': {
+            'MessageId': '',
+            'MessageType': 'Integration Object',
+            'IntObjectName': 'Base Channel Partner',
+            'IntObjectFormat': 'Siebel Hierarchical',
+            'ListOfBase Channel Partner': {
+              'Channel Partner': option.data.partner
+            }
+          }
+        }
+      }
+    };
   }
 };
 
 let ajax = (api) => {
-  // eslint-disable-next-line
   if (config.online) {
-    // eslint-disable-next-line
     KND.Native.ajax(api);
   } else {
     let data = require('./data.json');
@@ -28,7 +47,7 @@ let ajax = (api) => {
 };
 
 const get = (option) => {
-  ajax(apiList[option.key](option));
+  ajax(Object.assign(option, apiList[option.key](option)));
 };
 
 export default {

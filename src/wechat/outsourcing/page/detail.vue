@@ -13,16 +13,16 @@
       <div :class="{'readonly':read}">
         <mt-field label="合作伙伴名称" placeholder="请输入名称"
           :class="heartVisible"
-          :value="form['Name']"></mt-field>
+          v-model="form['Name']"></mt-field>
         <mt-field label="合作伙伴负责人" placeholder="请输入负责人"
           :class="heartVisible"
-          :value="form['KL Partner Owner Name']"></mt-field>
+          v-model="form['KL Partner Owner Name']"></mt-field>
         <mt-field label="联系电话" placeholder="请输入电话" type="tel"
           :class="heartVisible"
-          :value="form['Main Phone Number']"></mt-field>
+          v-model="form['Main Phone Number']"></mt-field>
         <mt-field label="详细地址" placeholder="请输入地址"
           :class="heartVisible"
-          :value="form['Primary Address Street']"></mt-field>
+          v-model="form['Primary Address Street']"></mt-field>
         <!--<mt-field v-show="!read" class="require" :readonly="read" label="合同附件"></mt-field>-->
       </div>
 
@@ -33,34 +33,36 @@
 
       <div v-show="read && state !== 'pending'">
         <title-group>联系人列表</title-group>
+        <empty v-show="!form.Contact"></empty>
         <mt-cell-swipe class="multiple"
-                 v-for="item in contact.list"
-                 :key="item.id"
+                 v-for="item in form.Contact"
+                 :key="item.Id"
                  :right="right"
+                 @click.native="toContact(item)"
                  is-link>
-          <div class="mint-cell-title" slot="title">姓名: {{item.name}}</div>
-          <div class="mint-cell-sub-title" slot="title">登录账号: {{item.loginID}}</div>
+          <div class="mint-cell-title" slot="title">姓名: {{item['Last Name']}}</div>
+          <div class="mint-cell-sub-title" slot="title">登录账号: {{item['Last Name']}}</div>
         </mt-cell-swipe>
       </div>
     </div>
 
     <button-group>
-  <mt-button type="primary" class="single"
-             v-show="type==='add'"
-             @click.native="submitFn">提交</mt-button>
-  <mt-button type="primary" class="single"
-             v-show="state==='valid'"
-             v-text="read? '新增联系人' : '失效'"
-             @click.native="submitFn"></mt-button>
-  <mt-button type="primary" class="single"
-             v-show="read && state==='invalid'"
-             @click="type='add'">重新启动</mt-button>
-</button-group>
+      <mt-button type="primary" class="single"
+        v-show="type==='add'"
+        @click.native="submitFn">提交</mt-button>
+      <mt-button type="primary" class="single"
+        v-show="isValid"
+        v-text="read? '新增联系人' : '失效'"
+        @click.native="multipleFn"></mt-button>
+      <mt-button type="primary" class="single"
+        v-show="read && state==='invalid'"
+        @click="type='add'">重新启动</mt-button>
+    </button-group>
   </div>
 </template>
 
 <script type="es6">
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import titleGroup from 'public/components/cus-title-group';
   import buttonGroup from 'public/components/cus-button-group';
 
@@ -73,13 +75,19 @@
 
   const NameSpace = 'detail';
   export default {
+    name: NameSpace,
+    components: {titleGroup, buttonGroup},
     // 初始化
     created() {
       let param = this.$route.query;
       this.state = param.state;
       this.type = param.type;
       // 获取详情
-      this.getDetail(param.id);
+      if (param.id) {
+        this.findPartner(param.id);
+      } else {
+        this.clear();
+      }
     },
     data: () => {
       return {
@@ -93,7 +101,7 @@
       };
     },
     computed: {
-      ...mapState(NameSpace, ['form', 'attach', 'contact']),
+      ...mapState(NameSpace, ['form', 'attach']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -115,18 +123,43 @@
        * 查看&编辑标题一致
        */
       title() {
-        let type = this.type;
-        return type === 'add' ? (this.state === 'invalid' ? '补充委外合约' : '创建委外团队') : '委外团队详情';
+        return this.type === 'add' ? (this.state === 'invalid' ? '补充委外合约' : '创建委外团队') : '委外团队详情';
       }
     },
     methods: {
-      ...mapActions(NameSpace, ['getDetail']),
+      ...mapMutations(NameSpace, ['clear']),
+      ...mapActions(NameSpace, ['findPartner', 'addPartner']),
+      toContact(contact) {
+        this.$router.push({
+          name: 'contact',
+          query: contact
+        });
+      },
+      // Create partner
       submitFn() {
-        // pending
-        this.state = this.state === 'add' ? 'edit' : 'read';
+        let me = this;
+        me.addPartner((data) => {
+          if (data.PrimaryRowId) {
+            Toast({
+              message: '创建成功'
+            });
+            me.$router.go(-1);
+          } else {
+            Toast({
+              message: '创建失败'
+            });
+          }
+        });
+      },
+      // Add contact or invalid of the partner
+      multipleFn() {
+        if (this.read) {
+          this.$router.push('contact');
+        } else {
+
+        }
       }
-    },
-    components: {titleGroup, buttonGroup}
+    }
   };
 </script>
 
