@@ -17,51 +17,54 @@
     <div class="mint-content">
 
       <mt-navbar v-model="selected">
-        <mt-tab-item id="pending">待审批</mt-tab-item>
-        <mt-tab-item id="valid">已生效</mt-tab-item>
-        <mt-tab-item id="invalid">已失效</mt-tab-item>
+        <mt-tab-item id="pending"
+          @click.native="getList('待审批')">待审批</mt-tab-item>
+        <mt-tab-item id="valid"
+          @click.native="getList('有效')">已生效</mt-tab-item>
+        <mt-tab-item id="invalid"
+          @click.native="getList('失效')">已失效</mt-tab-item>
       </mt-navbar>
 
       <!-- tab-container -->
       <mt-tab-container v-model="selected">
         <mt-tab-container-item id="pending">
           <loadmore ref="load" :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" :allLoaded="true">
-            <mt-cell class="multiple"
+            <cus-cell class="multiple"
                      :key="item.id"
-                     @click.native="toDetail"
-                     v-for="item in pendingList"
+                     :title="'合作伙伴名称:'+ item.Name"
+                     @click.native="toDetail(item.Id)"
+                     v-for="item in pending"
                      is-link>
-              <div class="mint-cell-title" slot="title">合作伙伴名称: {{item.title}}</div>
-              <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item.contact}}</div>
-              <div class="mint-cell-sub-title" slot="title">联系电话: {{item.phone}}</div>
-            </mt-cell>
+              <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Main Phone Number']}}</div>
+            </cus-cell>
           </loadmore>
         </mt-tab-container-item>
 
         <mt-tab-container-item id="valid">
           <loadmore ref="load" :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" :allLoaded="true">
-            <mt-cell class="multiple"
+            <cus-cell class="multiple"
                      :key="item.id"
-                     @click.native="toDetail"
-                     v-for="item in validList"
+                     :title="'合作伙伴名称:'+ item.Name"
+                     @click.native="toDetail(item.Id)"
+                     v-for="item in valid"
                      is-link>
-              <div class="mint-cell-title" slot="title">合作伙伴名称: {{item.title}}</div>
-              <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item.contact}}</div>
-              <div class="mint-cell-sub-title" slot="title">联系电话: {{item.phone}}</div>
-            </mt-cell>
+              <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Main Phone Number']}}</div>
+            </cus-cell>
           </loadmore>
         </mt-tab-container-item>
 
         <mt-tab-container-item id="invalid">
-          <mt-cell class="multiple"
+          <cus-cell class="multiple"
                    :key="item.id"
-                   @click.native="toDetail"
-                   v-for="item in invalidList"
+                   :title="'合作伙伴名称:'+ item.Name"
+                   @click.native="toDetail(item.Id)"
+                   v-for="item in invalid"
                    is-link>
-            <div class="mint-cell-title" slot="title">合作伙伴名称: {{item.title}}</div>
-            <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item.contact}}</div>
-            <div class="mint-cell-sub-title" slot="title">联系电话: {{item.phone}}</div>
-          </mt-cell>
+            <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
+            <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Main Phone Number']}}</div>
+          </cus-cell>
         </mt-tab-container-item>
       </mt-tab-container>
 
@@ -71,33 +74,21 @@
 </template>
 
 <script type="es6">
-  import {mapActions} from 'vuex';
+  import {mapState, mapActions} from 'vuex';
   import loadmore from 'public/components/cus-loadmore';
-  import api from '../api/api';
+  import cusCell from 'public/components/cus-cell';
 
   const NameSpace = 'index';
   export default {
     name: NameSpace,
     // 数据初始化
     created() {
-      let me = this;
-      api.get({
-        key: 'getList',
-        success: function(data) {
-          me.pendingList = data.pendingList;
-          me.validList = data.validList;
-          me.invalidList = data.invalidList;
-        }
-      });
+      this.getList();
     },
     data: () => {
       return {
         // 活跃tab
         selected: 'pending',
-        // 数据列表
-        pendingList: '',
-        validList: '',
-        invalidList: '',
         // 下拉状态
         topStatus: '',
         // 跳转新增
@@ -108,6 +99,9 @@
           }
         }
       };
+    },
+    computed: {
+      ...mapState(NameSpace, ['pending', 'valid', 'invalid']),
     },
     methods: {
       ...mapActions(NameSpace, ['getList']),
@@ -126,17 +120,18 @@
         }, 1000);
       },
       // 跳转详情
-      toDetail() {
+      toDetail(id) {
         // 跳转详情
         this.$router.push({
           name: 'detail',
           query: {
             type: 'read',
-            state: this.selected
+            state: this.selected,
+            id: id
           }
         });
       }
     },
-    components: {loadmore}
+    components: {loadmore, cusCell}
   };
 </script>

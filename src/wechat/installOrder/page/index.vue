@@ -14,11 +14,13 @@
         <mt-tab-item id="3">已完成</mt-tab-item>
       </mt-navbar>
       <loadmore :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" ref="load">
-        <mt-cell v-for="item in list" :key="item.id" is-link to="detail?index=1">
-          <div slot="title" class="list-text"><span>订单编码:</span><span>{{item.savrsNo}}</span></div>
-          <div slot="title" class="list-text"><span>销售类型:</span><span>{{item.type}}</span></div>
-          <div slot="title" class="list-text"><span>项目名称:</span><span>{{item.name}}</span></div>
-        </mt-cell>
+        <div  v-for="item in list" :key="item.Id" @click="toDetail(item.Id)">
+          <mt-cell is-link >
+            <div slot="title" class="list-text"><span>订单编码:</span><span>{{item["Order Number"]}}</span></div>
+            <div slot="title" class="list-text"><span>销售类型:</span><span>{{item["KL Delivery Sales Type"]}}</span></div>
+            <div slot="title" class="list-text"><span>项目名称:</span><span>{{item["KL Agreement Opportunity Name"]}}</span></div>
+          </mt-cell>
+        </div>
       </loadmore>
     </div>
   </div>
@@ -29,10 +31,22 @@
   import loadmore from 'public/components/cus-loadmore';
   import {mapState, mapActions} from 'vuex';
   import { Toast } from 'mint-ui';
+  import api from '../api/api';
   const NameSpace = 'index';
   export default {
     name: NameSpace,
-    created: () => {
+    created() {
+      let me = this;
+      api.get({
+        key: 'getList',
+        data: {
+        },
+        success: function(data) {
+          console.log(me);
+          me.list = data.items;
+          console.log(me.list);
+        }
+      });
     },
     data: () => {
       return {
@@ -41,11 +55,7 @@
         selected: '1',
         allLoaded: '',
         topStatus: '',
-        list: [
-          {id: '1', type: '工程', savrsNo: 'AZ201706010001001', name: 'XXXXXXX'},
-          {id: '2', type: '工程', savrsNo: 'AZ201706010001002', name: 'ZZZZZZ'},
-          {id: '3', type: '工程', savrsNo: 'AZ201706010001003', name: 'QQQQQQQ'}
-        ]
+        list: []
       };
     },
     computed: {
@@ -60,7 +70,13 @@
       search() {
         Toast(this.searchValue);
       },
-      getDetail() { // 详情
+      toDetail(id) { // 详情
+        this.$router.push({
+          name: 'detail',
+          query: {
+            id: id
+          }
+        });
       },
       // 顶部加载
       loadTop() {

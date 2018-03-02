@@ -8,7 +8,7 @@
         <mt-field label="联系电话" type="text" placeholder="请输入联系电话" v-model.trim="callPhone" class="textRight require"></mt-field>
         <mt-field label="报修联系人" type="text" placeholder="请输入联系人" v-model="ContactName" class="textRight require"></mt-field>
         <mt-cell class="require mint-field" title="联系人类型" placeholder="请选择" is-link>{{Type}}</mt-cell>
-        <mt-cell class="require mint-field" title="省市区" placeholder="请选择"  is-link></mt-cell>
+        <mt-cell class="require mint-field" @click.native="getLov('city')" title="省市" placeholder="请选择"  is-link></mt-cell>
         <mt-field class="block require" label="详细地址" placeholder="请输入详细地址..." type="textarea" rows="2"></mt-field>
         <mt-cell class="mint-field" title="故障现象" placeholder="请选择" is-link>{{subArea}}</mt-cell>
         <mt-cell class="mint-field" title="故障分级">{{Area}}</mt-cell>
@@ -24,6 +24,9 @@
           <span>更多</span>
         </div>
       </div>
+      <mt-popup v-if="showBox" v-model="showBox" position="bottom">
+        <menuBox @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :slots="slots"></menuBox>
+      </mt-popup>
       <ul class="search-list">
         <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item['Cellular Phone #'],item['Last Name'])">{{item['Cellular Phone #']}} {{item['Last Name']}}</li>
       </ul>
@@ -116,10 +119,14 @@
         font-size: 0.75rem;
       }
     }
+    .mint-popup{
+      width: 100%;
+    }
   }
 </style>
 <script>
   import api from '../api/api';
+  import menuBox from '../../../public/components/cus-menu.vue';
   const delay = (function() {
     let timer = 0;
     return function(callback, ms) {
@@ -144,7 +151,23 @@
         Description: '',
         ProductFlag: '',
         startDate: '',
-        search: []
+        search: [],
+        slots: [{
+          flex: 1,
+          values: [],
+          className: 'slot1',
+          textAlign: 'center'
+        }, {
+          divider: true,
+          content: '-',
+          className: 'slot2'
+        }, {
+          flex: 1,
+          values: [],
+          className: 'slot3',
+          textAlign: 'center'
+        }],
+        showBox: false
       };
     },
     methods: {
@@ -261,6 +284,53 @@
 //          }
         });
       },
+      getLov(values) {
+        let me = this;
+        me.showBox = true;
+        api.get({
+          url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="KL_PROVINCE" AND Parent="CN" &PageSize=100&StartRowNum=0',
+          method: 'GET',
+          success: function(data) {
+            let datas = data.items;
+            let Province = [];
+            for (let i = 0; i < datas.length; i++) {
+              Province.push(datas[i].Value);
+            }
+            me.slots[0].values = Province;
+          }
+        });
+      },
+      onValuesChange(values) {
+        let me = this;
+        if (values[0] !== undefined) {
+          api.get({
+            url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="KL_CITY" AND Parent Value="' + values[0] + '" &PageSize=100&StartRowNum=0',
+            method: 'GET',
+            success: function(data) {
+              let datas = data.items;
+              let Province = [];
+              if (datas.constructor === Array) {
+                for (let i = 0; i < datas.length; i++) {
+                  Province.push(datas[i].Value);
+                }
+                me.slots[2].values = Province;
+              } else {
+                Province.push(datas.Value);
+                me.slots[2].values = Province;
+              }
+            }
+          });
+        }
+      },
+      enter(values) {
+        let me = this;
+        me.showBox = false;
+        console.log(values);
+      },
+      cancel() {
+        let me = this;
+        me.showBox = false;
+      },
       async fetchData(val) {
         let me = this;
         if (me.callPhone) {
@@ -293,6 +363,8 @@
           this.fetchData();
         }, 300);
       }
-    }
+    },
+    components: {menuBox}
+
   };
 </script>

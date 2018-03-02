@@ -45,7 +45,7 @@
       <div class="timeTable">
         <table>
           <tr v-for="(Am, index1) in am" :key="index1">
-            <td v-for="(time, index) in Am.time" :key="index" @click="selectedTime(index+index1*8)" :class="{'selectedT':isTimeSelected[index+index1*8]}">{{time}}</td>
+            <td v-for="(time, index) in Am.time" :key="index" @click="selectedTime(index+index1*8,index1,index)" :class="{'selectedT':isTimeSelected[index+index1*8]}">{{time}}</td>
           </tr>
         </table>
       </div>
@@ -76,8 +76,14 @@
         daysUL: [],
         params: {
           selectDay: '',
-          Time1: '',
-          Time2: '',
+          Time1: {
+            key: '',
+            time: ''
+          },
+          Time2: {
+            key: '',
+            time: ''
+          },
           type: ''
         },
         leftBunHide: false,
@@ -97,7 +103,22 @@
       },
       enter() {                     // 日历确定
         let self = this;
-        self.$emit('my-enter', this.params);
+        if (!self.params.selectDay) {
+          self.params.selectDay = self.formatDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate());
+        }
+        self.$emit('my-enter', self.params);
+        self.params = {
+          selectDay: '',
+          Time1: {
+            key: '',
+            time: ''
+          },
+          Time2: {
+            key: '',
+            time: ''
+          },
+          type: ''
+        };
       },
       pickPre(year, month) {        // 点击切换上个月
         let self = this;
@@ -171,12 +192,10 @@
           d.setDate(d.getDate() - i);
           this.days.push(d);
         }
-        console.log(this.days);
         if (this.days.length % 7 === 0) {
           this.daysUL.push(this.days);
           this.days = [];
         }
-
         for (let i = 1; i <= 35 - this.firstWeek; i += 1) {
           const d = new Date(str);
           d.setDate(d.getDate() + i);
@@ -185,7 +204,6 @@
             if (!this.isMyDay) {
               for (let j = 0; j < this.days.length;j++) {
                 if (this.days[j].getFullYear() === Year && this.days[j].getMonth() === Month && this.days[j].getDate() === Day) {
-                  console.log(Year + ' ' + Month + ' ' + Day);
                   this.daysUL.push(this.days);
                   this.isMyDay = true;
                 } else {
@@ -225,7 +243,7 @@
         time = time.toString().split(' ')[4].slice(0, 5);
         return time;
       },
-      selectedTime(index) {             // 选择时间
+      selectedTime(index, index1, index2) {             // 选择时间
         let self = this;
         let seleat = '';
         if (self.num === 2) {
@@ -256,9 +274,11 @@
           }
         }
         if (self.num === 1) {
-          self.params.Time1 = self.am[seleat].time[index - seleat * 8];
+          self.params.Time1.time = self.am[seleat].time[index - seleat * 8];
+          self.params.Time1.key = (index1 + 1) * (index2 + 1);
         } else if (self.num === 2) {
-          self.params.Time2 = self.am[seleat].time[index - seleat * 8];
+          self.params.Time2.time = self.am[seleat].time[index - seleat * 8];
+          self.params.Time2.key = (index1 + 1) * (index2 + 1);
         }
       }
     }

@@ -8,10 +8,10 @@
 
       <div class="mint-content service-detail">
         <div class="detail-title">
-          <div class="mt-Detail-title">产品编号：{{ServiceRequest.Product}}<span class="user-state">{{ServiceRequest.Status}}</span></div>
-          <div class="mt-Detail-title">产品类型：指纹锁</div>
+          <div class="mt-Detail-title">服务单编号：{{ServiceRequest['SR Number']}}<span class="user-state">{{ServiceRequest.Status}}</span></div>
+          <div class="mt-Detail-title">优先级：{{ServiceRequest['Priority']}}</div>
           <div class="mt-Detail-title">联系人：{{ServiceRequest['Contact Last Name']}}</div>
-          <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call">{{ServiceRequest['KL Contact Mobile Phone']}}</a></div>
+          <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call">{{ServiceRequest['Contact Business Phone']}}</a></div>
         </div>
         <div class="detail-content">
           <mt-navbar v-model="active">
@@ -26,6 +26,7 @@
                 <div>客户预约时间：{{ServiceRequest['CEM Planned Start Date']}}</div>
                 <div>实际预约时间：{{ServiceRequest['CEM Planned Start Date']}}</div>
                 <div>地址：{{ServiceRequest['Personal City']}}{{ServiceRequest['Personal Street Address']}}</div>
+                <div>用户故障说明：{{ServiceRequest['Sub-Area']}}</div>
                 <div>问题说明：
                   <div>{{ServiceRequest['Description']}}</div>
                 </div>
@@ -75,9 +76,11 @@
         <!--<mt-button v-if="isCall === 'gdcz'"  size="normal" @click="popupVisible1 = !popupVisible1" type="danger" >工单操作</mt-button>-->
       <!--</div>-->
       <!--弹出日历-->
-      <mt-popup v-model="showBox2" position="bottom" popup-transition="popup-fade" class="mint-popup-1">
-        <dateControl @my-cancel="cancel" @my-enter="enter"></dateControl>
-      </mt-popup>
+      <div v-if="showBox2">
+        <mt-popup v-model="showBox2"  position="bottom" popup-transition="popup-fade" class="mint-popup-1">
+          <dateControl @my-cancel="cancel" @my-enter="enter"></dateControl>
+        </mt-popup>
+      </div>
 
       <close :showBox1="showBox" @my-enter="boxEnter" @my-close="boxClose" :options1="option"></close>
 
@@ -173,7 +176,9 @@
           {name: '流程记录', id: 'tab-container3'}
         ],
         option: ['客户不接受维修报价', '已自行解决', '暂不影响使用', '其他'],
-        processDate: []
+        processDate: [],
+        starTime: '',
+        endTime: ''
       };
     },
     methods: {
@@ -202,10 +207,27 @@
         console.log(val);
       },
       enter(val) {                     // 日历确定
-//        let num = parseInt(val.Time1, 0);
+        let me = this;
+        if (val.Time1.time && val.Time2.time) {
+          if (val.Time1.key <= val.Time2.key) {
+            me.starTime = val.Time1.time;
+            me.endTime = val.Time2.time;
+          } else {
+            me.starTime = val.Time2.time;
+            me.endTime = val.Time1.time;
+          }
+          me.starTime = val.selectDay + ' ' + me.starTime;
+          me.endTime = val.selectDay + ' ' + me.endTime;
+          console.log(me.starTime);
+          console.log(me.endTime);
+        } else {
+          MessageBox({
+            title: '提示',
+            message: '请选择预约开始和结束时间！'
+          });
+        }
         this.showBox2 = false;
-//        this.isCall = 'gdcz';
-        console.log(val);
+        this.isCall = 'gdcz';
       },
       callSolve() {
         MessageBox.confirm('远程电话沟通客户已解决，确认提交？?', '').then(action => {

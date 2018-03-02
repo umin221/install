@@ -13,8 +13,7 @@
 <style lang="scss">
   div.cus-group-title {
     margin-top: 10px;
-    padding: 15px 10px 0;
-    height: 28px;
+    padding: 15px 10px;
     background: #fff;
     font-size: $font-size-small;
     @include border;

@@ -12,13 +12,17 @@
     <div class="mint-content wide-form">
       <div :class="{'readonly':read}">
         <mt-field label="合作伙伴名称" placeholder="请输入名称"
-          :class="heartVisible"></mt-field>
+          :class="heartVisible"
+          :value="form['Name']"></mt-field>
         <mt-field label="合作伙伴负责人" placeholder="请输入负责人"
-          :class="heartVisible"></mt-field>
+          :class="heartVisible"
+          :value="form['KL Partner Owner Name']"></mt-field>
         <mt-field label="联系电话" placeholder="请输入电话" type="tel"
-          :class="heartVisible"></mt-field>
+          :class="heartVisible"
+          :value="form['Main Phone Number']"></mt-field>
         <mt-field label="详细地址" placeholder="请输入地址"
-          :class="heartVisible"></mt-field>
+          :class="heartVisible"
+          :value="form['Primary Address Street']"></mt-field>
         <!--<mt-field v-show="!read" class="require" :readonly="read" label="合同附件"></mt-field>-->
       </div>
 
@@ -41,21 +45,22 @@
     </div>
 
     <button-group>
-      <mt-button type="primary" class="single"
-        v-show="type==='add'"
-        @click.native="submitFn">提交</mt-button>
-      <mt-button type="primary" class="single"
-        v-show="state==='valid'"
-        v-text="read? '新增联系人' : '失效'"
-        @click.native="submitFn"></mt-button>
-      <mt-button type="primary" class="single"
-        v-show="read && state==='invalid'"
-        @click="type='add'">重新启动</mt-button>
-    </button-group>
+  <mt-button type="primary" class="single"
+             v-show="type==='add'"
+             @click.native="submitFn">提交</mt-button>
+  <mt-button type="primary" class="single"
+             v-show="state==='valid'"
+             v-text="read? '新增联系人' : '失效'"
+             @click.native="submitFn"></mt-button>
+  <mt-button type="primary" class="single"
+             v-show="read && state==='invalid'"
+             @click="type='add'">重新启动</mt-button>
+</button-group>
   </div>
 </template>
 
 <script type="es6">
+  import {mapState, mapActions} from 'vuex';
   import titleGroup from 'public/components/cus-title-group';
   import buttonGroup from 'public/components/cus-button-group';
 
@@ -66,37 +71,20 @@
     handler: () => this.$messagebox('delete')
   }];
 
+  const NameSpace = 'detail';
   export default {
     // 初始化
     created() {
       let param = this.$route.query;
       this.state = param.state;
       this.type = param.type;
+      // 获取详情
+      this.getDetail(param.id);
     },
     data: () => {
       return {
         type: 'add', // add 新增 / edit 编辑 / read 只读
         state: 'pending', // pending 待审批 / valid 已生效 / invalid 未生效
-        attach: {
-          list: [{id:1}, {id:2}, {id:3}, {id:4}, {id:4}],
-          edit: false,
-          title: '合同附件'
-        }, // 附件
-        contact: {
-          list: [{ // 联系人列表
-            id: '1',
-            name: '张晓明',
-            loginID: 'zhangxm'
-          },{
-            id: '2',
-            name: '张晓飞',
-            loginID: 'zhangxf'
-          },{
-            id: '2',
-            name: '张晓飞',
-            loginID: 'zhangxf'
-          }]
-        },
         button: {
           list: [{
             text: '提交'
@@ -105,6 +93,7 @@
       };
     },
     computed: {
+      ...mapState(NameSpace, ['form', 'attach', 'contact']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -131,6 +120,7 @@
       }
     },
     methods: {
+      ...mapActions(NameSpace, ['getDetail']),
       submitFn() {
         // pending
         this.state = this.state === 'add' ? 'edit' : 'read';

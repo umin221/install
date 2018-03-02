@@ -25,6 +25,13 @@
     };
 
     /**
+     * 转数组对象
+     */
+    toArray(o) {
+      return this.isArray(o) ? o : [o];
+    };
+
+    /**
      * 转时间对象
      */
     toDate(date) {

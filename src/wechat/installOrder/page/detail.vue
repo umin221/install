@@ -6,9 +6,9 @@
     <div class="mint-content mint-content-datail">
       <div class="mint-content-info">
         <mt-cell>
-          <div slot="title" class="list-text" style="margin-top: 10px;"><span class="list-text-span">订单编码</span><span>AZ11111000</span></div>
-          <div slot="title" class="list-text"><span class="list-text-span">项目名称</span><span>西南药都生态城-龙泉花园</span></div>
-          <div slot="title" class="list-text"><span class="list-text-span">销售类型</span><span>工程</span></div>
+          <div slot="title" class="list-text" style="margin-top: 10px;"><span class="list-text-span">订单编码</span><span>{{detailData['Order Number']}}</span></div>
+          <div slot="title" class="list-text"><span class="list-text-span">项目名称</span><span>{{detailData['KL Agreement Opportunity Name\n']}}</span></div>
+          <div slot="title" class="list-text"><span class="list-text-span">销售类型</span><span>{{detailData['KL Delivery Sales Type']}}</span></div>
           <div slot="title" class="list-text"><span class="list-text-span">安装数量</span><span>500</span></div>
           <div slot="title" class="mint-content-div"><div class="mint-content-xt" @click="butXttd">协同团队</div></div>
           <div slot="title" class="mint-content-xl" @click="is_show_fun">收起</div>
@@ -41,18 +41,28 @@
         </div>
       </div>
       <div style="height: 0.5rem;background: #eaeaea;"></div>
-      <div class="content-lc">
+      <div class="content-lc" style="margin-top: 15px">
         <div class="stage_li">
           <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 72px;">
             <div class="mui-scroll" style="height: 65px;overflow: -webkit-paged-x;">
+              <a v-for="(item, index) in taskData"  :key="index">
+                <div class="icon" @click="updateState">
+                  <span v-show="index!=0"  class="left line l_grey"></span>
+                  <span class="point mui-icon"><span></span></span>
+                  <span  class="right line l_grey"></span>
+<!--
+                  <span v-if="item.length!= index" class="right mui-icon l_grey"></span>
+-->
+                </div>
+                <div class="name present" @click="updateTask(index)">{{item['KL Detail Type']}}</div>
+              </a>
               <a>
                 <div class="icon" @click="updateState">
 
                   <span class="point mui-icon"><span></span></span>
                   <span class="right line l_grey"></span>
                 </div>
-                <div class="name present">
-                  商机确认
+                <div class="name present">2222
                 </div>
               </a><a>
               <div class="icon">
@@ -63,10 +73,11 @@
               <div class="name grey">
                 投标阶段
               </div>
-            </a><a>
+            </a>
+              <a>
               <div class="icon">
                 <span class="left line l_grey"></span>
-                <span class="point mui-icon p_grey"><span></span></span>
+                <span class="point mui-icon close"><span></span></span>
                 <span class="right line l_grey"></span>
               </div>
               <div class="name grey">
@@ -106,12 +117,12 @@
         </div>
       </div>
       <div class="mint-content-info">
-        <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
-          <ul class="content">
-            <li class="bd-radius"  @click.nataive="routerPage(index)">
+        <div class="crm-zyList" v-for="(item, index) in taskDataList" :key="index">
+          <ul class="content" @click.nataive="routerPage(index)">
+            <li class="bd-radius">
               <span class="icon"></span>
             </li>
-            <li style="margin-right: 8px">{{item.option}}</li>
+            <li style="margin-right: 8px">{{item['KL Detail Type']}}</li>
             <div class="content-div" v-if="index===2"  @click.nataive="sporadic(index)">
               <div>批次</div>
               <div>已开孔/开孔批次</div>
@@ -128,6 +139,7 @@
     /*.mint-cell-wrapper {
       font-size: 0.7rem!important;
     }*/
+    background: white;
     .mint-cell-title {
     }
     .list-text-span {
@@ -293,7 +305,6 @@
     }
 
     .stage_li > .mui-scroll-wrapper a > div.icon > span.close > span:before {
-      content: "\A148";
       color: #d61518;
       position: absolute;
       top: 2px;
@@ -354,7 +365,7 @@
 
     .stage_li > .mui-scroll-wrapper a > div.present {
       color: #8bc17c;
-      margin: 0px 12px 0px 12px;
+      margin: 0px 6px 0px 6px;
       padding-bottom: 10px;
       border-bottom: 1px solid #0772c1;
     }
@@ -369,27 +380,43 @@
   }
 </style>
 <script type="application/javascript">
+  import api from '../api/api';
   export default {
     name: 'detail',
-    created: () => {
-      console.dir(1);
+    created() {
+      let me = this;
+      me.id = me.$route.query.id;
+      api.get({
+        key: 'getDetail',
+        method: 'POST',
+        data: {
+          'body': {
+            'OutputIntObjectName': 'Base Order Entry (Sales)',
+/*
+            'SearchSpec': '[Order Entry - Orders.Id]=' + '\'' + me.id + '\''
+*/
+            'SearchSpec': '[Order Entry - Orders.Id]="1-2BSATYIN"'
+          }
+        },
+        success: function(data) {
+          console.dir(data.SiebelMessage);
+          me.detailData = data.SiebelMessage['Order Entry - Orders'];
+          me.taskData = me.detailData['KL Installation Task'];
+          me.taskDataList = me.taskData[0]['KL Installation Task'];
+          console.dir(me.taskDataList);
+        }
+      });
     },
     data: () => {
       return {
+
         value: '',
+        id: '',
+        detailData: '',
+        taskData: '',
+        taskDataList: '',
         is_show_sx: false,
-        active: 'tab-container',
-        processDate: [{
-          option: '开孔锁签收'
-        }, {
-          option: '图纸签收'
-        }, {
-          option: '开孔批次'
-        }, {
-          option: '门厂发运'
-        }, {
-          option: '挂门验收'
-        }]
+        active: 'tab-container'
       };
     },
     beforeRouteEnter(to, from, next) {
@@ -400,6 +427,11 @@
       });
     },
     methods: {
+      updateTask(index) {
+        let me = this;
+        me.taskDataList = me.taskData[index]['KL Installation Task'];
+        console.dir(me.taskDataList);
+      },
       is_show_fun() {
         var self = this;
         if (self.is_show_sx) {
