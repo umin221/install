@@ -9,12 +9,14 @@ import router from './router';
 import 'public/js/base/main';
 import 'public/js/base/mint';
 import fallback from 'public/components/cus-fallback';
+import attach from 'public/components/cus-attach';
 import App from '../../App';
 import store from './store';
 import './filters'; // Vue Filter
 
 // For back
 Vue.component('fallback', fallback);
+Vue.component('attach', attach);
 
 Vue.config.productionTip = false;
 

@@ -41,9 +41,17 @@
           MessageBox('提示', '操作成功');
         } else if (status === 2) {
           MessageBox({
-            title: '提示',
+            title: '',
             message: '确定执行此操作?',
             showCancelButton: true
+          }).then(action => {
+            if (action === 'confirm') {
+              console.log('abc');
+            }
+          }).catch(err => {
+            if (err === 'cancel') {
+              console.log('123');
+            }
           });
         } else if (status === 3) {
           MessageBox.prompt('请输入姓名').then(({ value, action }) => {
