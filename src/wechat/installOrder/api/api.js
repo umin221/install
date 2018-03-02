@@ -5,6 +5,9 @@ let ApiList = {
   },
   getDetail: {
     url: 'http://192.168.166.8:9001/siebel-rest/v1.0/service/EAI Siebel Adapter/Query'
+  },
+  getTaskAdd: {
+    url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/KL Installation Task/KL Installation Task'
   }
 };
 

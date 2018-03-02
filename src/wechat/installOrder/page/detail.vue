@@ -4,16 +4,14 @@
       <fallback slot="left"></fallback>
     </mt-header>
     <div class="mint-content mint-content-datail">
-      <div class="mint-content-info">
-        <mt-cell>
-          <div slot="title" class="list-text" style="margin-top: 10px;"><span class="list-text-span">订单编码</span><span>{{detailData['Order Number']}}</span></div>
-          <div slot="title" class="list-text"><span class="list-text-span">项目名称</span><span>{{detailData['KL Agreement Opportunity Name\n']}}</span></div>
-          <div slot="title" class="list-text"><span class="list-text-span">销售类型</span><span>{{detailData['KL Delivery Sales Type']}}</span></div>
-          <div slot="title" class="list-text"><span class="list-text-span">安装数量</span><span>500</span></div>
+        <div class="readonly">
+          <mt-field label="订单编码" :value="detailData['Order Number']"></mt-field>
+          <mt-field label="项目名称" :value="detailData['KL Agreement Opportunity Name']"></mt-field>
+          <mt-field label="销售类型" :value="detailData['KL Delivery Sales Type']"></mt-field>
+          <mt-field label="安装数量" :value="detailData['KL Delivery Sales Type']"></mt-field>
           <div slot="title" class="mint-content-div"><div class="mint-content-xt" @click="butXttd">协同团队</div></div>
           <div slot="title" class="mint-content-xl" @click="is_show_fun">收起</div>
           <div slot="title" class="mint-content-xl xl" @click="is_show_fun"></div>
-        </mt-cell>
       </div>
       <div style="height: 0.5rem;background: #eaeaea;" v-show="is_show_sx"></div>
       <div class="mint-content-info" v-show="is_show_sx">
@@ -46,7 +44,7 @@
           <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 72px;">
             <div class="mui-scroll" style="height: 65px;overflow: -webkit-paged-x;">
               <a v-for="(item, index) in taskData"  :key="index">
-                <div class="icon" @click="updateState">
+                <div class="icon" @click="updateState(item.Status, item.Id)">
                   <span v-show="index!=0"  class="left line l_grey"></span>
                   <span class="point mui-icon"><span></span></span>
                   <span  class="right line l_grey"></span>
@@ -157,8 +155,9 @@
       font-size: 1rem;
     }
     .mint-content-div{
-      width: 100%;
+      width: 98%;
       height: 30px;
+      margin-top: 5px;
       text-align: right;
     }
     .mint-content-xt {
@@ -381,6 +380,7 @@
 </style>
 <script type="application/javascript">
   import api from '../api/api';
+  import { MessageBox, Toast } from 'mint-ui';
   export default {
     name: 'detail',
     created() {
@@ -409,7 +409,7 @@
     },
     data: () => {
       return {
-
+        type: 'read', // add 新增 / edit 编辑 / read 只读
         value: '',
         id: '',
         detailData: '',
@@ -444,9 +444,36 @@
         var self = this;
         self.$router.push('xttd');
       },
-      updateState() {
+      updateState(status, id) {
         var self = this;
-        self.$router.push('updateState');
+        if (status === '未开始') {
+          console.dir('===');
+          MessageBox({
+            title: '提示',
+            message: ' 确认开始进行?',
+            showCancelButton: true
+          }).then(action => {
+            if (action === 'confirm') {
+              console.log('abc');
+              api.get({
+                key: 'getTaskAdd',
+                method: 'PUT',
+                data: {
+                  'Status': status,
+                  'Id': id
+                },
+                success: function(data) {
+                  Toast({
+                    message: '已发起安装替代锁申请，销售审批通过后进行安装。',
+                    duration: 5000
+                  });
+                }
+              });
+            }
+          });
+        } else {
+          self.$router.push('updateState');
+        }
       },
       routerPage(index) {
         var self = this;

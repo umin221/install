@@ -24,6 +24,18 @@ export default new Vuex.Store({
       namespaced: true,
       state: {
       }
+    },
+    sign: {
+      namespaced: true,
+      state: {
+        form: '',
+        attach: {
+          list: [{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}],
+          edit: false,
+          title: '合同附件'
+        } // 附件
+      }
     }
+
   }
 });

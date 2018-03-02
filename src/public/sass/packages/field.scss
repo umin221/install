@@ -15,6 +15,10 @@
   .mint-cell-value {
     color: $black-base;
     font-size: $font-size-default;
+
+    input {
+      text-align: right;
+    }
   }
 }
 
@@ -31,6 +35,10 @@
 
       .mint-cell-value {
         font-size: $font-size-small;
+
+        input {
+          text-align: left;
+        }
       }
 
       ::-webkit-input-placeholder {

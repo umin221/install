@@ -5,6 +5,60 @@
       <mt-button icon="search" slot="right" @click.native="searchKey = true"></mt-button>
     </mt-header>
     <div class="mint-content">
+      <mt-navbar v-model="selected">
+        <mt-tab-item id="pending"
+                     @click.native="getList('待处理')">待处理</mt-tab-item>
+        <mt-tab-item id="completing"
+                     @click.native="getList('处理中')">处理中</mt-tab-item>
+        <mt-tab-item id="completed"
+                     @click.native="getList('已完成')">已完成</mt-tab-item>
+      </mt-navbar>
+      <!-- tab-container -->
+      <mt-tab-container v-model="selected">
+        <mt-tab-container-item id="pending">
+          <loadmore ref="load" :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" :allLoaded="true">
+          <cus-cell class="multiple"
+                    :key="item.Id"
+                    :title="'订单编码:'+ item['Order Number']"
+                    @click.native="toDetail(item.Id)"
+                    v-for="item in list"
+                    is-link>
+            <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
+            <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
+          </cus-cell>
+        </loadmore>
+        </mt-tab-container-item>
+
+        <mt-tab-container-item id="completing">
+          <loadmore ref="load" :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" :allLoaded="true">
+            <cus-cell class="multiple"
+                      :key="item.id"
+                      :title="'订单编码:'+ item['Order Number']"
+                      @click.native="toDetail(item.Id)"
+                      v-for="item in list"
+                      is-link>
+              <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
+              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
+            </cus-cell>
+          </loadmore>
+        </mt-tab-container-item>
+
+        <mt-tab-container-item id="completed">
+          <cus-cell class="multiple"
+                    :key="item.id"
+                    :title="'订单编码:'+ item['Order Number']"
+                    @click.native="toDetail(item.Id)"
+                    v-for="item in list"
+                    is-link>
+            <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
+            <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
+          </cus-cell>
+        </mt-tab-container-item>
+      </mt-tab-container>
+
+    </div>
+<!--
+    <div class="mint-content">
       <div class="page-search" v-show="searchKey">
         <mt-search autofocus placeholder="请输入项目名称或负责人" @keyup.enter.native="search" cancel-text="取消" v-model="searchValue" :result.sync="filterResult"></mt-search>
       </div>
@@ -23,6 +77,7 @@
         </div>
       </loadmore>
     </div>
+-->
   </div>
 </template>
 
@@ -32,6 +87,7 @@
   import {mapState, mapActions} from 'vuex';
   import { Toast } from 'mint-ui';
   import api from '../api/api';
+  import cusCell from 'public/components/cus-cell';
   const NameSpace = 'index';
   export default {
     name: NameSpace,
@@ -47,19 +103,20 @@
           console.log(me.list);
         }
       });
+      // this.getList();
     },
     data: () => {
       return {
         searchKey: false,
         searchValue: '',
-        selected: '1',
+        selected: 'pending',
         allLoaded: '',
         topStatus: '',
         list: []
       };
     },
     computed: {
-      ...mapState(NameSpace, ['value']),
+      ...mapState(NameSpace, ['pending', 'completimg', 'completed']),
       filterResult() {
         console.dir(this.searchValue);
         // return this.defaultResult.filter(value => new RegExp(this.value, 'i').test(value));
@@ -85,9 +142,7 @@
       loadBottom() {
       }
     },
-    components: {
-      loadmore
-    }
+    components: {loadmore, cusCell}
   };
 </script>
 <style>
