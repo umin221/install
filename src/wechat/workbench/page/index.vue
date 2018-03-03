@@ -15,19 +15,12 @@
 </template>
 
 <script type="application/javascript">
-  // import api from '../api/api';
   import {mapState} from 'vuex';
 
   const NameSpace = 'index';
   export default {
     name: NameSpace,
     created: () => {
-     /* api.get({
-        key: 'getList',
-        callback: function(data) {
-          console.log(data);
-        }
-      });*/
     },
     data: () => {
       return {
