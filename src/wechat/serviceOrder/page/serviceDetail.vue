@@ -67,14 +67,6 @@
         </div>
         <mt-button v-if="isCall === 'gdcz'"  type="primary" class="single" @click="popupVisible1 = !popupVisible1" >工单操作</mt-button>
       </button-group>
-      <!--<div v-else-if="role" class="submitButton">-->
-        <!--<mt-button v-if="isCall === 'lxkh'"  size="normal" @click.native="changeBtnStote" type="danger" >电话联系客户</mt-button>-->
-        <!--<div v-else-if="isCall === 'yyjh'" class="callPlan">-->
-          <!--<mt-button size="normal" type="default" @click.native="callSolve" >电话已解决</mt-button>-->
-          <!--<mt-button size="normal" @click.native="clickShow" type="danger" >预约维修计划</mt-button>-->
-        <!--</div>-->
-        <!--<mt-button v-if="isCall === 'gdcz'"  size="normal" @click="popupVisible1 = !popupVisible1" type="danger" >工单操作</mt-button>-->
-      <!--</div>-->
       <!--弹出日历-->
       <div v-if="showBox2">
         <mt-popup v-model="showBox2"  position="bottom" popup-transition="popup-fade" class="mint-popup-1">
@@ -385,120 +377,6 @@
         }
       }
     }
-    /*底部按钮*/
-    /*.mint-popup-1{*/
-      /*width: 100%;*/
-      /*height: 22rem;*/
-      /*background: white;*/
-      /*.alertDate{*/
-        /*width: 100%;*/
-        /*.headerButton{*/
-          /*height: 2rem;*/
-          /*line-height: 2rem;*/
-          /*border-bottom: 1px solid gainsboro;*/
-          /*div{*/
-            /*color: darkred;*/
-            /*font-size: 0.7rem;*/
-          /*}*/
-          /*.cancelBtn{*/
-            /*float: left;*/
-            /*margin-left: 0.5rem;*/
-          /*}*/
-          /*.enterBtn{*/
-            /*float: right;*/
-            /*margin-right: 0.5rem;*/
-          /*}*/
-        /*}*/
-        /*.dateContent{*/
-          /*height: 6rem;*/
-          /*border-bottom: 1px solid gainsboro;*/
-          /*.month{*/
-            /*text-align: center;*/
-            /*line-height: 2rem;*/
-            /*font-size: 0.7rem;*/
-            /*i{*/
-              /*font: 500 1.2rem sans-serif;*/
-              /*color: #888;*/
-            /*}*/
-            /*.el-icon-left{*/
-              /*float: left;*/
-            /*}*/
-            /*.el-icon-right{*/
-              /*float: right;*/
-            /*}*/
-          /*}*/
-          /*.bodyDiv*/
-          /*.weekdays{*/
-            /*display: flex;*/
-            /*li{*/
-              /*flex: 1;*/
-              /*font-size: 0.7rem;*/
-              /*width:2.7rem;*/
-              /*list-style-type:none;*/
-              /*text-align: center;*/
-              /*line-height:  2rem;*/
-              /*cursor:pointer;*/
-            /*}*/
-          /*}*/
-          /*.mint-swipe{*/
-            /*height: 2rem !important;*/
-            /*.mint-swipe-items-wrap{*/
-              /*.days{*/
-                /*ul{*/
-                  /*display: flex;*/
-                  /*li{*/
-                    /*flex: 1;*/
-                    /*font-size: 0.7rem;*/
-                    /*width:2.7rem;*/
-                    /*list-style-type:none;*/
-                    /*text-align: center;*/
-                    /*line-height:  2rem;*/
-                    /*cursor:pointer;*/
-                    /*.other-month {*/
-                      /*color: #EEC591;*/
-                    /*}*/
-                    /*.active {*/
-                      /*display: inline-block;*/
-                      /*width: 2rem;*/
-                      /*height: 2rem;*/
-                      /*color: #fff;*/
-                      /*background-color: #324057;*/
-                    /*}*/
-                    /*.selected{*/
-                      /*display: inline-block;*/
-                      /*width: 2rem;*/
-                      /*height: 2rem;*/
-                      /*color: #fff;*/
-                      /*background-color: #1E90FF!important;*/
-                    /*}*/
-                  /*}*/
-                /*}*/
-              /*}*/
-            /*}*/
-          /*}*/
-        /*}*/
-        /*.timeTable{*/
-          /*background: gainsboro;*/
-          /*table{*/
-            /*width: 100%;*/
-            /*font-size: 0.7rem;*/
-            /*margin-top: 0.5rem;*/
-            /*background: white;*/
-            /*tr{*/
-              /*td{*/
-                /*width: 12.5%;*/
-                /*height: 2rem;*/
-                /*text-align: center;*/
-              /*}*/
-              /*.selectedT{*/
-                /*background: gainsboro;*/
-              /*}*/
-            /*}*/
-          /*}*/
-        /*}*/
-      /*}*/
-    /*}*/
-
     .mint-popup-2{
       width: 90%;
       background-color: inherit !important;

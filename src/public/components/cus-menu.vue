@@ -1,8 +1,8 @@
 <template>
   <div class="menu-box">
       <div class="button-group">
-        <div @click="enter">确定</div>
         <div @click="cancel">取消</div>
+        <div @click="enter">确定</div>
       </div>
       <mt-picker :slots="slots" @change="onValuesChange"></mt-picker>
   </div>
@@ -10,13 +10,14 @@
 <script>
   export default {
     name: 'menu',
-    props: ['slots'],
+    props: ['slots', 'type'],
     created() {
     },
     data() {
       return {
         value: [],
-        value1: ''
+        value1: '',
+        lovType: this.type
       };
     },
     methods: {
@@ -26,13 +27,14 @@
       },
       enter() {                     // 确定
         let self = this;
-        self.$emit('my-enter', self.value);
+        self.$emit('my-enter', self.value, self.lovType);
       },
       onValuesChange(picker, values) {
+        console.log(values);
         let self = this;
         self.value = values;
         if (self.value1 !== self.value[0]) {
-          self.$emit('my-change', self.value);
+          self.$emit('my-change', self.value, self.lovType);
         }
         self.value1 = values[0];
       }
@@ -50,6 +52,9 @@
       text-align: center;
       width: 50%;
       color: $theme-color;
+    }
+    .picker>.picker-items>.slot2{
+      display: none;
     }
   }
 </style>

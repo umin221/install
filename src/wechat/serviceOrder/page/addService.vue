@@ -5,19 +5,20 @@
     </mt-header>
     <div class="mint-content addService">
       <div class="addform">
-        <mt-field label="联系电话" type="text" placeholder="请输入联系电话" v-model.trim="callPhone" class="textRight require"></mt-field>
-        <mt-field label="报修联系人" type="text" placeholder="请输入联系人" v-model="ContactName" class="textRight require"></mt-field>
-        <mt-cell class="require mint-field" title="联系人类型" placeholder="请选择" is-link>{{Type}}</mt-cell>
-        <mt-cell class="require mint-field" @click.native="getLov('city')" title="省市" placeholder="请选择"  is-link></mt-cell>
-        <mt-field class="block require" label="详细地址" placeholder="请输入详细地址..." type="textarea" rows="2"></mt-field>
-        <mt-cell class="mint-field" title="故障现象" placeholder="请选择" is-link>{{subArea}}</mt-cell>
-        <mt-cell class="mint-field" title="故障分级">{{Area}}</mt-cell>
+        <mt-field label="联系电话" type="number" placeholder="请输入联系电话" v-model.trim="Contact_Phone" class="textRight require"></mt-field>
+        <mt-field label="报修联系人" type="text" :attr="isCall" placeholder="请输入联系人" v-model="Contact_Name" class="textRight require"></mt-field>
+        <mt-cell class="require mint-field"  @click.native="getLov('SR_TYPE')" title="联系人类型"  :value="SR_TYPE" placeholder="请选择" is-link></mt-cell>
+        <mt-cell class="require mint-field" @click.native="getLov('KL_PROVINCE','CN')" title="省市" :value="KL_PROVINCE" placeholder="请选择"  is-link></mt-cell>
+        <mt-field class="block require" label="详细地址" placeholder="请输入详细地址..." v-model="Address" type="textarea" rows="2"></mt-field>
+        <mt-cell class="mint-field"  title="故障现象" :value="SR_AREA" @click.native="getLov('SR_AREA','')"  placeholder="请选择" is-link></mt-cell>
+        <mt-cell class="mint-field" title="故障分级" :value="Priority"></mt-cell>
         <mt-field class="block" label="客服说明" v-model="ProductFlag" placeholder="详细描述或附加需求..." type="textarea" rows="2"></mt-field>
-        <mt-cell class="mint-field" title="客户预约时间"  placeholder="请选择" is-link>{{startDate}}</mt-cell>
+        <mt-cell class="mint-field" title="客户预约时间" @click.native="open('picker1')" :value="Start_Date"  placeholder="请选择" is-link></mt-cell>
         <div v-if="hideMore">
-          <mt-field label="产品条形码" placeholder="客户如提供请输入" class="textRight" ></mt-field>
-          <mt-field label="产品型号" placeholder="客户如提供请输入"  class="textRight"></mt-field>
-          <mt-cell class="mint-field" title="移交日期"  placeholder="请选择" is-link></mt-cell>
+          <mt-field label="产品条形码" placeholder="客户如提供请输入" v-model="KL_SN" class="textRight" ></mt-field>
+          <mt-field label="产品型号" placeholder="客户如提供请输入" v-model="KL_Product_Model"  class="textRight"></mt-field>
+          <mt-cell class="mint-field" title="移交日期" :value="KL_Cutoff_Date"></mt-cell>
+          <mt-cell class="mint-field" title="保修期限" :value="Product_Warranty_Flag" ></mt-cell>
         </div>
         <div class="addMore" v-if="!hideMore" @click="showMore">
           <i class="xs-icon icon-add"></i>
@@ -25,8 +26,19 @@
         </div>
       </div>
       <mt-popup v-if="showBox" v-model="showBox" position="bottom">
-        <menuBox @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :slots="slots"></menuBox>
+        <menuBox @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType" :slots="slots"></menuBox>
       </mt-popup>
+      <mt-datetime-picker
+        ref="picker1"
+        v-model="pickerVisible"
+        :startDate="startDate"
+        year-format="{value} 年"
+        month-format="{value} 月"
+        date-format="{value} 日"
+        hour-format="{value} 时"
+        class="datetime"
+        @confirm="handleChange">
+      </mt-datetime-picker>
       <ul class="search-list">
         <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item['Cellular Phone #'],item['Last Name'])">{{item['Cellular Phone #']}} {{item['Last Name']}}</li>
       </ul>
@@ -36,6 +48,213 @@
     </div>
   </div>
 </template>
+<script>
+  import api from '../api/api';
+  import menuBox from '../../../public/components/cus-menu.vue';
+  const delay = (function() {
+    let timer = 0;
+    return function(callback, ms) {
+      clearTimeout(timer);
+      timer = setTimeout(callback, ms);
+    };
+  })();
+  const NameSpace = 'addService';
+  export default {
+    name: NameSpace,
+    created() {
+    },
+    computed: {
+    },
+    data: () => {
+      return {
+        hideMore: false,
+        startDate: new Date(),
+        value: '',
+        pickerVisible: true,
+        showBox: false,
+        isCall: {},
+        search: [],
+        slots: [],
+        lovType: '',
+        Contact_Name: '',   // 报修联系人
+        Contact_Phone: '',     // 联系电话
+        Address: '',       // 详细地址
+        PROVINCE: '',      // 省
+        CITY: '',           // 市
+        SR_TYPE: '',       //  联系人类型
+        KL_PROVINCE: '',  // 省市
+        SR_AREA: '',        // 故障现象
+        Area: '',
+        Priority: '',          // 故障等级
+        ProductFlag: '',    // 客服说明
+        Start_Date: null,        // 客户预约时间
+        KL_SN: '',           // 条形码
+        KL_Product_Model: '', // 产品类型
+        KL_Cutoff_Date: '',  // 移交日期
+        Product_Warranty_Flag: '' // 保修期限
+      };
+    },
+    methods: {
+      showMore() {
+        let me = this;
+        me.hideMore = true;
+      },
+      submit() {
+        let me = this;
+        api.get({
+          url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/Service Request/Service Request',
+          method: 'PUT',
+          data: {
+            'KL Contact Mobile Phone': me.Contact_Phone,
+            'Contact Last Name': me.Contact_Name,
+            'KL Personal Province': me.PROVINCE,
+            'Personal City': me.CITY,
+            'Personal Street Address': me.Address,
+            'Area': me.Area,
+            'Sub-Area': me.SR_AREA,
+            'Priority': me.Priority,
+            'Description': me.ProductFlag,
+            'CEM Planned Start Date': me.Start_Date,
+            'KL SN': me.KL_SN,
+            'KL Product Model': me.KL_Product_Model,
+            'KL Cutoff Date': me.KL_Cutoff_Date,
+            'Product Warranty Flag': me.Product_Warranty_Flag,
+            'Id': '1'
+          },
+          success: function(data) {
+            console.log(data);
+          }
+        });
+      },
+      getLov(values, parent) {
+        let me = this;
+        let Province = [];
+        me.showBox = true;
+        me.lovType = values;
+        if (values === 'KL_PROVINCE') {
+          parent = ' AND Parent=' + '"' + parent + '"';
+          me.slots = [
+            {flex: 1, values: [], className: 'slot1', textAlign: 'center'},
+            {divider: true, content: '-', className: 'slot2'},
+            {flex: 1, values: [], className: 'slot3', textAlign: 'center'}
+          ];
+        } else if (values === 'SR_TYPE') {
+          parent = '';
+          me.slots = [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}];
+        } else if (values === 'SR_AREA') {
+          parent = ' AND Parent is null';
+          me.slots = [
+            {flex: 1, values: [], className: 'slot1', textAlign: 'center'},
+            {divider: false, values: [], content: '-', className: 'slot2'},
+            {flex: 1, values: [], className: 'slot3', textAlign: 'center'}
+          ];
+        }
+        api.get({
+          url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="' + values + '"' + parent + ' &PageSize=100&StartRowNum=0',
+          method: 'GET',
+          success: function(data) {
+            let datas = data.items;
+            for (let i = 0; i < datas.length; i++) {
+              Province.push(datas[i].Value);
+            }
+            me.slots[0].values = Province;
+          }
+        });
+      },
+      onValuesChange(values, type) {
+        if (type === 'KL_PROVINCE') {
+          type = 'KL_CITY';
+        }
+        let me = this;
+        if (values[0] !== undefined && values.length > 1) {
+          api.get({
+            url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="' + type + '" AND Parent Value="' + values[0] + '" &PageSize=100&StartRowNum=0',
+            method: 'GET',
+            success: function(data) {
+              let datas = data.items;
+              let Province = [];
+              let High = [];
+              if (datas.constructor === Array) {
+                for (let i = 0; i < datas.length; i++) {
+                  Province.push(datas[i].Value);
+                  High.push(datas[i].High);
+                }
+                me.slots[2].values = Province;
+                me.slots[1].values = High;
+              } else {
+                Province.push(datas.Value);
+                High.push(datas.High);
+                me.slots[2].values = Province;
+                me.slots[1].values = High;
+              }
+            }
+          });
+        }
+      },
+      open(picker) {
+        this.$refs[picker].open();
+      },
+      handleChange(value) {
+        let me = this;
+        me.Start_Date = value.format('MM/dd/yyyy hh:mm:ss');
+      },
+      enter(values, type) {
+        let me = this;
+        me.showBox = false;
+        if (type === 'SR_TYPE') {
+          me[type] = values[0];
+        } else if (type === 'KL_PROVINCE') {
+          me[type] = values[0] + values[1];
+          me.PROVINCE = values[0];
+          me.CITY = values[1];
+        } else if (type === 'SR_AREA') {
+          me.Area = values[0];
+          me.Priority = values[1];
+          me[type] = values[2];
+        }
+      },
+      cancel() {
+        let me = this;
+        me.showBox = false;
+      },
+      async fetchData(val) {
+        let me = this;
+        if (me.Contact_Phone) {
+          api.get({
+            url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] = ' + me.Contact_Phone + '',
+            method: 'GET',
+            success: function(data) {
+              me.search = KND.Util.isArray(data.items) ? data.items : KND.Util.toArray(data);
+            },
+            error: function(data) {
+              me.search = data;
+            }
+          });
+        } else {
+          me.search = [];
+        }
+      },
+      selectCaLL(callNur, name) {
+        let me = this;
+        if (callNur && name) {
+          me.Contact_Phone = callNur;
+          me.Contact_Name = name;
+          me.search = [];
+          me.isCall = {disabled: false};
+        }
+      }
+    },
+    watch: {
+      Contact_Phone() {
+        delay(() => {
+          this.fetchData();
+        }, 300);
+      }
+    },
+    components: {menuBox}
+
+  };
+</script>
 <style lang="scss">
   *{
     margin: 0;
@@ -53,11 +272,15 @@
         .mint-cell-wrapper{
           display: block!important;
           .mint-cell-value{
+            justify-content: flex-end;
             textarea{
               resize: none;
             }
           }
         }
+      }
+      .mint-field .mint-cell-wrapper .mint-cell-value{
+        justify-content: flex-end;
       }
     }
     .search-list{
@@ -74,17 +297,6 @@
       line-height: 1.5rem;
       text-align: center;
       color: #777;
-    }
-    .textRight{
-      .mint-cell-wrapper{
-        .mint-cell-value{
-          @include disFlex();
-          input{
-            height: 100%;
-            text-align: right;
-          }
-        }
-      }
     }
     .submitButton,.addMore{
       @include disFlex();
@@ -122,249 +334,23 @@
     .mint-popup{
       width: 100%;
     }
+    .datetime>.picker>.picker-items>.picker-slot:nth-child(5){
+      display: none;
+    }
+  }
+  .textRight{
+    .mint-cell-wrapper{
+      .mint-cell-value{
+        @include disFlex();
+        input{
+          height: 100%;
+          text-align: right;
+          padding-right: 1rem;
+        }
+      }
+    }
+  }
+  input:disabled{
+    background-color:#ffffff;
   }
 </style>
-<script>
-  import api from '../api/api';
-  import menuBox from '../../../public/components/cus-menu.vue';
-  const delay = (function() {
-    let timer = 0;
-    return function(callback, ms) {
-      clearTimeout(timer);
-      timer = setTimeout(callback, ms);
-    };
-  })();
-  export default {
-    name: 'addService',
-    created() {
-    },
-    data: () => {
-      return {
-        hideMore: false,
-        ContactName: '',
-        ContactId: '',
-        callPhone: '',
-        Type: '',
-        Area: '',
-        subArea: '',
-        Priority: '',
-        Description: '',
-        ProductFlag: '',
-        startDate: '',
-        search: [],
-        slots: [{
-          flex: 1,
-          values: [],
-          className: 'slot1',
-          textAlign: 'center'
-        }, {
-          divider: true,
-          content: '-',
-          className: 'slot2'
-        }, {
-          flex: 1,
-          values: [],
-          className: 'slot3',
-          textAlign: 'center'
-        }],
-        showBox: false
-      };
-    },
-    methods: {
-      showMore() {
-        let me = this;
-        me.hideMore = true;
-      },
-      submit() {
-        let me = this;
-        console.log(me.callPhone);
-        api.get({
-          key: 'getContact1',
-          method: 'GET',
-          success: function(data) {
-            console.log(1);
-            console.log(data);
-            me.ContactId = data.items.Id;
-//            api.get({
-//              key: 'getAdd',
-//              data: {
-//                body: {
-//                  SiebelMessage: {
-//                    'MessageId': '',
-//                    'MessageType': 'Integration Object',
-//                    'IntObjectName': 'Base KL Service Request Interface BO',
-//                    'IntObjectFormat': 'Siebel Hierarchical',
-//                    'ListOfBase KL Service Request Interface BO': {
-//                      'Service Request': {
-//                        'Id': '1',
-//                        'Contact Id': me.ContactId,
-//                        'Contact Last Name': me.ContactName,
-//                        'Area': '其它问题',
-//                        'Sub-Area': '有一定影响力的社会人士',            // 故障现象2
-//                        'Priority': '',            // 优先级
-//                        'Description': '',        // 客服说明
-//                        'Product Warranty Flag': '',  // 报修期限
-//                        'CEM Planned Start Date': '', // 客户预约时间
-//                        'KL Product Model': '',     // 产品型号
-//                        'KL Cutoff Date': '',       // 移交日期
-//                        'KL SN': ''                   // 产品条形码
-//                      }
-//                    }
-//                  }
-//                }
-//              },
-//              success: function(data) {
-//                console.log(11);
-//                console.log(data);
-//              }
-//            });
-            console.log(me.ContactName);
-            api.get({
-              key: 'getaddContact',
-              method: 'POST',
-              data: {
-                'body': {
-                  'SiebelMessage': {
-                    'MessageId': '222',
-                    'MessageType': 'Integration Object',
-                    'IntObjectName': 'Base KL Contact Interface BO',
-                    'IntObjectFormat': 'Siebel Hierarchical',
-                    'ListOfBase KL Contact Interface BO': {
-                      'Contact': {
-                        'Id': '222',
-                        'M/F': '男',
-                        'Type': '业主',
-                        'Last Name': me.ContactName,
-                        'Work Phone #': me.callPhone,
-                        'Job Title': 'Job Title',
-                        'KL Department': 'KL Department'
-                      }
-                    }
-                  }
-                }
-              },
-              success: function(data) {
-                console.log(data);
-              }
-            });
-          }
-//          error: function(data) {
-//            console.log(2);
-//            console.log(data);
-//            if (data) {
-//              api.get({
-//                url: 'http://192.168.166.8:9001/siebel-rest/v1.0/service/EAI Siebel Adapter/Upsert',
-//                method: 'POST',
-//                data: {
-//                  'body': {
-//                    'SiebelMessage': {
-//                      'MessageId': '',
-//                      'MessageType': 'Integration Object',
-//                      'IntObjectName': 'Base KL Contact Interface BO',
-//                      'IntObjectFormat': 'Siebel Hierarchical',
-//                      'ListOfBase KL Contact Interface BO': {
-//                        'Contact': {
-//                          'Id': '17763756438',
-//                          'M/F': '男',
-//                          'Type': '业主',
-//                          'Last Name': me.ContactName,
-//                          'Work Phone #': '17763756438',
-//                          'Job Title': 'Job Title',
-//                          'KL Department': 'KL Department'
-//                        }
-//                      }
-//                    }
-//                  }
-//                },
-//                success: function(data) {
-//                  console.log(data);
-//                }
-//              });
-//            }
-//          }
-        });
-      },
-      getLov(values) {
-        let me = this;
-        me.showBox = true;
-        api.get({
-          url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="KL_PROVINCE" AND Parent="CN" &PageSize=100&StartRowNum=0',
-          method: 'GET',
-          success: function(data) {
-            let datas = data.items;
-            let Province = [];
-            for (let i = 0; i < datas.length; i++) {
-              Province.push(datas[i].Value);
-            }
-            me.slots[0].values = Province;
-          }
-        });
-      },
-      onValuesChange(values) {
-        let me = this;
-        if (values[0] !== undefined) {
-          api.get({
-            url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="KL_CITY" AND Parent Value="' + values[0] + '" &PageSize=100&StartRowNum=0',
-            method: 'GET',
-            success: function(data) {
-              let datas = data.items;
-              let Province = [];
-              if (datas.constructor === Array) {
-                for (let i = 0; i < datas.length; i++) {
-                  Province.push(datas[i].Value);
-                }
-                me.slots[2].values = Province;
-              } else {
-                Province.push(datas.Value);
-                me.slots[2].values = Province;
-              }
-            }
-          });
-        }
-      },
-      enter(values) {
-        let me = this;
-        me.showBox = false;
-        console.log(values);
-      },
-      cancel() {
-        let me = this;
-        me.showBox = false;
-      },
-      async fetchData(val) {
-        let me = this;
-        if (me.callPhone) {
-          api.get({
-            url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/KL Contact Interface BO/Contact/?searchspec=[Cellular Phone %23] = ' + me.callPhone + '',
-            method: 'GET',
-            success: function(data) {
-              console.log(data);
-              me.search = data.items;
-            }
-          });
-        } else {
-          me.search = [];
-        }
-      },
-      selectCaLL(callNur, name) {
-        console.log(callNur);
-        console.log(name);
-        let me = this;
-        if (callNur && name) {
-          me.callPhone = callNur;
-          me.ContactName = name;
-          me.search = [];
-        }
-      }
-    },
-    watch: {
-      callPhone() {
-        delay(() => {
-          this.fetchData();
-        }, 300);
-      }
-    },
-    components: {menuBox}
-
-  };
-</script>

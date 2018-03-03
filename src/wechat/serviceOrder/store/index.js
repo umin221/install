@@ -20,7 +20,7 @@ export default new Vuex.Store({
       mutations: {
       }
     },
-    detail: {
+    addService: {
       namespaced: true,
       state: {
       }

@@ -1,6 +1,6 @@
 <template>
   <div style="background-color: #ebebeb;">
-    <mt-header fixed :title="headTitle">
+    <mt-header fixed title="维修工单列表">
       <fallback slot="left"></fallback>
       <router-link v-if="!role" to="addService" slot="right">
         <mt-button>
@@ -143,7 +143,6 @@
       return {
         selected: 'pending',
         role: false,
-        headTitle: '维修工单列表',
         topStatus: '',
         list: [],
         number: []
