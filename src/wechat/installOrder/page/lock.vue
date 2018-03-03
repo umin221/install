@@ -2,7 +2,9 @@
   <div>
     <mt-header fixed :title="titleVal">
       <fallback slot="left"></fallback>
+<!--
       <mt-button slot="right" @click.native="huan">切换</mt-button>
+-->
     </mt-header>
     <div class="mint-content">
       <mt-cell title="产品名称">
@@ -55,11 +57,24 @@
   export default {
     name: 'detail',
     created: () => {
-      console.dir(1);
+      var self = this;
+      self.id = self.$route.query.id;
+      self.type = self.$route.query.type;
+      if (self.type === '锁体') {
+        self.lockVal = false;
+        self.titleVal = '锁体部分*真锁';
+
+      } else {
+        self.lockVal = true;
+        self.titleVal = '锁芯部分';
+
+      }
     },
     data: () => {
       return {
         titleVal: '锁芯部分',
+        id: '', // id
+        type: '', // 区分锁芯还是锁体
         lockVal: true, // lockVal=true 锁芯， lockVal=false 锁体
         active: 'tab-container',
         lockDetail: {
@@ -88,20 +103,6 @@
       });
     },
     methods: {
-      butXttd() {
-        var self = this;
-        self.$router.push('');
-      },
-      huan() {
-        var self = this;
-        if (self.lockVal) {
-          self.lockVal = false;
-          self.titleVal = '锁体部分*真锁';
-        } else {
-          self.lockVal = true;
-          self.titleVal = '锁芯部分';
-        }
-      }
     }
   };
 </script>

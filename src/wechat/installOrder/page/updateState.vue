@@ -7,8 +7,11 @@
       <mt-cell>
         <div slot="title" class="list-text"><span style="color:red">*</span>关闭原因</div>
       </mt-cell>
-      <mt-field label="" placeholder="请输入关闭原因" type="textarea" rows="8"></mt-field>
-      <div class="button-cla"><mt-button type="primary" @click.native="handleClick()">提交</mt-button></div>
+      <mt-field label="" placeholder="请输入关闭原因" type="textarea" rows="8" v-model="value"></mt-field>
+      <button-group>
+        <mt-button type="primary" class="single"
+                   @click.native="handleClick">提交</mt-button>
+      </button-group>
     </div>
   </div>
 </template>
@@ -32,15 +35,19 @@
   }
 </style>
 <script type="application/javascript">
+  import buttonGroup from 'public/components/cus-button-group';
+  import api from '../api/api';
   export default {
-    name: 'detail',
-    created: () => {
+    name: 'updateState',
+    created() {
       console.dir(1);
+      let param = this.$route.query;
+      this.id = param.id;
     },
     data: () => {
       return {
         value: '',
-        active: 'tab-container'
+        id: ''
       };
     },
     beforeRouteEnter(to, from, next) {
@@ -51,13 +58,28 @@
       });
     },
     methods: {
-      butXttd() {
-        var self = this;
-        self.$router.go('/xttd');
-      },
       handleClick() {
-        history.go(-1);
+        var self = this;
+        if (self.value) {
+          api.get({
+            key: 'getUPStatus',
+            method: 'POST',
+            data: {
+              'body': {
+                'ProcessName': 'KL Install Task Complete Action Workflow',
+                'RowId': self.id
+              }
+            },
+            success: function(data) {
+              history.go(-1);
+            }
+          });
+        } else {
+          Toast('关闭原因不能为空！');
+        }
       }
-    }
+    },
+    components: {buttonGroup}
+
   };
 </script>

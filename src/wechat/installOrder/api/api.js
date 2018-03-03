@@ -1,14 +1,17 @@
 let ApiList = {
   getList: {
-    url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/Order Entry (Sales)/Order Entry - Orders/?searchspec=[KL Agreement Opportunity Name] like "*测试*" &PageSize=2&StartRowNum=0'
+    url: 'data/Order Entry (Sales)/Order Entry - Orders/?searchspec=[KL Agreement Opportunity Name] like "*测试*" &PageSize=2&StartRowNum=0'
     // 列表
   },
   getDetail: {
-    url: 'http://192.168.166.8:9001/siebel-rest/v1.0/service/EAI Siebel Adapter/Query'
-  },
+    url: 'service/EAI Siebel Adapter/Query'
+  }, // 详情
   getTaskAdd: {
-    url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/KL Installation Task/KL Installation Task'
-  }
+    url: 'data/KL Installation Task/KL Installation Task'
+  }, // 任务开始更新状态
+  getUPStatus: {
+    url: 'service/Workflow Process Manager/RunProcess'
+  } // 任务结束关闭
 };
 
 let ajax = (api) => {

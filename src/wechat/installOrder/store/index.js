@@ -35,6 +35,17 @@ export default new Vuex.Store({
           title: '合同附件'
         } // 附件
       }
+    },
+    zsBatch: {
+      namespaced: true,
+      state: {
+        form: '',
+        attach: {
+          list: [{id: 1}, {id: 2}, {id: 3}],
+          edit: false,
+          title: '签收单据归档'
+        } // 附件
+      }
     }
 
   }

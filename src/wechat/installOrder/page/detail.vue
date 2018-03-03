@@ -19,22 +19,18 @@
         <div slot="title" class="list-text"><span class="list-text-span">锁芯部分</span></div>
       </mt-cell>
         <div class="mint-sx-div">
-          <mt-cell title="SZ6010指纹锁"  @click.native="getLock" is-link>
-            <span style="width: 120px">开向：左内开</span>
-            <span>数量：200</span>
-          </mt-cell>
-          <mt-cell title="SZ6011指纹锁"  @click.native="getLock" is-link>
-            <span style="width: 120px">开向：左内开</span>
-            <span>数量：100</span>
+          <mt-cell   @click.native="getLock(item.Id, item['KL Product Type'])" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='锁芯'"  :title="item['KL Product Series Code']">
+            <span style="width: 120px">开向：{{item['KL Hole Direction']}}</span>
+            <span>数量：{{item['Quantity Requested']}}</span>
           </mt-cell>
         </div>
         <mt-cell>
           <div slot="title" class="list-text"><span class="list-text-span">锁体部分* 真锁</span></div>
         </mt-cell>
         <div class="mint-sx-div">
-          <mt-cell title="SZ6010指纹锁"  @click.native="getLock" is-link>
-            <span style="width: 120px">开向：左内开</span>
-            <span>数量：200</span>
+          <mt-cell  @click.native="getLock(item.Id, item['KL Product Type'])" is-link v-for="item in taskDataST" v-if="item['KL Product Type']=='锁体'"  :title="item['KL Product Series Code']">
+            <span style="width: 120px">开向：{{item['KL Hole Direction']}}</span>
+            <span>数量：{{item['Quantity Requested']}}</span>
           </mt-cell>
         </div>
       </div>
@@ -401,21 +397,22 @@
         success: function(data) {
           console.dir(data.SiebelMessage);
           me.detailData = data.SiebelMessage['Order Entry - Orders'];
-          me.taskData = me.detailData['KL Installation Task'];
-          me.taskDataList = me.taskData[0]['KL Installation Task'];
-          console.dir(me.taskDataList);
+          me.taskData = KND.Util.toArray(me.detailData['KL Installation Task']);
+          me.taskDataList = KND.Util.toArray(me.taskData[0]['KL Installation Task']);
+          me.taskDataST = KND.Util.toArray(me.detailData['Order Entry - Line Items']);
+          console.dir(me.taskDataST);
         }
       });
     },
     data: () => {
       return {
         type: 'read', // add 新增 / edit 编辑 / read 只读
-        value: '',
         id: '',
-        detailData: '',
-        taskData: '',
-        taskDataList: '',
-        is_show_sx: false,
+        detailData: '', // 详情整体数据
+        taskData: '', // 任务集
+        taskDataList: '', // 任务集子任务
+        taskDataST: '', // 锁芯锁体
+        is_show_sx: false, // 是否显示锁芯锁体
         active: 'tab-container'
       };
     },
@@ -427,12 +424,12 @@
       });
     },
     methods: {
-      updateTask(index) {
+      updateTask(index) { // 点击任务切换子任务
         let me = this;
-        me.taskDataList = me.taskData[index]['KL Installation Task'];
+        me.taskDataList = KND.Util.toArray(me.taskData[index]['KL Installation Task']);
         console.dir(me.taskDataList);
       },
-      is_show_fun() {
+      is_show_fun() { // 是否显示锁体锁芯
         var self = this;
         if (self.is_show_sx) {
           self.is_show_sx = false;
@@ -440,13 +437,24 @@
           self.is_show_sx = true;
         }
       },
-      butXttd() {
+      getLock(id, type) { // 锁芯锁体详情事件
+        var self = this;
+        // 跳转锁芯锁体详情
+        self.$router.push({
+          name: 'lock',
+          query: {
+            id: id,
+            type: type
+          }
+        });
+      },
+      butXttd() { // 跳转协同团队
         var self = this;
         self.$router.push('xttd');
       },
-      updateState(status, id) {
+      updateState(status, id) { // 任务事件 ；1.还没开始先开始 ； 2.已开始就跳转关闭页面
         var self = this;
-        if (status === '未开始') {
+        if (status !== '未开始') {
           console.dir('===');
           MessageBox({
             title: '提示',
@@ -473,26 +481,41 @@
           });
         } else {
           self.$router.push('updateState');
+          // 跳转关闭页面更新状态
+          this.$router.push({
+            name: 'updateState',
+            query: {
+              id: id
+            }
+          });
         }
       },
-      routerPage(index) {
+      routerPage(index, id, state) { // 子任务事件
         var self = this;
         if (index === 0) {
-          self.$router.push('sign');
+          if (index === 0) {
+            self.$router.push('sign');
+          } else {
+            // 跳转详情
+            this.$router.push({
+              name: 'sign',
+              query: {
+                type: 'read',
+                state: state,
+                id: id
+              }
+            });
+          }
         } else {
           self.$router.push('batch');
         }
       },
-      sporadic(index) {
+      sporadic(index) { // 子任务数据集事件
         var self = this;
         if (index === 0) {
         } else {
           self.$router.push('sporadic');
         }
-      },
-      getLock() {
-        var self = this;
-        self.$router.push('lock');
       }
     }
   };

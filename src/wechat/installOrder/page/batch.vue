@@ -16,7 +16,10 @@
       <mt-cell title="计划开孔数量" is-link>
         <span></span>
       </mt-cell>
-      <div class="button-cla"><mt-button type="primary" @click.native="handleClick()">提交</mt-button></div>
+      <button-group>
+        <mt-button type="primary" class="single"
+                   @click.native="handleClick">提交</mt-button>
+      </button-group>
     </div>
   </div>
 </template>
@@ -38,6 +41,7 @@
   }
 </style>
 <script type="application/javascript">
+  import buttonGroup from 'public/components/cus-button-group';
   export default {
     name: 'detail',
     created: () => {
@@ -64,6 +68,7 @@
         var self = this;
         self.$router.go('/xttd');
       }
-    }
+    },
+    components: {buttonGroup}
   };
 </script>
