@@ -8,10 +8,10 @@
 
       <div class="mint-content service-detail">
         <div class="detail-title">
-          <div class="mt-Detail-title">产品编号：{{ServiceRequest.Product}}<span class="user-state">{{ServiceRequest.Status}}</span></div>
-          <div class="mt-Detail-title">产品类型：指纹锁</div>
+          <div class="mt-Detail-title">服务单编号：{{ServiceRequest['SR Number']}}<span class="user-state">{{ServiceRequest.Status}}</span></div>
+          <div class="mt-Detail-title">优先级：{{ServiceRequest['Priority']}}</div>
           <div class="mt-Detail-title">联系人：{{ServiceRequest['Contact Last Name']}}</div>
-          <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call">{{ServiceRequest['KL Contact Mobile Phone']}}</a></div>
+          <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call">{{ServiceRequest['Contact Business Phone']}}</a></div>
         </div>
         <div class="detail-content">
           <mt-navbar v-model="active">
@@ -26,6 +26,7 @@
                 <div>客户预约时间：{{ServiceRequest['CEM Planned Start Date']}}</div>
                 <div>实际预约时间：{{ServiceRequest['CEM Planned Start Date']}}</div>
                 <div>地址：{{ServiceRequest['Personal City']}}{{ServiceRequest['Personal Street Address']}}</div>
+                <div>用户故障说明：{{ServiceRequest['Sub-Area']}}</div>
                 <div>问题说明：
                   <div>{{ServiceRequest['Description']}}</div>
                 </div>
@@ -58,18 +59,28 @@
       <div v-if="!role" class="submitButton">
         <mt-button size="normal" type="danger" @click="toContact" >派单</mt-button>
       </div>
-      <div v-else-if="role" class="submitButton">
-        <mt-button v-if="isCall === 'lxkh'"  size="normal" @click.native="changeBtnStote" type="danger" >电话联系客户</mt-button>
+      <button-group>
+        <mt-button v-if="isCall === 'lxkh'" type="primary" class="single" @click.native="changeBtnStote"  >电话联系客户</mt-button>
         <div v-else-if="isCall === 'yyjh'" class="callPlan">
-          <mt-button size="normal" type="default" @click.native="callSolve" >电话已解决</mt-button>
-          <mt-button size="normal" @click.native="clickShow" type="danger" >预约维修计划</mt-button>
+          <mt-button  type="primary" class="single flax"  @click.native="callSolve" >电话已解决</mt-button>
+          <mt-button type="primary" class="single flax" @click.native="clickShow"  >预约维修计划</mt-button>
         </div>
-        <mt-button v-if="isCall === 'gdcz'"  size="normal" @click="popupVisible1 = !popupVisible1" type="danger" >工单操作</mt-button>
-      </div>
+        <mt-button v-if="isCall === 'gdcz'"  type="primary" class="single" @click="popupVisible1 = !popupVisible1" >工单操作</mt-button>
+      </button-group>
+      <!--<div v-else-if="role" class="submitButton">-->
+        <!--<mt-button v-if="isCall === 'lxkh'"  size="normal" @click.native="changeBtnStote" type="danger" >电话联系客户</mt-button>-->
+        <!--<div v-else-if="isCall === 'yyjh'" class="callPlan">-->
+          <!--<mt-button size="normal" type="default" @click.native="callSolve" >电话已解决</mt-button>-->
+          <!--<mt-button size="normal" @click.native="clickShow" type="danger" >预约维修计划</mt-button>-->
+        <!--</div>-->
+        <!--<mt-button v-if="isCall === 'gdcz'"  size="normal" @click="popupVisible1 = !popupVisible1" type="danger" >工单操作</mt-button>-->
+      <!--</div>-->
       <!--弹出日历-->
-      <mt-popup v-model="showBox2" position="bottom" popup-transition="popup-fade" class="mint-popup-1">
-        <dateControl @my-cancel="cancel" @my-enter="enter"></dateControl>
-      </mt-popup>
+      <div v-if="showBox2">
+        <mt-popup v-model="showBox2"  position="bottom" popup-transition="popup-fade" class="mint-popup-1">
+          <dateControl @my-cancel="cancel" @my-enter="enter"></dateControl>
+        </mt-popup>
+      </div>
 
       <close :showBox1="showBox" @my-enter="boxEnter" @my-close="boxClose" :options1="option"></close>
 
@@ -104,6 +115,7 @@
   import dateControl from './dateControl';
   import api from '../api/api';
   import { MessageBox } from 'mint-ui';
+  import buttonGroup from 'public/components/cus-button-group';
   export default {
     name: 'serviceDetail',
     created() {
@@ -164,7 +176,9 @@
           {name: '流程记录', id: 'tab-container3'}
         ],
         option: ['客户不接受维修报价', '已自行解决', '暂不影响使用', '其他'],
-        processDate: []
+        processDate: [],
+        starTime: '',
+        endTime: ''
       };
     },
     methods: {
@@ -193,10 +207,27 @@
         console.log(val);
       },
       enter(val) {                     // 日历确定
-        let num = parseInt(val.Time1, 0);
+        let me = this;
+        if (val.Time1.time && val.Time2.time) {
+          if (val.Time1.key <= val.Time2.key) {
+            me.starTime = val.Time1.time;
+            me.endTime = val.Time2.time;
+          } else {
+            me.starTime = val.Time2.time;
+            me.endTime = val.Time1.time;
+          }
+          me.starTime = val.selectDay + ' ' + me.starTime;
+          me.endTime = val.selectDay + ' ' + me.endTime;
+          console.log(me.starTime);
+          console.log(me.endTime);
+        } else {
+          MessageBox({
+            title: '提示',
+            message: '请选择预约开始和结束时间！'
+          });
+        }
         this.showBox2 = false;
         this.isCall = 'gdcz';
-        console.log(num);
       },
       callSolve() {
         MessageBox.confirm('远程电话沟通客户已解决，确认提交？?', '').then(action => {
@@ -229,7 +260,8 @@
     },
     components: {
       close,
-      dateControl
+      dateControl,
+      buttonGroup
     }
   };
 </script>
@@ -251,7 +283,7 @@
     position: relative;
     height:100%;
     .service-detail{
-      background: #F2F2F2;
+      height: 84%;
       .detail-title{
         position: relative;
         padding: 0.5rem;
@@ -275,10 +307,12 @@
         position: relative;
         margin-top: 0.5rem;
         font-size: 0.7rem;
+        height: 80%;
+        background-color: #ffffff;
+        overflow: auto;
         .mint-tab-container{
           .mint-tab-container-wrap{
             .mint-tab-container-item{
-              background: white;
               padding: 0.5rem;
               .crm-zyList {
                 overflow: hidden;
@@ -341,22 +375,17 @@
         }
       }
     }
-
-    /*底部按钮*/
-    .submitButton {
-      @include disFlex();
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      height: 3rem;
-      background: white;
-      line-height: 3rem;
-      opacity: 0.7;
-      button {
-        width: 7rem;
-        border-radius: 1rem;
+    .cus-group-button{
+      .callPlan{
+        display: flex;
+        justify-content: space-around;
+        button{
+          margin: 0.3rem 0;
+          width: 40%;
+        }
       }
     }
+    /*底部按钮*/
     /*.mint-popup-1{*/
       /*width: 100%;*/
       /*height: 22rem;*/

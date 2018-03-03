@@ -9,9 +9,9 @@
       <!--选择年月和日期-->
       <div class="dateContent">
         <div class="month">
-          <i class="el-icon-left" v-show="leftBunHide" @click="pickPre(currentYear,currentMonth)"><</i>
+          <i class="xs-icon icon-back" v-show="leftBunHide" @click="pickPre(currentYear,currentMonth)"></i>
           <span>{{ currentYear }} 年 {{ currentMonth }} 月</span>
-          <i class="el-icon-right" @click="pickNext(currentYear,currentMonth)">></i>
+          <i class="xs-icon icon-next" @click="pickNext(currentYear,currentMonth)"></i>
         </div>
         <!-- 日期 -->
         <div class="bodyDiv">
@@ -45,7 +45,7 @@
       <div class="timeTable">
         <table>
           <tr v-for="(Am, index1) in am" :key="index1">
-            <td v-for="(time, index) in Am.time" :key="index" @click="selectedTime(index+index1*8)" :class="{'selectedT':isTimeSelected[index+index1*8]}">{{time}}</td>
+            <td v-for="(time, index) in Am.time" :key="index" @click="selectedTime(index+index1*8,index1,index)" :class="{'selectedT':isTimeSelected[index+index1*8]}">{{time}}</td>
           </tr>
         </table>
       </div>
@@ -76,8 +76,14 @@
         daysUL: [],
         params: {
           selectDay: '',
-          Time1: '',
-          Time2: '',
+          Time1: {
+            key: '',
+            time: ''
+          },
+          Time2: {
+            key: '',
+            time: ''
+          },
           type: ''
         },
         leftBunHide: false,
@@ -86,7 +92,8 @@
         initAm: '00:00',
         am: [],
         num: 0,
-        isTimeSelected: []
+        isTimeSelected: [],
+        isMyDay: false
       };
     },
     methods: {
@@ -96,7 +103,22 @@
       },
       enter() {                     // 日历确定
         let self = this;
-        self.$emit('my-enter', this.params);
+        if (!self.params.selectDay) {
+          self.params.selectDay = self.formatDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate());
+        }
+        self.$emit('my-enter', self.params);
+        self.params = {
+          selectDay: '',
+          Time1: {
+            key: '',
+            time: ''
+          },
+          Time2: {
+            key: '',
+            time: ''
+          },
+          type: ''
+        };
       },
       pickPre(year, month) {        // 点击切换上个月
         let self = this;
@@ -146,6 +168,9 @@
       },
       initData(cur) {            // 日历初始化
         let date = '';
+        let Year = new Date().getFullYear();
+        let Month = new Date().getMonth();
+        let Day = new Date().getDate();
         if (cur) {
           date = new Date(cur);
         } else {
@@ -171,13 +196,23 @@
           this.daysUL.push(this.days);
           this.days = [];
         }
-
         for (let i = 1; i <= 35 - this.firstWeek; i += 1) {
           const d = new Date(str);
           d.setDate(d.getDate() + i);
           this.days.push(d);
           if (this.days.length % 7 === 0) {
-            this.daysUL.push(this.days);
+            if (!this.isMyDay) {
+              for (let j = 0; j < this.days.length;j++) {
+                if (this.days[j].getFullYear() === Year && this.days[j].getMonth() === Month && this.days[j].getDate() === Day) {
+                  this.daysUL.push(this.days);
+                  this.isMyDay = true;
+                } else {
+                  console.log('其他');
+                }
+              }
+            } else {
+              this.daysUL.push(this.days);
+            }
             this.days = [];
           }
         }
@@ -208,7 +243,7 @@
         time = time.toString().split(' ')[4].slice(0, 5);
         return time;
       },
-      selectedTime(index) {             // 选择时间
+      selectedTime(index, index1, index2) {             // 选择时间
         let self = this;
         let seleat = '';
         if (self.num === 2) {
@@ -239,9 +274,11 @@
           }
         }
         if (self.num === 1) {
-          self.params.Time1 = self.am[seleat].time[index - seleat * 8];
+          self.params.Time1.time = self.am[seleat].time[index - seleat * 8];
+          self.params.Time1.key = (index1 + 1) * (index2 + 1);
         } else if (self.num === 2) {
-          self.params.Time2 = self.am[seleat].time[index - seleat * 8];
+          self.params.Time2.time = self.am[seleat].time[index - seleat * 8];
+          self.params.Time2.key = (index1 + 1) * (index2 + 1);
         }
       }
     }
@@ -282,15 +319,16 @@
           text-align: center;
           line-height: 2rem;
           font-size: 0.7rem;
+          position: relative;
           i{
-            font: 500 1.2rem sans-serif;
-            color: #888;
+            position: absolute;
+            top: 0;
           }
-          .el-icon-left{
-            float: left;
+          .icon-next{
+            right: 0.5rem;
           }
-          .el-icon-right{
-            float: right;
+          .icon-back{
+            left: 0.5rem;
           }
         }
         .weekdays{
