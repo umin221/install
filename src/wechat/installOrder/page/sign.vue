@@ -13,7 +13,7 @@
                   :class="heartVisible"></mt-field>
         <mt-field label="签收数量" placeholder="请输入签收数量"
                   :class="heartVisible"></mt-field>
-        <mt-field label="备注说明" type="textarea" rows="4" placeholder="请输入备注说明"></mt-field>
+        <mt-field label="备注说明" type="textarea" rows="4"></mt-field>
       </div>
       <attach :attach="attach.list"
               :edit="!read"
@@ -23,7 +23,6 @@
 
     <button-group>
       <mt-button type="primary" class="single"
-                 v-show="type==='add'"
                  @click.native="submitFn">提交</mt-button>
     </button-group>
   </div>
@@ -61,6 +60,13 @@
           }]
         }
       };
+    },
+    beforeRouteEnter(to, from, next) {
+      console.dir(2);
+      next(vm => {
+        let query = vm.$route.query;
+        console.dir(query);
+      });
     },
     computed: {
       ...mapState(NameSpace, ['form', 'attach']),

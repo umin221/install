@@ -10,13 +10,17 @@
         <div slot="title" class="list-text"><span>产品条形码:</span><span>{{item.savrsNo}}</span></div>
         <div slot="title" class="list-text"><span></span><span>{{item.name}}</span></div>
       </mt-cell>
-      <div class="button-cla"><mt-button type="primary" @click.native="scavenging">扫码安装</mt-button></div>
+      <button-group>
+        <mt-button type="primary" class="single"
+                   @click.native="scavenging">扫码安装</mt-button>
+      </button-group>
     </div>
   </div>
 </template>
 
 <script type="application/javascript">
   // import api from '../api/api';
+  import buttonGroup from 'public/components/cus-button-group';
   import {mapState, mapActions} from 'vuex';
   import { Toast } from 'mint-ui';
   const NameSpace = 'index';
@@ -51,8 +55,7 @@
         self.$router.push('scanCode');
       }
     },
-    components: {
-    }
+    components: {buttonGroup}
   };
 </script>
 <style>

@@ -78,18 +78,7 @@
     data: () => {
       return {
         value: '',
-        titleVal: '日志',
-        processDate: [{
-          option: '开孔锁签收'
-        }, {
-          option: '图纸签收'
-        }, {
-          option: '开孔批次'
-        }, {
-          option: '门厂发运'
-        }, {
-          option: '挂门验收'
-        }]
+        titleVal: '日志'
       };
     },
     beforeRouteEnter(to, from, next) {
