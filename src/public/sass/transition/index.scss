@@ -31,37 +31,31 @@
   }
 }
 
-// song list
-.list-view-enter-active, .list-view-leave-active {
-  transition: transform .5s ease;
-}
-.list-view-enter, .list-view-leave-to{
-  transform: translateY(100%);
-}
-
-// header title switch animation
-.title-enter-active, .title-leave-active {
-  transition-property: opacity, transform;
-  transition-duration: .5s;
-}
-.title-enter, .title-leave-to {
-  opacity: 0;
-  transform: translateY(10px);
-}
-
-// Song Ablum Infinite Rotate
-.spin-slow {
-  animation: spin 6s linear infinite;
-}
-.spin {
-  animation: spin 30s linear infinite;
-}
-
-@keyframes spin{
-  from {
-    transform: rotate(0deg);
+// Page Turn on Transian Effect
+.turn-up {
+  &-enter {
+    transform: translate3d(0, 50%, 0);
   }
-  to {
-    transform: rotate(360deg);
+  &-leave-to {
+    transform: translate3d(0, 0, 0);
+  }
+  &-enter-active, &-leave-active  {
+    transition: transform .2s ease;
+  }
+}
+
+// Page Turn Off Transian Effect
+.turn-down {
+  &-enter {
+    transform: translate3d(0, 0, 0);
+  }
+  &-leave-to {
+    transform: translate3d(0, 100%, 0);
+  }
+  &-leave-active {
+    z-index: 2;
+  }
+  &-enter-active, &-leave-active  {
+    transition: transform .2s ease;
   }
 }

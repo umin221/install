@@ -163,6 +163,29 @@
       return __name;
     };
 
+    /**
+     * 参数转换
+     * @param obj
+     */
+    param(obj) {
+      let arr = [];
+      for (var i in obj) {
+        arr.push(i + '=' + obj[i]);
+      }
+      return arr.join('&');
+    };
+
+    /**
+     * SIEBEL 查询条件转换
+     */
+    condition(obj) {
+      let arr = [];
+      for (var i in obj) {
+        arr.push('[' + i + ']="' + obj[i] + '"');
+      }
+      return arr.join('&');
+    };
+
   };
 
   /**

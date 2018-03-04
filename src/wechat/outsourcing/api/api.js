@@ -1,13 +1,13 @@
 let apiList = {
   // 委外列表
-  getPartners: (option) => {
+  getPartners: option => {
     return {
-      url: 'data/Channel Partner/Channel Partner/?searchspec=[KL Partner Status] = "' + option.data.status + '"&PageSize=10&StartRowNum=0'
+      url: 'data/Channel Partner/Channel Partner/?searchspec=[KL Partner Status]="' + option.data.status + '&' + KND.Util.param(option.paging)
     };
   },
 
-  // 委外详情
-  findPartner: (option) => {
+  // id 查找委外详情
+  findPartnerById: option => {
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/Query/?OutputIntObjectName=Base Channel Partner&PrimaryRowId=' + option.data.id,
@@ -15,8 +15,16 @@ let apiList = {
     };
   },
 
+  // 查找委外详情
+  findPartner: option => {
+    return {
+      url: 'data/Channel Partner/Channel Partner/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=2&StartRowNum=0',
+      data: {}
+    };
+  },
+
   // 添加委外团队
-  addPartner: (option) => {
+  addPartner: option => {
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/Upsert',
@@ -34,10 +42,24 @@ let apiList = {
         }
       }
     };
+  },
+
+  // 更新团队状态
+  update: option => {
+    return {
+      method: 'put',
+      url: 'data/Channel Partner/Channel Partner/'
+    };
+  },
+
+  findContact: () => {
+    return {
+      url: 'service/EAI Siebel Adapter/Upsert'
+    };
   }
 };
 
-let ajax = (api) => {
+let ajax = api => {
   if (config.online) {
     KND.Native.ajax(api);
   } else {
@@ -46,7 +68,7 @@ let ajax = (api) => {
   }
 };
 
-const get = (option) => {
+const get = option => {
   ajax(Object.assign(option, apiList[option.key](option)));
 };
 

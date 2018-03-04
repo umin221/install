@@ -8,12 +8,18 @@
   </div>
 </template>
 
-<script type="application/javascript">
+<script type="es6">
   import {mapState, mapMutations} from 'vuex';
 
   const NameSpace = 'app';
   export default {
     name: NameSpace,
+    created() {
+      let me = this;
+      KND.Util.back = () => {
+        me.$router.back();
+      }
+    },
     data() {
       return {
         prevRoutes: []
@@ -26,24 +32,30 @@
        * Don't Need Transition Effect
        * ========================================= */
       $route(to, from) {
+        let me = this;
+        let leaveTransition;
         if (!(to.meta.noPageAnimation || from.meta.noPageAnimation)) {
-          if (to.name === this.prevRoutes[this.prevRoutes.length - 1]) {
-            this.setTransition('turn-off');
-            this.prevRoutes.pop();
+          if (to.name === me.prevRoutes[me.prevRoutes.length - 1]) {
+            leaveTransition = me.transition[1];
+            me.setTransition(leaveTransition);
+            me.prevRoutes.pop();
+            if (leaveTransition !== 'turn-off') {
+              me.setTransitionName(['turn-on', 'turn-off']);
+            }
           } else {
             if (from.name != null) {
-              this.setTransition('turn-on');
-              this.prevRoutes.push(from.name);
+              me.setTransition(me.transition[0]);
+              me.prevRoutes.push(from.name);
             }
           }
         }
       }
     },
     computed: {
-      ...mapState(NameSpace, ['transitionName', 'alive'])
+      ...mapState(NameSpace, ['transition', 'transitionName', 'alive'])
     },
     methods: {
-      ...mapMutations(NameSpace, ['setTransition']),
+      ...mapMutations(NameSpace, ['setTransition', 'setTransitionName']),
       // Clear Transition Effects After Each Switch
       clearTransition() {
         this.setTransition('');

@@ -1,18 +1,21 @@
 <!--详情、新增、编辑等页面复用-->
 <template>
   <div>
+    <!--header-->
     <mt-header fixed :title="title">
       <fallback slot="left"></fallback>
       <mt-button v-show="read && isValid" slot="right"
                  @click="type = 'edit'">编辑</mt-button>
       <mt-button v-show="!read && isValid" slot="right"
-                 @click="type = 'read'">完成</mt-button>
+                 @click="updateFn">完成</mt-button>
     </mt-header>
 
+    <!--create detail edit-->
     <div class="mint-content wide-form">
       <div :class="{'readonly':read}">
         <mt-field label="合作伙伴名称" placeholder="请输入名称"
           :class="heartVisible"
+          @change="checkNameExistFn"
           v-model="form['Name']"></mt-field>
         <mt-field label="合作伙伴负责人" placeholder="请输入负责人"
           :class="heartVisible"
@@ -31,13 +34,27 @@
               :title="title">
       </attach>
 
+      <!--pending -->
+      <div class="records"
+           v-show="state === 'pending'">
+        <title-group>审批记录</title-group>
+        <empty v-show="!record"></empty>
+        <mt-cell class="multiple"
+                       v-for="item in record"
+                       :key="item.state">
+          <div class="mint-cell-title" slot="title">{{item['state']}}</div>
+          <div class="mint-cell-sub-title" slot="title">{{item['time']}}</div>
+        </mt-cell>
+      </div>
+
+      <!--valid invalid && read-->
       <div v-show="read && state !== 'pending'">
         <title-group>联系人列表</title-group>
         <empty v-show="!form.Contact"></empty>
         <mt-cell-swipe class="multiple"
                  v-for="item in form.Contact"
                  :key="item.Id"
-                 :right="right"
+                 :right="swiperBtn"
                  @click.native="toContact(item)"
                  is-link>
           <div class="mint-cell-title" slot="title">姓名: {{item['Last Name']}}</div>
@@ -46,17 +63,18 @@
       </div>
     </div>
 
+    <!--buttons-->
     <button-group>
       <mt-button type="primary" class="single"
-        v-show="type==='add'"
+        v-show="isSubmit"
         @click.native="submitFn">提交</mt-button>
       <mt-button type="primary" class="single"
         v-show="isValid"
-        v-text="read? '新增联系人' : '失效'"
+        v-text="read ? '新增联系人' : '失效'"
         @click.native="multipleFn"></mt-button>
       <mt-button type="primary" class="single"
-        v-show="read && state==='invalid'"
-        @click="type='add'">重新启动</mt-button>
+        v-show="read && state === 'invalid'"
+        @click="type = 'edit'">重新启用</mt-button>
     </button-group>
   </div>
 </template>
@@ -66,8 +84,8 @@
   import titleGroup from 'public/components/cus-title-group';
   import buttonGroup from 'public/components/cus-button-group';
 
-  // Right button
-  let right = [{
+  // Swiper button
+  let swiperBtn = [{
     content: '删除',
     style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
     handler: () => this.$messagebox('delete')
@@ -84,7 +102,7 @@
       this.type = param.type;
       // 获取详情
       if (param.id) {
-        this.findPartner(param.id);
+        this.findPartnerById(param.id);
       } else {
         this.clear();
       }
@@ -101,7 +119,7 @@
       };
     },
     computed: {
-      ...mapState(NameSpace, ['form', 'attach']),
+      ...mapState(NameSpace, ['form', 'attach','record']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -110,8 +128,13 @@
       isValid() {
         return this.state === 'valid';
       },
-      right() {
-        return this.state === 'valid' ? right : [];
+      // 提交按钮
+      isSubmit() {
+        let type = this.type;
+        return type === 'add' || (type === 'edit' && this.state === 'invalid');
+      },
+      swiperBtn() {
+        return this.state === 'valid' ? swiperBtn : [];
       },
       // * 是否显示
       heartVisible() {
@@ -123,40 +146,61 @@
        * 查看&编辑标题一致
        */
       title() {
-        return this.type === 'add' ? (this.state === 'invalid' ? '补充委外合约' : '创建委外团队') : '委外团队详情';
+        return this.type === 'add' ? '创建委外团队' :
+          this.type === 'edit' && this.state === 'invalid' ? '补充委外合约' : '委外团队详情';
       }
     },
     methods: {
       ...mapMutations(NameSpace, ['clear']),
-      ...mapActions(NameSpace, ['findPartner', 'addPartner']),
+      ...mapActions(NameSpace, ['findPartnerById', 'findPartner', 'addPartner', 'update']),
       toContact(contact) {
         this.$router.push({
           name: 'contact',
           query: contact
         });
       },
-      // Create partner
-      submitFn() {
-        let me = this;
-        me.addPartner((data) => {
-          if (data.PrimaryRowId) {
-            Toast({
-              message: '创建成功'
-            });
-            me.$router.go(-1);
-          } else {
-            Toast({
-              message: '创建失败'
-            });
-          }
+      // Check whether the name is repeated
+      checkNameExistFn() {
+        this.findPartner({
+          data: {
+            Name: this.form.Name
+          },
+          loading: false,
+          success: data => {
+            // 查询已存在相同名称记录
+            if (data.items) {
+              console.log(data);
+              Toast('伙伴名称已存在');
+            }
+          }, error: error => {}
         });
       },
-      // Add contact or invalid of the partner
-      multipleFn() {
-        if (this.read) {
-          this.$router.push('contact');
+      // Partner create & restart
+      submitFn() {
+        // restart
+        if (this.state === 'invalid') {
+          this.update({
+            'KL Partner Status': '待审批'
+          });
         } else {
-
+          // create
+          this.addPartner();
+        }
+      },
+      // Partner update
+      updateFn() {
+        this.update();
+      },
+      // To contact or fail out partner
+      multipleFn() {
+        let me = this;
+        if (me.read) {
+          me.$router.push('contact');
+        } else {
+          // fail out partner
+          me.update({
+            'KL Partner Status': '失效'
+          });
         }
       }
     }
@@ -167,6 +211,12 @@
   .wide-form {
     .mint-cell-title {
       width: 130px;
+    }
+
+    .multiple {
+      .mint-cell-title {
+        font-size: $font-size-small;
+      }
     }
   }
 

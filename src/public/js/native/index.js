@@ -26,10 +26,12 @@ import axios from 'axios';
      * @param option
      */
     ajax(option) {
-      // tips
-      Indicator.open({
-        spinnerType: 'fading-circle'
-      });
+      // loading
+      if (option.loading !== false) {
+        Indicator.open({
+          spinnerType: 'fading-circle'
+        });
+      };
       // post data
       let setting = Object.assign({
         headers: {
@@ -43,7 +45,7 @@ import axios from 'axios';
         setting.url = config.host + config.context + setting.url;
       };
       // get data
-      axios(setting).then((response) => {
+      axios(setting).then(response => {
         Indicator.close();
         let data = response.data;
         // Error 字段判断是否存在系统异常
@@ -54,12 +56,12 @@ import axios from 'axios';
         }
         // callback
         option.success(response.data);
-      }).catch((error) => {
+      }).catch(error => {
         Indicator.close();
         if (option.error) {
           option.error(error);
         } else {
-          console.log(error);
+          console.error(error);
           let message = error.response && error.response.data.ERROR;
           Toast({
             message: message || '获取数据失败',

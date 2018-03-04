@@ -1,6 +1,11 @@
 <template>
-  <mt-loadmore :bottom-method="loadBottom" :bottom-all-loaded="allLoaded" :top-method="loadTop"
-               @bottom-status-change="handleBottomChange" @top-status-change="handleTopChange" ref="loadmore">
+  <mt-loadmore :bottom-method="loadBottom"
+               :bottom-all-loaded="allLoaded"
+               :top-method="loadTop"
+               :autoFill="false"
+               @bottom-status-change="handleBottomChange"
+               @top-status-change="handleTopChange"
+               ref="loadmore">
 
     <div slot="top" class="mint-loadmore-top">
       <span v-show="topStatus !== 'loading'" :class="{ 'is-rotate': topStatus === 'drop' }">↓</span>
@@ -26,10 +31,11 @@
     data() {
       return {
         topStatus: '',
-        bottomStatus: ''
+        bottomStatus: '',
+        allLoaded: false
       };
     },
-		props: ['loadTop', 'loadBottom', 'allLoaded'],
+		props: ['loadTop', 'loadBottom'],
 		methods: {
       handleTopChange(status) {
         this.topStatus = status;
@@ -40,8 +46,9 @@
       onTopLoaded() {
         this.$refs.loadmore.onTopLoaded();
       },
-      onBottomLoaded() {
+      onBottomLoaded(hasmore = true) {
         this.$refs.loadmore.onBottomLoaded();
+        this.allLoaded = hasmore;
       }
 		}
 	};
