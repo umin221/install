@@ -37,29 +37,43 @@
             </mt-tab-container-item>
             <mt-tab-container-item id="tab-container2">
               <div class="service-record">
-                暂无数据
+                <div>单据编号{{ServiceRequest['SR Number']}}
+                  <i :class="[icon,iconDown]" @click="openOrder"></i>
+                  <ul v-show="isOpenOrder">
+                    <li>故障记录</li>
+                    <li>产品序列号：{{ServiceRequest['KL SN']}}</li>
+                    <li>详细地址：{{ServiceRequest['KL SN']}}</li>
+                    <li>产品类型：{{ServiceRequest['KL Product Model']}}</li>
+                    <li>故障描述：{{ServiceRequest['Sub-Area']}}</li>
+                    <li>故障现象：{{ServiceRequest['Area']}}</li>
+                    <li>照片附件</li>
+                  </ul>
+                  <ul v-show="isOpenOrder">
+                    <li>完工确认单</li>
+                  </ul>
+                </div>
               </div>
             </mt-tab-container-item>
             <mt-tab-container-item id="tab-container3">
-                <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
-                  <ul class="content">
-                    <li class="bd-radius">
-                      <span class="icon"></span>
-                    </li>
-                    <li style="margin-right: 8px">{{item.Note}}</li>
-                    <div class="content-div">
-                      <div>{{item.Created}}</div>
-                    </div>
-                  </ul>
-                </div>
+              <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
+                <ul class="content">
+                  <li class="bd-radius">
+                    <span class="icon"></span>
+                  </li>
+                  <li style="margin-right: 8px">{{item.Note}}</li>
+                  <div class="content-div">
+                    <div>{{item.Created}}</div>
+                  </div>
+                </ul>
+              </div>
             </mt-tab-container-item>
           </mt-tab-container>
         </div>
       </div>
-      <div v-if="!role" class="submitButton">
-        <mt-button size="normal" type="danger" @click="toContact" >派单</mt-button>
-      </div>
-      <button-group>
+      <button-group v-if="!role">
+        <mt-button type="primary" class="single" @click="toContact" >派单</mt-button>
+      </button-group>
+      <button-group v-if="role">
         <mt-button v-if="isCall === 'lxkh'" type="primary" class="single" @click.native="changeBtnStote"  >电话联系客户</mt-button>
         <div v-else-if="isCall === 'yyjh'" class="callPlan">
           <mt-button  type="primary" class="single flax"  @click.native="callSolve" >电话已解决</mt-button>
@@ -152,12 +166,15 @@
         active: 'tab-container1',
         headTitle: '维修工单详情',
         popupVisible1: false,
+        icon: 'xs-icon',
+        iconDown: 'icon-arrow-down',
+        isOpenOrder: false,
         ServiceRequest: {},
         contact: {},
         srNumber: '',
         contactName: '',
         Created: '',
-        role: true,
+        role: false,
         isCall: 'lxkh',
         showBox: false,
         showBox2: false,
@@ -248,6 +265,15 @@
         this.$router.push({
           name: 'contact'
         });
+      },
+      openOrder() {
+        if (this.iconDown === 'icon-arrow-down') {
+          this.iconDown = 'icon-arrow-up';
+          this.isOpenOrder = true;
+        } else {
+          this.iconDown = 'icon-arrow-down';
+          this.isOpenOrder = false;
+        }
       }
     },
     components: {
@@ -357,10 +383,14 @@
                   }
                 }
               }
-              .service-record{
-                height: 5rem;
-                line-height: 5rem;
-                text-align: center;
+              .service-record>div{
+                border-bottom: 1px solid gray;
+                line-height: 2rem;
+                text-align: left;
+                i{
+                  float: right;
+                  margin-right: 1rem;
+                }
               }
             }
           }

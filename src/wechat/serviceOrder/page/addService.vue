@@ -40,7 +40,7 @@
         @confirm="handleChange">
       </mt-datetime-picker>
       <ul class="search-list">
-        <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item['Cellular Phone #'],item['Last Name'])">{{item['Cellular Phone #']}} {{item['Last Name']}}</li>
+        <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item)">{{item['Cellular Phone #']}} {{item['Last Name']}}</li>
       </ul>
       <div class="submitButton">
         <mt-button size="normal" type="danger" @click="submit">提交</mt-button>
@@ -73,6 +73,7 @@
         pickerVisible: true,
         showBox: false,
         isCall: {},
+        isClick: false,
         search: [],
         slots: [],
         lovType: '',
@@ -102,7 +103,7 @@
       submit() {
         let me = this;
         api.get({
-          url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/Service Request/Service Request',
+          url: '/data/Service Request/Service Request',
           method: 'PUT',
           data: {
             'KL Contact Mobile Phone': me.Contact_Phone,
@@ -150,7 +151,7 @@
           ];
         }
         api.get({
-          url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="' + values + '"' + parent + ' &PageSize=100&StartRowNum=0',
+          url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="' + values + '"' + parent + ' &PageSize=100&StartRowNum=0',
           method: 'GET',
           success: function(data) {
             let datas = data.items;
@@ -168,7 +169,7 @@
         let me = this;
         if (values[0] !== undefined && values.length > 1) {
           api.get({
-            url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="' + type + '" AND Parent Value="' + values[0] + '" &PageSize=100&StartRowNum=0',
+            url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="' + type + '" AND Parent Value="' + values[0] + '" &PageSize=100&StartRowNum=0',
             method: 'GET',
             success: function(data) {
               let datas = data.items;
@@ -221,7 +222,7 @@
         let me = this;
         if (me.Contact_Phone) {
           api.get({
-            url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] = ' + me.Contact_Phone + '',
+            url: 'data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] = ' + me.Contact_Phone + '',
             method: 'GET',
             success: function(data) {
               me.search = KND.Util.isArray(data.items) ? data.items : KND.Util.toArray(data);
@@ -234,20 +235,27 @@
           me.search = [];
         }
       },
-      selectCaLL(callNur, name) {
+      selectCaLL(data) {
         let me = this;
-        if (callNur && name) {
-          me.Contact_Phone = callNur;
-          me.Contact_Name = name;
-          me.search = [];
-          me.isCall = {disabled: false};
-        }
+        console.log(data);
+        me.Contact_Phone = data['Cellular Phone #'];
+        me.Contact_Name = data['Last Name'];
+        me.Address = data['Primary Personal Street Address'];
+        me.PROVINCE = data['KL Primary Personal Province'];
+        me.CITY = data['Primary Personal City'];
+        me.search = [];
+        me.isCall = {disabled: false};
+        me.isClick = true;
       }
     },
     watch: {
       Contact_Phone() {
         delay(() => {
-          this.fetchData();
+          if (this.isClick) {
+            this.isClick = false;
+          } else {
+            this.fetchData();
+          }
         }, 300);
       }
     },

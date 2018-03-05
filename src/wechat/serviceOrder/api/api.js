@@ -41,7 +41,7 @@ let ajax = (api) => {
     timeout: 30000,
     method: 'POST',
     headers: {
-      'Authorization': 'Basic MTQwODAwODg6MTQwODAwODg='
+      'Authorization': 'Basic MTYxMTMwMDk6MTYxMTMwMDk='
     }
   }, api));
 };
