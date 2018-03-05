@@ -1,8 +1,14 @@
 let apiList = {
   // 委外列表
   getPartners: option => {
+    let name = option.data.Name;
+    let spec = '';
+    if (name) {
+      spec = '[Name] LIKE \'' + name + '*\'';
+      delete option.data.Name;
+    }
     return {
-      url: 'data/Channel Partner/Channel Partner/?searchspec=[KL Partner Status]="' + option.data.status + '&' + KND.Util.param(option.paging)
+      url: 'data/Channel Partner/Channel Partner/?searchspec=' + spec + KND.Util.condition(option.data) + '&' + KND.Util.param(option.paging)
     };
   },
 
@@ -52,9 +58,30 @@ let apiList = {
     };
   },
 
-  findContact: () => {
+  // 创建&更新联系人
+  upsertContact: option => {
     return {
-      url: 'service/EAI Siebel Adapter/Upsert'
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Upsert',
+      data: {
+        'body': {
+          'SiebelMessage': {
+            'MessageId': '',
+            'MessageType': 'Integration Object',
+            'IntObjectName': 'Base Channel Partner',
+            'IntObjectFormat': 'Siebel Hierarchical',
+            'ListOfBase Channel Partner': {
+              'Channel Partner': option.data.partner
+            }
+          }
+        }
+      }
+    };
+  },
+
+  findContact: (option) => {
+    return {
+      url: 'data/Base User/Base User/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=2&StartRowNum=0'
     };
   }
 };

@@ -50,15 +50,15 @@
       <!--valid invalid && read-->
       <div v-show="read && state !== 'pending'">
         <title-group>联系人列表</title-group>
-        <empty v-show="!form.Contact"></empty>
+        <empty v-show="!form.User"></empty>
         <mt-cell-swipe class="multiple"
-                 v-for="item in form.Contact"
+                 v-for="item in form.User"
                  :key="item.Id"
                  :right="swiperBtn"
                  @click.native="toContact(item)"
                  is-link>
           <div class="mint-cell-title" slot="title">姓名: {{item['Last Name']}}</div>
-          <div class="mint-cell-sub-title" slot="title">登录账号: {{item['Last Name']}}</div>
+          <div class="mint-cell-sub-title" slot="title">登录账号: {{item['Login Name']}}</div>
         </mt-cell-swipe>
       </div>
     </div>
@@ -91,9 +91,9 @@
     handler: () => this.$messagebox('delete')
   }];
 
-  const NameSpace = 'detail';
+  const NAMESPACE = 'detail';
   export default {
-    name: NameSpace,
+    name: NAMESPACE,
     components: {titleGroup, buttonGroup},
     // 初始化
     created() {
@@ -119,7 +119,7 @@
       };
     },
     computed: {
-      ...mapState(NameSpace, ['form', 'attach','record']),
+      ...mapState(NAMESPACE, ['form', 'attach','record']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -151,8 +151,8 @@
       }
     },
     methods: {
-      ...mapMutations(NameSpace, ['clear']),
-      ...mapActions(NameSpace, ['findPartnerById', 'findPartner', 'addPartner', 'update']),
+      ...mapMutations(NAMESPACE, ['clear']),
+      ...mapActions(NAMESPACE, ['findPartnerById', 'findPartner', 'addPartner', 'update']),
       toContact(contact) {
         this.$router.push({
           name: 'contact',

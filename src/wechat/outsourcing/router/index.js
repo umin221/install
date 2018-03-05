@@ -27,6 +27,9 @@ export default new Router({
     name: 'search',
     component(resolve) {
       require(['../page/search'], resolve);
+    },
+    meta: {
+      transition: 'push'
     }
   }, { // 联系人
     path: '/contact',

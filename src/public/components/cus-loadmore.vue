@@ -26,8 +26,10 @@
 </template>
 
 <script type="es6">
+  let pageSize = config.pageSize;
+
 	export default {
-		name: 'cust-loadmore',
+		name: 'cus-loadmore',
     data() {
       return {
         topStatus: '',
@@ -46,9 +48,9 @@
       onTopLoaded() {
         this.$refs.loadmore.onTopLoaded();
       },
-      onBottomLoaded(hasmore = true) {
+      onBottomLoaded(len = 10) {
         this.$refs.loadmore.onBottomLoaded();
-        this.allLoaded = hasmore;
+        this.allLoaded = len < pageSize;
       }
 		}
 	};

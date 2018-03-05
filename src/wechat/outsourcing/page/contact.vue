@@ -6,15 +6,15 @@
 
     <div class="mint-content">
       <div>
-        <mt-field label="姓名" placeholder="请输入姓名"
-          v-model="contact['Last Name']"
-          @blur="checkNameFn"></mt-field>
         <mt-field label="联系电话" placeholder="请输入电话"
-          v-model="contact['Work Phone #']"></mt-field>
+          v-model="contact['Cellular Phone #']"
+          @change="findContactFn"></mt-field>
+        <mt-field label="姓名" placeholder="请输入姓名"
+          v-model="contact['Last Name']"></mt-field>
         <mt-field label="登陆账号" placeholder="请输入账号"
-          :value="contact['Work Phone #']"></mt-field>
-        <mt-field label="登陆密码" placeholder="请输入密码"
-          :value="contact['Work Phone #']"></mt-field>
+          :value="contact['Cellular Phone #']"></mt-field>
+        <!--<mt-field label="登陆密码" placeholder="请输入密码"-->
+          <!--v-model="contact['KL Outsource Password']"></mt-field>-->
       </div>
     </div>
 
@@ -30,9 +30,9 @@
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
 
-  let NameSpace = 'contact';
+  let NAMESPACE = 'contact';
   export default {
-    name: NameSpace,
+    name: NAMESPACE,
     components: {buttonGroup, cusField},
     created() {
       let contact = this.$route.query;
@@ -44,18 +44,29 @@
     data() {
       return {
         title: '新建委外联系人',
-        contact: {}
+        contact: {
+          'Id': KND.Util.now(),
+          'First Name': '.',
+          'KL Type': '委外人员', // 联系人类型
+          'User Type': '委外人员', // 用户类型
+          'Login Name': ''
+        }
       }
     },
     methods: {
-      ...mapActions(NameSpace, ['']),
-      // 检测名字，不可重复
-      checkNameFn() {
-
+      ...mapActions(NAMESPACE, ['findContact', 'upsertContact']),
+      // 通过电话号码查询联系人 查询到则直接关联用户
+      findContactFn() {
+        this.findContact({
+          'Login Name': this.contact['Cellular Phone #']
+        });
       },
+      // 创建&编辑联系人
       saveFn() {
+        let c = this.contact;
+        c['Login Name'] = c['Cellular Phone #'];
         // 保存联系人
-        console.log(this.contact);
+        this.upsertContact(this.contact);
       }
     }
   }

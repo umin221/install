@@ -32,7 +32,7 @@
 }
 
 // Page Turn on Transian Effect
-.turn-up {
+.push-on {
   &-enter {
     transform: translate3d(0, 50%, 0);
   }
@@ -45,7 +45,7 @@
 }
 
 // Page Turn Off Transian Effect
-.turn-down {
+.push-off {
   &-enter {
     transform: translate3d(0, 0, 0);
   }

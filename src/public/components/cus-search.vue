@@ -1,0 +1,102 @@
+<template>
+  <div class="cus-search">
+    <fallback slot="left"></fallback>
+
+    <mt-search :value="currentValue"
+               :result.sync="result"
+               :placeholder="placeholder"
+               :autofocus="true"
+               @input="handleInput">
+      <slot>
+        <mt-cell
+          v-for="item in result"
+          :key="item.title"
+          :title="item.title"
+          :value="item.value">
+        </mt-cell>
+      </slot>
+
+      </mt-cell>
+    </mt-search>
+  </div>
+</template>
+
+<script type="es6">
+  import 'public/js/lib/lodash.min.js';
+
+  export default {
+    name: 'cus-search',
+    props: {
+      result: Array,
+      placeholder: String,
+      attr: Object,
+      value: String
+    },
+    data: () => {
+      return {
+        currentValue: ''
+      };
+    },
+    watch: {
+      value(val) {
+        this.currentValue = val;
+      },
+      currentValue(val) {
+        this.$emit('input', val);
+      }
+    },
+    methods: {
+      handleInput: _.debounce(
+        function (val) {
+          this.currentValue = val;
+          if (val.length) {
+            this.$parent.searchFn(val);
+          }
+        },
+        1000
+      )
+    }
+  };
+</script>
+
+<style lang="scss">
+  .cus-search {
+    .cus-fallback {
+      position: absolute;
+      line-height: $header-height;
+      background-color: #d9d9d9;
+      border: 0;
+      z-index: 2;
+
+      button {
+        background-color: #d9d9d9;
+        box-shadow: none;
+      }
+    }
+
+    .mint-search {
+      top: 0;
+
+      .mint-searchbar-inner {
+        text-indent: 26px;
+      }
+
+      .mint-searchbar {
+        padding: 0.3rem 10px;
+
+        .mint-searchbar-inner {
+          height: 1.4rem;
+          padding: 0.2rem 6px;
+
+          input {
+            font-size: $font-size-default;
+          }
+        }
+
+        .mint-searchbar-cancel {
+            font-size: $font-size-default;
+        }
+      }
+    }
+  }
+</style>

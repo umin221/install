@@ -33,20 +33,16 @@
        * ========================================= */
       $route(to, from) {
         let me = this;
-        let leaveTransition;
-        if (!(to.meta.noPageAnimation || from.meta.noPageAnimation)) {
-          if (to.name === me.prevRoutes[me.prevRoutes.length - 1]) {
-            leaveTransition = me.transition[1];
-            me.setTransition(leaveTransition);
-            me.prevRoutes.pop();
-            if (leaveTransition !== 'turn-off') {
-              me.setTransitionName(['turn-on', 'turn-off']);
-            }
-          } else {
-            if (from.name != null) {
-              me.setTransition(me.transition[0]);
-              me.prevRoutes.push(from.name);
-            }
+        let transition = 'turn';
+        if (to.name === me.prevRoutes[me.prevRoutes.length - 1]) {
+          transition = (from.meta.transition || transition) + '-off';
+          me.setTransition(transition);
+          me.prevRoutes.pop();
+        } else {
+          if (from.name != null) {
+            transition = (to.meta.transition || transition) + '-on';
+            me.setTransition(transition);
+            me.prevRoutes.push(from.name);
           }
         }
       }
