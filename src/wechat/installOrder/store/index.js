@@ -46,6 +46,14 @@ export default new Vuex.Store({
           title: '签收单据归档'
         } // 附件
       }
+    },
+    buildingInfo: {
+      namespaced: true,
+      state: {
+        buildingNum: '1',
+        layerNum: '1',
+        roomNum: '1'
+      }
     }
 
   }

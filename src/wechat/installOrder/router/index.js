@@ -17,7 +17,7 @@ export default new Router({
       require(['../page/index'], resolve);
     }
   }, {
-    path: '/detail', // 测试页面
+    path: '/detail', // 详情页面
     name: 'detail',
     component(resolve) {
       require(['../page/detail'], resolve);
@@ -75,6 +75,30 @@ export default new Router({
     name: 'lock',
     component(resolve) {
       require(['../page/lock'], resolve);
+    }
+  }, { // 项目楼层信息采集
+    path: '/buildingInfo',
+    name: 'buildingInfo',
+    component(resolve) {
+      require(['../page/buildingInfo'], resolve);
+    }
+  }, { // 项目楼层信息采集---楼层
+    path: '/building',
+    name: 'building',
+    component(resolve) {
+      require(['../page/building'], resolve);
+    }
+  }, { // 项目楼层信息采集 -- 栋
+    path: '/ban',
+    name: 'ban',
+    component(resolve) {
+      require(['../page/ban'], resolve);
+    }
+  }, { // 项目楼层信息采集 -- 层
+    path: '/floor',
+    name: 'floor',
+    component(resolve) {
+      require(['../page/floor'], resolve);
     }
   }]
 });

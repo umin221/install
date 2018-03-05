@@ -28,7 +28,7 @@
           <div slot="title" class="list-text"><span class="list-text-span">锁体部分* 真锁</span></div>
         </mt-cell>
         <div class="mint-sx-div">
-          <mt-cell  @click.native="getLock(item.Id, item['KL Product Type'])" is-link v-for="item in taskDataST" v-if="item['KL Product Type']=='锁体'"  :title="item['KL Product Series Code']">
+          <mt-cell  @click.native="getLock(item.Id, item['KL Product Type'])" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='锁体'"  :title="item['KL Product Series Code']">
             <span style="width: 120px">开向：{{item['KL Hole Direction']}}</span>
             <span>数量：{{item['Quantity Requested']}}</span>
           </mt-cell>
@@ -76,24 +76,6 @@
               </div>
               <div class="name grey">
                 投标阶段
-              </div>
-            </a><a>
-              <div class="icon">
-                <span class="left line l_grey"></span>
-                <span class="point mui-icon p_grey"><span></span></span>
-                <span class="right line l_grey"></span>
-              </div>
-              <div class="name grey">
-                投标阶段
-              </div>
-            </a><a>
-              <div class="icon">
-                <span class="left line l_grey"></span>
-                <span class="point mui-icon p_grey"><span></span></span>
-                <span class="right line l_grey"></span>
-              </div>
-              <div class="name grey">
-                需求调研
               </div>
             </a>
               <a>
@@ -388,9 +370,7 @@
         data: {
           'body': {
             'OutputIntObjectName': 'Base Order Entry (Sales)',
-/*
-            'SearchSpec': '[Order Entry - Orders.Id]=' + '\'' + me.id + '\''
-*/
+            // 'SearchSpec': '[Order Entry - Orders.Id]=' + '\'' + me.id + '\''
             'SearchSpec': '[Order Entry - Orders.Id]="1-2BSATYIN"'
           }
         },
