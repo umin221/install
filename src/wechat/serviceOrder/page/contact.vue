@@ -36,8 +36,6 @@
       api.get({
         key: 'getUser',
         method: 'GET',
-        data: {
-        },
         success: function(data) {
           me.list = data.items;
           console.log(me.list);
