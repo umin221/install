@@ -43,6 +43,7 @@
       console.dir(1);
       let param = this.$route.query;
       this.id = param.id;
+      console.dir('this.id' + this.id);
     },
     data: () => {
       return {

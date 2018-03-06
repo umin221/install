@@ -40,7 +40,7 @@
           <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 72px;">
             <div class="mui-scroll" style="height: 65px;overflow: -webkit-paged-x;">
               <a v-for="(item, index) in taskData"  :key="index">
-                <div class="icon" @click="updateState(item.Status, item.Id)">
+                <div class="icon" @click="updateState(item.Status, item.Id, index)">
                   <span v-show="index!=0"  class="left line l_grey"></span>
                   <span class="point mui-icon"><span></span></span>
                   <span  class="right line l_grey"></span>
@@ -432,9 +432,10 @@
         var self = this;
         self.$router.push('xttd');
       },
-      updateState(status, id) { // 任务事件 ；1.还没开始先开始 ； 2.已开始就跳转关闭页面
+      updateState(status, id, index) { // 任务事件 ；1.还没开始先开始 ； 2.已开始就跳转关闭页面
         var self = this;
-        if (status !== '未开始') {
+        if (status === '未开始') {
+        // if (index === 0) {
           console.dir('===');
           MessageBox({
             title: '提示',
@@ -445,10 +446,13 @@
               console.log('abc');
               api.get({
                 key: 'getTaskAdd',
-                method: 'PUT',
+                method: 'POST',
                 data: {
-                  'Status': status,
-                  'Id': id
+                  'body': {
+                    'ProcessName': 'KL Install Task Start Action Workflow',
+                    'RowId': id
+                  }
+
                 },
                 success: function(data) {
                   Toast({

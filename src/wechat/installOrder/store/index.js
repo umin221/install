@@ -53,6 +53,36 @@ export default new Vuex.Store({
         buildingNum: '1',
         layerNum: '1',
         roomNum: '1'
+      },
+      actions: {
+        // 数量加减
+        plusValFn({state}, obj) {
+          console.dir(state.buildingNum);
+          var type = obj.type;
+          if (type === 'buildingNum') {
+            state.buildingNum ++;
+          } else if (type === 'layerNum') {
+            state.layerNum ++;
+          } if (type === 'roomNum') {
+            state.roomNum ++;
+          }
+        },
+        reduceValFn({state}, obj) {
+          var type = obj.type;
+          if (type === 'buildingNum') {
+            if (state.buildingNum > 1) {
+              state.buildingNum --;
+            }
+          } else if (type === 'layerNum') {
+            if (state.layerNum > 1) {
+              state.layerNum --;
+            }
+          } if (type === 'roomNum') {
+            if (state.roomNum > 1) {
+              state.roomNum --;
+            }
+          }
+        }
       }
     }
 

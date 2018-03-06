@@ -7,7 +7,7 @@ let ApiList = {
     url: 'service/EAI Siebel Adapter/Query'
   }, // 详情
   getTaskAdd: {
-    url: 'data/KL Installation Task/KL Installation Task'
+    url: 'service/Workflow Process Manager/RunProcess/'
   }, // 任务开始更新状态
   getUPStatus: {
     url: 'service/Workflow Process Manager/RunProcess'

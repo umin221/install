@@ -94,7 +94,7 @@
   }
 </style>
 <script type="application/javascript">
-  import {mapState} from 'vuex';
+  import {mapState, mapActions} from 'vuex';
 
   import buttonGroup from 'public/components/cus-button-group';
   const NameSpace = 'buildingInfo';
@@ -117,6 +117,7 @@
       });
     },
     methods: {
+      ...mapActions(NameSpace, ['reduceValFn', 'plusValFn']),
       previewFn: function() { // 楼层预览
         var self = this;
         self.$router.push('building');
@@ -125,18 +126,28 @@
         console.dir('获取地址');
       },
       reduceVal: function(type) {
-        var self = this;
-        if (type) {
-          if (self.type > 1) {
-            self.type = self.type - 1;
+        this.reduceValFn({
+          type: type,
+          success: data => {
           }
-        }
+        });
+        /* var self = this;
+        if (type) {
+          if (type > 1) {
+            self.buildingNum --;
+          }
+        }*/
       },
       plusVal: function(type) {
-        var self = this;
+        this.plusValFn({
+          type: type,
+          success: data => {
+          }
+        });
+        /* var self = this;
         if (type) {
-          self.type = self.type + 1;
-        }
+          self.buildingNum ++;
+        }*/
       }
     },
     components: {buttonGroup},
