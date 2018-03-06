@@ -131,12 +131,6 @@
           success: data => {
           }
         });
-        /* var self = this;
-        if (type) {
-          if (type > 1) {
-            self.buildingNum --;
-          }
-        }*/
       },
       plusVal: function(type) {
         this.plusValFn({
@@ -144,10 +138,6 @@
           success: data => {
           }
         });
-        /* var self = this;
-        if (type) {
-          self.buildingNum ++;
-        }*/
       }
     },
     components: {buttonGroup},

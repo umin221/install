@@ -2,30 +2,18 @@
   <div>
     <mt-header fixed title="修改楼栋名称">
       <fallback slot="left"></fallback>
-      <mt-button @click.native="toEditFn" slot="right" >保存</mt-button>
+      <mt-button @click.native="toEdit" slot="right" >保存</mt-button>
     </mt-header>
     <div class="mint-content ban">
-      <mt-field label="楼栋名称1" placeholder="栋1"
-                :class="heartVisible"></mt-field>
-      <mt-field label="楼栋名称2" placeholder="栋2"
-                :class="heartVisible"></mt-field>
-      <mt-field label="楼栋名称3" placeholder="栋3"
-                :class="heartVisible"></mt-field>
-      <mt-field label="楼栋名称4" placeholder="栋4"
-                :class="heartVisible"></mt-field>
-      <mt-field label="楼栋名称5" placeholder="栋5"
-                :class="heartVisible"></mt-field>
+      <mt-field v-for="(item, index) in buildingList"  :key="index" label="楼栋名称" v-model="item.val"></mt-field>
     </div>
-    <button-group>
-      <mt-button type="primary" class="single"
-                 @click.native="addFloor">新增房间</mt-button>
-    </button-group>
   </div>
 </template>
 <style lang="scss">
 </style>
 <script type="application/javascript">
-  import buttonGroup from 'public/components/cus-button-group';
+  import {mapState, mapActions} from 'vuex';
+  const NameSpace = 'buildingInfo';
   export default {
     name: 'detail',
     created: () => {
@@ -44,8 +32,18 @@
         console.dir(query);
       });
     },
-    methods: {
+    computed: {
+      ...mapState(NameSpace, ['buildingList']),
+      // * 是否显示
+      editClass() {
+        return this.type === '' ? '' : 'editClass';
+      }
     },
-    components: {buttonGroup}
+    methods: {
+      ...mapActions(NameSpace, ['toEditFn']),
+      toEdit() {
+        this.toEditFn();
+      }
+    }
   };
 </script>

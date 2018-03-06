@@ -6,7 +6,7 @@
     </mt-header>
     <div class="mint-content building">
       <div class="building-tab-div" >
-        <span>1栋</span><span>2栋</span><span>3栋</span>
+        <span v-for="(item, index) in buildingList"  :key="index">{{item.val}}</span>
         <span :class="editClass" style="position: absolute;right: 0px;" @click="toBanFn"></span>
       </div>
       <div style="height: 5px"></div>
@@ -92,11 +92,13 @@
   }
 </style>
 <script type="application/javascript">
+  import {mapState, mapActions} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
+  const NameSpace = 'buildingInfo';
   export default {
-    name: 'detail',
-    created: () => {
-      console.dir(1);
+    name: 'building',
+    created() {
+      this.calculationFn();
     },
     data: () => {
       return {
@@ -106,19 +108,20 @@
       };
     },
     beforeRouteEnter(to, from, next) {
-      console.dir(2);
       next(vm => {
         let query = vm.$route.query;
         console.dir(query);
       });
     },
     computed: {
+      ...mapState(NameSpace, ['buildingNum', 'layerNum', 'roomNum', 'buildingList']),
       // * 是否显示
       editClass() {
         return this.type === '' ? '' : 'editClass';
       }
     },
     methods: {
+      ...mapActions(NameSpace, ['calculationFn']),
       toEditFn() {
         var self = this;
         if (self.type === '') {
@@ -132,7 +135,6 @@
         self.$router.push({
           name: 'ban'
         });
-
       },
       toFloorFn() {
         var self = this;

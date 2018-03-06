@@ -52,7 +52,77 @@ export default new Vuex.Store({
       state: {
         buildingNum: '1',
         layerNum: '1',
-        roomNum: '1'
+        roomNum: '1',
+        buildingList: [
+          {
+            index: 1,
+            val: 1,
+            layerList: [
+              {
+                index: 1,
+                val: 1,
+                roomList: [
+                  {
+                    index: 1,
+                    val: 1
+                  },
+                  {
+                    index: 2,
+                    val: 2
+                  }
+                ]
+              },
+              {
+                index: 2,
+                val: 2,
+                roomList: [
+                  {
+                    index: 1,
+                    val: 1
+                  },
+                  {
+                    index: 2,
+                    val: 2
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            index: 2,
+            val: 2,
+            layerList: [
+              {
+                index: 1,
+                val: 1,
+                roomList: [
+                  {
+                    index: 1,
+                    val: 1
+                  },
+                  {
+                    index: 2,
+                    val: 2
+                  }
+                ]
+              },
+              {
+                index: 2,
+                val: 2,
+                roomList: [
+                  {
+                    index: 1,
+                    val: 1
+                  },
+                  {
+                    index: 2,
+                    val: 2
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       },
       actions: {
         // 数量加减
@@ -63,7 +133,7 @@ export default new Vuex.Store({
             state.buildingNum ++;
           } else if (type === 'layerNum') {
             state.layerNum ++;
-          } if (type === 'roomNum') {
+          } else if (type === 'roomNum') {
             state.roomNum ++;
           }
         },
@@ -77,14 +147,40 @@ export default new Vuex.Store({
             if (state.layerNum > 1) {
               state.layerNum --;
             }
-          } if (type === 'roomNum') {
+          } else if (type === 'roomNum') {
             if (state.roomNum > 1) {
               state.roomNum --;
             }
           }
+        },
+        calculationFn({state}) {
+          console.dir('======' + state.buildingNum);
+          /* if (state.buildingNum) {
+            state.buildingList = [];
+            for (var i = 0; i < state.buildingNum; i++) {
+              var buildingObj = {};
+              buildingObj.index = i + 1;
+              buildingObj.val = i + 1;
+              state.buildingList.push(buildingObj);
+              /!* if (state.layerNum) {
+                var layerVal = i + '000';
+                for (var j = 0; j < state.layerNum; j++) {
+                  var layerObj = {};
+                  layerObj.index = layerVal + 1;
+                  layerObj.val = layerVal + 1;
+                  state.buildingList[i].push(layerObj);
+                }
+              }*!/
+            }
+            console.dir(state.buildingList);
+          }*/
+        },
+        toEditFn({state}) {
+          console.dir('=============');
+          console.dir(state.buildingList);
+
         }
       }
     }
-
   }
 });
