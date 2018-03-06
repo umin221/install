@@ -13,19 +13,23 @@
     <!--create detail edit-->
     <div class="mint-content wide-form">
       <div :class="{'readonly':read}">
-        <mt-field label="合作伙伴名称" placeholder="请输入名称"
+        <cus-field label="合作伙伴名称" placeholder="请输入名称"
           :class="heartVisible"
+          :edit=!read
           @change="checkNameExistFn"
-          v-model="form['Name']"></mt-field>
-        <mt-field label="合作伙伴负责人" placeholder="请输入负责人"
+          v-model="form['Name']"></cus-field>
+        <cus-field label="合作伙伴负责人" placeholder="请输入负责人"
           :class="heartVisible"
-          v-model="form['KL Partner Owner Name']"></mt-field>
-        <mt-field label="联系电话" placeholder="请输入电话" type="tel"
+          :edit=!read
+          v-model="form['KL Partner Owner Name']"></cus-field>
+        <cus-field label="联系电话" placeholder="请输入电话" type="tel"
           :class="heartVisible"
-          v-model="form['Main Phone Number']"></mt-field>
-        <mt-field label="详细地址" placeholder="请输入地址"
+          :edit=!read
+          v-model="form['Main Phone Number']"></cus-field>
+        <cus-field label="详细地址" placeholder="请输入地址"
           :class="heartVisible"
-          v-model="form['Primary Address Street']"></mt-field>
+          :edit=!read
+          v-model="form['Primary Address Street']"></cus-field>
         <!--<mt-field v-show="!read" class="require" :readonly="read" label="合同附件"></mt-field>-->
       </div>
 
@@ -50,15 +54,15 @@
       <!--valid invalid && read-->
       <div v-show="read && state !== 'pending'">
         <title-group>联系人列表</title-group>
-        <empty v-show="!form.Contact"></empty>
+        <empty v-show="!form.User"></empty>
         <mt-cell-swipe class="multiple"
-                 v-for="item in form.Contact"
+                 v-for="item in form.User"
                  :key="item.Id"
                  :right="swiperBtn"
                  @click.native="toContact(item)"
                  is-link>
           <div class="mint-cell-title" slot="title">姓名: {{item['Last Name']}}</div>
-          <div class="mint-cell-sub-title" slot="title">登录账号: {{item['Last Name']}}</div>
+          <div class="mint-cell-sub-title" slot="title">登录账号: {{item['Login Name']}}</div>
         </mt-cell-swipe>
       </div>
     </div>
@@ -83,6 +87,7 @@
   import {mapState, mapActions, mapMutations} from 'vuex';
   import titleGroup from 'public/components/cus-title-group';
   import buttonGroup from 'public/components/cus-button-group';
+  import cusField from 'public/components/cus-field';
 
   // Swiper button
   let swiperBtn = [{
@@ -91,10 +96,10 @@
     handler: () => this.$messagebox('delete')
   }];
 
-  const NameSpace = 'detail';
+  const NAMESPACE = 'detail';
   export default {
-    name: NameSpace,
-    components: {titleGroup, buttonGroup},
+    name: NAMESPACE,
+    components: {titleGroup, buttonGroup, cusField},
     // 初始化
     created() {
       let param = this.$route.query;
@@ -119,7 +124,7 @@
       };
     },
     computed: {
-      ...mapState(NameSpace, ['form', 'attach','record']),
+      ...mapState(NAMESPACE, ['form', 'attach','record']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -151,8 +156,8 @@
       }
     },
     methods: {
-      ...mapMutations(NameSpace, ['clear']),
-      ...mapActions(NameSpace, ['findPartnerById', 'findPartner', 'addPartner', 'update']),
+      ...mapMutations(NAMESPACE, ['clear']),
+      ...mapActions(NAMESPACE, ['findPartnerById', 'findPartner', 'addPartner', 'update']),
       toContact(contact) {
         this.$router.push({
           name: 'contact',

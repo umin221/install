@@ -1,65 +1,97 @@
 <template>
   <div class="search">
-    <fallback slot="left"></fallback>
+    <cus-search v-model="value"
+                placeholder="请输入合作伙伴名称">
 
-    <mt-search v-model.trim="value" ref="search"
-               :result.sync="result"
-               placeholder="搜索委外团队"
-               :autofocus="true">
-      <mt-cell
-        v-for="item in result"
-        :key="item"
-        :title="item"
-        :value="item">
-      </mt-cell>
-    </mt-search>
+        <cus-loadmore ref="result"
+                      :loadBottom="loadBottomFn"
+                      :topStatus="topStatus">
+          <cus-cell class="multiple"
+                    :key="item.id"
+                    :title="'合作伙伴名称:'+ item.Name"
+                    @click.native="toDetailFn(item)"
+                    v-for="item in result"
+                    is-link>
+            <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
+            <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Main Phone Number']}}</div>
+          </cus-cell>
+        </cus-loadmore>
+
+    </cus-search>
   </div>
 </template>
 
 <script type="es6">
+  import {mapState, mapActions} from 'vuex';
+  import cusLoadmore from 'public/components/cus-loadmore';
+  import cusSearch from 'public/components/cus-search';
+  import cusCell from 'public/components/cus-cell';
+  //
+  let loader = function(...args) {
+    let me = this;
+    let event = args.pop();
+    let name = me.value;
+    let param = {
+      data: {
+        'KL Partner Status': '',
+        'Name': name
+      },
+      more: args.pop(),
+      callback: (data) => {
+        me.$refs.result[event](data.length);
+      }
+    };
+    // 获取团队列表
+    me.getPartners(param);
+  };
+
+  const NAMESPACE = 'index';
   export default {
     name: 'search',
+    components: {cusLoadmore, cusSearch, cusCell},
     data: () => {
       return {
-        result: ['array', 'string', 'inter'],
-        value: ''
+        value: '',
+        topStatus: ''
       };
     },
-    methods: {
-      input(val) {
-        console.log(val);
-      }
+    computed: {
+      ...mapState(NAMESPACE, ['result']),
+      ...mapState('index', ['status2list'])
     },
-    mounted() {
-      this.$refs.search.$on('input', (val) => {
-        console.log(val);
-      })
+    methods: {
+      ...mapActions(NAMESPACE, ['getPartners']),
+      /**
+       * 搜索回调
+       * @param {String} val 搜索值
+       */
+      searchFn(val) {
+        this.value = val;
+        loader.call(this, 'onBottomLoaded');
+      },
+      /**
+       * To detail
+       * @param {Object} item 行内容
+       */
+      toDetailFn(item) {
+        this.$router.push({
+          name: 'detail',
+          query: {
+            // detail
+            type: 'read',
+            state: this.status2list[item['KL Partner Status']],
+            id: item.Id
+          }
+        });
+      },
+      /**
+       * Load more
+       */
+      loadBottomFn() {
+        loader.call(this, {
+          more: true
+        }, 'onBottomLoaded');
+      }
     }
   };
 </script>
-
-<style lang="scss">
-  .search {
-    .cus-fallback {
-      position: absolute;
-      height: 52px;
-      line-height: 52px;
-      background-color: #d9d9d9;
-      border: 0;
-      z-index: 2;
-
-      button {
-        background-color: #d9d9d9;
-        box-shadow: none;
-      }
-    }
-
-    .mint-search {
-      top: 0;
-
-      .mint-searchbar-inner {
-        text-indent: 26px;
-      }
-    }
-  }
-</style>

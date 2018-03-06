@@ -83,29 +83,31 @@
   </div>
 </template>
 
-<script type="es6">
-  import {mapState, mapActions, mapMutations} from 'vuex';
+<script type="application/javascript">
+  import {mapState, mapActions} from 'vuex';
   import cusLoadmore from 'public/components/cus-loadmore';
   import cusCell from 'public/components/cus-cell';
 
-  // 每页加载条数
-  const COUNT = config.pageSize;
+  const NAMESPACE = 'index';
   //
   let loader = function(...args) {
     let me = this;
     let event = args.pop();
     let list = args.pop();
-    let param = args.pop();
-    me.getPartners(Object.assign({
+    let param = Object.assign({
+      data: {
+        'KL Partner Status': '待审批'
+      },
       callback: (data) => {
-        me.$refs[list][event](data.length < COUNT);
+        me.$refs[list][event](data.length);
       }
-    }, param));
-  }
+    }, args.pop() || {});
+    // 获取团队列表
+    me.getPartners(param);
+  };
 
-  const NameSpace = 'index';
   export default {
-    name: NameSpace,
+    name: NAMESPACE,
     components: {cusLoadmore, cusCell},
     // 数据初始化
     created() {
@@ -120,11 +122,10 @@
       };
     },
     computed: {
-      ...mapState(NameSpace, ['pending', 'valid', 'invalid']),
+      ...mapState(NAMESPACE, ['pending', 'valid', 'invalid'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getPartners']),
-      ...mapMutations('app', ['setTransitionName']),
+      ...mapActions(NAMESPACE, ['getPartners']),
       // 待审批顶部加载
       pendingLoadTopFn() {
         loader.call(this, 'pending', 'onTopLoaded');
@@ -132,13 +133,17 @@
       // 有效顶部加载
       validLoadTopFn() {
         loader.call(this, {
-          status: '有效',
+          data: {
+            'KL Partner Status': '有效'
+          }
         }, 'valid', 'onTopLoaded');
       },
       // 失效顶部加载
       invalidLoadTopFn() {
         loader.call(this, {
-          status: '失效',
+          data: {
+            'KL Partner Status': '失效'
+          }
         }, 'invalid', 'onTopLoaded');
       },
       // 待审批底部加载
@@ -150,20 +155,23 @@
       // 有效底部加载
       validLoadBottomFn() {
         loader.call(this, {
-          more: true,
-          status: '有效',
+          data: {
+            'KL Partner Status': '有效'
+          },
+          more: true
         }, 'valid', 'onBottomLoaded');
       },
       // 失效底部加载
       invalidLoadBottomFn() {
         loader.call(this, {
-          more: true,
-          status: '失效',
+          data: {
+            'KL Partner Status': '失效'
+          },
+          more: true
         }, 'invalid', 'onBottomLoaded');
       },
       // 跳转搜索
       toSearchFn() {
-        this.setTransitionName(['turn-up', 'turn-down']);
         this.$router.push('search');
       },
       // To detail or create

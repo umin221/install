@@ -8,12 +8,6 @@ Vue.use(Vuex);
 // 缓存页面
 app.state.alive = ['index'];
 
-//
-const STATUS2LIST = {
-  '待审批': 'pending',
-  '有效': 'valid',
-  '失效': 'invalid'
-};
 // 每页加载条数
 const PAGESIZE = config.pageSize;
 
@@ -31,7 +25,16 @@ export default new Vuex.Store({
         // 有效
         valid: [],
         // 失效
-        invalid: []
+        invalid: [],
+        // 搜索结果
+        result: [],
+        // status 2 list
+        status2list: {
+          '待审批': 'pending',
+          '有效': 'valid',
+          '失效': 'invalid',
+          '': 'result'
+        }
       },
       mutations: {
         setPartners(state, {partners, list}) {
@@ -42,28 +45,33 @@ export default new Vuex.Store({
         }
       },
       actions: {
-        // 获取委外列表
-        getPartners({state, commit, dispatch}, {status, more, callback}) {
-          status = status || '待审批';
+        /**
+         * 获取委外团队列表
+         * @param {Object} data 必填 接口请求参数
+         * @param {Boolean} more 选填 是否加载更多
+         * @param {Function} callback 选填 处理回调
+         * @param {Function} error 选填 错误回调
+         */
+        getPartners({state, commit, dispatch}, {data, more, callback, error}) {
+          let list = state.status2list[data['KL Partner Status']];
           api.get({
             key: 'getPartners',
-            data: {
-              status
-            },
+            data: data,
             paging: {
-              StartRowNum: more ? state[STATUS2LIST[status]].length : 0,
+              StartRowNum: more ? state[list].length : 0,
               PageSize: PAGESIZE
             },
             success: function(data) {
               let partners = KND.Util.toArray(data.items);
               commit(more ? 'addPartners' : 'setPartners', {
                 partners: partners,
-                list: STATUS2LIST[status]
+                list: list
               });
               if (callback) {
                 callback(partners);
               }
-            }
+            },
+            error
           });
         }
       }
@@ -87,13 +95,13 @@ export default new Vuex.Store({
       mutations: {
         setPartner(state, form) {
           state.form = form;
-          if (form.Contact) {
-            state.form.Contact = KND.Util.toArray(form.Contact);
+          if (form.User) {
+            state.form.User = KND.Util.toArray(form.User);
           };
         },
         clear(state) {
           state.form = {
-            'Id': new Date().getTime(),
+            'Id': KND.Util.now(),
             'Name': '',
             'Alias': '',
             'KL Partner Owner Name': '',
@@ -103,6 +111,10 @@ export default new Vuex.Store({
         }
       },
       actions: {
+        /**
+         * 通过id获取委外团队信息
+         * @param {String} id 必填 id
+         */
         findPartnerById({commit}, id) {
           api.get({
             key: 'findPartnerById',
@@ -114,16 +126,22 @@ export default new Vuex.Store({
             }
           });
         },
-        // 获取委外详情
-        findPartner({commit}, setting) {
+        /**
+         * 获取委外团队信息
+         * @param {Object} condition 必填 查询条件 键值对
+         */
+        findPartner({commit}, condition) {
           api.get(Object.assign({
             key: 'findPartner',
             success: function(data) {
               commit('setPartner', data.items);
             }
-          }, setting));
+          }, condition));
         },
-        // 创建委外团队
+        /**
+         * 创建委外团队
+         * 绑定当前表单数据
+         */
         addPartner({state}) {
           let partner = state.form;
           // Alias 为必填，默认填入 Name
@@ -151,10 +169,13 @@ export default new Vuex.Store({
             }
           });
         },
-        // 更新委外状态 有效&失效
+        /**
+         * 更新委外团队信息
+         * @param {Object} data 必填 需要修改的信息 键值对
+         */
         update({state}, data) {
           delete state.form['Channel Partner_Position'];
-          delete state.form['Contact'];
+          delete state.form['User'];
           api.get({
             key: 'update',
             data: Object.assign(state.form, data),
@@ -178,14 +199,45 @@ export default new Vuex.Store({
       namespaced: true,
       state: {},
       actions: {
-        checkName(commit, name) {
+        /**
+         * 查找委外联系人
+         * @param {Object} data 必填 查询条件 键值对
+         */
+        findContact({commit}, data) {
           api.get({
-            key: '',
-            data: {
-
-            },
+            key: 'findContact',
+            data: data,
             success: (data) => {
 
+            }
+          });
+        },
+        /**
+         * 创建&更新联系人信息
+         * @param {Object} contact 必填 人员信息 键值对
+         */
+        upsertContact({state}, contact) {
+          api.get({
+            key: 'upsertContact',
+            data: {
+              partner: {
+                Id: this.state.detail.form.Id,
+                ListOfUser: {
+                  User: contact
+                }
+              }
+            },
+            success: (data) => {
+              if (data.PrimaryRowId) {
+                Toast({
+                  message: '提交成功'
+                });
+                KND.Util.back();
+              } else {
+                Toast({
+                  message: '提交失败'
+                });
+              }
             }
           });
         }

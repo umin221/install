@@ -181,9 +181,11 @@
     condition(obj) {
       let arr = [];
       for (var i in obj) {
-        arr.push('[' + i + ']="' + obj[i] + '"');
+        if (obj[i]) {
+          arr.push('[' + i + ']="' + obj[i] + '"');
+        }
       }
-      return arr.join('&');
+      return arr.join(' AND ');
     };
 
   };
