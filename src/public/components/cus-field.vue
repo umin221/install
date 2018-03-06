@@ -1,13 +1,16 @@
 <template>
-  <div>
-    <mt-cell v-if="edit" ref="cell"
-      :title="label"
-      :placeholder="placeholder"
-      :isLink="isLink"></mt-cell>
-    <mt-field v-else ref="field"
+  <div class="cus-field">
+    <mt-field v-if="edit"
       :label="label"
       :placeholder="placeholder"
-      :type="type"></mt-field>
+      :value="currentValue"
+      :type="type"
+      @input="handleInput"></mt-field>
+    <mt-cell v-else
+      :title="label"
+      :placeholder="placeholder"
+      :value="currentValue"
+      :isLink="isLink"></mt-cell>
   </div>
 </template>
 
@@ -18,30 +21,58 @@
       props: {
         type: String,
         label: String,
-        model: String,
         placeholder: String,
-        edit: Boolean,
-        isLink: Boolean,
-        attr: Object
+        edit: {
+          type: Boolean,
+          default: true
+        },
+        value: String,
+        isLink: Boolean
       },
       data() {
-          return {}
+          return {
+            currentValue: this.value
+          }
+      },
+      methods: {
+        handleInput(val) {
+          this.currentValue = val;
+        }
       },
       watch: {
-        attr: {
-          immediate: true,
-          handler(attrs) {
-            this.$nextTick(() => {
-              const target = [this.$refs.field];
-              target.forEach(el => {
-                if (!el || !attrs) return;
-                Object.keys(attrs).map(name => el.setAttribute(name, attrs[name]));
-              });
-            });
-          }
+        value(val) {
+          this.currentValue = val;
+        },
+
+        currentValue(val) {
+          this.$emit('input', val);
         }
       }
     }
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+  .cus-field {
+    &.require {
+      .mint-cell-title:before {
+        content: "*";
+        color: $red-base;
+      }
+    }
+
+    .mint-cell {
+      background-image: none;
+    }
+
+    .mint-cell-wrapper {
+      .mint-cell-title {
+        flex: 2;
+      }
+
+      .mint-cell-value {
+        flex: 3;
+        word-break: break-all;
+      }
+    }
+  }
+</style>

@@ -66,6 +66,7 @@
        * @param {String} val 搜索值
        */
       searchFn(val) {
+        this.value = val;
         loader.call(this, 'onBottomLoaded');
       },
       /**

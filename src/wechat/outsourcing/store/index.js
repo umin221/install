@@ -175,7 +175,7 @@ export default new Vuex.Store({
          */
         update({state}, data) {
           delete state.form['Channel Partner_Position'];
-          delete state.form['Contact'];
+          delete state.form['User'];
           api.get({
             key: 'update',
             data: Object.assign(state.form, data),

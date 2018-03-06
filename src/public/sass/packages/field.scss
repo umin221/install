@@ -23,17 +23,19 @@
 }
 
 .readonly {
-  .mint-field {
+  .mint-cell {
     min-height: 34px;
 
     .mint-cell-wrapper {
       background-image: none;
 
       .mint-cell-title {
+        color: $gray-minor;
         font-size: $font-size-small;
       }
 
       .mint-cell-value {
+        color: $black-base;
         font-size: $font-size-small;
 
         input {
