@@ -7,10 +7,39 @@ import axios from 'axios';
 
 (function(context) {
 
+  // 用户ID
+  let userID;
+  let session = {
+    set: (key, val) => {
+      sessionStorage.setItem(key, val);
+    },
+    get: (key) => {
+      return sessionStorage.getItem(key);
+    }
+  };
+
   class Native {
 
+    /**
+     * 构造函数
+     */
     constructor() {
-      console.info('native init ...');
+      console.info('-------------------------------- NATIVE INIT --------------------------------');
+
+      userID = this.getUserID();
+      Object.defineProperty(this, 'userID', {
+        enumerable: false,
+        configurable: true,
+        get: () => {
+          console.info('当前用户ID：' + userID);
+          return userID;
+        },
+        set: (val) => {
+          console.info('设置用户ID：' + val);
+          userID = val;
+          session.set('userID', val);
+        }
+      });
     };
 
     /**
@@ -19,6 +48,14 @@ import axios from 'axios';
      */
     getLoginInfo() {
       return 'umin';
+    };
+
+    /**
+     * 获取用户ID
+     * @returns {string}
+     */
+    getUserID() {
+      return session.get('userID') || context['Util']['getParam']('userID');
     };
 
     /**
@@ -35,7 +72,8 @@ import axios from 'axios';
       // post data
       let setting = Object.assign({
         headers: {
-          'Authorization': 'Basic ' + btoa('XIEXW:XIEXW')
+          // 'Authorization': 'Basic ' + btoa('XIEXW:XIEXW')
+          'Authorization': 'Basic ' + btoa(userID + ':' + userID) // btoa('XIEXW:XIEXW') //
         },
         timeout: 30000,
         method: 'get'

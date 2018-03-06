@@ -1,6 +1,17 @@
 let apiList = {
-  // 委外列表
-  getPartners: option => {
+  // 交接单列表
+  getTransferOrder1: option => {
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'OutputIntObjectName': 'KL Project',
+        'SearchSpec': '[Project.Setter Id]="1-SF7863"'
+      }
+    };
+  },
+
+  getTransferOrder: option => {
     let name = option.data.Name;
     let spec = '';
     if (name) {
@@ -12,8 +23,8 @@ let apiList = {
     };
   },
 
-  // id 查找委外详情
-  findPartnerById: option => {
+  // id 查找交接单详情
+  findTransferOrderById: option => {
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/Query/?OutputIntObjectName=Base Channel Partner&PrimaryRowId=' + option.data.id,
@@ -21,16 +32,16 @@ let apiList = {
     };
   },
 
-  // 查找委外详情
-  findPartner: option => {
+  // 查找交接单详情
+  findTransferOrder: option => {
     return {
       url: 'data/Channel Partner/Channel Partner/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=2&StartRowNum=0',
       data: {}
     };
   },
 
-  // 添加委外团队
-  addPartner: option => {
+  // 添加交接单团队
+  addTransferOrder: option => {
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/Upsert',
@@ -91,9 +102,7 @@ let ajax = api => {
     KND.Native.ajax(api);
   } else {
     let data = require('./data.json');
-    setTimeout(() => {
-      api.success(data[api.key]);
-    }, 100);
+    api.success(data[api.key]);
   }
 };
 

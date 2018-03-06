@@ -57,3 +57,17 @@
 @mixin readonly() {
   pointer-events: none;
 }
+
+@mixin allow() {
+  border: solid 2px #c8c8cd;
+  border-bottom-width: 0;
+  border-left-width: 0;
+  content: " ";
+  top: 50%;
+  right: 20px;
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  -webkit-transform: translateY(-50%) rotate(45deg);
+  transform: translateY(-50%) rotate(45deg);
+}

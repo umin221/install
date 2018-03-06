@@ -8,3 +8,4 @@ Vue.use(Mint);
 
 global.Toast = Mint.Toast;
 global.Indicator = Mint.Indicator;
+global.MessageBox = Mint.MessageBox;

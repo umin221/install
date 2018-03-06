@@ -1,37 +1,243 @@
 {
-  "getList": {
-    "pendingList": [{
-      "id": 1,
-      "title": "恒通安装公司-pd",
-      "contact": "李立三 07100028",
-      "phone": "18688889999"
-    },{
-      "id": 1,
-      "title": "恒通安装公司-pd",
-      "contact": "李立三 07100028",
-      "phone": "18688889999"
-    }],
-    "validList": [{
-      "id": 1,
-      "title": "恒通安装公司-vl",
-      "contact": "李立三 07100028",
-      "phone": "18688889999"
-    },{
-      "id": 1,
-      "title": "恒通安装公司-vl",
-      "contact": "李立三 07100028",
-      "phone": "18688889999"
-    }],
-    "invalidList": [{
-      "id": 2,
-      "title": "恒通安装公司1-il",
-      "contact": "李立三 07100033",
-      "phone": "186888833"
-    },{
-      "id": 2,
-      "title": "恒通安装公司1-il",
-      "contact": "李立三 07100033",
-      "phone": "186888833"
-    }]
+  "getPartners": {
+    "items": [
+      {
+        "Link": [
+          {
+            "rel": "self",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB6P0I",
+            "name": "Channel Partner"
+          },
+          {
+            "rel": "canonical",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB6P0I",
+            "name": "Channel Partner"
+          },
+          {
+            "rel": "child",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB6P0I\/User",
+            "name": "User"
+          },
+          {
+            "rel": "child",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB6P0I\/Position",
+            "name": "Position"
+          },
+          {
+            "rel": "child",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB6P0I\/CUT Address",
+            "name": "CUT Address"
+          }
+        ],
+        "KL Partner Owner Name": "Administrator SADMIN",
+        "KL Primary Address Province": "广东",
+        "Partner Category": "委外厂商",
+        "Alias": "Test0207001",
+        "Primary Address City": "深圳市",
+        "Id": "1-2BSB6P0I",
+        "KL Partner Status": "待审批",
+        "Primary Address Street": "123",
+        "Primary Address Country": "中国",
+        "Name": "Test0207001",
+        "Home Page": "",
+        "KL Partner Type": "委外厂商",
+        "Main Phone Number": "Test0207001"
+      },
+      {
+        "Link": [
+          {
+            "rel": "self",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB6PVK",
+            "name": "Channel Partner"
+          },
+          {
+            "rel": "canonical",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB6PVK",
+            "name": "Channel Partner"
+          },
+          {
+            "rel": "child",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB6PVK\/User",
+            "name": "User"
+          },
+          {
+            "rel": "child",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB6PVK\/Position",
+            "name": "Position"
+          },
+          {
+            "rel": "child",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB6PVK\/CUT Address",
+            "name": "CUT Address"
+          }
+        ],
+        "KL Partner Owner Name": "Administrator SADMIN",
+        "KL Primary Address Province": "广东",
+        "Partner Category": "委外厂商",
+        "Alias": "Test0207001",
+        "Primary Address City": "深圳市",
+        "Id": "1-2BSB6PVK",
+        "KL Partner Status": "待审批",
+        "Primary Address Street": "123",
+        "Primary Address Country": "中国",
+        "Name": "Test0207003",
+        "Home Page": "",
+        "KL Partner Type": "委外厂商",
+        "Main Phone Number": "Test0207001"
+      },
+      {
+        "Link": [
+          {
+            "rel": "self",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB7KLL",
+            "name": "Channel Partner"
+          },
+          {
+            "rel": "canonical",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB7KLL",
+            "name": "Channel Partner"
+          },
+          {
+            "rel": "child",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB7KLL\/User",
+            "name": "User"
+          },
+          {
+            "rel": "child",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB7KLL\/Position",
+            "name": "Position"
+          },
+          {
+            "rel": "child",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB7KLL\/CUT Address",
+            "name": "CUT Address"
+          }
+        ],
+        "KL Partner Owner Name": "testuser SSO_TESTUSER1",
+        "KL Primary Address Province": "广东",
+        "Partner Category": "委外厂商",
+        "Alias": "Test0207001",
+        "Primary Address City": "深圳市",
+        "Id": "1-2BSB7KLL",
+        "KL Partner Status": "待审批",
+        "Primary Address Street": "123",
+        "Primary Address Country": "中国",
+        "Name": "Test0207008",
+        "Home Page": "",
+        "KL Partner Type": "委外厂商",
+        "Main Phone Number": "Test0207001"
+      },
+      {
+        "Link": [
+          {
+            "rel": "self",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB7JYJ",
+            "name": "Channel Partner"
+          },
+          {
+            "rel": "canonical",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB7JYJ",
+            "name": "Channel Partner"
+          },
+          {
+            "rel": "child",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB7JYJ\/User",
+            "name": "User"
+          },
+          {
+            "rel": "child",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB7JYJ\/Position",
+            "name": "Position"
+          },
+          {
+            "rel": "child",
+            "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner\/1-2BSB7JYJ\/CUT Address",
+            "name": "CUT Address"
+          }
+        ],
+        "KL Partner Owner Name": "谢小为 XIEXW",
+        "KL Primary Address Province": "",
+        "Partner Category": "委外厂商",
+        "Alias": "23",
+        "Primary Address City": "",
+        "Id": "1-2BSB7JYJ",
+        "KL Partner Status": "待审批",
+        "Primary Address Street": "",
+        "Primary Address Country": "",
+        "Name": "app006",
+        "Home Page": "",
+        "KL Partner Type": "委外厂商",
+        "Main Phone Number": "+8633"
+      }
+    ],
+    "Link": {
+      "rel": "self",
+      "href": "http:\/\/sieb-template\/siebel-rest\/v1.0\/data\/Channel Partner\/Channel Partner",
+      "name": "Channel Partner"
+    }
+  },
+  "findPartnerById": {
+    "SiebelMessage": {
+      "Channel Partner": {
+        "Channel Partner_Position": {
+          "IsPrimaryMVG": "Y",
+          "Position": "系统管理员_DEPT0002_17063032",
+          "Sales Rep": "SADMIN",
+          "Last Name": "Administrator"
+        },
+        "CUT Address": {
+          "Province": "广东",
+          "Id": "1-2BSB6P0P",
+          "City": "深圳市",
+          "Country": "中国",
+          "Street Address": "123"
+        },
+        "User": [
+          {
+            "Id": "1-33QM-6",
+            "KL Type": "",
+            "User Type": "",
+            "First Name": ".",
+            "Last Name": "张沙沙",
+            "Cellular Phone #": "",
+            "Login Name": "14080088"
+          },
+          {
+            "Id": "1-2BSBY1HI",
+            "KL Type": "",
+            "User Type": "",
+            "First Name": ".",
+            "Last Name": "23",
+            "Cellular Phone #": "",
+            "Login Name": "23"
+          }
+        ],
+        "KL Partner Owner Name": "Administrator SADMIN",
+        "KL Primary Address Province": "广东",
+        "Partner Category": "委外厂商",
+        "Alias": "Test0207001",
+        "Primary Address City": "深圳市",
+        "Id": "1-2BSB6P0I",
+        "KL Partner Status": "待审批",
+        "Primary Address Street": "123",
+        "Primary Address Country": "中国",
+        "Name": "Test0207001",
+        "Home Page": "",
+        "KL Partner Type": "委外厂商",
+        "Main Phone Number": "Test0207001"
+      },
+      "IntObjectFormat": "Siebel Hierarchical",
+      "MessageId": "1-IRILZ",
+      "IntObjectName": "Base Channel Partner",
+      "MessageType": "Integration Object"
+    },
+    "ErrorContextSearchSpec": "",
+    "OMErrorCode": "",
+    "NumOutputObjects": "1",
+    "ErrorSymbol": "",
+    "OMErrorSymbol": "",
+    "ErrorCode": "0x0",
+    "ErrorContextIntComp": "",
+    "PrimaryRowId": "1-2BSB6P0I"
   }
 }

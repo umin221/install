@@ -5,8 +5,8 @@
  * @description main
  */
 import 'public/config'; // Loader Config
-import '../native'; // Register Native API
 import './util'; // Global Util
+import '../native'; // Register Native API
 import './filters'; // Global Vue Filter
 import './mixin'; // Global Mixin
 

@@ -15,5 +15,11 @@ export default new Router({
     path: '/',
     name: 'index',
     component: Index
+  }, { // 切换用户
+    path: '/switch',
+    name: 'switch',
+    component(resolve) {
+      require(['../page/switch'], resolve);
+    }
   }]
 });

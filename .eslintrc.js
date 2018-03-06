@@ -22,7 +22,8 @@ module.exports = {
     'KND': true,
     'config': true,
     'Indicator': true,
-    'Toast': true
+    'Toast': true,
+    'MessageBox': true
   },
   rules: {
     'accessor-pairs': 2,

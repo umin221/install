@@ -1,27 +1,22 @@
-<!--委外团队列表-->
+<!--交接单列表-->
 <template>
   <div>
-    <mt-header fixed title="委外人员管理">
+    <mt-header fixed title="我的交接单">
       <fallback slot="left"></fallback>
       <mt-button @click.native="toSearchFn" slot="right">
         <i class="xs-icon icon-search"></i>
       </mt-button>
-      <!--<router-link :to="toAdd" >-->
-      <mt-button @click.native="toDetailFn" slot="right">
-        <i class="xs-icon icon-add"></i>
-      </mt-button>
-      <!--</router-link>-->
     </mt-header>
 
     <div class="mint-content">
 
       <mt-navbar v-model="selected">
         <mt-tab-item id="pending"
-          @click.native="!pending.length && pendingLoadBottomFn()">待审批</mt-tab-item>
+          @click.native="!pending.length && pendingLoadBottomFn()">待处理</mt-tab-item>
         <mt-tab-item id="valid"
-          @click.native="!valid.length && validLoadBottomFn()">已生效</mt-tab-item>
+          @click.native="!valid.length && validLoadBottomFn()">处理中</mt-tab-item>
         <mt-tab-item id="invalid"
-          @click.native="!invalid.length && invalidLoadBottomFn()">已失效</mt-tab-item>
+          @click.native="!invalid.length && invalidLoadBottomFn()">已完成</mt-tab-item>
       </mt-navbar>
 
       <!-- tab-container -->
@@ -33,12 +28,12 @@
                         :topStatus="topStatus">
             <cus-cell class="multiple"
                      :key="item.id"
-                     :title="'合作伙伴名称:'+ item.Name"
+                     :title="'合同编码:'+ item.Name"
                      @click.native="toDetailFn(item.Id)"
                      v-for="item in pending"
                      is-link>
-              <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Main Phone Number']}}</div>
+              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Partner Owner Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Main Phone Number']}}</div>
             </cus-cell>
           </cus-loadmore>
         </mt-tab-container-item>
@@ -50,12 +45,12 @@
                         :topStatus="topStatus">
             <cus-cell class="multiple"
                      :key="item.id"
-                     :title="'合作伙伴名称:'+ item.Name"
+                     :title="'合同编码:'+ item.Name"
                      @click.native="toDetailFn(item.Id)"
                      v-for="item in valid"
                      is-link>
-              <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Main Phone Number']}}</div>
+              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Partner Owner Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Main Phone Number']}}</div>
             </cus-cell>
           </cus-loadmore>
         </mt-tab-container-item>
@@ -67,12 +62,12 @@
                         :topStatus="topStatus">
             <cus-cell class="multiple"
                       :key="item.id"
-                      :title="'合作伙伴名称:'+ item.Name"
+                      :title="'合同编码:'+ item.Name"
                       @click.native="toDetailFn(item.Id)"
                       v-for="item in invalid"
                       is-link>
-              <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Main Phone Number']}}</div>
+              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Partner Owner Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Main Phone Number']}}</div>
             </cus-cell>
           </cus-loadmore>
 
@@ -104,7 +99,7 @@
       }
     }, args.pop() || {});
     // 获取团队列表
-    me.getPartners(param);
+    me.getTransferOrder(param);
   };
 
   export default {
@@ -126,7 +121,7 @@
       ...mapState(NAMESPACE, ['pending', 'valid', 'invalid'])
     },
     methods: {
-      ...mapActions(NAMESPACE, ['getPartners']),
+      ...mapActions(NAMESPACE, ['getTransferOrder']),
       // 待审批顶部加载
       pendingLoadTopFn() {
         loader.call(this, 'pending', 'onTopLoaded');

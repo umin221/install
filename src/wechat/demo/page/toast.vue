@@ -12,20 +12,11 @@
 </template>
 
 <script type="application/javascript">
-  import api from '../api/api';
   import {mapState, mapActions} from 'vuex';
   import { Toast } from 'mint-ui';
   const NameSpace = 'index';
   export default {
     name: NameSpace,
-    created: () => {
-      api.get({
-        key: 'toastClick1',
-        callback: function(data) {
-          console.dir(data);
-        }
-      });
-    },
     data: () => {
       return {
         active: 'tab-container1'

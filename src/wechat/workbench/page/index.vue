@@ -1,6 +1,9 @@
 <template>
   <div>
     <mt-header fixed title="工作台">
+      <router-link to="switch" slot="right">
+        <mt-button>切换用户</mt-button>
+      </router-link>
     </mt-header>
 
     <mt-cell title="标题文字" is-link>
@@ -26,9 +29,10 @@
       return {
         active: 'tab-container1',
         listObj: [
+          {'id': 'demo', 'vul': 'demo'},
           {'id': 'workPlan', 'vul': '工作计划'},
-          /* {'id': 1, 'vul': '安装打卡'},
-          {'id': 1, 'vul': '安装交接单'},*/
+          /* {'id': 1, 'vul': '安装打卡'},*/
+          {'id': 'transferOrder', 'vul': '安装交接单'},
           {'id': 'installOrder', 'vul': '安装订单'},
           {'id': 'serviceOrder', 'vul': '维修工单'},
           /* {'id': 1, 'vul': '维修订单'},
@@ -44,7 +48,8 @@
     },
     methods: {
       getUrl(id) {
-        document.location = '../' + id + '/index.html';
+        let href = '../' + id + '/index.html' + location.search;
+        document.location.href = href;
       }
     }
   };

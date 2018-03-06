@@ -9,4 +9,9 @@ button {
   &.mint-button--primary {
     background-color: $theme-color;
   }
+
+  &.mint-button--default {
+    color: $theme-color;
+    background-color: #f6f8fa;
+  }
 }

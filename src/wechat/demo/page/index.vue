@@ -11,7 +11,8 @@
       <mt-cell title="messageBox" to="messageBox" is-link></mt-cell>
       <mt-cell title="loading" to="loading" is-link></mt-cell>
       <mt-cell title="icon" to="icon" is-link></mt-cell>
-      <mt-cell title="test" to="test" is-link></mt-cell>
+      <mt-cell title="detail" to="detail" is-link></mt-cell>
+      <mt-cell title="getUserID" @click.native="getUserIDFn" is-link></mt-cell>
     </div>
 
   </div>
@@ -41,7 +42,10 @@
       ...mapState(NameSpace, ['value'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getList'])
+      ...mapActions(NameSpace, ['getList']),
+      getUserIDFn() {
+        MessageBox('提示', KND.Util.getParam('userID'));
+      }
     }
   };
 </script>
