@@ -36,7 +36,7 @@
               </div>
             </mt-tab-container-item>
             <mt-tab-container-item id="tab-container2">
-              <div class="service-record">
+              <div class="service-record" v-if="ServiceRequest['Status'] !== '未开始'">
                 <div>单据编号{{ServiceRequest['SR Number']}}
                   <i :class="[icon,iconDown]" @click="openOrder"></i>
                   <ul v-show="isOpenOrder">
@@ -53,6 +53,7 @@
                   </ul>
                 </div>
               </div>
+              <div v-else style="line-height: 5rem;text-align: center">暂无数据</div>
             </mt-tab-container-item>
             <mt-tab-container-item id="tab-container3">
               <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
@@ -70,10 +71,10 @@
           </mt-tab-container>
         </div>
       </div>
-      <button-group v-if="!role">
+      <button-group v-if="loginMeg['Job Title'] === '400'">
         <mt-button type="primary" class="single" @click="toContact" >派单</mt-button>
       </button-group>
-      <button-group v-if="role">
+      <button-group v-if="loginMeg['Job Title'] === 'install'">
         <mt-button v-if="isCall === 'lxkh'" type="primary" class="single" @click.native="changeBtnStote"  >电话联系客户</mt-button>
         <div v-else-if="isCall === 'yyjh'" class="callPlan">
           <mt-button  type="primary" class="single flax"  @click.native="callSolve" >电话已解决</mt-button>
@@ -88,7 +89,7 @@
         </mt-popup>
       </div>
 
-      <close :showBox1="showBox" @my-enter="boxEnter" @my-close="boxClose" :options1="option"></close>
+      <close :showBox1="showBox" @my-enter="boxEnter" @my-close="boxClose"></close>
 
       <!--工单操作-->
       <mt-popup v-model="popupVisible1" position="bottom" popup-transition="popup-fade" class="mint-popup-2">
@@ -117,13 +118,15 @@
   </div>
 </template>
 <script>
+  import {mapState, mapActions} from 'vuex';
   import close from './close';
   import dateControl from './dateControl';
   import api from '../api/api';
   import { MessageBox } from 'mint-ui';
   import buttonGroup from 'public/components/cus-button-group';
+  const NameSpace = 'index';
   export default {
-    name: 'serviceDetail',
+    name: NameSpace,
     created() {
       let me = this;
       me.srNumber = me.$route.query.type;
@@ -174,7 +177,7 @@
         srNumber: '',
         contactName: '',
         Created: '',
-        role: false,
+        role: true,
         isCall: 'lxkh',
         showBox: false,
         showBox2: false,
@@ -190,14 +193,50 @@
         endTime: ''
       };
     },
+    computed: {
+      ...mapState('index', ['loginMeg'])
+    },
     methods: {
+      ...mapActions(NameSpace, ['']),
       boxClose(msg) {               // 关闭取消事件
         this.showBox = false;
         console.log(msg);
       },
       boxEnter(msg) {               // 关闭确认
-        this.showBox = false;
-        console.log(msg);
+        let self = this;
+        self.showBox = false;
+        if (msg) {
+          let Action = KND.Util.isArray(self.ServiceRequest.Action) ? self.ServiceRequest.Action[0] : self.ServiceRequest.Action;
+          api.get({
+            key: 'getaddContact',
+            method: 'POST',
+            data: {
+              'body': {
+                'SiebelMessage': {
+                  'MessageId': '',
+                  'MessageType': 'Integration Object',
+                  'IntObjectName': 'Base KL Service Request Interface BO',
+                  'IntObjectFormat': 'Siebel Hierarchical',
+                  'ListOfBase KL Service Request Interface BO': {
+                    'Service Request': {
+                      'Id': self.ServiceRequest['Id'],
+                      'ListOfAction': {
+                        'Action': {
+                          'Id': Action['Id'],
+                          'Activity SR Id': self.ServiceRequest['Id'],
+                          'No Sales Reason': msg
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            success: function(data) {
+              console.log(data);
+            }
+          });
+        }
       },
       openConfirm() {               // 点击关闭弹出层
         let self = this;

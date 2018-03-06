@@ -2,12 +2,12 @@
   <div style="background-color: #ebebeb;">
     <mt-header fixed title="维修工单列表">
       <fallback slot="left"></fallback>
-      <router-link v-if="!role" to="addService" slot="right">
+      <router-link v-if="loginMeg['Job Title'] === '400'" to="addService" slot="right">
         <mt-button>
           <i class="xs-icon icon-add"></i>
         </mt-button>
       </router-link>
-      <router-link v-if="role" to="search" slot="right">
+      <router-link v-if="loginMeg['Job Title'] === 'install'" to="search" slot="right">
         <mt-button >
           <i class="xs-icon icon-search"></i>
         </mt-button>
@@ -149,7 +149,7 @@
       };
     },
     computed: {
-      ...mapState(NameSpace, ['value'])
+      ...mapState(NameSpace, ['loginMeg'])
     },
     methods: {
       ...mapActions(NameSpace, ['getList']),
@@ -171,6 +171,7 @@
         this.$router.push({path: '/addService'});
       },
       toDetail(type, name) {
+        console.log(this.loginMeg1);
         this.$router.push({
           name: 'serviceDetail',
           query: {

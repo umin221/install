@@ -13,7 +13,16 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
-        value: ''
+        loginMeg: {
+          'Last Name': '袁静',
+          'Emp #': '16113009',
+          'Job Title': '400'
+        }
+        // loginMeg: {
+        //   'Last Name': '代一',
+        //   'Emp #': '16013107',
+        //   'Job Title': 'install'
+        // }
       },
       actions: {
       },

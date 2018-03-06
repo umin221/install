@@ -24,12 +24,16 @@ let ApiList = {
     // 添加联系人
   },
   getUser: {
-    url: 'data/KL Employee Interface BO/Employee'
+    url: 'service/EAI Siebel Adapter/Query?ViewMode=Organization'
     // 用户信息
   },
   getValue: {
     url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="SR_TYPE"'
     // lov值
+  },
+  getRunProcess: {
+    url: 'service/Workflow Process Manager/RunProcess'
+    // 派单
   }
 };
 // 16113009 袁静

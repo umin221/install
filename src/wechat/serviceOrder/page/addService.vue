@@ -40,7 +40,7 @@
         @confirm="handleChange">
       </mt-datetime-picker>
       <ul class="search-list">
-        <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item)">{{item['Cellular Phone #']}} {{item['Last Name']}}</li>
+        <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item)">{{item['Work Phone #']}} {{item['Last Name']}}</li>
       </ul>
       <div class="submitButton">
         <mt-button size="normal" type="danger" @click="submit">提交</mt-button>
@@ -120,7 +120,8 @@
             'KL Product Model': me.KL_Product_Model,
             'KL Cutoff Date': me.KL_Cutoff_Date,
             'Product Warranty Flag': me.Product_Warranty_Flag,
-            'Id': '1'
+            'Id': '1',
+            'Owner': '16113009'
           },
           success: function(data) {
             console.log(data);
@@ -238,7 +239,7 @@
       selectCaLL(data) {
         let me = this;
         console.log(data);
-        me.Contact_Phone = data['Cellular Phone #'];
+        me.Contact_Phone = data['Work Phone #'];
         me.Contact_Name = data['Last Name'];
         me.Address = data['Primary Personal Street Address'];
         me.PROVINCE = data['KL Primary Personal Province'];

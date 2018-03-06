@@ -12,7 +12,7 @@
             <mt-radio
               class="page-part"
               v-model="value1"
-              :options="options1">
+              :options="option">
             </mt-radio>
 
           </div>
@@ -37,12 +37,26 @@
   }
 </style>
 <script>
+  import api from '../api/api';
   export default {
     name: 'close',
-    props: ['showBox1', 'options1'],
+    props: ['showBox1'],
+    created() {
+      let me = this;
+      api.get({
+        url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="FIN_NO_SALE_REASON"',
+        method: 'GET',
+        success: function(data) {
+          for (let i = 0;i < data.items.length;i++) {
+            me.option.push(data.items[i].Value);
+          }
+        }
+      });
+    },
     data() {
       return {
-        value1: ''
+        value1: '',
+        option: []
       };
     },
     methods: {
@@ -52,8 +66,6 @@
       close() {
         this.$emit('my-close', this.value1);
       }
-    },
-    created() {
     }
   };
 </script>

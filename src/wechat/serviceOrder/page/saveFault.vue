@@ -1,97 +1,60 @@
 <template>
-  <div style="background-color: #ebebeb;">
+  <div>
     <mt-header fixed title="故障记录">
       <fallback slot="left"></fallback>
       <mt-button slot="right">提交</mt-button>
     </mt-header>
 
-    <div class="mint-content addService">
-      <div class="addform">
-        <mt-field label="产品条形码" type="text" placeholder="输入或扫码" class="textRight"></mt-field>
-        <mt-cell class="require mint-field" title="所在省市区" placeholder="请选择"><i class="xs-icon icon-addr icon-right"></i></mt-cell>
-        <mt-field class="block require" label="详细地址" placeholder="请输入详细地址..." type="textarea" rows="2"></mt-field>
-        <mt-cell class="require mint-field" title="产品型号" placeholder="请选择" is-link>{{Type}}</mt-cell>
-        <mt-cell class="mint-field require" title="故障现象" placeholder="请选择" is-link>{{subArea}}</mt-cell>
-        <mt-cell class="mint-field require" title="责任划分">{{Area}}</mt-cell>
-        <mt-field class="block" label="故障描述" v-model="ProductFlag" placeholder="详细描述或附加需求..." type="textarea" rows="3">
-          <div style="line-height: 2rem"><i class="xs-icon icon-mic" style="float: right;"></i></div>
-        </mt-field>
-        <div>
-          <div style="color: #777;font-size: 0.75rem;text-indent:0.75em;line-height: 40px">上传图片</div>
-          <div style="text-indent:0.75em"><i class="xs-icon icon-attach"></i></div>
+    <div class="mint-content">
+      <div class="saveFault">
+        <mt-cell title="单据编号：" ></mt-cell>
+        <mt-cell title="移交日期："></mt-cell>
+        <mt-cell class="require" title="是否保修范围" is-link></mt-cell>
+        <mt-cell title="维修配件"></mt-cell>
+        <div class="servesParts">
+          <div class="Parts">
+            <mt-switch v-model="value">保外</mt-switch>
+            <div class="PartsDetail"><div>浴室锁</div><div>￥100</div><div>X1</div></div>
+          </div>
+          <div class="Parts">
+            <div><div>上门费</div></div>
+          </div>
+          <div class="addBtn">
+            <mt-button type="primary"><i class="xs-icon icon-add"></i>添加配件</mt-button>
+            <mt-button type="primary"><i class="xs-icon icon-add"></i>添加上门费</mt-button>
+          </div>
         </div>
+        <mt-cell class="require" title="总费用"></mt-cell>
+        <mt-cell class="require" title="附件"></mt-cell>
       </div>
     </div>
   </div>
 </template>
 <style lang="scss">
-  @mixin disFlex (){
-    display: flex;
-    justify-content:center;
-    align-items: center;
-  }
-  .addService{
-    .addform{
-      background: white;
-      .block{
-        .mint-cell-wrapper{
-          display: block!important;
-          .mint-cell-value{
-            display: block!important;
-            textarea{
-              resize: none;
-            }
-          }
+  .saveFault{
+    .servesParts{
+      .Parts{
+        line-height: 2.5rem;
+        display: flex;
+        .mint-switch{
+          width: 40%;
+        }
+        .PartsDetail{
+          display: flex;
+          width: 60%;
+          justify-content: space-around;
+          background-image: linear-gradient(0deg, #d9d9d9, #d9d9d9 0%, transparent 5%);
         }
       }
-    }
-
-    .textRight{
-      .mint-cell-wrapper{
-        .mint-cell-value{
-          @include disFlex();
-          input{
-            height: 100%;
-            text-align: right;
+      .addBtn{
+        display: flex;
+        justify-content: space-around;
+        button{
+          width:40%;
+          i{
+            font-size: 0.5rem;
           }
         }
-      }
-    }
-    .icon-right{
-      position: absolute;
-      right:0.5rem;
-    }
-    .submitButton,.addMore{
-      @include disFlex();
-    }
-    .addMore{
-      height: 2rem;
-      color: $theme-color;
-      font-size: 0.75rem;
-      span{
-        margin-left: 5px;
-      }
-    }
-    .submitButton {
-      height: 2.75rem;
-      background: white;
-      margin-top: 1rem;
-      button {
-        width: 60%;
-        border-radius: 5px;
-        background:$theme-color;
-      }
-    }
-    .mint-field-core::-webkit-input-placeholder{
-      color: #d4d4d4;
-      font-weight: 100;
-    }
-    .mint-field{
-      padding: 0 0.5rem;
-      .mint-cell-wrapper{
-        padding: 0;
-        background-position: bottom;
-        font-size: 0.75rem;
       }
     }
   }
@@ -104,16 +67,7 @@
     },
     data: () => {
       return {
-        hideMore: false,
-        ContactName: '',
-        callPhone: '',
-        Type: '',
-        Area: '',
-        subArea: '',
-        Priority: '',
-        Description: '',
-        ProductFlag: '',
-        startDate: ''
+        isSwitch: false
       };
     },
     methods: {
