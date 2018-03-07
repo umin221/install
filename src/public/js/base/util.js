@@ -8,7 +8,7 @@
   class Util {
 
     constructor() {
-      console.info('-------------------------------- UTIL INIT --------------------------------');
+      this.log('Util init...');
     };
 
     /**
@@ -28,7 +28,7 @@
      * 转数组对象
      */
     toArray(o) {
-      return this.isArray(o) ? o : [o];
+      return o === undefined ? [] : this.isArray(o) ? o : [o];
     };
 
     /**
@@ -44,7 +44,7 @@
      * @returns {*|boolean}
      */
     isArray(o) {
-      var ots = Object.prototype.toString;
+      let ots = Object.prototype.toString;
       return o && (o.constructor === Array || ots.call(o) === '[object Array]');
     };
 
@@ -117,7 +117,7 @@
      * @returns {boolean} true / false
      */
     isEmptyObject(obj) {
-      for (var n in obj) {
+      for (let n in obj) {
         return false;
       }
       return true;
@@ -155,7 +155,7 @@
      * @returns {string} 方法名
      */
     generateRandomNameForMethod(method) {
-      var __name = 'random_name_' + new Date().getTime();
+      let __name = 'random_name_' + new Date().getTime();
       window[__name] = function() {
         method.apply(null, Array.prototype.slice.call(arguments, 0));
         window[__name] = undefined;
@@ -169,7 +169,7 @@
      */
     param(obj) {
       let arr = [];
-      for (var i in obj) {
+      for (let i in obj) {
         arr.push(i + '=' + obj[i]);
       }
       return arr.join('&');
@@ -180,7 +180,7 @@
      */
     condition(obj) {
       let arr = [];
-      for (var i in obj) {
+      for (let i in obj) {
         if (obj[i]) {
           arr.push('[' + i + ']="' + obj[i] + '"');
         }
@@ -194,11 +194,25 @@
      * @returns {null}
      */
     getParam(name) {
-      var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
-      var r = window.location.search.substr(1).match(reg);
+      let reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+      let r = window.location.search.substr(1).match(reg);
       if (r != null) return decodeURI(r[2]);
       return null;
     };
+
+    /**
+     * 日志输出
+     */
+    log(...args) {
+      console.log(this);
+      let normalStyle = 'padding:1px; color:#fff; background:#35495e; border-radius: 3px 0 0 3px;';
+      let content = args.pop().split(' ');
+      let style = normalStyle + (args.pop() || 'background:#41b883; border-radius: 0 3px 3px 0;');
+      console.log('%c ' + content.join(' %c ') + ' %c',
+        normalStyle,
+        style,
+        'background:transparent');
+    }
 
   };
 
@@ -208,7 +222,7 @@
    */
   // eslint-disable-next-line
   Date.prototype.format = function(format) {
-    var o = {
+    let o = {
       'M+': this.getMonth() + 1, // month
       'd+': this.getDate(), // day
       'h+': this.getHours(), // hour
@@ -222,7 +236,7 @@
       format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
     }
 
-    for (var k in o) {
+    for (let k in o) {
       if (new RegExp('(' + k + ')').test(format)) {
         format = format.replace(RegExp.$1, RegExp.$1.length === 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length));
       }
