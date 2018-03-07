@@ -24,7 +24,7 @@ import axios from 'axios';
      * 构造函数
      */
     constructor() {
-      console.info('-------------------------------- NATIVE INIT --------------------------------');
+      KND.Util.log('Native init...');
 
       userID = this.getUserID();
       Object.defineProperty(this, 'userID', {
@@ -55,7 +55,7 @@ import axios from 'axios';
      * @returns {string}
      */
     getUserID() {
-      return session.get('userID') || context['Util']['getParam']('userID');
+      return session.get('userID') || 'XIEXW' || context['Util']['getParam']('userID');
     };
 
     /**
@@ -72,8 +72,7 @@ import axios from 'axios';
       // post data
       let setting = Object.assign({
         headers: {
-          // 'Authorization': 'Basic ' + btoa('XIEXW:XIEXW')
-          'Authorization': 'Basic ' + btoa(userID + ':' + userID) // btoa('XIEXW:XIEXW') //
+          'Authorization': 'Basic ' + btoa(userID + ':' + userID)
         },
         timeout: 30000,
         method: 'get'

@@ -178,14 +178,15 @@
     /**
      * SIEBEL 查询条件转换
      */
-    condition(obj) {
+    condition(obj, entity, jion = ' AND ', operator = '=') {
       let arr = [];
+      entity = entity ? entity + '.' : '';
       for (let i in obj) {
         if (obj[i]) {
-          arr.push('[' + i + ']="' + obj[i] + '"');
+          arr.push('[' + entity + i + ']' + operator + '"' + obj[i] + '"');
         }
       }
-      return arr.join(' AND ');
+      return arr.join(jion);
     };
 
     /**
@@ -204,7 +205,6 @@
      * 日志输出
      */
     log(...args) {
-      console.log(this);
       let normalStyle = 'padding:1px; color:#fff; background:#35495e; border-radius: 3px 0 0 3px;';
       let content = args.pop().split(' ');
       let style = normalStyle + (args.pop() || 'background:#41b883; border-radius: 0 3px 3px 0;');

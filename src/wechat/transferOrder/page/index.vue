@@ -13,10 +13,10 @@
       <mt-navbar v-model="selected">
         <mt-tab-item id="pending"
           @click.native="!pending.length && pendingLoadBottomFn()">待处理</mt-tab-item>
-        <mt-tab-item id="valid"
-          @click.native="!valid.length && validLoadBottomFn()">处理中</mt-tab-item>
-        <mt-tab-item id="invalid"
-          @click.native="!invalid.length && invalidLoadBottomFn()">已完成</mt-tab-item>
+        <mt-tab-item id="process"
+          @click.native="!process.length && processLoadBottomFn()">处理中</mt-tab-item>
+        <mt-tab-item id="completed"
+          @click.native="!completed.length && completedLoadBottomFn()">已完成</mt-tab-item>
       </mt-navbar>
 
       <!-- tab-container -->
@@ -28,46 +28,46 @@
                         :topStatus="topStatus">
             <cus-cell class="multiple"
                      :key="item.id"
-                     :title="'合同编码:'+ item.Name"
+                     :title="'合同编码:'+ item['Agree Number']"
                      @click.native="toDetailFn(item.Id)"
                      v-for="item in pending"
                      is-link>
-              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Partner Owner Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Main Phone Number']}}</div>
+              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['Lead Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Created Date']}}</div>
             </cus-cell>
           </cus-loadmore>
         </mt-tab-container-item>
 
-        <mt-tab-container-item id="valid">
-          <cus-loadmore ref="valid"
-                        :loadTop="validLoadTopFn"
-                        :loadBottom="validLoadBottomFn"
+        <mt-tab-container-item id="process">
+          <cus-loadmore ref="process"
+                        :loadTop="processLoadTopFn"
+                        :loadBottom="processLoadBottomFn"
                         :topStatus="topStatus">
             <cus-cell class="multiple"
                      :key="item.id"
-                     :title="'合同编码:'+ item.Name"
+                     :title="'合同编码:'+ item['Agree Number']"
                      @click.native="toDetailFn(item.Id)"
-                     v-for="item in valid"
+                     v-for="item in process"
                      is-link>
-              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Partner Owner Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Main Phone Number']}}</div>
+              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['Lead Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Created Date']}}</div>
             </cus-cell>
           </cus-loadmore>
         </mt-tab-container-item>
 
-        <mt-tab-container-item id="invalid">
-          <cus-loadmore ref="invalid"
-                        :loadTop="invalidLoadTopFn"
-                        :loadBottom="invalidLoadBottomFn"
+        <mt-tab-container-item id="completed">
+          <cus-loadmore ref="completed"
+                        :loadTop="completedLoadTopFn"
+                        :loadBottom="completedLoadBottomFn"
                         :topStatus="topStatus">
             <cus-cell class="multiple"
                       :key="item.id"
-                      :title="'合同编码:'+ item.Name"
+                      :title="'合同编码:'+ item['Agree Number']"
                       @click.native="toDetailFn(item.Id)"
-                      v-for="item in invalid"
+                      v-for="item in completed"
                       is-link>
-              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Partner Owner Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Main Phone Number']}}</div>
+              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['Lead Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Created Date']}}</div>
             </cus-cell>
           </cus-loadmore>
 
@@ -92,7 +92,7 @@
     let list = args.pop();
     let param = Object.assign({
       data: {
-        'KL Partner Status': '待审批'
+        'Status': '已提交'
       },
       callback: (data) => {
         me.$refs[list][event](data.length);
@@ -118,7 +118,7 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['pending', 'valid', 'invalid'])
+      ...mapState(NAMESPACE, ['pending', 'process', 'completed'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['getTransferOrder']),
@@ -126,21 +126,21 @@
       pendingLoadTopFn() {
         loader.call(this, 'pending', 'onTopLoaded');
       },
-      // 有效顶部加载
-      validLoadTopFn() {
+      // 处理中顶部加载
+      processLoadTopFn() {
         loader.call(this, {
           data: {
-            'KL Partner Status': '有效'
+            'Status': '已交接'
           }
-        }, 'valid', 'onTopLoaded');
+        }, 'process', 'onTopLoaded');
       },
-      // 失效顶部加载
-      invalidLoadTopFn() {
+      // 已完成顶部加载
+      completedLoadTopFn() {
         loader.call(this, {
           data: {
-            'KL Partner Status': '失效'
+            'Status': '已完成'
           }
-        }, 'invalid', 'onTopLoaded');
+        }, 'completed', 'onTopLoaded');
       },
       // 待审批底部加载
       pendingLoadBottomFn() {
@@ -148,23 +148,23 @@
           more: true
         }, 'pending', 'onBottomLoaded');
       },
-      // 有效底部加载
-      validLoadBottomFn() {
+      // 处理中底部加载
+      processLoadBottomFn() {
         loader.call(this, {
           data: {
-            'KL Partner Status': '有效'
+            'Status': '已交接'
           },
           more: true
-        }, 'valid', 'onBottomLoaded');
+        }, 'process', 'onBottomLoaded');
       },
-      // 失效底部加载
-      invalidLoadBottomFn() {
+      // 已完成底部加载
+      completedLoadBottomFn() {
         loader.call(this, {
           data: {
-            'KL Partner Status': '失效'
+            'Status': '已完成'
           },
           more: true
-        }, 'invalid', 'onBottomLoaded');
+        }, 'completed', 'onBottomLoaded');
       },
       // 跳转搜索
       toSearchFn() {
@@ -172,18 +172,14 @@
       },
       // To detail or create
       toDetailFn(id) {
-        let query = typeof id === 'string' ? {
-          // detail
-          type: 'read',
-          state: this.selected,
-          id: id
-        } : {
-          // create
-          type: 'add'
-        };
         this.$router.push({
           name: 'detail',
-          query: query
+          query: {
+            // detail
+            type: 'read',
+            state: this.selected,
+            id: id
+          }
         });
       }
     }

@@ -54,7 +54,7 @@
       <!--valid invalid && read-->
       <div v-show="read && state !== 'pending'">
         <title-group>联系人列表</title-group>
-        <empty v-show="!form.User"></empty>
+        <empty v-show="!form.User.length"></empty>
         <mt-cell-swipe class="multiple"
                  v-for="item in form.User"
                  :key="item.Id"

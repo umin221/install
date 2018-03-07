@@ -6,6 +6,8 @@
                :result.sync="result"
                :placeholder="placeholder"
                :autofocus="true"
+               :show="show"
+               @keyup.enter.native="searchFn"
                @input="handleInput">
       <slot>
         <mt-cell
@@ -30,6 +32,7 @@
       result: Array,
       placeholder: String,
       attr: Object,
+      show: Boolean,
       value: String
     },
     data: () => {
@@ -46,15 +49,24 @@
       }
     },
     methods: {
-      handleInput: _.debounce(
-        function (val) {
-          this.currentValue = val;
-          if (val.length) {
-            this.$parent.searchFn(val);
-          }
-        },
-        1000
-      )
+      handleInput(val) {
+        this.currentValue = val;
+      },
+      searchFn() {
+        let val = this.currentValue;
+        if (val.length) {
+          this.$parent.searchFn(val);
+        }
+      }
+      // handleInput: _.debounce(
+      //  function (val) {
+      //    this.currentValue = val;
+      //    if (val.length) {
+      //      this.$parent.searchFn(val);
+      //    }
+      //  },
+      //  1000
+      // )
     }
   };
 </script>

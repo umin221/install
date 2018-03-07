@@ -31,11 +31,14 @@ export default new Router({
     meta: {
       transition: 'push'
     }
-  }, { // 联系人
-    path: '/contact',
-    name: 'contact',
+  }, { // 选择工程师
+    path: '/engineer',
+    name: 'engineer',
     component(resolve) {
       require(['../page/contact'], resolve);
+    },
+    meta: {
+      transition: 'push'
     }
   }]
 });

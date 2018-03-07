@@ -22,17 +22,17 @@ export default new Vuex.Store({
       state: {
         // 待审批
         pending: [],
-        // 有效
-        valid: [],
-        // 失效
-        invalid: [],
+        // 处理中
+        process: [],
+        // 已完成
+        completed: [],
         // 搜索结果
         result: [],
         // status 2 list
         status2list: {
-          '待审批': 'pending',
-          '有效': 'valid',
-          '失效': 'invalid',
+          '已提交': 'pending',
+          '已交接': 'process',
+          '已完成': 'completed',
           '': 'result'
         }
       },
@@ -46,14 +46,14 @@ export default new Vuex.Store({
       },
       actions: {
         /**
-         * 获取委外团队列表
+         * 获取交接
          * @param {Object} data 必填 接口请求参数
          * @param {Boolean} more 选填 是否加载更多
          * @param {Function} callback 选填 处理回调
          * @param {Function} error 选填 错误回调
          */
         getTransferOrder({state, commit, dispatch}, {data, more, callback, error}) {
-          let list = state.status2list[data['KL Partner Status']];
+          let list = state.status2list[data['Status']];
           api.get({
             key: 'getTransferOrder',
             data: data,
@@ -62,7 +62,7 @@ export default new Vuex.Store({
               PageSize: PAGESIZE
             },
             success: function(data) {
-              let partners = KND.Util.toArray(data.items);
+              let partners = KND.Util.toArray(data.SiebelMessage.Project);
               commit(more ? 'addPartners' : 'setPartners', {
                 partners: partners,
                 list: list
@@ -193,51 +193,52 @@ export default new Vuex.Store({
     },
 
     /**
-     * 委外联系人新增&编辑
+     * 指派安装工程师
      */
     contact: {
       namespaced: true,
-      state: {},
+      state: {
+        result: [],
+        select: {
+          'Last Name': '请选择'
+        }
+      },
+      mutations: {
+        setContact(state, contacts) {
+          state.result = contacts;
+        },
+        addContact(state, contacts) {
+          state.result.push(...contacts);
+        },
+        selContact(state, contact) {
+          state.select = contact;
+        }
+      },
       actions: {
         /**
-         * 查找委外联系人
+         * 查找安装工程师
          * @param {Object} data 必填 查询条件 键值对
          */
-        findContact({commit}, data) {
+        findContact({state, commit}, {data, more, callback}) {
           api.get({
             key: 'findContact',
             data: data,
-            success: (data) => {
-
-            }
-          });
-        },
-        /**
-         * 创建&更新联系人信息
-         * @param {Object} contact 必填 人员信息 键值对
-         */
-        upsertContact({state}, contact) {
-          api.get({
-            key: 'upsertContact',
-            data: {
-              partner: {
-                Id: this.state.detail.form.Id,
-                ListOfUser: {
-                  User: contact
-                }
-              }
+            paging: {
+              StartRowNum: more ? state.result.length : 0,
+              PageSize: PAGESIZE
             },
             success: (data) => {
-              if (data.PrimaryRowId) {
-                Toast({
-                  message: '提交成功'
-                });
-                KND.Util.back();
-              } else {
-                Toast({
-                  message: '提交失败'
-                });
+              let contacts = KND.Util.toArray(data.items);
+              commit(more ? 'addContact' : 'setContact', contacts);
+              if (callback) {
+                callback(contacts);
               }
+            },
+            error: (error) => {
+              if (callback) {
+                callback();
+              };
+              console.log(error);
             }
           });
         }

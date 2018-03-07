@@ -55,14 +55,14 @@ export default new Vuex.Store({
         getPartners({state, commit, dispatch}, {data, more, callback, error}) {
           let list = state.status2list[data['KL Partner Status']];
           api.get({
-            key: 'getPartners',
+            key: 'queryPartners',
             data: data,
             paging: {
               StartRowNum: more ? state[list].length : 0,
               PageSize: PAGESIZE
             },
             success: function(data) {
-              let partners = KND.Util.toArray(data.items);
+              let partners = KND.Util.toArray(data.SiebelMessage['Channel Partner']);
               commit(more ? 'addPartners' : 'setPartners', {
                 partners: partners,
                 list: list
@@ -83,7 +83,9 @@ export default new Vuex.Store({
     detail: {
       namespaced: true,
       state: {
-        form: {},
+        form: {
+          User: []
+        },
         attach: { // 附件
           list: [], // [{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}],
           edit: false,
@@ -95,9 +97,7 @@ export default new Vuex.Store({
       mutations: {
         setPartner(state, form) {
           state.form = form;
-          if (form.User) {
-            state.form.User = KND.Util.toArray(form.User);
-          };
+          state.form.User = KND.Util.toArray(form.User);
         },
         clear(state) {
           state.form = {
@@ -209,6 +209,9 @@ export default new Vuex.Store({
             data: data,
             success: (data) => {
 
+            },
+            error: (data) => {
+              console.log(data);
             }
           });
         },

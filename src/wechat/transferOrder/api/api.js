@@ -1,25 +1,18 @@
 let apiList = {
   // 交接单列表
-  getTransferOrder1: option => {
+  getTransferOrder: option => {
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/Query',
       data: {
-        'OutputIntObjectName': 'KL Project',
-        'SearchSpec': '[Project.Setter Id]="1-SF7863"'
+        'body': {
+          'OutputIntObjectName': 'Base Project',
+          'ViewMode': 'Sales Rep',
+          'SearchSpec': KND.Util.condition(option.data, 'Project', ' OR ', ' LIKE '), // '[Project.Status]="' + option.data.Status + '"',
+          'StartRowNum': option.paging.StartRowNum,
+          'PageSize': option.paging.PageSize
+        }
       }
-    };
-  },
-
-  getTransferOrder: option => {
-    let name = option.data.Name;
-    let spec = '';
-    if (name) {
-      spec = '[Name] LIKE \'' + name + '*\'';
-      delete option.data.Name;
-    }
-    return {
-      url: 'data/Channel Partner/Channel Partner/?searchspec=' + spec + KND.Util.condition(option.data) + '&' + KND.Util.param(option.paging)
     };
   },
 
@@ -27,7 +20,7 @@ let apiList = {
   findTransferOrderById: option => {
     return {
       method: 'post',
-      url: 'service/EAI Siebel Adapter/Query/?OutputIntObjectName=Base Channel Partner&PrimaryRowId=' + option.data.id,
+      url: 'data/Project/Project/' + option.data.id,
       data: {}
     };
   },
@@ -90,9 +83,22 @@ let apiList = {
     };
   },
 
+  // 查找所有产品安装工程师&主管
   findContact: (option) => {
+    let position = option.data.position.split('||');
+    let name = option.data['Last Name'];
+    let specPosi = [];
+    let specName = '';
+    // 职位过滤
+    for (let i in position) {
+      specPosi.push('[KL Primary Position Type]="' + position[i] + '"');
+    };
+    // 名字过滤
+    if (name) {
+      specName += '[Last Name] LIKE "' + name + '*" AND ';
+    };
     return {
-      url: 'data/Base User/Base User/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=2&StartRowNum=0'
+      url: 'data/KL Employee Interface BO/Employee/?searchspec=' + specName + specPosi.join(' OR ') + '&' + KND.Util.param(option.paging)
     };
   }
 };

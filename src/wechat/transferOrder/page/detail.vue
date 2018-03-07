@@ -33,8 +33,9 @@
       <mt-cell title="销售方式"
         :value="salesPath"></mt-cell>
       <mt-cell title="指派安装工程师"
-        :value="engineer"
-        is-link></mt-cell>
+               :value="select['Last Name']"
+               @click.native="toEngineer"
+               is-link></mt-cell>
     </div>
 
     <!--buttons-->
@@ -68,20 +69,17 @@
     },
     data: () => {
       return {
-        salesPath: '工程安装',
-        engineer: '请选择'
+        salesPath: '工程安装'
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['form'])
+      ...mapState(NAMESPACE, ['form']),
+      ...mapState('contact', ['select'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['findTransferOrderById', 'findTransferOrder', 'addPartner', 'update']),
-      toContact(contact) {
-        this.$router.push({
-          name: 'contact',
-          query: contact
-        });
+      toEngineer() {
+        this.$router.push('engineer');
       },
       // Close order
       closeFn() {

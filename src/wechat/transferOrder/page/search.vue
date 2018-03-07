@@ -1,3 +1,4 @@
+<!--搜索交接单-->
 <template>
   <div class="search">
     <cus-search v-model="value"
@@ -33,8 +34,8 @@
     let name = me.value;
     let param = {
       data: {
-        'KL Partner Status': '',
-        'Name': name
+        'Lead Name': name + '*',
+        'Setter': name + '*'
       },
       more: args.pop(),
       callback: (data) => {
@@ -56,8 +57,7 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['result']),
-      ...mapState('index', ['status2list'])
+      ...mapState(NAMESPACE, ['result'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['getTransferOrder']),
@@ -66,7 +66,6 @@
        * @param {String} val 搜索值
        */
       searchFn(val) {
-        this.value = val;
         loader.call(this, 'onBottomLoaded');
       },
       /**
@@ -79,7 +78,6 @@
           query: {
             // detail
             type: 'read',
-            state: this.status2list[item['KL Partner Status']],
             id: item.Id
           }
         });

@@ -1,7 +1,7 @@
 <template>
     <div class="cus-toggle">
       <div :class="{visible:visible}" class="cus-toggle-btn"
-        @click="toggleFn">展开</div>
+        @click="toggleFn">{{label}}</div>
       <div v-show="visible">
         <slot></slot>
       </div>
@@ -14,6 +14,11 @@
     data() {
       return {
         visible: false
+      }
+    },
+    computed: {
+      label() {
+        return this.visible ? '收起' : '展开'
       }
     },
     methods: {
@@ -49,6 +54,7 @@
       left: 50%;
       -webkit-transform: translateX(-50%) rotate(135deg);
       transform: translateX(-50%) rotate(135deg);
+      transition: transform .4s ease;
     }
   }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="search">
+  <div>
     <cus-search v-model="value"
                 placeholder="请输入合作伙伴名称">
 
@@ -66,7 +66,6 @@
        * @param {String} val 搜索值
        */
       searchFn(val) {
-        this.value = val;
         loader.call(this, 'onBottomLoaded');
       },
       /**

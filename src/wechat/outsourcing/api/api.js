@@ -12,6 +12,29 @@ let apiList = {
     };
   },
 
+  // 获取委外列表 只获取团队内的
+  queryPartners: option => {
+    let name = option.data.Name;
+    let spec = '';
+    if (name) {
+      spec = '[Channel Partner.Name] LIKE \'' + name + '*\'';
+      delete option.data.Name;
+    };
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/QueryPage',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'KL Channel Partner',
+          'SearchSpec': spec + KND.Util.condition(option.data, 'Channel Partner'),
+          'ViewMode': 'Sales Rep',
+          'StartRowNum': option.paging.StartRowNum,
+          'PageSize': option.paging.PageSize
+        }
+      }
+    };
+  },
+
   // id 查找委外详情
   findPartnerById: option => {
     return {
