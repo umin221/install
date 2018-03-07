@@ -95,12 +95,24 @@
       let me = this;
       api.get({
         key: 'getList',
+        method: 'POST',
         data: {
+          'body': {
+            'OutputIntObjectName': 'KL Install Order',
+            'SearchSpec': '[Order Entry - Orders.Status]=\'安装中\'',
+            'ViewMode': 'Sales Rep',
+            'StartRowNum': '0',
+            'PageSize': '2'
+          }
         },
         success: function(data) {
-          console.log(me);
-          me.list = data.items;
-          console.log(me.list);
+          if (data.NumOutputObjects === '0') {
+            Toast('暂无数据');
+          } else {
+            console.log(me);
+            me.list = data.SiebelMessage['Order Entry - Orders'];
+            console.log(me.list);
+          }
         }
       });
       // this.getList();

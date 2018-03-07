@@ -1,6 +1,6 @@
 let ApiList = {
   getList: {
-    url: 'data/Order Entry (Sales)/Order Entry - Orders/?searchspec=[KL Agreement Opportunity Name] like "*测试*" &PageSize=2&StartRowNum=0'
+    url: 'service/EAI Siebel Adapter/QueryPage'
     // 列表
   },
   getDetail: {
@@ -20,7 +20,7 @@ let ajax = (api) => {
     timeout: 30000,
     method: 'get',
     headers: {
-      'Authorization': 'Basic MTQwODAwODg6MTQwODAwODg='
+      'Authorization': 'Basic U0FETUlOOkNSTUFQUEFETUlO'
     }
   }, api));
 };

@@ -6,17 +6,17 @@
     </mt-header>
     <div class="mint-content building">
       <div class="building-tab-div" >
-        <span v-for="(item, index) in buildingList"  :key="index">{{item.val}}</span>
+        <span v-for="(item, index) in buildingList"  :key="index" @click="calculation(index)">{{item.val}}</span>
         <span :class="editClass" style="position: absolute;right: 0px;" @click="toBanFn"></span>
       </div>
       <div style="height: 5px"></div>
-      <div style="background: white;padding-bottom: 10px;">
+      <div style="background: white;padding-bottom: 10px;margin-bottom: 5px;"  v-for="(layerItem, index) in layerList"  :key="index" >
         <mt-cell>
-          <div slot="title" class="list-text"><span class="list-text-span">1F</span></div><div :class="editClass" @click="toFloorFn"></div>
+          <div slot="title" class="list-text"><span class="list-text-span">{{layerItem.val}}</span></div><div :class="editClass" @click="toFloorFn(index)"></div>
         </mt-cell>
-        <div class="building-div"><span>1001</span><span>1001</span><span>1001</span></div>
+        <div class="building-div"><span  v-for="(roomItem, index) in layerList[index].roomList"  :key="index">{{roomItem.val}}</span></div>
       </div>
-      <div style="height: 5px"></div>
+      <!--<div style="height: 5px"></div>
 
       <div style="background: white;padding-bottom: 10px;">
         <mt-cell>
@@ -39,7 +39,7 @@
           <div slot="title" class="list-text"><span class="list-text-span">1F</span></div>
         </mt-cell>
         <div class="building-div"><span>1001</span><span>1001</span><span>1001</span></div>
-      </div>
+      </div>-->
     </div>
     <button-group>
       <mt-button type="primary" class="single"
@@ -98,7 +98,7 @@
   export default {
     name: 'building',
     created() {
-      this.calculationFn();
+      this.calculationFn('0');
     },
     data: () => {
       return {
@@ -114,7 +114,7 @@
       });
     },
     computed: {
-      ...mapState(NameSpace, ['buildingNum', 'layerNum', 'roomNum', 'buildingList']),
+      ...mapState(NameSpace, ['buildingNum', 'layerNum', 'roomNum', 'buildingList', 'layerList']),
       // * 是否显示
       editClass() {
         return this.type === '' ? '' : 'editClass';
@@ -122,6 +122,9 @@
     },
     methods: {
       ...mapActions(NameSpace, ['calculationFn']),
+      calculation(index) {
+        this.calculationFn(index);
+      },
       toEditFn() {
         var self = this;
         if (self.type === '') {
@@ -136,10 +139,13 @@
           name: 'ban'
         });
       },
-      toFloorFn() {
+      toFloorFn(index) {
         var self = this;
         self.$router.push({
-          name: 'floor'
+          name: 'floor',
+          query: {
+            layerIndex: index
+          }
         });
 
       }

@@ -8,7 +8,7 @@
           <mt-field label="订单编码" :value="detailData['Order Number']"></mt-field>
           <mt-field label="项目名称" :value="detailData['KL Agreement Opportunity Name']"></mt-field>
           <mt-field label="销售类型" :value="detailData['KL Delivery Sales Type']"></mt-field>
-          <mt-field label="安装数量" :value="detailData['KL Delivery Sales Type']"></mt-field>
+          <mt-field label="安装数量" :value="detailData['KL Install Amount'] || 0"></mt-field>
           <div slot="title" class="mint-content-div"><div class="mint-content-xt" @click="butXttd">协同团队</div></div>
           <div slot="title" class="mint-content-xl" @click="is_show_fun">收起</div>
           <div slot="title" class="mint-content-xl xl" @click="is_show_fun"></div>
@@ -51,7 +51,7 @@
                 <div class="name present" @click="updateTask(index)">{{item['KL Detail Type']}}</div>
               </a>
               <a>
-                <div class="icon" @click="updateState">
+                <div class="icon">
 
                   <span class="point mui-icon"><span></span></span>
                   <span class="right line l_grey"></span>
@@ -94,7 +94,7 @@
       </div>
       <div class="mint-content-info">
         <div class="crm-zyList" v-for="(item, index) in taskDataList" :key="index">
-          <ul class="content" @click.nataive="routerPage(index)">
+          <ul class="content" @click.nataive="routerPage(index, item.Id, '')">
             <li class="bd-radius">
               <span class="icon"></span>
             </li>
@@ -370,14 +370,16 @@
         data: {
           'body': {
             'OutputIntObjectName': 'Base Order Entry (Sales)',
-            // 'SearchSpec': '[Order Entry - Orders.Id]=' + '\'' + me.id + '\''
-            'SearchSpec': '[Order Entry - Orders.Id]="1-2BSATYIN"'
+            'SearchSpec': '[Order Entry - Orders.Id]=' + '\'' + me.id + '\''
+            // 'SearchSpec': '[Order Entry - Orders.Id]="1-2BSATYIN"'
           }
         },
         success: function(data) {
           console.dir(data.SiebelMessage);
           me.detailData = data.SiebelMessage['Order Entry - Orders'];
           me.taskData = KND.Util.toArray(me.detailData['KL Installation Task']);
+          console.dir('=====');
+          console.dir(me.taskData);
           me.taskDataList = KND.Util.toArray(me.taskData[0]['KL Installation Task']);
           me.taskDataST = KND.Util.toArray(me.detailData['Order Entry - Line Items']);
           console.dir(me.taskDataST);
@@ -478,7 +480,13 @@
         var self = this;
         if (index === 0) {
           if (index === 0) {
-            self.$router.push('sign');
+            // 新曾
+            this.$router.push({
+              name: 'sign',
+              query: {
+                id: id
+              }
+            });
           } else {
             // 跳转详情
             this.$router.push({

@@ -5,19 +5,9 @@
       <mt-button @click.native="toEditFn" slot="right" >保存</mt-button>
     </mt-header>
     <div class="mint-content building">
-      <mt-field label="楼层名称" placeholder="1F"
-                @change="addAddress"></mt-field>
+      <mt-field label="楼层名称" v-model="roomList.val"></mt-field>
       <div style="height: 5px"></div>
-      <mt-field label="房间1" placeholder="1001"
-                :class="heartVisible"></mt-field>
-      <mt-field label="房间2" placeholder="1002"
-                :class="heartVisible"></mt-field>
-      <mt-field label="房间3" placeholder="1003"
-                :class="heartVisible"></mt-field>
-      <mt-field label="房间4" placeholder="1004"
-                :class="heartVisible"></mt-field>
-      <mt-field label="房间5" placeholder="1005"
-                :class="heartVisible"></mt-field>
+      <mt-field label="房间1" v-for="(item, index) in roomList.roomList"  :key="index" v-model="item.val"></mt-field>
     </div>
     <button-group>
       <mt-button type="primary" class="single"
@@ -29,14 +19,19 @@
 </style>
 <script type="application/javascript">
   import buttonGroup from 'public/components/cus-button-group';
+  import {mapState, mapActions} from 'vuex';
+  const NameSpace = 'buildingInfo';
   export default {
     name: 'detail',
-    created: () => {
+    created() {
       console.dir(1);
+      let param = this.$route.query;
+      this.layerIndex = param.layerIndex;
+      this.layer(this.layerIndex);
     },
     data: () => {
       return {
-        value: '',
+        layerIndex: '',
         active: 'tab-container'
       };
     },
@@ -47,7 +42,18 @@
         console.dir(query);
       });
     },
+    computed: {
+      ...mapState(NameSpace, ['roomList', 'index']),
+      // * 是否显示
+      editClass() {
+        return this.type === '' ? '' : 'editClass';
+      }
+    },
     methods: {
+      ...mapActions(NameSpace, ['layerFn']),
+      layer(index) {
+        this.layerFn(index);
+      }
     },
     components: {buttonGroup}
   };

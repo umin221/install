@@ -3,7 +3,7 @@
   <div>
     <mt-header fixed :title="title">
       <fallback slot="left"></fallback>
-      <mt-button v-show="read && isValid" slot="right"
+      <mt-button v-show="read" slot="right"
                  @click="type = 'edit'">编辑</mt-button>
     </mt-header>
 
@@ -32,6 +32,7 @@
   import {mapState, mapActions} from 'vuex';
   import titleGroup from 'public/components/cus-title-group';
   import buttonGroup from 'public/components/cus-button-group';
+  import api from '../api/api';
 
   // Right button
   let right = [{
@@ -47,11 +48,14 @@
       let param = this.$route.query;
       this.state = param.state;
       this.type = param.type;
+      this.id = param.id;
+      console.dir('=====' + this.id);
       // 获取详情
      // this.getSign(param.id);
     },
     data: () => {
       return {
+        id: '',
         type: 'add', // add 新增 / edit 编辑 / read 只读
         state: 'pending', // pending 待审批 / valid 已生效 / invalid 未生效
         button: {
@@ -74,10 +78,6 @@
       read() {
         return this.type === 'read';
       },
-      // 已生效
-      isValid() {
-        return this.state === 'valid';
-      },
       right() {
         return this.state === 'valid' ? right : [];
       },
@@ -99,7 +99,21 @@
       ...mapActions(NameSpace, ['getSign']),
       submitFn() {
         // pending
+        var self = this;
         this.state = this.state === 'add' ? 'edit' : 'read';
+        api.get({
+          key: 'getUPStatus',
+          method: 'POST',
+          data: {
+            'body': {
+              'ProcessName': 'KL Install Task Submit For Approval Workflow',
+              'RowId': self.id
+            }
+          },
+          success: function(data) {
+            history.go(-1);
+          }
+        });
       }
     },
     components: {titleGroup, buttonGroup}

@@ -53,6 +53,7 @@ export default new Vuex.Store({
         buildingNum: '1',
         layerNum: '1',
         roomNum: '1',
+        index: 0, // 标记栋索引
         buildingList: [
           {
             index: 1,
@@ -94,35 +95,37 @@ export default new Vuex.Store({
             layerList: [
               {
                 index: 1,
-                val: 1,
+                val: 1222,
                 roomList: [
                   {
                     index: 1,
-                    val: 1
+                    val: 1001
                   },
                   {
                     index: 2,
-                    val: 2
+                    val: 1002
                   }
                 ]
               },
               {
                 index: 2,
-                val: 2,
+                val: 23333,
                 roomList: [
                   {
                     index: 1,
-                    val: 1
+                    val: 2001
                   },
                   {
                     index: 2,
-                    val: 2
+                    val: 2002
                   }
                 ]
               }
             ]
           }
-        ]
+        ],
+        layerList: [],
+        roomList: []
       },
       actions: {
         // 数量加减
@@ -153,8 +156,12 @@ export default new Vuex.Store({
             }
           }
         },
-        calculationFn({state}) {
-          console.dir('======' + state.buildingNum);
+        calculationFn({state}, index) {
+          console.dir('=====index=' + state.buildingNum);
+          console.dir('=====index=' + index);
+          this.index = index;
+          state.layerList = state.buildingList[index].layerList;
+          console.dir(state.layerList);
           /* if (state.buildingNum) {
             state.buildingList = [];
             for (var i = 0; i < state.buildingNum; i++) {
@@ -174,6 +181,11 @@ export default new Vuex.Store({
             }
             console.dir(state.buildingList);
           }*/
+        },
+        layerFn({state}, index) {
+          state.roomList = state.buildingList[this.index].layerList[index];
+          console.dir('======');
+          console.dir(state.roomList);
         },
         toEditFn({state}) {
           console.dir('=============');
