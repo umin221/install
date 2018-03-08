@@ -53,10 +53,22 @@ export default new Router({
       require(['../page/contact'], resolve);
     }
   }, {
+    path: '/comEnter',    // 故障记录
+    name: 'comEnter',
+    component(resolve) {
+      require(['../page/comEnter'], resolve);
+    }
+  }, {
     path: '/saveFault',    // 故障记录
     name: 'saveFault',
     component(resolve) {
       require(['../page/saveFault'], resolve);
+    }
+  }, {
+    path: '/searchTrans',    // 搜索配件
+    name: 'searchTrans',
+    component(resolve) {
+      require(['../page/searchTrans'], resolve);
     }
   }]
 });

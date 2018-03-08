@@ -37,29 +37,25 @@
   }
 </style>
 <script>
-  import api from '../api/api';
+  import {mapState, mapActions} from 'vuex';
+  const NameSpace = 'close';
   export default {
-    name: 'close',
+    name: NameSpace,
     props: ['showBox1'],
     created() {
       let me = this;
-      api.get({
-        url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="FIN_NO_SALE_REASON"',
-        method: 'GET',
-        success: function(data) {
-          for (let i = 0;i < data.items.length;i++) {
-            me.option.push(data.items[i].Value);
-          }
-        }
-      });
+      me.getClose();
     },
     data() {
       return {
-        value1: '',
-        option: []
+        value1: ''
       };
     },
+    computed: {
+      ...mapState(NameSpace, ['option'])
+    },
     methods: {
+      ...mapActions(NameSpace, ['getClose']),
       enter() {
         this.$emit('my-enter', this.value1);
       },

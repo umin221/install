@@ -40,7 +40,7 @@
         @confirm="handleChange">
       </mt-datetime-picker>
       <ul class="search-list">
-        <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item)">{{item['Work Phone #']}} {{item['Last Name']}}</li>
+        <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item)">{{item['Cellular Phone #']}} {{item['Last Name']}}</li>
       </ul>
       <div class="submitButton">
         <mt-button size="normal" type="danger" @click="submit">提交</mt-button>
@@ -49,6 +49,7 @@
   </div>
 </template>
 <script>
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import api from '../api/api';
   import menuBox from '../../../public/components/cus-menu.vue';
   const delay = (function() {
@@ -63,8 +64,6 @@
     name: NameSpace,
     created() {
     },
-    computed: {
-    },
     data: () => {
       return {
         hideMore: false,
@@ -72,13 +71,9 @@
         value: '',
         pickerVisible: true,
         showBox: false,
-        isCall: {},
-        isClick: false,
-        search: [],
-        slots: [],
         lovType: '',
-        Contact_Name: '',   // 报修联系人
         Contact_Phone: '',     // 联系电话
+        Contact_Name: '',   // 报修联系人
         Address: '',       // 详细地址
         PROVINCE: '',      // 省
         CITY: '',           // 市
@@ -92,10 +87,18 @@
         KL_SN: '',           // 条形码
         KL_Product_Model: '', // 产品类型
         KL_Cutoff_Date: '',  // 移交日期
-        Product_Warranty_Flag: '' // 保修期限
+        Product_Warranty_Flag: '', // 保修期限
+        selectd: [],
+        isCall: {},
+        isClick: false
       };
     },
+    computed: {
+      ...mapState(NameSpace, ['search', 'slots'])
+    },
     methods: {
+      ...mapActions(NameSpace, ['getSearch', 'getValue', 'valueChange']),
+      ...mapMutations(NameSpace, ['removeSearch']),
       showMore() {
         let me = this;
         me.hideMore = true;
@@ -130,67 +133,48 @@
       },
       getLov(values, parent) {
         let me = this;
-        let Province = [];
         me.showBox = true;
         me.lovType = values;
         if (values === 'KL_PROVINCE') {
           parent = ' AND Parent=' + '"' + parent + '"';
-          me.slots = [
+          me.selectd = [
             {flex: 1, values: [], className: 'slot1', textAlign: 'center'},
             {divider: true, content: '-', className: 'slot2'},
             {flex: 1, values: [], className: 'slot3', textAlign: 'center'}
           ];
         } else if (values === 'SR_TYPE') {
           parent = '';
-          me.slots = [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}];
+          me.selectd = [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}];
         } else if (values === 'SR_AREA') {
           parent = ' AND Parent is null';
-          me.slots = [
+          me.selectd = [
             {flex: 1, values: [], className: 'slot1', textAlign: 'center'},
             {divider: false, values: [], content: '-', className: 'slot2'},
             {flex: 1, values: [], className: 'slot3', textAlign: 'center'}
           ];
         }
-        api.get({
-          url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="' + values + '"' + parent + ' &PageSize=100&StartRowNum=0',
-          method: 'GET',
-          success: function(data) {
-            let datas = data.items;
-            for (let i = 0; i < datas.length; i++) {
-              Province.push(datas[i].Value);
-            }
-            me.slots[0].values = Province;
-          }
-        });
+        let selectd = me.selectd;
+        me.getValue({values, parent, selectd});
+      },
+      selectCaLL(val) {
+        let me = this;
+        me.Contact_Phone = val['Work Phone #'];
+        me.Contact_Name = val['Last Name'];
+        me.Address = val['Primary Personal Street Address'];
+        me.PROVINCE = val['KL Primary Personal Province'];
+        me.CITY = val['Primary Personal City'];
+        me.isCall = {disabled: false};
+        me.isClick = true;
+        me.removeSearch();
       },
       onValuesChange(values, type) {
+        let me = this;
         if (type === 'KL_PROVINCE') {
           type = 'KL_CITY';
         }
-        let me = this;
+        console.log(values);
         if (values[0] !== undefined && values.length > 1) {
-          api.get({
-            url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="' + type + '" AND Parent Value="' + values[0] + '" &PageSize=100&StartRowNum=0',
-            method: 'GET',
-            success: function(data) {
-              let datas = data.items;
-              let Province = [];
-              let High = [];
-              if (datas.constructor === Array) {
-                for (let i = 0; i < datas.length; i++) {
-                  Province.push(datas[i].Value);
-                  High.push(datas[i].High);
-                }
-                me.slots[2].values = Province;
-                me.slots[1].values = High;
-              } else {
-                Province.push(datas.Value);
-                High.push(datas.High);
-                me.slots[2].values = Province;
-                me.slots[1].values = High;
-              }
-            }
-          });
+          me.valueChange({type, values});
         }
       },
       open(picker) {
@@ -222,31 +206,8 @@
       async fetchData(val) {
         let me = this;
         if (me.Contact_Phone) {
-          api.get({
-            url: 'data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] = ' + me.Contact_Phone + '',
-            method: 'GET',
-            success: function(data) {
-              me.search = KND.Util.isArray(data.items) ? data.items : KND.Util.toArray(data);
-            },
-            error: function(data) {
-              me.search = data;
-            }
-          });
-        } else {
-          me.search = [];
+          me.getSearch(me.Contact_Phone);
         }
-      },
-      selectCaLL(data) {
-        let me = this;
-        console.log(data);
-        me.Contact_Phone = data['Work Phone #'];
-        me.Contact_Name = data['Last Name'];
-        me.Address = data['Primary Personal Street Address'];
-        me.PROVINCE = data['KL Primary Personal Province'];
-        me.CITY = data['Primary Personal City'];
-        me.search = [];
-        me.isCall = {disabled: false};
-        me.isClick = true;
       }
     },
     watch: {

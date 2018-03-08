@@ -75,12 +75,12 @@
         <mt-button type="primary" class="single" @click="toContact" >派单</mt-button>
       </button-group>
       <button-group v-if="loginMeg['Job Title'] === 'install'">
-        <mt-button v-if="isCall === 'lxkh'" type="primary" class="single" @click.native="changeBtnStote"  >电话联系客户</mt-button>
-        <div v-else-if="isCall === 'yyjh'" class="callPlan">
+        <mt-button v-if="BtnStatu === 'status1'" type="primary" class="single" @click.native="changeBtnStote"  >电话联系客户</mt-button>
+        <div v-if="BtnStatu === 'status2'" class="callPlan">
           <mt-button  type="primary" class="single flax"  @click.native="callSolve" >电话已解决</mt-button>
           <mt-button type="primary" class="single flax" @click.native="clickShow"  >预约维修计划</mt-button>
         </div>
-        <mt-button v-if="isCall === 'gdcz'"  type="primary" class="single" @click="popupVisible1 = !popupVisible1" >工单操作</mt-button>
+        <mt-button v-if="BtnStatu === 'status3'"  type="primary" class="single" @click="popupVisible1 = !popupVisible1" >工单操作</mt-button>
       </button-group>
       <!--弹出日历-->
       <div v-if="showBox2">
@@ -100,17 +100,17 @@
           <mt-button @click="clickPosition('reach')">签到</mt-button>
         </mt-cell>
         <mt-cell title="记录故障">
-          <router-link to="saveFault">
+          <router-link to="comEnter">
             <mt-button>填写</mt-button>
           </router-link>
         </mt-cell>
         <mt-cell title="完工确认">
           <router-link to="saveFault">
-            <mt-button>填写</mt-button>
+            <mt-button >填写</mt-button>
           </router-link>
         </mt-cell>
         <mt-cell class="completeEnd" title="结束">
-          <mt-button @click.native="completeEnd">确认</mt-button>
+          <mt-button @click.native="clickPosition('end')">确认</mt-button>
         </mt-cell>
         <div class="cancelHandle" @click="popupVisible1 = !popupVisible1">取消</div>
       </mt-popup>
@@ -121,48 +121,18 @@
   import {mapState, mapActions} from 'vuex';
   import close from './close';
   import dateControl from './dateControl';
-  import api from '../api/api';
   import { MessageBox } from 'mint-ui';
   import buttonGroup from 'public/components/cus-button-group';
-  const NameSpace = 'index';
+  //
+  const NameSpace = 'detail';
+  //
   export default {
     name: NameSpace,
     created() {
       let me = this;
       me.srNumber = me.$route.query.type;
       me.contactId = me.$route.query.id;
-      api.get({
-        key: 'getList',
-        data: {
-          'body': {
-            'OutputIntObjectName': 'Base KL Service Request Interface BO',
-            'SearchSpec': '[Service Request.SR Number]= "' + me.srNumber + '"'
-          }
-        },
-        success: function(data) {
-          let Note = null;
-          me.ServiceRequest = data.SiebelMessage['Service Request'] || {};
-          Note = me.ServiceRequest['FIN Service Request Notes'];
-          if (Note) {
-            if (Object.prototype.toString.call(Note) !== '[object Array]') {
-              console.log(111);
-              me.processDate.push(Note);
-            } else {
-              me.processDate = Note;
-            }
-          } else {
-            me.processDate = [{Note: '暂无数据'}];
-          }
-        }
-      });
-//      api.get({
-//        key: 'getDetail',
-//        method: 'GET',
-//        success: function(data) {
-//          me.ServiceRequest = data;
-//          console.log(me.ServiceRequest);
-//        }
-//      });
+      this.getDetail(me.srNumber);
     },
     data: () => {
       return {
@@ -172,7 +142,6 @@
         icon: 'xs-icon',
         iconDown: 'icon-arrow-down',
         isOpenOrder: false,
-        ServiceRequest: {},
         contact: {},
         srNumber: '',
         contactName: '',
@@ -187,55 +156,30 @@
           {name: '维修记录', id: 'tab-container2'},
           {name: '流程记录', id: 'tab-container3'}
         ],
-        option: ['客户不接受维修报价', '已自行解决', '暂不影响使用', '其他'],
-        processDate: [],
         starTime: '',
         endTime: ''
       };
     },
     computed: {
-      ...mapState('index', ['loginMeg'])
+      ...mapState('index', ['loginMeg']),
+      ...mapState(NameSpace, ['ServiceRequest', 'processDate', 'Statu', 'BtnStatu'])
     },
     methods: {
-      ...mapActions(NameSpace, ['']),
+      ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus']),
       boxClose(msg) {               // 关闭取消事件
         this.showBox = false;
-        console.log(msg);
       },
       boxEnter(msg) {               // 关闭确认
         let self = this;
         self.showBox = false;
         if (msg) {
           let Action = KND.Util.isArray(self.ServiceRequest.Action) ? self.ServiceRequest.Action[0] : self.ServiceRequest.Action;
-          api.get({
-            key: 'getaddContact',
-            method: 'POST',
-            data: {
-              'body': {
-                'SiebelMessage': {
-                  'MessageId': '',
-                  'MessageType': 'Integration Object',
-                  'IntObjectName': 'Base KL Service Request Interface BO',
-                  'IntObjectFormat': 'Siebel Hierarchical',
-                  'ListOfBase KL Service Request Interface BO': {
-                    'Service Request': {
-                      'Id': self.ServiceRequest['Id'],
-                      'ListOfAction': {
-                        'Action': {
-                          'Id': Action['Id'],
-                          'Activity SR Id': self.ServiceRequest['Id'],
-                          'No Sales Reason': msg
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            success: function(data) {
-              console.log(data);
-            }
-          });
+          let obj = {
+            srId: self.ServiceRequest['Id'],
+            actionId: Action['Id'],
+            closeMsg: msg
+          };
+          self.getCloseReason(obj);
         }
       },
       openConfirm() {               // 点击关闭弹出层
@@ -249,6 +193,12 @@
       clickShow() {                 // 点击显示日历
         let self = this;
         self.showBox2 = true;
+        let parms = {
+          'Object Id': self.ServiceRequest.Id,
+          'ActivityId': self.ServiceRequest.Action.Id,
+          'inStatus': self.Statu['预约']
+        };
+        self.setStatus(parms);
       },
       cancel(val) {                    // 日历取消事件
         this.showBox2 = false;
@@ -283,16 +233,20 @@
         });
       },
       clickPosition(value1) {
-        api.get({
-          key: 'getaddr',
-          data: {
-            'datetime': 1511971200,
-            'useridlist': ['james', 'paul']
-          },
-          success: function(data) {
-            console.log(data);
-          }
-        });
+        let self = this;
+        let parms = {
+          'Object Id': self.ServiceRequest.Id,
+          'ActivityId': self.ServiceRequest.Action.Id,
+          'inStatus': ''
+        };
+        if (value1 === 'setOut') {
+          parms['inStatus'] = self.Statu['接单'];
+        } else if (value1 === 'reach') {
+          parms['inStatus'] = self.Statu['上门'];
+        } else if (value1 === 'end') {
+          parms['inStatus'] = self.Statu['完成'];
+        }
+        self.setStatus(parms);
       },
       completeEnd() {
         MessageBox({
@@ -301,8 +255,12 @@
         });
       },
       toContact() {
+        console.log(this.ServiceRequest['Id']);
         this.$router.push({
-          name: 'contact'
+          name: 'contact',
+          query: {
+            id: this.ServiceRequest['Id']
+          }
         });
       },
       openOrder() {

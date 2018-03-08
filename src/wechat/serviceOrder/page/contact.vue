@@ -99,25 +99,26 @@
       haveEnter() {
       },
       selected(value) {
-//        let me = this;
+        let me = this;
         console.log(value);
-//        api.get({
-//          key: 'getRunProcess',
-//          method: 'POST',
-//          data: {
-//            'body': {
-//              'Object Id': '1-2BSBXQN6',
-//              'function': 'Distribute',
-//              'empId': '1-2BS93NOL',
-//              'ifRefresh': 'N',
-//              'empFullName': '谢小为 XIEXW',
-//              'ProcessName': 'KL SR Pick Owner Process'
-//            }
-//          },
-//          success: function(data) {
-//            console.log(data);
-//          }
-//        });
+        console.log(me.$route);
+        api.get({
+          key: 'getRunProcess',
+          method: 'POST',
+          data: {
+            'body': {
+              'Object Id': me.$route.query.id,
+              'function': 'Dispatch',
+              'empId': value['Id'],
+              'ifRefresh': 'N',
+              'empFullName': value['KL Employee Full Name'],
+              'ProcessName': 'KL SR Pick Owner Process'
+            }
+          },
+          success: function(data) {
+            console.log(data);
+          }
+        });
       }
     },
     components: {

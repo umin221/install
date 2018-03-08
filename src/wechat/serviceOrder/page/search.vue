@@ -1,44 +1,97 @@
 <template>
-  <div>
-    <mt-header fixed title="搜索">
-      <fallback slot="left"></fallback>
-    </mt-header>
-    <div class="mint-content">
-      <mt-search v-model="value" :result.sync="result" :autofocus="true" placeholder="请输入服务单编号"></mt-search>
-    </div>
+  <div class="search">
+    <cus-search v-model="value"
+                placeholder="请输入合作伙伴名称">
+
+        <cus-loadmore ref="result"
+                      :loadBottom="loadBottomFn"
+                      :topStatus="topStatus">
+          <cus-cell class="multiple"
+                    :key="item.id"
+                    :title="'合作伙伴名称:'+ item.Name"
+                    @click.native="toDetailFn(item)"
+                    v-for="item in result"
+                    is-link>
+            <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
+            <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Main Phone Number']}}</div>
+          </cus-cell>
+        </cus-loadmore>
+
+    </cus-search>
   </div>
 </template>
-<script type="application/javascript">
-  import api from '../api/api';
+
+<script type="es6">
+  import {mapState, mapActions} from 'vuex';
+  import cusLoadmore from 'public/components/cus-loadmore';
+  import cusSearch from 'public/components/cus-search';
+  import cusCell from 'public/components/cus-cell';
+  //
+  let loader = function(...args) {
+    let me = this;
+    let event = args.pop();
+    let name = me.value;
+    let param = {
+      data: {
+        'KL Partner Status': '',
+        'Name': name
+      },
+      more: args.pop(),
+      callback: (data) => {
+        me.$refs.result[event](data.length);
+      }
+    };
+    // 获取团队列表
+    me.getPartners(param);
+  };
+
+  const NAMESPACE = 'index';
   export default {
     name: 'search',
-    created() {
-      let me = this;
-      api.get({
-        key: 'getList',
-        data: {
-          'body': {
-            'OutputIntObjectName': 'Base KL Service Request Interface BO',
-            'SearchSpec': '[Service Request.Owner]="16113009"'
-          }
-        },
-        success: function(data) {
-          me.list = data.SiebelMessage['Service Request'];
-          console.log(me.list);
-          for (let i = 0; i < me.list.length; i++) {
-            me.result.push(me.list[i]['SR Number']);
-          }
-          console.log(me.result);
-        }
-      });
-    },
+    components: {cusLoadmore, cusSearch, cusCell},
     data: () => {
       return {
-        list: [],
-        result: [],
-        value: ''
+        value: '',
+        topStatus: ''
       };
     },
-    methods: {}
+    computed: {
+      ...mapState(NAMESPACE, ['result']),
+      ...mapState('index', ['status2list'])
+    },
+    methods: {
+      ...mapActions(NAMESPACE, ['getPartners']),
+      /**
+       * 搜索回调
+       * @param {String} val 搜索值
+       */
+      searchFn(val) {
+        this.value = val;
+        loader.call(this, 'onBottomLoaded');
+      },
+      /**
+       * To detail
+       * @param {Object} item 行内容
+       */
+      toDetailFn(item) {
+        this.$router.push({
+          name: 'detail',
+          query: {
+            // detail
+            type: 'read',
+            state: this.status2list[item['KL Partner Status']],
+            id: item.Id
+          }
+        });
+      },
+      /**
+       * Load more
+       */
+      loadBottomFn() {
+        loader.call(this, {
+          more: true
+        }, 'onBottomLoaded');
+      }
+    }
   };
 </script>
