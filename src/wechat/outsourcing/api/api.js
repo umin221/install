@@ -121,7 +121,7 @@ let ajax = api => {
 };
 
 const get = option => {
-  ajax(Object.assign(option, apiList[option.key](option)));
+  ajax(Object.extend(true, option, apiList[option.key](option)));
 };
 
 export default {

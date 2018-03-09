@@ -70,7 +70,7 @@ import axios from 'axios';
         });
       };
       // post data
-      let setting = Object.assign({
+      let setting = Object.extend(true, {
         headers: {
           'Authorization': 'Basic ' + btoa(userID + ':' + userID)
         },

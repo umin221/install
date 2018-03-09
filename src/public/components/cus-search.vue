@@ -75,7 +75,7 @@
   .cus-search {
     .cus-fallback {
       position: absolute;
-      line-height: $header-height;
+      line-height: 2.2rem;
       background-color: #d9d9d9;
       border: 0;
       z-index: 2;

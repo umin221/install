@@ -12,3 +12,6 @@ import './mixin'; // Global Mixin
 
 // Inject Global Css
 import 'public/sass/index.scss';
+
+// Object extend
+Object.extend = require('node.extend');

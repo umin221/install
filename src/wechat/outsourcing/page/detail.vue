@@ -54,7 +54,7 @@
       <!--valid invalid && read-->
       <div v-show="read && state !== 'pending'">
         <title-group>联系人列表</title-group>
-        <empty v-show="!form.User.length"></empty>
+        <empty v-show="!form.User || !form.User.length"></empty>
         <mt-cell-swipe class="multiple"
                  v-for="item in form.User"
                  :key="item.Id"
@@ -185,7 +185,9 @@
         // restart
         if (this.state === 'invalid') {
           this.update({
-            'KL Partner Status': '待审批'
+            data: {
+              'KL Partner Status': '待审批'
+            }
           });
         } else {
           // create
@@ -204,7 +206,9 @@
         } else {
           // fail out partner
           me.update({
-            'KL Partner Status': '失效'
+            data: {
+              'KL Partner Status': '失效'
+            }
           });
         }
       }

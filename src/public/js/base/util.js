@@ -212,7 +212,7 @@
         normalStyle,
         style,
         'background:transparent');
-    }
+    };
 
   };
 

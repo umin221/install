@@ -83,9 +83,7 @@ export default new Vuex.Store({
     detail: {
       namespaced: true,
       state: {
-        form: {
-          User: []
-        },
+        form: '',
         attach: { // 附件
           list: [], // [{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}],
           edit: false,
@@ -128,15 +126,15 @@ export default new Vuex.Store({
         },
         /**
          * 获取委外团队信息
-         * @param {Object} condition 必填 查询条件 键值对
+         * @param {Object} setting 必填 请求参数配置
          */
-        findPartner({commit}, condition) {
-          api.get(Object.assign({
+        findPartner({commit}, setting) {
+          api.get(Object.extend({
             key: 'findPartner',
             success: function(data) {
               commit('setPartner', data.items);
             }
-          }, condition));
+          }, setting));
         },
         /**
          * 创建委外团队
@@ -171,14 +169,14 @@ export default new Vuex.Store({
         },
         /**
          * 更新委外团队信息
-         * @param {Object} data 必填 需要修改的信息 键值对
+         * @param {Object} setting 必填 请求参数配置
          */
-        update({state}, data) {
+        update({state}, setting) {
           delete state.form['Channel Partner_Position'];
           delete state.form['User'];
-          api.get({
+          api.get(Object.extend({
             key: 'update',
-            data: Object.assign(state.form, data),
+            data: state.form,
             success: (data) => {
               if (data['KL Partner Status'] !== status) {
                 Toast('更新成功');
@@ -187,7 +185,7 @@ export default new Vuex.Store({
                 Toast('更新失败');
               }
             }
-          });
+          }, setting));
         }
       }
     },

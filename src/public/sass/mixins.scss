@@ -53,8 +53,8 @@
   -webkit-box-align: center;
 }
 
-// Readonly
-@mixin readonly() {
+// Disable
+@mixin disable() {
   pointer-events: none;
 }
 
