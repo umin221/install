@@ -1,0 +1,120 @@
+<template>
+  <div>
+    <mt-header fixed :title="titleVal">
+      <fallback slot="left"></fallback>
+    </mt-header>
+    <div class="mint-content zsBatch">
+      <div :class="{'readonly':raddead}">
+        <mt-field label="今日完成数量" placeholder="请输入"
+                  :class="heartVisible"></mt-field>
+        <mt-field is-link label="抽查数量" placeholder="请输入"
+                  :class="heartVisible"></mt-field>
+        <mt-field is-link label="合格数量" placeholder="请输入"
+                  :class="heartVisible"></mt-field>
+        <mt-field label="异常描述" placeholder="请输入"
+                  :class="heartVisible"></mt-field>
+        <mt-field is-link label="异常处理描述" placeholder="请输入异常处理描述"
+                  :class="heartVisible"></mt-field>
+
+      </div>
+      <button-group>
+        <mt-button type="primary" class="single"
+                   @click.native="handleClick">提交</mt-button>
+      </button-group>
+      <!--<mt-cell title="批次">
+        <span>201712010001</span>
+      </mt-cell>
+      <mt-cell title="委外负责人" is-link>
+        <span></span>
+      </mt-cell>
+      <mt-cell title="真锁交接日期" is-link>
+        <span></span>
+      </mt-cell>
+      <mt-cell>
+        <div slot="title" class="list-text"><span style="color:red">*</span>附件：签收单据归档</div>
+      </mt-cell>
+
+      <div class="button-cla"><mt-button type="primary" @click.native="handleClick()">下一步</mt-button></div>-->
+    </div>
+  </div>
+</template>
+<style lang="scss">
+  .zsBatch {
+    .button-cla {
+      margin-top: 2.5rem;
+      width: 100%;
+      text-align: center;
+    }
+    .mint-button--normal {
+      display: inline-block;
+      padding: 0 12px;
+      width: 5rem;
+    }
+    input {
+      text-align: right!important;
+    }
+  }
+</style>
+<script type="application/javascript">
+  import buttonGroup from 'public/components/cus-button-group';
+  import {mapState} from 'vuex';
+
+  let right = [{
+    content: '删除',
+    style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
+    handler: () => this.$messagebox('delete')
+  }];
+  const NameSpace = 'updateDoor';
+
+  export default {
+    name: 'updateDoor',
+    created: () => {
+      console.dir(1);
+    },
+    data: () => {
+      return {
+        value: '',
+        type: 'add', // add 新增 / edit 编辑 / read 只读
+        titleVal: '挂门进度更新',
+        active: 'tab-container'
+      };
+    },
+    beforeRouteEnter(to, from, next) {
+      console.dir(2);
+      next(vm => {
+        let query = vm.$route.query;
+        console.dir(query);
+      });
+    },
+    computed: {
+      ...mapState(NameSpace, ['form', 'attach']),
+      // 表单只读
+      read() {
+        return this.type === 'read';
+      },
+      right() {
+        return this.state === 'valid' ? right : [];
+      },
+      // * 是否显示
+      heartVisible() {
+        return this.type === 'read' ? '' : 'require';
+      },
+      /**
+       * 根据当前状态和类型判断标题展示
+       * 新建&重新启用界面复用 仅标题不一样
+       * 查看&编辑标题一致
+       */
+      title() {
+        let type = this.type;
+        return type === 'add' ? (this.state === 'invalid' ? '补充委外合约' : '开孔锁签收') : '开孔锁签收详情';
+      }
+    },
+    methods: {
+      butXttd() {
+        var self = this;
+        self.$router.go('/xttd');
+      }
+    },
+    components: {buttonGroup}
+  };
+</script>

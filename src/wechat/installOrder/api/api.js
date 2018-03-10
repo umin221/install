@@ -1,16 +1,34 @@
-let ApiList = {
-  getList: {
+let apiList = {
+  /* getList: {
     url: 'service/EAI Siebel Adapter/QueryPage'
     // 列表
+  },*/
+  getList: option => {
+    let name = option.data.Name;
+    // let spec = '';
+    if (name) {
+      // spec = '[Name] LIKE \'' + name + '*\'';
+      delete option.data.Name;
+    }
+    return {
+      url: 'service/EAI Siebel Adapter/QueryPage'
+      // url: 'service/EAI Siebel Adapter/QueryPage/?searchspec=' /* + spec*/ + KND.Util.condition(option.data) + '&' + KND.Util.param(option.paging)
+    };
   },
-  getDetail: {
-    url: 'service/EAI Siebel Adapter/Query'
+  getDetail: option => {
+    return {
+      url: 'service/EAI Siebel Adapter/Query'
+    };
   }, // 详情
-  getTaskAdd: {
-    url: 'service/Workflow Process Manager/RunProcess/'
+  getTaskAdd: option => {
+    return {
+      url: 'service/Workflow Process Manager/RunProcess/'
+    };
   }, // 任务开始更新状态
-  getUPStatus: {
-    url: 'service/Workflow Process Manager/RunProcess'
+  getUPStatus: option => {
+    return {
+      url: 'service/Workflow Process Manager/RunProcess'
+    };
   } // 任务结束关闭
 };
 
@@ -25,10 +43,9 @@ let ajax = (api) => {
   }, api));
 };
 
-const get = (option) => {
-  ajax(typeof option === 'string' ? ApiList[option] : Object.assign(option, ApiList[option.key]));
+const get = option => {
+  ajax(Object.assign(option, apiList[option.key](option)));
 };
-
 export default {
   get
 };

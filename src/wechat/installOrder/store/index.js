@@ -1,11 +1,14 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { app } from 'public/store';
+import api from '../api/api';
 
 Vue.use(Vuex);
 
 // 缓存页面
 app.state.alive = ['index'];
+// 每页加载条数
+const PAGESIZE = config.pageSize;
 
 export default new Vuex.Store({
   modules: {
@@ -13,11 +16,61 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
-        value: ''
-      },
-      actions: {
+        // 待审批
+        pending: [],
+        // 有效
+        valid: [],
+        // 失效
+        invalid: [],
+        // 搜索结果
+        result: [],
+        // status 2 list
+        status2list: {
+          '待处理': 'pending',
+          '处理中': 'valid',
+          '已完成': 'invalid',
+          '': 'result'
+        }
       },
       mutations: {
+        setPartners(state, {partners, list}) {
+          state[list] = partners;
+        },
+        addPartners(state, {partners, list}) {
+          state[list].push(...partners);
+        }
+      },
+      actions: {
+        /**
+         * 安装订单列表
+         * @param {Object} data 必填 接口请求参数
+         * @param {Boolean} more 选填 是否加载更多
+         * @param {Function} callback 选填 处理回调
+         * @param {Function} error 选填 错误回调
+         */
+        getList({state, commit, dispatch}, {data, more, callback, error}) {
+          let list = state.status2list[data['Order Entry - Orders']];
+          api.get({
+            key: 'getList',
+            method: 'POST',
+            data: data,
+            paging: {
+              StartRowNum: more ? state[list].length : 0,
+              PageSize: PAGESIZE
+            },
+            success: function(data) {
+              let partners = KND.Util.toArray(data.SiebelMessage['Order Entry - Orders']);
+              commit(more ? 'addPartners' : 'setPartners', {
+                partners: partners,
+                list: list
+              });
+              if (callback) {
+                callback(partners);
+              }
+            },
+            error
+          });
+        }
       }
     },
     detail: {

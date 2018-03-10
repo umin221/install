@@ -16,6 +16,15 @@ export default new Router({
     component(resolve) {
       require(['../page/index'], resolve);
     }
+  }, { // 搜索
+    path: '/search',
+    name: 'search',
+    component(resolve) {
+      require(['../page/search'], resolve);
+    },
+    meta: {
+      transition: 'push'
+    }
   }, {
     path: '/detail', // 详情页面
     name: 'detail',
@@ -51,6 +60,12 @@ export default new Router({
     name: 'journal',
     component(resolve) {
       require(['../page/journal'], resolve);
+    }
+  }, {
+    path: '/updateDoor', // 挂门更新
+    name: 'updateDoor',
+    component(resolve) {
+      require(['../page/updateDoor'], resolve);
     }
   }, {
     path: '/sporadic', // 零星真锁安装页面

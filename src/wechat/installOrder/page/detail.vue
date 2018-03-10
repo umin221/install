@@ -363,7 +363,7 @@
     name: 'detail',
     created() {
       let me = this;
-      me.id = me.$route.query.id;
+      me.id = me.$route.query.id || '1-2BSATYIN';
       api.get({
         key: 'getDetail',
         method: 'POST',

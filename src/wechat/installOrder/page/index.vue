@@ -1,170 +1,197 @@
+<!--委外团队列表-->
 <template>
   <div>
     <mt-header fixed title="我的安装订单">
       <fallback slot="left"></fallback>
-      <mt-button icon="search" slot="right" @click.native="searchKey = true"></mt-button>
+      <mt-button @click.native="toSearchFn" slot="right">
+        <i class="xs-icon icon-search"></i>
+      </mt-button>
     </mt-header>
+
     <div class="mint-content">
+
       <mt-navbar v-model="selected">
         <mt-tab-item id="pending"
-                     @click.native="getList('待处理')">待处理</mt-tab-item>
-        <mt-tab-item id="completing"
-                     @click.native="getList('处理中')">处理中</mt-tab-item>
-        <mt-tab-item id="completed"
-                     @click.native="getList('已完成')">已完成</mt-tab-item>
+          @click.native="!pending.length && pendingLoadBottomFn()">待处理</mt-tab-item>
+        <mt-tab-item id="valid"
+          @click.native="!valid.length && validLoadBottomFn()">处理中</mt-tab-item>
+        <mt-tab-item id="invalid"
+          @click.native="!invalid.length && invalidLoadBottomFn()">已完成</mt-tab-item>
       </mt-navbar>
+
       <!-- tab-container -->
       <mt-tab-container v-model="selected">
         <mt-tab-container-item id="pending">
-          <loadmore ref="load" :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" :allLoaded="true">
-          <cus-cell class="multiple"
-                    :key="item.Id"
-                    :title="'订单编码:'+ item['Order Number']"
-                    @click.native="toDetail(item.Id)"
-                    v-for="item in list"
-                    is-link>
-            <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
-            <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
-          </cus-cell>
-        </loadmore>
-        </mt-tab-container-item>
-
-        <mt-tab-container-item id="completing">
-          <loadmore ref="load" :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" :allLoaded="true">
+          <cus-loadmore ref="pending"
+                        :loadTop="pendingLoadTopFn"
+                        :loadBottom="pendingLoadBottomFn"
+                        :topStatus="topStatus">
             <cus-cell class="multiple"
-                      :key="item.id"
+                      :key="item.Id"
                       :title="'订单编码:'+ item['Order Number']"
                       @click.native="toDetail(item.Id)"
-                      v-for="item in list"
+                      v-for="item in pending"
                       is-link>
               <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
               <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
             </cus-cell>
-          </loadmore>
+          </cus-loadmore>
         </mt-tab-container-item>
 
-        <mt-tab-container-item id="completed">
-          <cus-cell class="multiple"
-                    :key="item.id"
-                    :title="'订单编码:'+ item['Order Number']"
-                    @click.native="toDetail(item.Id)"
-                    v-for="item in list"
-                    is-link>
-            <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
-            <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
-          </cus-cell>
+        <mt-tab-container-item id="valid">
+          <cus-loadmore ref="valid"
+                        :loadTop="validLoadTopFn"
+                        :loadBottom="validLoadBottomFn"
+                        :topStatus="topStatus">
+            <cus-cell class="multiple"
+                      :key="item.Id"
+                      :title="'订单编码:'+ item['Order Number']"
+                      @click.native="toDetail(item.Id)"
+                      v-for="item in valid"
+                      is-link>
+              <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
+              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
+            </cus-cell>
+          </cus-loadmore>
+        </mt-tab-container-item>
+
+        <mt-tab-container-item id="invalid">
+          <cus-loadmore ref="invalid"
+                        :loadTop="invalidLoadTopFn"
+                        :loadBottom="invalidLoadBottomFn"
+                        :topStatus="topStatus">
+            <cus-cell class="multiple"
+                      :key="item.Id"
+                      :title="'订单编码:'+ item['Order Number']"
+                      @click.native="toDetail(item.Id)"
+                      v-for="item in invalid"
+                      is-link>
+              <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
+              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
+            </cus-cell>
+          </cus-loadmore>
+
         </mt-tab-container-item>
       </mt-tab-container>
 
     </div>
-<!--
-    <div class="mint-content">
-      <div class="page-search" v-show="searchKey">
-        <mt-search autofocus placeholder="请输入项目名称或负责人" @keyup.enter.native="search" cancel-text="取消" v-model="searchValue" :result.sync="filterResult"></mt-search>
-      </div>
-      <mt-navbar class="page-part" v-model="selected">
-        <mt-tab-item id="1">待处理</mt-tab-item>
-        <mt-tab-item id="2">处理中</mt-tab-item>
-        <mt-tab-item id="3">已完成</mt-tab-item>
-      </mt-navbar>
-      <loadmore :loadTop="loadTop" :loadBottom="loadBottom" :topStatus="topStatus" ref="load">
-        <div  v-for="item in list" :key="item.Id" @click="toDetail(item.Id)">
-          <mt-cell is-link >
-            <div slot="title" class="list-text"><span>订单编码:</span><span>{{item["Order Number"]}}</span></div>
-            <div slot="title" class="list-text"><span>销售类型:</span><span>{{item["KL Delivery Sales Type"]}}</span></div>
-            <div slot="title" class="list-text"><span>项目名称:</span><span>{{item["KL Agreement Opportunity Name"]}}</span></div>
-          </mt-cell>
-        </div>
-      </loadmore>
-    </div>
--->
+
   </div>
 </template>
 
 <script type="application/javascript">
-  // import api from '../api/api';
-  import loadmore from 'public/components/cus-loadmore';
   import {mapState, mapActions} from 'vuex';
-  import { Toast } from 'mint-ui';
-  import api from '../api/api';
+  import cusLoadmore from 'public/components/cus-loadmore';
   import cusCell from 'public/components/cus-cell';
-  const NameSpace = 'index';
-  export default {
-    name: NameSpace,
-    created() {
-      let me = this;
-      api.get({
-        key: 'getList',
-        method: 'POST',
-        data: {
-          'body': {
-            'OutputIntObjectName': 'KL Install Order',
-            'SearchSpec': '[Order Entry - Orders.Status]=\'安装中\'',
-            'ViewMode': 'Sales Rep',
-            'StartRowNum': '0',
-            'PageSize': '2'
-          }
-        },
-        success: function(data) {
-          if (data.NumOutputObjects === '0') {
-            Toast('暂无数据');
-          } else {
-            console.log(me);
-            me.list = data.SiebelMessage['Order Entry - Orders'];
-            console.log(me.list);
-          }
+
+  const NAMESPACE = 'index';
+  //
+  let loader = function(...args) {
+    let me = this;
+    let event = args.pop();
+    let list = args.pop();
+    let param = Object.assign({
+      data: {
+        'body': {
+          'OutputIntObjectName': 'KL Install Order',
+          'SearchSpec': '[Order Entry - Orders.Status]=\'安装中\'',
+          'ViewMode': 'Sales Rep',
+          'StartRowNum': '0',
+          'PageSize': '10'
         }
-      });
-      // this.getList();
+      },
+      callback: (data) => {
+        me.$refs[list][event](data.length);
+      }
+    }, args.pop() || {});
+    // 获取安装订单
+    me.getList(param);
+  };
+
+  export default {
+    name: NAMESPACE,
+    components: {cusLoadmore, cusCell},
+    // 数据初始化
+    created() {
+      loader.call(this, 'pending', 'onBottomLoaded');
     },
     data: () => {
       return {
-        searchKey: false,
-        searchValue: '',
+        // 活跃tab
         selected: 'pending',
-        allLoaded: '',
-        topStatus: '',
-        list: []
+        // 下拉状态
+        topStatus: ''
       };
     },
     computed: {
-      ...mapState(NameSpace, ['pending', 'completimg', 'completed']),
-      filterResult() {
-        console.dir(this.searchValue);
-        // return this.defaultResult.filter(value => new RegExp(this.value, 'i').test(value));
-      }
+      ...mapState(NAMESPACE, ['pending', 'valid', 'invalid'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getList']),
-      search() {
-        Toast(this.searchValue);
+      ...mapActions(NAMESPACE, ['getList']),
+      // 待审批顶部加载
+      pendingLoadTopFn() {
+        loader.call(this, 'pending', 'onTopLoaded');
       },
-      toDetail(id) { // 详情
+      // 有效顶部加载
+      validLoadTopFn() {
+        loader.call(this, {
+          data: {
+            'KL Partner Status': '有效'
+          }
+        }, 'valid', 'onTopLoaded');
+      },
+      // 失效顶部加载
+      invalidLoadTopFn() {
+        loader.call(this, {
+          data: {
+            'KL Partner Status': '失效'
+          }
+        }, 'invalid', 'onTopLoaded');
+      },
+      // 待审批底部加载
+      pendingLoadBottomFn() {
+        loader.call(this, {
+          more: true
+        }, 'pending', 'onBottomLoaded');
+      },
+      // 有效底部加载
+      validLoadBottomFn() {
+        loader.call(this, {
+          data: {
+            'KL Partner Status': '有效'
+          },
+          more: true
+        }, 'valid', 'onBottomLoaded');
+      },
+      // 失效底部加载
+      invalidLoadBottomFn() {
+        loader.call(this, {
+          data: {
+            'KL Partner Status': '失效'
+          },
+          more: true
+        }, 'invalid', 'onBottomLoaded');
+      },
+      // 跳转搜索
+      toSearchFn() {
+        this.$router.push('search');
+      },
+      // To detail or create
+      toDetailFn(id) {
+        let query = typeof id === 'string' ? {
+          // detail
+          type: 'read',
+          state: this.selected,
+          id: id
+        } : {
+          // create
+          type: 'add'
+        };
         this.$router.push({
           name: 'detail',
-          query: {
-            id: id
-          }
+          query: query
         });
-      },
-      // 顶部加载
-      loadTop() {
-      },
-      // 底部加载
-      loadBottom() {
       }
-    },
-    components: {loadmore, cusCell}
+    }
   };
 </script>
-<style>
-  .mint-search {
-    height: 8vh!important;
-  }
-  .list-img {
-    color: #A2BBFC;
-  }
-  .list-text {
-    line-height: 30px;
-  }
-</style>

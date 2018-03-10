@@ -22,7 +22,7 @@
   import {mapState, mapActions} from 'vuex';
   const NameSpace = 'buildingInfo';
   export default {
-    name: 'detail',
+    name: 'buildingInfo',
     created() {
       console.dir(1);
       let param = this.$route.query;
