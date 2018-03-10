@@ -7,18 +7,19 @@
       <div class="addform">
         <mt-field label="联系电话" type="number" placeholder="请输入联系电话" v-model.trim="Contact_Phone" class="textRight require"></mt-field>
         <mt-field label="报修联系人" type="text" :attr="isCall" placeholder="请输入联系人" v-model="Contact_Name" class="textRight require"></mt-field>
-        <mt-cell class="require mint-field"  @click.native="getLov('SR_TYPE')" title="联系人类型"  :value="SR_TYPE" placeholder="请选择" is-link></mt-cell>
+        <!--<mt-cell class="require mint-field"  @click.native="getLov('SR_TYPE')" title="联系人类型"  :value="SR_TYPE" placeholder="请选择" is-link></mt-cell>-->
+        <mt-cell class="require mint-field margin-right" title="联系人类型"  :value="SR_TYPE"></mt-cell>
         <mt-cell class="require mint-field" @click.native="getLov('KL_PROVINCE','CN')" title="省市" :value="KL_PROVINCE" placeholder="请选择"  is-link></mt-cell>
         <mt-field class="block require" label="详细地址" placeholder="请输入详细地址..." v-model="Address" type="textarea" rows="2"></mt-field>
         <mt-cell class="mint-field"  title="故障现象" :value="SR_AREA" @click.native="getLov('SR_AREA','')"  placeholder="请选择" is-link></mt-cell>
-        <mt-cell class="mint-field" title="故障分级" :value="Priority"></mt-cell>
+        <mt-cell class="mint-field margin-right" title="故障分级" :value="Priority"></mt-cell>
         <mt-field class="block" label="客服说明" v-model="ProductFlag" placeholder="详细描述或附加需求..." type="textarea" rows="2"></mt-field>
         <mt-cell class="mint-field" title="客户预约时间" @click.native="open('picker1')" :value="Start_Date"  placeholder="请选择" is-link></mt-cell>
         <div v-if="hideMore">
-          <mt-field label="产品条形码" placeholder="客户如提供请输入" v-model="KL_SN" class="textRight" ></mt-field>
-          <mt-field label="产品型号" placeholder="客户如提供请输入" v-model="KL_Product_Model"  class="textRight"></mt-field>
-          <mt-cell class="mint-field" title="移交日期" :value="KL_Cutoff_Date"></mt-cell>
-          <mt-cell class="mint-field" title="保修期限" :value="Product_Warranty_Flag" ></mt-cell>
+          <mt-field label="产品条形码" placeholder="客户如提供请输入" @change="SnChange" v-model="KL_SN" class="textRight" ></mt-field>
+          <mt-field label="产品型号" placeholder="客户如提供请输入" v-model="form.KL_Product_Model"  class="textRight"></mt-field>
+          <mt-cell class="mint-field margin-right" title="移交日期" :value="form.KL_Cutoff_Date"></mt-cell>
+          <mt-cell class="mint-field margin-right" title="保修期限" :value="form.Product_Warranty_Flag" ></mt-cell>
         </div>
         <div class="addMore" v-if="!hideMore" @click="showMore">
           <i class="xs-icon icon-add"></i>
@@ -26,7 +27,9 @@
         </div>
       </div>
       <mt-popup v-if="showBox" v-model="showBox" position="bottom">
-        <menuBox @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType" :slots="slots"></menuBox>
+        <menuBox v-show="lovType === 'KL_PROVINCE'" @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType" :slots="provinceSlots"></menuBox>
+        <menuBox v-show="lovType === 'SR_TYPE'" @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType" :slots="typeSlots"></menuBox>
+        <menuBox v-show="lovType === 'SR_AREA'" @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType" :slots="areaSlots"></menuBox>
       </mt-popup>
       <mt-datetime-picker
         ref="picker1"
@@ -50,8 +53,9 @@
 </template>
 <script>
   import {mapState, mapActions, mapMutations} from 'vuex';
-  import api from '../api/api';
+//  import api from '../api/api';
   import menuBox from '../../../public/components/cus-menu.vue';
+//  import { MessageBox } from 'mint-ui';
   const delay = (function() {
     let timer = 0;
     return function(callback, ms) {
@@ -68,7 +72,7 @@
       return {
         hideMore: false,
         startDate: new Date(),
-        value: '',
+        value: '12',
         pickerVisible: true,
         showBox: false,
         lovType: '',
@@ -77,7 +81,7 @@
         Address: '',       // 详细地址
         PROVINCE: '',      // 省
         CITY: '',           // 市
-        SR_TYPE: '',       //  联系人类型
+        SR_TYPE: '业主',       //  联系人类型
         KL_PROVINCE: '',  // 省市
         SR_AREA: '',        // 故障现象
         Area: '',
@@ -85,19 +89,15 @@
         ProductFlag: '',    // 客服说明
         Start_Date: null,        // 客户预约时间
         KL_SN: '',           // 条形码
-        KL_Product_Model: '', // 产品类型
-        KL_Cutoff_Date: '',  // 移交日期
-        Product_Warranty_Flag: '', // 保修期限
-        selectd: [],
         isCall: {},
         isClick: false
       };
     },
     computed: {
-      ...mapState(NameSpace, ['search', 'slots'])
+      ...mapState(NameSpace, ['search', 'provinceSlots', 'typeSlots', 'areaSlots', 'form', 'mustField'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getSearch', 'getValue', 'valueChange']),
+      ...mapActions(NameSpace, ['getSearch', 'getValue', 'valueChange', 'getSn', 'submitService']),
       ...mapMutations(NameSpace, ['removeSearch']),
       showMore() {
         let me = this;
@@ -105,60 +105,53 @@
       },
       submit() {
         let me = this;
-        api.get({
-          url: '/data/Service Request/Service Request',
-          method: 'PUT',
-          data: {
-            'KL Contact Mobile Phone': me.Contact_Phone,
-            'Contact Last Name': me.Contact_Name,
-            'KL Personal Province': me.PROVINCE,
-            'Personal City': me.CITY,
-            'Personal Street Address': me.Address,
-            'Area': me.Area,
-            'Sub-Area': me.SR_AREA,
-            'Priority': me.Priority,
-            'Description': me.ProductFlag,
-            'CEM Planned Start Date': me.Start_Date,
-            'KL SN': me.KL_SN,
-            'KL Product Model': me.KL_Product_Model,
-            'KL Cutoff Date': me.KL_Cutoff_Date,
-            'Product Warranty Flag': me.Product_Warranty_Flag,
-            'Id': '1',
-            'Owner': '16113009'
-          },
-          success: function(data) {
-            console.log(data);
-          }
-        });
+//        for (let i = 0; i < me.mustField.length; i++) {
+//          console.log(me[me.mustField[i].key]);
+//          if (!me[me.mustField[i].key]) {
+//            MessageBox({
+//              title: '提示',
+//              message: '请选择' + me.mustField[i].name + '！'
+//            });
+//            return;
+//          }
+//        }
+        let submitForm = {
+          Contact_Phone: me.Contact_Phone,
+          Contact_Name: me.Contact_Name,
+          PROVINCE: me.PROVINCE,
+          CITY: me.CITY,
+          Address: me.Address,
+          Area: me.Area,
+          SR_AREA: me.SR_AREA,
+          Priority: me.Priority,
+          ProductFlag: me.ProductFlag,
+          Start_Date: me.Start_Date,
+          KL_SN: me.KL_SN,
+          KL_Product_Model: me.form.KL_Product_Model,
+          KL_Cutoff_Date: me.form.KL_Cutoff_Date,
+          Product_Warranty_Flag: me.form.Product_Warranty_Flag
+        };
+        me.submitService(submitForm);
       },
-      getLov(values, parent) {
+      getLov(type) {
         let me = this;
         me.showBox = true;
-        me.lovType = values;
-        if (values === 'KL_PROVINCE') {
-          parent = ' AND Parent=' + '"' + parent + '"';
-          me.selectd = [
-            {flex: 1, values: [], className: 'slot1', textAlign: 'center'},
-            {divider: true, content: '-', className: 'slot2'},
-            {flex: 1, values: [], className: 'slot3', textAlign: 'center'}
-          ];
-        } else if (values === 'SR_TYPE') {
-          parent = '';
-          me.selectd = [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}];
-        } else if (values === 'SR_AREA') {
-          parent = ' AND Parent is null';
-          me.selectd = [
-            {flex: 1, values: [], className: 'slot1', textAlign: 'center'},
-            {divider: false, values: [], content: '-', className: 'slot2'},
-            {flex: 1, values: [], className: 'slot3', textAlign: 'center'}
-          ];
+        me.lovType = type;
+        if (type === 'KL_PROVINCE') {
+          me.getValue({type: type, parent: 'Parent= "CN"'});
+        } else {
+          me.getValue({type: type, parent: ''});
         }
-        let selectd = me.selectd;
-        me.getValue({values, parent, selectd});
+      },
+      onValuesChange(values, type) {
+        let me = this;
+        if (values[0] !== undefined && values.length > 1) {
+          me.valueChange({type: type, value: values[0]});
+        }
       },
       selectCaLL(val) {
         let me = this;
-        me.Contact_Phone = val['Work Phone #'];
+        me.Contact_Phone = val['Cellular Phone #'];
         me.Contact_Name = val['Last Name'];
         me.Address = val['Primary Personal Street Address'];
         me.PROVINCE = val['KL Primary Personal Province'];
@@ -166,16 +159,6 @@
         me.isCall = {disabled: false};
         me.isClick = true;
         me.removeSearch();
-      },
-      onValuesChange(values, type) {
-        let me = this;
-        if (type === 'KL_PROVINCE') {
-          type = 'KL_CITY';
-        }
-        console.log(values);
-        if (values[0] !== undefined && values.length > 1) {
-          me.valueChange({type, values});
-        }
       },
       open(picker) {
         this.$refs[picker].open();
@@ -203,10 +186,18 @@
         let me = this;
         me.showBox = false;
       },
+      SnChange() {
+        let me = this;
+        delay(() => {
+          me.getSn(me.KL_SN);
+        }, 500);
+      },
       async fetchData(val) {
         let me = this;
-        if (me.Contact_Phone) {
+        if (me.Contact_Phone.length > 4) {
           me.getSearch(me.Contact_Phone);
+        } else {
+          me.removeSearch();
         }
       }
     },
@@ -218,11 +209,10 @@
           } else {
             this.fetchData();
           }
-        }, 300);
+        }, 500);
       }
     },
     components: {menuBox}
-
   };
 </script>
 <style lang="scss">
@@ -322,5 +312,10 @@
   }
   input:disabled{
     background-color:#ffffff;
+  }
+  .margin-right>.mint-cell-wrapper{
+    .mint-cell-value>span{
+      margin-right: 1rem;
+    }
   }
 </style>

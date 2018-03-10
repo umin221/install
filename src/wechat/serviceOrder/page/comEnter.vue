@@ -68,7 +68,7 @@
       showArea() {
         let me = this;
         me.showBox = true;
-        me.getLov1();
+        me.getLov1('SR_AREA');
       },
       enter(value) {
         console.log(value);
