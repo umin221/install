@@ -1,5 +1,5 @@
 <template>
-  <div class="cus-group-button">
+  <div class="cus-group-button co-flex co-jc">
     <slot></slot>
   </div>
 </template>
@@ -12,22 +12,17 @@
 
 <style lang="scss">
   div.cus-group-button {
-    display: flex;
     position: fixed;
     bottom: 0;
     width: 100%;
     box-sizing: border-box;
     background-color: #fbfbfb;
-    padding: .3rem .8rem;
+    padding: 0 .8rem;
 
-    button {
+    a, button {
+      max-width: 7rem;
       flex: 1;
-      margin: 0 .8rem;
-
-      &.single {
-        width: 60%;
-        margin: 0 20%;
-      }
+      margin: .3rem .8rem;
 
       &.mint-button {
         height: 1.8rem;

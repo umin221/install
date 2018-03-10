@@ -69,14 +69,14 @@
 
     <!--buttons-->
     <button-group>
-      <mt-button type="primary" class="single"
+      <mt-button type="primary"
         v-show="isSubmit"
         @click.native="submitFn">提交</mt-button>
-      <mt-button type="primary" class="single"
+      <mt-button type="primary"
         v-show="isValid"
         v-text="read ? '新增联系人' : '失效'"
         @click.native="multipleFn"></mt-button>
-      <mt-button type="primary" class="single"
+      <mt-button type="primary"
         v-show="read && state === 'invalid'"
         @click="type = 'edit'">重新启用</mt-button>
     </button-group>
