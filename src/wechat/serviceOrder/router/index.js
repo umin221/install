@@ -47,12 +47,6 @@ export default new Router({
       require(['../page/search'], resolve);
     }
   }, {
-    path: '/contact',       // 选择联系人
-    name: 'contact',
-    component(resolve) {
-      require(['../page/contact'], resolve);
-    }
-  }, {
     path: '/comEnter',    // 故障记录
     name: 'comEnter',
     component(resolve) {
@@ -69,6 +63,15 @@ export default new Router({
     name: 'searchTrans',
     component(resolve) {
       require(['../page/searchTrans'], resolve);
+    }
+  }, { // 选择工程师
+    path: '/engineer',
+    name: 'engineer',
+    component(resolve) {
+      require(['../page/engineer'], resolve);
+    },
+    meta: {
+      transition: 'push'
     }
   }]
 });

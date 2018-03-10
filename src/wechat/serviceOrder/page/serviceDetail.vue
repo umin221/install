@@ -71,8 +71,8 @@
           </mt-tab-container>
         </div>
       </div>
-      <button-group v-if="loginMeg['Job Title'] === '400'">
-        <mt-button type="primary" class="single" @click="toContact" >派单</mt-button>
+      <button-group v-if="loginMeg['Job Title'] === '400'&& BtnStatu === 'status4'">
+        <mt-button type="primary" class="single" @click.native="toContact" >派单</mt-button>
       </button-group>
       <button-group v-if="loginMeg['Job Title'] === 'install'">
         <mt-button v-if="BtnStatu === 'status1'" type="primary" class="single" @click.native="changeBtnStote"  >电话联系客户</mt-button>
@@ -255,9 +255,8 @@
         });
       },
       toContact() {
-        console.log(this.ServiceRequest['Id']);
         this.$router.push({
-          name: 'contact',
+          name: 'engineer',
           query: {
             id: this.ServiceRequest['Id']
           }

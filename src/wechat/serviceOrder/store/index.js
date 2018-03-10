@@ -34,16 +34,16 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
-        // loginMeg: {
-        //   'Last Name': '袁静',
-        //   'Emp #': '16113009',
-        //   'Job Title': '400'
-        // },
         loginMeg: {
-          'Last Name': '代一',
-          'Emp #': '16013107',
-          'Job Title': 'install'
+          'Last Name': '袁静',
+          'Emp #': '16113009',
+          'Job Title': '400'
         },
+        // loginMeg: {
+        //   'Last Name': '代一',
+        //   'Emp #': '16013107',
+        //   'Job Title': 'install'
+        // },
         // 待处理
         pending: [],
         // 处理中
@@ -73,15 +73,14 @@ export default new Vuex.Store({
           } else {
             state.cusService = [];
             for (let i = 0; i < data.length; i++) {
-              if (data[i].Status !== '未开始') {
-                state.cusService.push(data[i]);
-              }
+              state.cusService.push(data[i]);
             }
           }
         }
       },
       actions: {
         getList({state, commit, dispatch}, {status, more, callback}) {
+          console.log(111);
           status = status || state.loginMeg['Emp #'];
           api.get({
             key: 'getList',
@@ -116,38 +115,87 @@ export default new Vuex.Store({
     addService: {
       namespaced: true,
       state: {
+        mustField: [
+          {name: '联系电话', key: 'Contact_Phone'},
+          {name: '报修联系人', key: 'Contact_Name'},
+          {name: '联系人类型', key: 'SR_TYPE'},
+          {name: '省市', key: 'KL_PROVINCE'},
+          {name: '详细地址', key: 'Address'}
+        ],
         search: [],
-        slots: []
+        provinceSlots: [
+          {flex: 1, values: [], className: 'slot1', textAlign: 'center'},
+          {divider: true, content: '-', className: 'slot2'},
+          {flex: 1, values: [], className: 'slot3', textAlign: 'center'}
+        ],
+        typeSlots: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
+        areaSlots: [
+          {flex: 1, values: [], className: 'slot1', textAlign: 'center'},
+          {divider: false, values: [], content: '-', className: 'slot2'},
+          {flex: 1, values: [], className: 'slot3', textAlign: 'center'}
+        ],
+        form: {
+          KL_Product_Model: '', // 产品类型
+          KL_Cutoff_Date: '',  // 移交日期
+          Product_Warranty_Flag: '' // 保修期限
+        }
       },
       mutations: {
         getSearch(state, data) {
-          state.search = data;
+          state.search = [];
+          if (data.constructor === Array) {
+            state.search = data;
+          } else {
+            state.search.push(data);
+          }
         },
         removeSearch(state) {
           state.search = [];
         },
-        addValue(state, data) {
-          state.slots = [];
-          state.slots = data;
-        },
-        changeValue(state, data) {
-          let datas = data;
-          let Province = [];
-          let High = [];
-          if (datas.constructor === Array) {
-            for (let i = 0; i < datas.length; i++) {
-              Province.push(datas[i].Value);
-              High.push(datas[i].High);
+        addValue(state, val) {
+          state.provinceSlots[0].values = [];
+          state.typeSlots[0].values = [];
+          state.areaSlots[0].values = [];
+          for (let i = 0; i < val.data.length; i++) {
+            if (val.type === 'KL_PROVINCE') {
+              state.provinceSlots[0].values.push(val.data[i].Value);
+            } else if (val.type === 'SR_TYPE') {
+              state.typeSlots[0].values.push(val.data[i].Value);
+            } else if (val.type === 'SR_AREA') {
+              state.areaSlots[0].values.push(val.data[i].Value);
             }
-            state.slots[2].values = Province;
-            state.slots[1].values = High;
-          } else {
-            Province.push(datas.Value);
-            High.push(datas.High);
-            state.slots[2].values = Province;
-            state.slots[1].values = High;
           }
-          console.log(state.slots);
+        },
+        changeValue(state, val) {
+          if (val !== 'error') {
+            state.areaSlots[1].values = [];
+            state.areaSlots[2].values = [];
+            state.provinceSlots[2].values = [];
+            if (val.data.constructor === Array) {
+              for (let i = 0; i < val.data.length; i++) {
+                if (val.type === 'SR_AREA') {
+                  state.areaSlots[1].values.push(val.data[i].High);
+                  state.areaSlots[2].values.push(val.data[i].Value);
+                } else if (val.type === 'KL_PROVINCE') {
+                  state.provinceSlots[2].values.push(val.data[i].Value);
+                }
+              }
+            } else {
+              if (val.type === 'SR_AREA') {
+                state.areaSlots[2].values.push(val.data.Value);
+                state.areaSlots[1].values.push(val.data.High);
+              } else if (val.type === 'KL_PROVINCE') {
+                state.provinceSlots[2].values.push(val.data.Value);
+              }
+            }
+          } else {
+            state.areaSlots[2].values = [];
+          }
+        },
+        setSn(state, data) {
+          state.form['KL_Product_Model'] = data['KL Product Model']; // 产品类型
+          state.form['KL_Cutoff_Date'] = data['Install Date'];  // 移交日期
+          state.form['Product_Warranty_Flag'] = data['Product Warranty Flag'];  // 保修期限
         }
       },
       actions: {
@@ -159,35 +207,88 @@ export default new Vuex.Store({
             },
             success: function(data) {
               console.log(data);
-              commit('getSearch', data.items);
+              if (data.items) {
+                commit('getSearch', data.items);
+              } else {
+                commit('getSearch', data);
+              }
             }
           });
         },
         getValue({commit}, val) {
           api.get({
-            key: 'getLov',
+            key: 'getLov1',
             data: {
-              val
+              type: val.type,
+              parent: val.parent
             },
             success: function(data) {
-              console.log(val);
-              for (let i = 0; i < data.items.length; i++) {
-                val.selectd[0].values.push(data.items[i].Value);
-              }
-              commit('addValue', val.selectd);
+              commit('addValue', {data: data.items, type: val.type});
             }
           });
         },
         valueChange({commit}, val) {
+          let type = val.type;
+          if (type === 'KL_PROVINCE') {
+            type = 'KL_CITY';
+          }
           api.get({
-            key: 'getParentLov',
+            key: 'getParentLov1',
             data: {
-              val
+              value: val.value,
+              type: type
             },
             success: function(data) {
-              commit('changeValue', data.items);
+              commit('changeValue', {data: data.items, type: val.type});
+            },
+            error: function(data) {
+              commit('changeValue', 'error');
             }
           });
+        },
+        getSn({commit}, Sn) {
+          api.get({
+            key: 'getSn',
+            data: {
+              Sn
+            },
+            success: function(data) {
+              console.log(data);
+              commit('setSn', data['SiebelMessage']['Asset Mgmt - Asset']);
+            },
+            error: function(data) {
+              // commit('changeValue', 'error');
+            }
+          });
+        },
+        submitService({commit}, form) {
+          api.get({
+            key: 'submitService',
+            data: {
+              form
+            },
+            success: function(data) {
+              console.log(data);
+              // commit('setSn', data['SiebelMessage']['Asset Mgmt - Asset']);
+            },
+            error: function(data) {
+              // commit('changeValue', 'error');
+            }
+          });
+          // api.get({
+          //   key: 'searchAddress',
+          //   data: {
+          //     Province: form.PROVINCE,
+          //     City: form.CITY,
+          //     Address: form.Address
+          //   },
+          //   success: function(data) {
+          //     console.log(data);
+          //   },
+          //   error: function(data) {
+          //     // commit('changeValue', 'error');
+          //   }
+          // });
         }
       }
     },
@@ -208,17 +309,8 @@ export default new Vuex.Store({
       mutations: {
         setPartner(state, form) {
           state.ServiceRequest = form;
-          if (Object.prototype.toString.call(form.Action) !== '[object Array]') {
-            if (form.Action.Status === '已派工') {
-              state.BtnStatu = 'status1';
-            } else if (form.Action.Status === '已接单') {
-              state.BtnStatu = 'status2';
-            } else if (form.Action.Status === '已预约' || form.Action[0].Status === '已预约' || form.Action[0].Status === '已出发' || form.Action[0].Status === '已完成') {
-              state.BtnStatu = 'status3';
-            }
-          }
           let Note = null;
-          Note = state.ServiceRequest['FIN Service Request Notes'];
+          Note = form['FIN Service Request Notes'];
           if (Note) {
             if (Object.prototype.toString.call(Note) !== '[object Array]') {
               state.processDate.push(Note);
@@ -227,6 +319,19 @@ export default new Vuex.Store({
             }
           } else {
             state.processDate = [{Note: '暂无数据'}];
+          }
+          if (form.Action) {
+            if (Object.prototype.toString.call(form.Action) !== '[object Array]') {
+              if (form.Action.Status === '已派工') {
+                state.BtnStatu = 'status1';
+              } else if (form.Action.Status === '已接单') {
+                state.BtnStatu = 'status2';
+              } else if (form.Action.Status === '已预约' || form.Action.Status === '已出发' || form.Action.Status === '已完成') {
+                state.BtnStatu = 'status3';
+              }
+            }
+          } else {
+            state.BtnStatu = 'status4';
           }
         }
       },
@@ -358,9 +463,12 @@ export default new Vuex.Store({
             }
           });
         },
-        getLov1({commit}, val) {
+        getLov1({commit}, type) {
           api.get({
             key: 'getLov1',
+            data: {
+              type
+            },
             success: function(data) {
               commit('addValue1', data.items);
             }
@@ -420,6 +528,68 @@ export default new Vuex.Store({
                   }
                 });
               }
+            }
+          });
+        }
+      }
+    },
+    contact: {
+      namespaced: true,
+      state: {
+        result: [],
+        select: {
+          'Last Name': '请选择'
+        }
+      },
+      mutations: {
+        setContact(state, contacts) {
+          state.result = contacts;
+        },
+        addContact(state, contacts) {
+          state.result.push(...contacts);
+        },
+        selContact(state, contact) {
+          state.select = contact;
+        }
+      },
+      actions: {
+        /**
+         * 查找安装工程师
+         * @param {Object} data 必填 查询条件 键值对
+         */
+        findContact({state, commit}, {data, more, callback}) {
+          api.get({
+            key: 'findEngineer',
+            data: data,
+            paging: {
+              StartRowNum: more ? state.result.length : 0,
+              PageSize: PAGESIZE
+            },
+            success: (data) => {
+              let contacts = KND.Util.toArray(data.items);
+              commit(more ? 'addContact' : 'setContact', contacts);
+              if (callback) {
+                callback(contacts);
+              }
+            },
+            error: (error) => {
+              if (callback) {
+                callback();
+              };
+              console.log(error);
+            }
+          });
+        },
+        setContact({commit}, contacts) {
+          api.get({
+            key: 'getActivity',
+            data: {
+              id: contacts.id,
+              empId: contacts.empId,
+              empFullName: contacts.empFullName
+            },
+            success: function(data) {
+              console.log(data);
             }
           });
         }
