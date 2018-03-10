@@ -10,30 +10,30 @@
           <mt-field label="销售类型" :value="detailData['KL Delivery Sales Type']"></mt-field>
           <mt-field label="安装数量" :value="detailData['KL Install Amount'] || 0"></mt-field>
           <div slot="title" class="mint-content-div"><div class="mint-content-xt" @click="butXttd">协同团队</div></div>
-          <div slot="title" class="mint-content-xl" @click="is_show_fun">收起</div>
-          <div slot="title" class="mint-content-xl xl" @click="is_show_fun"></div>
       </div>
-      <div style="height: 0.5rem;background: #eaeaea;" v-show="is_show_sx"></div>
-      <div class="mint-content-info" v-show="is_show_sx">
-        <mt-cell>
-        <div slot="title" class="list-text"><span class="list-text-span">锁芯部分</span></div>
-      </mt-cell>
-        <div class="mint-sx-div">
-          <mt-cell   @click.native="getLock(item.Id, item['KL Product Type'])" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='锁芯'"  :title="item['KL Product Series Code']">
-            <span style="width: 120px">开向：{{item['KL Hole Direction']}}</span>
-            <span>数量：{{item['Quantity Requested']}}</span>
+      <toggle>
+        <div style="height: 0.5rem;background: #eaeaea;"></div>
+        <div class="mint-content-info">
+          <mt-cell>
+            <div slot="title" class="list-text"><span class="list-text-span">锁芯部分</span></div>
           </mt-cell>
-        </div>
-        <mt-cell>
-          <div slot="title" class="list-text"><span class="list-text-span">锁体部分* 真锁</span></div>
-        </mt-cell>
-        <div class="mint-sx-div">
-          <mt-cell  @click.native="getLock(item.Id, item['KL Product Type'])" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='锁体'"  :title="item['KL Product Series Code']">
-            <span style="width: 120px">开向：{{item['KL Hole Direction']}}</span>
-            <span>数量：{{item['Quantity Requested']}}</span>
+          <div class="mint-sx-div">
+            <mt-cell   @click.native="getLock(item.Id, item['KL Product Type'])" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='锁芯'"  :title="item['KL Product Series Code']">
+              <span style="width: 120px">开向：{{item['KL Hole Direction']}}</span>
+              <span>数量：{{item['Quantity Requested']}}</span>
+            </mt-cell>
+          </div>
+          <mt-cell>
+            <div slot="title" class="list-text"><span class="list-text-span">锁体部分* 真锁</span></div>
           </mt-cell>
+          <div class="mint-sx-div">
+            <mt-cell  @click.native="getLock(item.Id, item['KL Product Type'])" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='锁体'"  :title="item['KL Product Series Code']">
+              <span style="width: 120px">开向：{{item['KL Hole Direction']}}</span>
+              <span>数量：{{item['Quantity Requested']}}</span>
+            </mt-cell>
+          </div>
         </div>
-      </div>
+      </toggle>
       <div style="height: 0.5rem;background: #eaeaea;"></div>
       <div class="content-lc" style="margin-top: 15px">
         <div class="stage_li">
@@ -359,8 +359,10 @@
 <script type="application/javascript">
   import api from '../api/api';
   import { MessageBox, Toast } from 'mint-ui';
+  import toggle from 'public/components/cus-toggle';
   export default {
     name: 'detail',
+    components: {toggle},
     created() {
       let me = this;
       me.id = me.$route.query.id || '1-2BSATYIN';
@@ -394,7 +396,7 @@
         taskData: '', // 任务集
         taskDataList: '', // 任务集子任务
         taskDataST: '', // 锁芯锁体
-        is_show_sx: false, // 是否显示锁芯锁体
+        // is_show_sx: false, // 是否显示锁芯锁体
         active: 'tab-container'
       };
     },
@@ -411,14 +413,14 @@
         me.taskDataList = KND.Util.toArray(me.taskData[index]['KL Installation Task']);
         console.dir(me.taskDataList);
       },
-      is_show_fun() { // 是否显示锁体锁芯
+      /* is_show_fun() { // 是否显示锁体锁芯
         var self = this;
         if (self.is_show_sx) {
           self.is_show_sx = false;
         } else {
           self.is_show_sx = true;
         }
-      },
+      },*/
       getLock(id, type) { // 锁芯锁体详情事件
         var self = this;
         // 跳转锁芯锁体详情
