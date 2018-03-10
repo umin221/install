@@ -44,10 +44,10 @@
       }
     };
     // 获取团队列表
-    me.findContact(param);
+    me.findEngineer(param);
   };
 
-  const NAMESPACE = 'contact';
+  const NAMESPACE = 'engineer';
   export default {
     name: 'search',
     // 获取默认数据
@@ -65,8 +65,8 @@
       ...mapState(NAMESPACE, ['result', 'select'])
     },
     methods: {
-      ...mapActions(NAMESPACE, ['findContact']),
-      ...mapMutations(NAMESPACE, ['selContact']),
+      ...mapActions(NAMESPACE, ['findEngineer']),
+      ...mapMutations(NAMESPACE, ['selEngineer']),
       /**
        * 搜索回调
        * @param {String} val 搜索值
@@ -79,7 +79,7 @@
        * @param {Object} item 用户选择结果
        */
       selectFn(item) {
-        this.selContact(item);
+        this.selEngineer(item);
         this.$router.back();
       },
       /**

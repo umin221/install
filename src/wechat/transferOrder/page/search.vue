@@ -34,7 +34,7 @@
     let name = me.value;
     let param = {
       data: {
-        'Lead Name': name + '*',
+        'Agree Number': name + '*',
         'Setter': name + '*'
       },
       more: args.pop(),
@@ -76,8 +76,6 @@
         this.$router.push({
           name: 'detail',
           query: {
-            // detail
-            type: 'read',
             id: item.Id
           }
         });

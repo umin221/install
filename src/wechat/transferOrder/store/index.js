@@ -15,7 +15,7 @@ export default new Vuex.Store({
   modules: {
     app,
     /**
-     * 委外团队列表
+     * 安装交接单列表
      */
     index: {
       namespaced: true,
@@ -32,16 +32,15 @@ export default new Vuex.Store({
         status2list: {
           '已提交': 'pending',
           '已交接': 'process',
-          '已完成': 'completed',
-          '': 'result'
+          '已完成': 'completed'
         }
       },
       mutations: {
-        setPartners(state, {partners, list}) {
-          state[list] = partners;
+        setTransferOrders(state, {TransferOrders, list}) {
+          state[list] = TransferOrders;
         },
-        addPartners(state, {partners, list}) {
-          state[list].push(...partners);
+        addTransferOrders(state, {TransferOrders, list}) {
+          state[list].push(...TransferOrders);
         }
       },
       actions: {
@@ -53,7 +52,7 @@ export default new Vuex.Store({
          * @param {Function} error 选填 错误回调
          */
         getTransferOrder({state, commit, dispatch}, {data, more, callback, error}) {
-          let list = state.status2list[data['Status']];
+          let list = state.status2list[data['Status']] || 'result';
           api.get({
             key: 'getTransferOrder',
             data: data,
@@ -62,13 +61,13 @@ export default new Vuex.Store({
               PageSize: PAGESIZE
             },
             success: function(data) {
-              let partners = KND.Util.toArray(data.SiebelMessage.Project);
-              commit(more ? 'addPartners' : 'setPartners', {
-                partners: partners,
+              let TransferOrders = KND.Util.toArray(data.SiebelMessage.Project);
+              commit(more ? 'addTransferOrders' : 'setTransferOrders', {
+                TransferOrders: TransferOrders,
                 list: list
               });
               if (callback) {
-                callback(partners);
+                callback(TransferOrders);
               }
             },
             error
@@ -78,22 +77,22 @@ export default new Vuex.Store({
     },
 
     /**
-     * 委外详情&新增&编辑
+     * 安装交接单详情
      */
     detail: {
       namespaced: true,
       state: {
         form: {},
-        attach: { // 附件
-          list: [], // [{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}],
-          edit: false,
-          title: '合同附件'
-        },
         record: [{state: '已提交', time: '2017-02-01 18:00'},
-          {state: '总部安装主管xx审批中', time: '2017-02-01 19:00'}]
+          {state: '总部安装主管xx审批中', time: '2017-02-01 19:00'}],
+        order: [{
+          code: '1-182624597380',
+          number: '500',
+          state: 'pending'
+        }]
       },
       mutations: {
-        setPartner(state, form) {
+        setTransferOrder(state, form) {
           state.form = form;
           if (form.User) {
             state.form.User = KND.Util.toArray(form.User);
@@ -112,7 +111,7 @@ export default new Vuex.Store({
       },
       actions: {
         /**
-         * 通过id获取委外团队信息
+         * 通过id获取安装交接单信息
          * @param {String} id 必填 id
          */
         findTransferOrderById({commit}, id) {
@@ -122,72 +121,29 @@ export default new Vuex.Store({
               id: id
             },
             success: function(data) {
-              commit('setPartner', data.SiebelMessage['Channel Partner']);
+              commit('setTransferOrder', data);
             }
           });
         },
         /**
-         * 获取委外团队信息
-         * @param {Object} condition 必填 查询条件 键值对
+         * 更新安装交接单状态
+         * @param {Object} setting 必填 请求参数配置
          */
-        findTransferOrder({commit}, condition) {
-          api.get(Object.assign({
-            key: 'findTransferOrder',
-            success: function(data) {
-              commit('setPartner', data.items);
-            }
-          }, condition));
-        },
-        /**
-         * 创建委外团队
-         * 绑定当前表单数据
-         */
-        addPartner({state}) {
-          let partner = state.form;
-          // Alias 为必填，默认填入 Name
-          partner.Alias = partner.Alias || partner.Name;
-          // 失效编辑状态修改
-          if (partner.state === '失效') {
-            partner.state = '待审批';
-          };
-          api.get({
-            key: 'addPartner',
+        update({state}, setting) {
+          api.get(Object.extend(true, {
+            key: 'update',
             data: {
-              partner: partner
+              Id: state.form.Id
             },
             success: (data) => {
-              if (data.PrimaryRowId) {
-                Toast({
-                  message: '提交成功'
-                });
-                KND.Util.back();
-              } else {
-                Toast({
-                  message: '提交失败'
-                });
-              }
-            }
-          });
-        },
-        /**
-         * 更新委外团队信息
-         * @param {Object} data 必填 需要修改的信息 键值对
-         */
-        update({state}, data) {
-          delete state.form['Channel Partner_Position'];
-          delete state.form['User'];
-          api.get({
-            key: 'update',
-            data: Object.assign(state.form, data),
-            success: (data) => {
-              if (data['KL Partner Status'] !== status) {
+              if (data) {
                 Toast('更新成功');
                 KND.Util.back();
               } else {
                 Toast('更新失败');
               }
             }
-          });
+          }, setting));
         }
       }
     },
@@ -195,7 +151,7 @@ export default new Vuex.Store({
     /**
      * 指派安装工程师
      */
-    contact: {
+    engineer: {
       namespaced: true,
       state: {
         result: [],
@@ -204,14 +160,14 @@ export default new Vuex.Store({
         }
       },
       mutations: {
-        setContact(state, contacts) {
-          state.result = contacts;
+        setEngineer(state, engineer) {
+          state.result = engineer;
         },
-        addContact(state, contacts) {
-          state.result.push(...contacts);
+        addEngineer(state, engineer) {
+          state.result.push(...engineer);
         },
-        selContact(state, contact) {
-          state.select = contact;
+        selEngineer(state, engineer) {
+          state.select = engineer;
         }
       },
       actions: {
@@ -219,19 +175,19 @@ export default new Vuex.Store({
          * 查找安装工程师
          * @param {Object} data 必填 查询条件 键值对
          */
-        findContact({state, commit}, {data, more, callback}) {
+        findEngineer({state, commit}, {data, more, callback}) {
           api.get({
-            key: 'findContact',
+            key: 'findEngineer',
             data: data,
             paging: {
               StartRowNum: more ? state.result.length : 0,
               PageSize: PAGESIZE
             },
             success: (data) => {
-              let contacts = KND.Util.toArray(data.items);
-              commit(more ? 'addContact' : 'setContact', contacts);
+              let engineer = KND.Util.toArray(data.items);
+              commit(more ? 'addEngineer' : 'setEngineer', engineer);
               if (callback) {
-                callback(contacts);
+                callback(engineer);
               }
             },
             error: (error) => {

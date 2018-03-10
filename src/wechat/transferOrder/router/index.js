@@ -16,7 +16,7 @@ export default new Router({
     component(resolve) {
       require(['../page/index'], resolve);
     }
-  }, { // 创建/编辑/查看 委外团队详情
+  }, { // 创建/编辑/查看 安装交接单详情
     path: '/detail',
     name: 'detail',
     component(resolve) {
@@ -35,10 +35,16 @@ export default new Router({
     path: '/engineer',
     name: 'engineer',
     component(resolve) {
-      require(['../page/contact'], resolve);
+      require(['../page/engineer'], resolve);
     },
     meta: {
       transition: 'push'
+    }
+  }, { // 驳回
+    path: '/reject',
+    name: 'reject',
+    component(resolve) {
+      require(['../page/reject'], resolve);
     }
   }]
 });

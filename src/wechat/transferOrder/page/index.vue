@@ -1,12 +1,12 @@
 <!--交接单列表-->
 <template>
   <div>
-    <mt-header fixed title="我的交接单">
+    <cus-header fixed title="我的交接单" :menu="[{title:'查看我的团队', key:'a'}]">
       <fallback slot="left"></fallback>
       <mt-button @click.native="toSearchFn" slot="right">
         <i class="xs-icon icon-search"></i>
       </mt-button>
-    </mt-header>
+    </cus-header>
 
     <div class="mint-content">
 
@@ -28,12 +28,12 @@
                         :topStatus="topStatus">
             <cus-cell class="multiple"
                      :key="item.id"
-                     :title="'合同编码:'+ item['Agree Number']"
+                     :title="'合同编号:'+ item['Agree Number']"
                      @click.native="toDetailFn(item.Id)"
                      v-for="item in pending"
                      is-link>
               <div class="mint-cell-sub-title" slot="title">项目名称: {{item['Lead Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Created Date']}}</div>
+              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Updated']}}</div>
             </cus-cell>
           </cus-loadmore>
         </mt-tab-container-item>
@@ -45,12 +45,12 @@
                         :topStatus="topStatus">
             <cus-cell class="multiple"
                      :key="item.id"
-                     :title="'合同编码:'+ item['Agree Number']"
+                     :title="'合同编号:'+ item['Agree Number']"
                      @click.native="toDetailFn(item.Id)"
                      v-for="item in process"
                      is-link>
               <div class="mint-cell-sub-title" slot="title">项目名称: {{item['Lead Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Created Date']}}</div>
+              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Updated']}}</div>
             </cus-cell>
           </cus-loadmore>
         </mt-tab-container-item>
@@ -62,12 +62,12 @@
                         :topStatus="topStatus">
             <cus-cell class="multiple"
                       :key="item.id"
-                      :title="'合同编码:'+ item['Agree Number']"
+                      :title="'合同编号:'+ item['Agree Number']"
                       @click.native="toDetailFn(item.Id)"
                       v-for="item in completed"
                       is-link>
-              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['Lead Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Created Date']}}</div>
+              <div class="mint-cell-sub-title" slot="title">工程: {{item['Lead Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Updated']}}</div>
             </cus-cell>
           </cus-loadmore>
 
@@ -81,6 +81,7 @@
 
 <script type="application/javascript">
   import {mapState, mapActions} from 'vuex';
+  import cusHeader from 'public/components/cus-header';
   import cusLoadmore from 'public/components/cus-loadmore';
   import cusCell from 'public/components/cus-cell';
 
@@ -104,7 +105,7 @@
 
   export default {
     name: NAMESPACE,
-    components: {cusLoadmore, cusCell},
+    components: {cusHeader, cusLoadmore, cusCell},
     // 数据初始化
     created() {
       loader.call(this, 'pending', 'onBottomLoaded');
@@ -122,6 +123,10 @@
     },
     methods: {
       ...mapActions(NAMESPACE, ['getTransferOrder']),
+      // 标题栏菜单选择回调方法
+      menuFn(item) {
+        console.log(item);
+      },
       // 待审批顶部加载
       pendingLoadTopFn() {
         loader.call(this, 'pending', 'onTopLoaded');
@@ -175,9 +180,6 @@
         this.$router.push({
           name: 'detail',
           query: {
-            // detail
-            type: 'read',
-            state: this.selected,
             id: id
           }
         });

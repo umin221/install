@@ -8,40 +8,53 @@
         @click.native="closeFn">关闭</mt-button>
     </mt-header>
 
-    <!--create detail edit-->
+    <!--detail-->
     <div class="mint-content">
       <div class="readonly narrow-form">
-        <cus-field label="合同编号" v-model="form['Name']"></cus-field>
-        <cus-field label="项目名称" v-model="form['KL Partner Owner Name']"></cus-field>
+        <cus-field label="合同编号" v-model="form['Agree Number']"></cus-field>
+        <cus-field label="工程" v-model="form['Lead Name']"></cus-field>
         <cus-field label="安装数量" type="tel" v-model="form['Main Phone Number']"></cus-field>
-        <cus-field label="项目地址" v-model="form['Primary Address Street']"></cus-field>
+        <cus-field label="项目地址" v-model="form['Address']"></cus-field>
 
         <toggle>
           <cus-field label="面板型号" v-model="form['Primary Address Street']"></cus-field>
           <cus-field label="锁体型号" v-model="form['Primary Address Street']"></cus-field>
           <cus-field label="甲方联系人电话" v-model="form['Primary Address Street']"></cus-field>
-          <cus-field label="门厂是否安装锁体" v-model="form['Primary Address Street']"></cus-field>
-          <cus-field label="门厂名称" v-model="form['Primary Address Street']"></cus-field>
-          <cus-field label="门厂联系人" v-model="form['Primary Address Street']"></cus-field>
-          <cus-field label="门厂技术员" v-model="form['Primary Address Street']"></cus-field>
-          <cus-field label="开孔方式" v-model="form['Primary Address Street']"></cus-field>
-          <cus-field label="是否安装替代锁" v-model="form['Primary Address Street']"></cus-field>
-          <cus-field label="是否销售审批" v-model="form['Primary Address Street']"></cus-field>
+          <cus-field label="门厂是否安装锁体" v-model="form['HBS Check Box 1']"></cus-field>
+          <cus-field label="门厂名称" v-model="form['Partner Name']"></cus-field>
+          <cus-field label="门厂联系人" v-model="form['Partner Contact Name']"></cus-field>
+          <cus-field label="门厂技术员" v-model="form['Door Factory Engineer']"></cus-field>
+          <cus-field label="开孔方式" v-model="form['Hole Type']"></cus-field>
+          <cus-field label="是否安装替代锁" v-model="form['HBS Check Box 2']"></cus-field>
+          <cus-field label="是否销售审批" v-model="form['Need Approval Flag']"></cus-field>
         </toggle>
       </div>
 
-      <mt-cell title="销售方式"
-        :value="salesPath"></mt-cell>
-      <mt-cell title="指派安装工程师"
-               :value="select['Last Name']"
-               @click.native="toEngineer"
-               is-link></mt-cell>
+      <div>
+        <mt-cell title="销售方式"
+                 :value="form['Sales Type']"></mt-cell>
+        <mt-cell title="指派安装工程师"
+                 :value="select['Last Name']"
+                 @click.native="toEngineer"
+                 is-link></mt-cell>
+      </div>
+
+      <div>
+        <title-group>安装订单</title-group>
+        <mt-cell class="multiple"
+                  v-for="item in order"
+                  :key="item.code"
+                  @click.native="toDetailFn(item)"
+                  is-link>
+          <div class="mint-cell-title" slot="title">订单编号: {{item['code']}}</div>
+          <div class="mint-cell-sub-title" slot="title">安装数量: {{item['number']}}</div>
+        </mt-cell>
+      </div>
     </div>
 
     <!--buttons-->
     <button-group>
-      <mt-button
-        @click.native="rejectFn">驳回</mt-button>
+      <mt-button @click.native="rejectFn">驳回</mt-button>
       <mt-button type="primary"
         @click.native="confirmFn">确认分配</mt-button>
     </button-group>
@@ -67,17 +80,14 @@
         this.findTransferOrderById(param.id);
       }
     },
-    data: () => {
-      return {
-        salesPath: '工程安装'
-      };
-    },
+    // data: () => {
+    // },
     computed: {
-      ...mapState(NAMESPACE, ['form']),
-      ...mapState('contact', ['select'])
+      ...mapState(NAMESPACE, ['form', 'order']),
+      ...mapState('engineer', ['select'])
     },
     methods: {
-      ...mapActions(NAMESPACE, ['findTransferOrderById', 'findTransferOrder', 'addPartner', 'update']),
+      ...mapActions(NAMESPACE, ['findTransferOrderById', 'addPartner', 'update']),
       toEngineer() {
         this.$router.push('engineer');
       },
@@ -85,13 +95,17 @@
       closeFn() {
         console.log('close order');
       },
-      // Reject transfer order
+      // Reject order
       rejectFn() {
-        console.log('reject');
+        this.$router.push('reject');
       },
       // Confirm allocation transfer order
       confirmFn() {
-        console.log('confirm');
+        this.update({
+          data: {
+            'Status': '已交接'
+          }
+        });
       }
     }
   };
