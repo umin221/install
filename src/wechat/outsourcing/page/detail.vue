@@ -102,14 +102,15 @@
     components: {titleGroup, buttonGroup, cusField},
     // 初始化
     created() {
-      let param = this.$route.query;
-      this.state = param.state;
-      this.type = param.type;
+      let me = this;
+      let param = me.$route.query;
+      me.state = param.state;
+      me.type = param.type;
       // 获取详情
       if (param.id) {
-        this.findPartnerById(param.id);
+        me.findPartnerById(param.id);
       } else {
-        this.clear();
+        me.clear();
       }
     },
     data: () => {

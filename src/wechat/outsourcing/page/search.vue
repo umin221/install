@@ -26,6 +26,8 @@
   import cusLoadmore from 'public/components/cus-loadmore';
   import cusSearch from 'public/components/cus-search';
   import cusCell from 'public/components/cus-cell';
+  // mapp
+  let mapp = config.mapp['list'];
   //
   let loader = function(...args) {
     let me = this;
@@ -57,7 +59,6 @@
     },
     computed: {
       ...mapState(NAMESPACE, ['result']),
-      ...mapState('index', ['status2list'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['getPartners']),
@@ -78,7 +79,7 @@
           query: {
             // detail
             type: 'read',
-            state: this.status2list[item['KL Partner Status']],
+            state: mapp[item['KL Partner Status']],
             id: item.Id
           }
         });

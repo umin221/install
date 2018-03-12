@@ -90,14 +90,16 @@
   import cusCell from 'public/components/cus-cell';
 
   const NAMESPACE = 'index';
+  // mapp
+  let mapp = config.mapp['status'];
   //
   let loader = function(...args) {
     let me = this;
     let event = args.pop();
     let list = args.pop();
-    let param = Object.assign({
+    let param = Object.extend({
       data: {
-        'KL Partner Status': '待审批'
+        'KL Partner Status': mapp['待审批']
       },
       callback: (data) => {
         me.$refs[list][event](data.length);
@@ -131,19 +133,19 @@
       pendingLoadTopFn() {
         loader.call(this, 'pending', 'onTopLoaded');
       },
-      // 有效顶部加载
+      // 已生效顶部加载
       validLoadTopFn() {
         loader.call(this, {
           data: {
-            'KL Partner Status': '有效'
+            'KL Partner Status': mapp['已生效']
           }
         }, 'valid', 'onTopLoaded');
       },
-      // 失效顶部加载
+      // 已失效顶部加载
       invalidLoadTopFn() {
         loader.call(this, {
           data: {
-            'KL Partner Status': '失效'
+            'KL Partner Status': mapp['已失效']
           }
         }, 'invalid', 'onTopLoaded');
       },
@@ -153,20 +155,20 @@
           more: true
         }, 'pending', 'onBottomLoaded');
       },
-      // 有效底部加载
+      // 已生效底部加载
       validLoadBottomFn() {
         loader.call(this, {
           data: {
-            'KL Partner Status': '有效'
+            'KL Partner Status': mapp['已生效']
           },
           more: true
         }, 'valid', 'onBottomLoaded');
       },
-      // 失效底部加载
+      // 已失效底部加载
       invalidLoadBottomFn() {
         loader.call(this, {
           data: {
-            'KL Partner Status': '失效'
+            'KL Partner Status': mapp['已失效']
           },
           more: true
         }, 'invalid', 'onBottomLoaded');

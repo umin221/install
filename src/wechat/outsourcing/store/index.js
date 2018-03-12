@@ -10,6 +10,8 @@ app.state.alive = ['index'];
 
 // 每页加载条数
 const PAGESIZE = config.pageSize;
+// mapp
+let mapp = config.mapp['list'];
 
 export default new Vuex.Store({
   modules: {
@@ -27,14 +29,7 @@ export default new Vuex.Store({
         // 失效
         invalid: [],
         // 搜索结果
-        result: [],
-        // status 2 list
-        status2list: {
-          '待审批': 'pending',
-          '有效': 'valid',
-          '失效': 'invalid',
-          '': 'result'
-        }
+        result: []
       },
       mutations: {
         setPartners(state, {partners, list}) {
@@ -53,7 +48,7 @@ export default new Vuex.Store({
          * @param {Function} error 选填 错误回调
          */
         getPartners({state, commit, dispatch}, {data, more, callback, error}) {
-          let list = state.status2list[data['KL Partner Status']];
+          let list = mapp[data['KL Partner Status']] || 'result';
           api.get({
             key: 'queryPartners',
             data: data,

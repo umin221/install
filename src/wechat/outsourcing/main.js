@@ -8,6 +8,7 @@ import Vue from 'vue';
 import router from './router';
 import 'public/js/base/main';
 import 'public/js/base/mint';
+import './mapp'; // Status Mapp
 import fallback from 'public/components/cus-fallback';
 import attach from 'public/components/cus-attach';
 import empty from 'public/components/cus-empty';
