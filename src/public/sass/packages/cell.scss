@@ -1,3 +1,9 @@
+.mint-cell {
+  .mint-cell-wrapper {
+    font-size: $font-size-default;
+  }
+}
+
 .multiple {
   @include border;
 

@@ -26,6 +26,8 @@
 
       &.mint-button {
         height: 1.8rem;
+        font-size: $font-size-default;
+        padding: 0 6px;
       }
     }
   }

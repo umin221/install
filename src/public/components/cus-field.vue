@@ -1,6 +1,6 @@
 <template>
   <div class="cus-field">
-    <mt-field v-if="edit"
+    <mt-field v-if="edit&&!isLink"
       :label="label"
       :placeholder="placeholder"
       :value="currentValue"

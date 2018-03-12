@@ -5,9 +5,9 @@
 //======= Colors
 $white-base:									#ffffff !default;
 
-$gray-light:									#D7D7D7 !default;
+$gray-light:									#f9f9f9 !default;
 $gray-minor:									#777 !default;
-$gray-default:								    #D1D0CD !default;
+$gray-default:								    #ebebeb !default;
 $gray-line-default:								#D4D4D4 !default;
 
 $black-base:									#333 !default;
@@ -40,6 +40,7 @@ $bg-login:										$yellow-base;
 $bg-primary:									$yellow-base;
 $bg-cancel:										#C9CDD2;
 $bg-register:									$purple-base;
+$bg-light:									  $gray-light;
 
 //** Font  Color
 $gray-light-font:								$gray-minor;
