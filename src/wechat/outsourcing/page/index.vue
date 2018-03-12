@@ -17,24 +17,25 @@
 
       <mt-navbar v-model="selected">
         <mt-tab-item id="pending"
-          @click.native="!pending.length && pendingLoadBottomFn()">待审批</mt-tab-item>
+          @click.native="!pending.length && loadBottomFn({status:'待审批', list:'pending'})">待审批</mt-tab-item>
         <mt-tab-item id="valid"
-          @click.native="!valid.length && validLoadBottomFn()">已生效</mt-tab-item>
+          @click.native="!valid.length && loadBottomFn({status:'已生效', list:'valid'})">已生效</mt-tab-item>
         <mt-tab-item id="invalid"
-          @click.native="!invalid.length && invalidLoadBottomFn()">已失效</mt-tab-item>
+          @click.native="!invalid.length && loadBottomFn({status:'已失效', list:'invalid'})">已失效</mt-tab-item>
       </mt-navbar>
 
       <!-- tab-container -->
       <mt-tab-container v-model="selected">
         <mt-tab-container-item id="pending">
           <cus-loadmore ref="pending"
-                        :loadTop="pendingLoadTopFn"
-                        :loadBottom="pendingLoadBottomFn"
+                        @loadTop="loadTopFn"
+                        @loadBottom="loadBottomFn"
+                        :param="{status: '待审批', list: 'pending'}"
                         :topStatus="topStatus">
             <cus-cell class="multiple"
+                      @click.native="toDetailFn(item.Id)"
                      :key="item.id"
                      :title="'合作伙伴名称:'+ item.Name"
-                     @click.native="toDetailFn(item.Id)"
                      v-for="item in pending"
                      is-link>
               <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
@@ -45,13 +46,14 @@
 
         <mt-tab-container-item id="valid">
           <cus-loadmore ref="valid"
-                        :loadTop="validLoadTopFn"
-                        :loadBottom="validLoadBottomFn"
+                        @loadTop="loadTopFn"
+                        @loadBottom="loadBottomFn"
+                        :param="{status: '已生效', list: 'valid'}"
                         :topStatus="topStatus">
             <cus-cell class="multiple"
+                      @click.native="toDetailFn(item.Id)"
                      :key="item.id"
                      :title="'合作伙伴名称:'+ item.Name"
-                     @click.native="toDetailFn(item.Id)"
                      v-for="item in valid"
                      is-link>
               <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
@@ -62,13 +64,14 @@
 
         <mt-tab-container-item id="invalid">
           <cus-loadmore ref="invalid"
-                        :loadTop="invalidLoadTopFn"
-                        :loadBottom="invalidLoadBottomFn"
+                        @loadTop="loadTopFn"
+                        @loadBottom="loadBottomFn"
+                        :param="{status: '已失效', list: 'invalid'}"
                         :topStatus="topStatus">
             <cus-cell class="multiple"
+                      @click.native="toDetailFn(item.Id)"
                       :key="item.id"
                       :title="'合作伙伴名称:'+ item.Name"
-                      @click.native="toDetailFn(item.Id)"
                       v-for="item in invalid"
                       is-link>
               <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
@@ -98,13 +101,10 @@
     let event = args.pop();
     let list = args.pop();
     let param = Object.extend({
-      data: {
-        'KL Partner Status': mapp['待审批']
-      },
       callback: (data) => {
         me.$refs[list][event](data.length);
       }
-    }, args.pop() || {});
+    }, args.pop());
     // 获取团队列表
     me.getPartners(param);
   };
@@ -114,7 +114,10 @@
     components: {cusLoadmore, cusCell},
     // 数据初始化
     created() {
-      loader.call(this, 'pending', 'onBottomLoaded');
+      this.loadBottomFn({
+        status: '待审批',
+        list: 'pending'
+      });
     },
     data: () => {
       return {
@@ -129,49 +132,22 @@
     },
     methods: {
       ...mapActions(NAMESPACE, ['getPartners']),
-      // 待审批顶部加载
-      pendingLoadTopFn() {
-        loader.call(this, 'pending', 'onTopLoaded');
-      },
-      // 已生效顶部加载
-      validLoadTopFn() {
-        loader.call(this, {
-          data: {
-            'KL Partner Status': mapp['已生效']
-          }
-        }, 'valid', 'onTopLoaded');
-      },
       // 已失效顶部加载
-      invalidLoadTopFn() {
+      loadTopFn(param) {
         loader.call(this, {
           data: {
-            'KL Partner Status': mapp['已失效']
+            'KL Partner Status': mapp[param.status]
           }
-        }, 'invalid', 'onTopLoaded');
+        }, param.list, 'onTopLoaded');
       },
       // 待审批底部加载
-      pendingLoadBottomFn() {
-        loader.call(this, {
-          more: true
-        }, 'pending', 'onBottomLoaded');
-      },
-      // 已生效底部加载
-      validLoadBottomFn() {
+      loadBottomFn(param) {
         loader.call(this, {
           data: {
-            'KL Partner Status': mapp['已生效']
+            'KL Partner Status': mapp[param.status]
           },
           more: true
-        }, 'valid', 'onBottomLoaded');
-      },
-      // 已失效底部加载
-      invalidLoadBottomFn() {
-        loader.call(this, {
-          data: {
-            'KL Partner Status': mapp['已失效']
-          },
-          more: true
-        }, 'invalid', 'onBottomLoaded');
+        }, param.list, 'onBottomLoaded');
       },
       // 跳转搜索
       toSearchFn() {

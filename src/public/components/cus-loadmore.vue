@@ -37,8 +37,14 @@
         allLoaded: false
       };
     },
-    props: ['loadTop', 'loadBottom'],
+    props: ['param'], // ['loadTop', 'loadBottom'],
     methods: {
+      loadTop() {
+        this.$emit('loadTop', this.param);
+      },
+      loadBottom() {
+        this.$emit('loadBottom', this.param);
+      },
       handleTopChange(status) {
         this.topStatus = status;
       },

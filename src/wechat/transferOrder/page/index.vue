@@ -12,19 +12,20 @@
 
       <mt-navbar v-model="selected">
         <mt-tab-item id="pending"
-          @click.native="!pending.length && pendingLoadBottomFn()">待处理</mt-tab-item>
+          @click.native="!pending.length && loadBottomFn({status:'待处理', list:'pending'})">待处理</mt-tab-item>
         <mt-tab-item id="process"
-          @click.native="!process.length && processLoadBottomFn()">处理中</mt-tab-item>
+          @click.native="!process.length && loadBottomFn({status:'处理中', list:'process'})">处理中</mt-tab-item>
         <mt-tab-item id="completed"
-          @click.native="!completed.length && completedLoadBottomFn()">已完成</mt-tab-item>
+          @click.native="!completed.length && loadBottomFn({status:'已完成', list:'completed'})">已完成</mt-tab-item>
       </mt-navbar>
 
       <!-- tab-container -->
       <mt-tab-container v-model="selected">
         <mt-tab-container-item id="pending">
           <cus-loadmore ref="pending"
-                        :loadTop="pendingLoadTopFn"
-                        :loadBottom="pendingLoadBottomFn"
+                        @loadTop="loadTopFn"
+                        @loadBottom="loadBottomFn"
+                        :param="{status:'待处理', list:'pending'}"
                         :topStatus="topStatus">
             <cus-cell class="multiple"
                      :key="item.id"
@@ -40,8 +41,9 @@
 
         <mt-tab-container-item id="process">
           <cus-loadmore ref="process"
-                        :loadTop="processLoadTopFn"
-                        :loadBottom="processLoadBottomFn"
+                        @loadTop="loadTopFn"
+                        @loadBottom="loadBottomFn"
+                        :param="{status:'处理中', list:'process'}"
                         :topStatus="topStatus">
             <cus-cell class="multiple"
                      :key="item.id"
@@ -57,8 +59,9 @@
 
         <mt-tab-container-item id="completed">
           <cus-loadmore ref="completed"
-                        :loadTop="completedLoadTopFn"
-                        :loadBottom="completedLoadBottomFn"
+                        @loadTop="loadTopFn"
+                        @loadBottom="loadBottomFn"
+                        :param="{status:'已完成', list:'completed'}"
                         :topStatus="topStatus">
             <cus-cell class="multiple"
                       :key="item.id"
@@ -97,9 +100,6 @@
     let event = args.pop();
     let list = args.pop();
     let param = Object.extend({
-      data: {
-        'Status': status['待处理']
-      },
       callback: (data) => {
         me.$refs[list][event](data.length);
       }
@@ -113,7 +113,10 @@
     components: {cusHeader, cusLoadmore, cusCell},
     // 数据初始化
     created() {
-      loader.call(this, 'pending', 'onBottomLoaded');
+      this.loadBottomFn({
+        status: '待处理',
+        list: 'pending'
+      });
     },
     data: () => {
       return {
@@ -132,52 +135,22 @@
       menuFn(item) {
         console.log(item);
       },
-      // 待审批顶部加载
-      pendingLoadTopFn() {
-        loader.call(this, 'pending', 'onTopLoaded');
-      },
-      // 处理中顶部加载
-      processLoadTopFn() {
-        loader.call(this, {
-          data: {
-            'Status': status['处理中']
-          }
-        }, 'process', 'onTopLoaded');
-      },
       // 已完成顶部加载
-      completedLoadTopFn() {
+      loadTopFn(param) {
         loader.call(this, {
           data: {
-            'Status': status['已完成']
+            'Status': status[param.status]
           }
-        }, 'completed', 'onTopLoaded');
+        }, param.list, 'onTopLoaded');
       },
       // 待审批底部加载
-      pendingLoadBottomFn() {
+      loadBottomFn(param) {
         loader.call(this, {
           data: {
-            'Status': status['待处理']
+            'Status': status[param.status]
           },
           more: true
-        }, 'pending', 'onBottomLoaded');
-      },
-      // 处理中底部加载
-      processLoadBottomFn() {
-        loader.call(this, {
-          data: {
-            'Status': status['处理中']
-          },
-          more: true
-        }, 'process', 'onBottomLoaded');
-      },
-      // 已完成底部加载
-      completedLoadBottomFn() {
-        loader.call(this, {
-          data: {
-            'Status': status['已完成']
-          },
-          more: true
-        }, 'completed', 'onBottomLoaded');
+        }, param.list, 'onBottomLoaded');
       },
       // 跳转搜索
       toSearchFn() {

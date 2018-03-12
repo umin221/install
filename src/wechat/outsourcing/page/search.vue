@@ -35,7 +35,6 @@
     let name = me.value;
     let param = {
       data: {
-        'KL Partner Status': '',
         'Name': name
       },
       more: args.pop(),
