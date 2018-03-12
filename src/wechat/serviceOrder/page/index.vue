@@ -73,49 +73,6 @@
     </div>
   </div>
 </template>
-<style lang="scss">
-  .indexService,.customService{
-    .mint-loadmore{
-      .mint-loadmore-content{
-        padding: 0 10px ;
-        .mint-cell{
-          height: 100px;
-        }
-      }
-    }
-  }
-  .list-content{
-    background: white;
-    padding: 0 1rem;
-    margin-top: 0.5rem;
-    .my-title{
-      font-size: 0.7rem;
-      line-height: 2rem;
-      background-position: bottom;
-      .badge-status{
-        line-height: 0.75rem;
-        width: 2.7rem;
-        margin-top: 0.5rem;
-      }
-    }
-    .multiple{
-      background-position: unset;
-      .mint-cell-wrapper{
-        padding: 0;
-      .mint-cell-title{
-        .my-cell-sub{
-          line-height: 1.5rem;
-          font-size: 0.6rem;
-        }
-      }
-      }
-    }
-  }
-  .badge-status{
-    float: right;
-    padding: 0 5px;
-  }
-</style>
 <script type="application/javascript">
   import {mapState, mapActions} from 'vuex';
   import loadmore from 'public/components/cus-loadmore';
@@ -208,3 +165,46 @@
     components: {loadmore, cusCell}
   };
 </script>
+<style lang="scss">
+  .indexService,.customService{
+    .mint-loadmore{
+      .mint-loadmore-content{
+        padding: 0 10px ;
+        .mint-cell{
+          height: 100px;
+        }
+      }
+    }
+  }
+  .list-content{
+    background: white;
+    padding: 0 1rem;
+    margin-top: 0.5rem;
+    .my-title{
+      font-size: 0.7rem;
+      line-height: 2rem;
+      background-position: bottom;
+      .badge-status{
+        line-height: 0.75rem;
+        width: 2.7rem;
+        margin-top: 0.5rem;
+      }
+    }
+    .multiple{
+      background-position: unset;
+      .mint-cell-wrapper{
+        padding: 0;
+        .mint-cell-title{
+          .my-cell-sub{
+            line-height: 1.5rem;
+            font-size: 0.6rem;
+          }
+        }
+      }
+    }
+  }
+  .badge-status{
+    float: right;
+    padding: 0 5px;
+  }
+</style>

@@ -75,12 +75,12 @@
         <mt-button type="primary" class="single" @click.native="toContact" >派单</mt-button>
       </button-group>
       <button-group v-if="loginMeg['Job Title'] === 'install'">
-        <mt-button v-if="BtnStatu === 'status1'" type="primary" class="single" @click.native="changeBtnStote"  >电话联系客户</mt-button>
-        <div v-if="BtnStatu === 'status2'" class="callPlan">
+        <mt-button v-show="BtnStatu === 'status1' && !callEnd" type="primary" class="single" @click.native="changeBtnStote"  >电话联系客户</mt-button>
+        <div v-show="BtnStatu === 'status2' || callEnd" class="callPlan">
           <mt-button  type="primary" class="single flax"  @click.native="callSolve" >电话已解决</mt-button>
           <mt-button type="primary" class="single flax" @click.native="clickShow"  >预约维修计划</mt-button>
         </div>
-        <mt-button v-if="BtnStatu === 'status3'"  type="primary" class="single" @click="popupVisible1 = !popupVisible1" >工单操作</mt-button>
+        <mt-button v-show="BtnStatu === 'status3'"  type="primary" class="single" @click="popupVisible1 = !popupVisible1" >工单操作</mt-button>
       </button-group>
       <!--弹出日历-->
       <div v-if="showBox2">
@@ -147,7 +147,6 @@
         contactName: '',
         Created: '',
         role: true,
-        isCall: 'lxkh',
         showBox: false,
         showBox2: false,
         result: false,
@@ -157,7 +156,8 @@
           {name: '流程记录', id: 'tab-container3'}
         ],
         starTime: '',
-        endTime: ''
+        endTime: '',
+        callEnd: false
       };
     },
     computed: {
@@ -188,7 +188,7 @@
       },
       changeBtnStote() {            // 改变按钮状态
         let self = this;
-        self.isCall = 'yyjh';
+        self.callEnd = true;
       },
       clickShow() {                 // 点击显示日历
         let self = this;
@@ -196,9 +196,12 @@
         let parms = {
           'Object Id': self.ServiceRequest.Id,
           'ActivityId': self.ServiceRequest.Action.Id,
-          'inStatus': self.Statu['预约']
+          'inStatus': self.Statu['接单'],
+          'key': 'getAccept'
         };
-        self.setStatus(parms);
+        if (self.BtnStatu === 'status2') {
+          self.setStatus(parms);
+        }
       },
       cancel(val) {                    // 日历取消事件
         this.showBox2 = false;
@@ -214,8 +217,9 @@
             me.starTime = val.Time2.time;
             me.endTime = val.Time1.time;
           }
-          me.starTime = val.selectDay + ' ' + me.starTime;
-          me.endTime = val.selectDay + ' ' + me.endTime;
+          me.starTime = val.selectDay + ' ' + me.starTime + ':00';
+          me.endTime = val.selectDay + ' ' + me.endTime + ':00';
+          this.showBox2 = false;
           console.log(me.starTime);
           console.log(me.endTime);
         } else {
@@ -224,8 +228,6 @@
             message: '请选择预约开始和结束时间！'
           });
         }
-        this.showBox2 = false;
-        this.isCall = 'gdcz';
       },
       callSolve() {
         MessageBox.confirm('远程电话沟通客户已解决，确认提交？?', '').then(action => {
@@ -398,8 +400,7 @@
         display: flex;
         justify-content: space-around;
         button{
-          margin: 0.3rem 0;
-          width: 40%;
+          width: 7rem;
         }
       }
     }

@@ -34,16 +34,16 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
-        loginMeg: {
-          'Last Name': '袁静',
-          'Emp #': '16113009',
-          'Job Title': '400'
-        },
         // loginMeg: {
-        //   'Last Name': '代一',
-        //   'Emp #': '16013107',
-        //   'Job Title': 'install'
+        //   'Last Name': '袁静',
+        //   'Emp #': '16113009',
+        //   'Job Title': '400'
         // },
+        loginMeg: {
+          'Last Name': '代一',
+          'Emp #': '16013107',
+          'Job Title': 'install'
+        },
         // 待处理
         pending: [],
         // 处理中
@@ -298,7 +298,7 @@ export default new Vuex.Store({
         ServiceRequest: {},
         processDate: [],
         Statu: {
-          '接单': 'Receive',
+          '接单': 'Accept',
           '出发': 'Depart',
           '上门': 'Arrive',
           '预约': 'Appoint',
@@ -322,7 +322,7 @@ export default new Vuex.Store({
           }
           if (form.Action) {
             if (Object.prototype.toString.call(form.Action) !== '[object Array]') {
-              if (form.Action.Status === '已派工') {
+              if (form.Action.Status === '已派工' || form.Action.Status === '未开始') {
                 state.BtnStatu = 'status1';
               } else if (form.Action.Status === '已接单') {
                 state.BtnStatu = 'status2';
@@ -361,7 +361,7 @@ export default new Vuex.Store({
         },
         setStatus({commit}, obj) {
           api.get({
-            key: 'setStatus',
+            key: obj.key,
             data: {
               obj
             },

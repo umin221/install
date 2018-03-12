@@ -10,7 +10,9 @@
         <!--<mt-cell class="require mint-field"  @click.native="getLov('SR_TYPE')" title="联系人类型"  :value="SR_TYPE" placeholder="请选择" is-link></mt-cell>-->
         <mt-cell class="require mint-field margin-right" title="联系人类型"  :value="SR_TYPE"></mt-cell>
         <mt-cell class="require mint-field" @click.native="getLov('KL_PROVINCE','CN')" title="省市" :value="KL_PROVINCE" placeholder="请选择"  is-link></mt-cell>
-        <mt-field class="block require" label="详细地址" placeholder="请输入详细地址..." v-model="Address" type="textarea" rows="2"></mt-field>
+        <mt-field class="block require" id="addressText" :attr="isEdit" label="详细地址" placeholder="请输入详细地址..." v-model="Address" type="textarea" rows="2">
+          <i class="xs-icon icon-edit" @click="editAddress" style="position: absolute;bottom: 1.8rem;right: 0.8rem;"></i>
+        </mt-field>
         <mt-cell class="mint-field"  title="故障现象" :value="SR_AREA" @click.native="getLov('SR_AREA','')"  placeholder="请选择" is-link></mt-cell>
         <mt-cell class="mint-field margin-right" title="故障分级" :value="Priority"></mt-cell>
         <mt-field class="block" label="客服说明" v-model="ProductFlag" placeholder="详细描述或附加需求..." type="textarea" rows="2"></mt-field>
@@ -43,7 +45,7 @@
         @confirm="handleChange">
       </mt-datetime-picker>
       <ul class="search-list">
-        <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item)">{{item['Cellular Phone #']}} {{item['Last Name']}}</li>
+        <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item)">{{item['Work Phone #']}} {{item['Last Name']}}</li>
       </ul>
       <div class="submitButton">
         <mt-button size="normal" type="danger" @click="submit">提交</mt-button>
@@ -63,6 +65,13 @@
       timer = setTimeout(callback, ms);
     };
   })();
+  const setAttrButt = (function() {
+    return function(id) {
+      let parent = document.getElementById(id);
+      let child = parent.getElementsByTagName('textarea');
+      child[0].removeAttribute('disabled');
+    };
+  })();
   const NameSpace = 'addService';
   export default {
     name: NameSpace,
@@ -78,6 +87,7 @@
         lovType: '',
         Contact_Phone: '',     // 联系电话
         Contact_Name: '',   // 报修联系人
+        Contact_Id: '',
         Address: '',       // 详细地址
         PROVINCE: '',      // 省
         CITY: '',           // 市
@@ -90,6 +100,7 @@
         Start_Date: null,        // 客户预约时间
         KL_SN: '',           // 条形码
         isCall: {},
+        isEdit: {disabled: false},
         isClick: false
       };
     },
@@ -116,6 +127,7 @@
 //          }
 //        }
         let submitForm = {
+          Contact_Id: me.Contact_Id,
           Contact_Phone: me.Contact_Phone,
           Contact_Name: me.Contact_Name,
           PROVINCE: me.PROVINCE,
@@ -151,13 +163,15 @@
       },
       selectCaLL(val) {
         let me = this;
-        me.Contact_Phone = val['Cellular Phone #'];
+        me.Contact_Id = val['Id'];
+        me.Contact_Phone = val['Work Phone #'];
         me.Contact_Name = val['Last Name'];
         me.Address = val['Primary Personal Street Address'];
         me.PROVINCE = val['KL Primary Personal Province'];
         me.CITY = val['Primary Personal City'];
         me.isCall = {disabled: false};
         me.isClick = true;
+        me.KL_PROVINCE = me.PROVINCE + me.CITY;
         me.removeSearch();
       },
       open(picker) {
@@ -181,6 +195,10 @@
           me.Priority = values[1];
           me[type] = values[2];
         }
+      },
+      editAddress() {
+        setAttrButt('addressText');
+        this.isEdit = {};
       },
       cancel() {
         let me = this;
@@ -291,9 +309,6 @@
         font-size: 0.75rem;
       }
     }
-    .mint-popup{
-      width: 100%;
-    }
     .datetime>.picker>.picker-items>.picker-slot:nth-child(5){
       display: none;
     }
@@ -311,6 +326,9 @@
     }
   }
   input:disabled{
+    background-color:#ffffff;
+  }
+  textarea:disabled{
     background-color:#ffffff;
   }
   .margin-right>.mint-cell-wrapper{

@@ -83,12 +83,12 @@
       selectFn(item) {
         let me = this;
         MessageBox.confirm('是否指派给该工程师！', '').then(action => {
-//          let params = {
-//            id: me.$route.query.id,
-//            empId: item['Id'],
-//            empFullName: item['KL Employee Full Name']
-//          };
-//          this.setContact(params);
+          let params = {
+            id: me.$route.query.id,
+            empId: item['Id'],
+            empFullName: item['KL Employee Full Name']
+          };
+          this.setContact(params);
           me.$router.push('/');
         });
       },

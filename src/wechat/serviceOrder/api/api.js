@@ -10,6 +10,7 @@ let ApiList = {
         }
       }
     };
+    // 列表
   },
   getDetail: option => {
     return {
@@ -22,6 +23,7 @@ let ApiList = {
         }
       }
     };
+    // 详情
   },
   getSn: option => {
     return {
@@ -34,6 +36,7 @@ let ApiList = {
         }
       }
     };
+    // 通过序列号查询
   },
   setStatus: option => {
     return {
@@ -48,11 +51,13 @@ let ApiList = {
         }
       }
     };
+    // 设置工单状态
   },
   getClose: option => {
     return {
       url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="FIN_NO_SALE_REASON"'
     };
+    // 关闭工单
   },
   getRunProcess: option => {
     return {
@@ -85,21 +90,55 @@ let ApiList = {
       }
     };
   },
+  getAccept: option => {
+    return {
+      method: 'post',
+      url: 'service/Workflow Process Manager/RunProcess',
+      data: {
+        'body': {
+          'Object Id': option.data.obj['Object Id'],
+          'ActivityId': option.data.obj.ActivityId,
+          'inStatus': 'Accept',
+          'ProcessName': 'KL SR Action Status Change Process'
+        }
+      }
+    };
+    // 接单状态
+  },
+  getAppoint: option => {
+    return {
+      method: 'post',
+      url: 'service/Workflow Process Manager/RunProcess',
+      data: {
+        'body': {
+          'Object Id': option.data.obj['Object Id'],
+          'ActivityId': option.data.obj.ActivityId,
+          'ActionPlanned': option.data.obj.ActivityId,  // 计划开始时间
+          'ActionPlanEnd': option.data.obj.ActivityId,   // 计划完成时间
+          'inStatus': 'Accept',
+          'ProcessName': 'KL SR Action Status Change Process'
+        }
+      }
+    };
+    // 预约状态
+  },
   getSearch: option => {
     return {
-      url: 'data/KL Contact Interface BO/Contact/?searchspec=[Cellular Phone %23] ~LIKE "*' + option.data.val + '*" &PageSize=10&StartRowNum=0'
+      url: 'data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] ~LIKE "*' + option.data.val + '*" &PageSize=10&StartRowNum=0'
     };
+    // 搜索电话联系人
   },
   submitService: option => {
     return {
       method: 'PUT',
-      url: 'data/Service Request/Service Request',
+      url: 'data/KL Service Request Interface BO/Service Request/1-2BSB0DZ1',
       data: {
-        'KL Contact Mobile Phone': option.data.form.Contact_Phone,
+        // 'KL Contact Mobile Phone': option.data.form.Contact_Phone,
         'Contact Last Name': option.data.form.Contact_Name,
-        'KL Personal Province': option.data.form.PROVINCE,
-        'Personal City': option.data.form.CITY,
-        'Personal Street Address': option.data.form.Address,
+        // 'KL Personal Province': option.data.form.PROVINCE,
+        // 'Personal City': option.data.form.CITY,
+        // 'Personal Street Address': option.data.form.Address,
+        'Contact Id': option.data.form.Contact_Id,
         'Area': option.data.form.Area,
         'Sub-Area': option.data.form.SR_AREA,
         'Priority': option.data.form.Priority,
@@ -113,6 +152,7 @@ let ApiList = {
         'Owner': '16113009'
       }
     };
+    // 提交服务请求
   },
   searchAddress: option => {
     return {
