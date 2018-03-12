@@ -46,5 +46,23 @@ export default new Router({
     component(resolve) {
       require(['../page/reject'], resolve);
     }
+  }, { // 安装交接单详情
+    path: '/order',
+    name: 'order',
+    component(resolve) {
+      require(['../page/order'], resolve);
+    }
+  }, { // 锁芯部分
+    path: '/lockCore',
+    name: 'lockCore',
+    component(resolve) {
+      require(['../page/lockCore'], resolve);
+    }
+  }, { // 锁体部分
+    path: '/lockBody',
+    name: 'lockBody',
+    component(resolve) {
+      require(['../page/lockBody'], resolve);
+    }
   }]
 });

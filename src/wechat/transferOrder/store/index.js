@@ -10,6 +10,8 @@ app.state.alive = ['index'];
 
 // 每页加载条数
 const PAGESIZE = config.pageSize;
+// mapp
+let mapp = config.mapp;
 
 export default new Vuex.Store({
   modules: {
@@ -27,13 +29,7 @@ export default new Vuex.Store({
         // 已完成
         completed: [],
         // 搜索结果
-        result: [],
-        // status 2 list
-        status2list: {
-          '已提交': 'pending',
-          '已交接': 'process',
-          '已完成': 'completed'
-        }
+        result: []
       },
       mutations: {
         setTransferOrders(state, {TransferOrders, list}) {
@@ -52,7 +48,7 @@ export default new Vuex.Store({
          * @param {Function} error 选填 错误回调
          */
         getTransferOrder({state, commit, dispatch}, {data, more, callback, error}) {
-          let list = state.status2list[data['Status']] || 'result';
+          let list = mapp.list[data['Status']] || 'result'; // 搜索所有时，没有状态
           api.get({
             key: 'getTransferOrder',
             data: data,
@@ -197,6 +193,20 @@ export default new Vuex.Store({
               console.log(error);
             }
           });
+        }
+      }
+    },
+
+    /**
+     * 安装订单产品收集
+     */
+    order: {
+      namespaced: true,
+      state: {
+        form: {}
+      },
+      actions: {
+        submit() {
         }
       }
     }

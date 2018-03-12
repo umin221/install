@@ -86,7 +86,6 @@
 <script type="es6">
   import {mapState, mapActions, mapMutations} from 'vuex';
   import titleGroup from 'public/components/cus-title-group';
-  import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
 
   // Swiper button
@@ -99,7 +98,7 @@
   const NAMESPACE = 'detail';
   export default {
     name: NAMESPACE,
-    components: {titleGroup, buttonGroup, cusField},
+    components: {titleGroup, cusField},
     // 初始化
     created() {
       let param = this.$route.query;

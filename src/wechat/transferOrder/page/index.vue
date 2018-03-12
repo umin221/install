@@ -29,7 +29,7 @@
             <cus-cell class="multiple"
                      :key="item.id"
                      :title="'合同编号:'+ item['Agree Number']"
-                     @click.native="toDetailFn(item.Id)"
+                     @click.native="toDetailFn(item)"
                      v-for="item in pending"
                      is-link>
               <div class="mint-cell-sub-title" slot="title">项目名称: {{item['Lead Name']}}</div>
@@ -46,7 +46,7 @@
             <cus-cell class="multiple"
                      :key="item.id"
                      :title="'合同编号:'+ item['Agree Number']"
-                     @click.native="toDetailFn(item.Id)"
+                     @click.native="toDetailFn(item)"
                      v-for="item in process"
                      is-link>
               <div class="mint-cell-sub-title" slot="title">项目名称: {{item['Lead Name']}}</div>
@@ -63,7 +63,7 @@
             <cus-cell class="multiple"
                       :key="item.id"
                       :title="'合同编号:'+ item['Agree Number']"
-                      @click.native="toDetailFn(item.Id)"
+                      @click.native="toDetailFn(item)"
                       v-for="item in completed"
                       is-link>
               <div class="mint-cell-sub-title" slot="title">工程: {{item['Lead Name']}}</div>
@@ -86,14 +86,19 @@
   import cusCell from 'public/components/cus-cell';
 
   const NAMESPACE = 'index';
+  // mapp
+  let mapp = config.mapp;
+  // 用户角色 => 状态
+  let status = mapp['manager'];
+  let list = mapp['list'];
   //
   let loader = function(...args) {
     let me = this;
     let event = args.pop();
     let list = args.pop();
-    let param = Object.assign({
+    let param = Object.extend({
       data: {
-        'Status': '已提交'
+        'Status': status['待处理']
       },
       callback: (data) => {
         me.$refs[list][event](data.length);
@@ -135,7 +140,7 @@
       processLoadTopFn() {
         loader.call(this, {
           data: {
-            'Status': '已交接'
+            'Status': status['处理中']
           }
         }, 'process', 'onTopLoaded');
       },
@@ -143,13 +148,16 @@
       completedLoadTopFn() {
         loader.call(this, {
           data: {
-            'Status': '已完成'
+            'Status': status['已完成']
           }
         }, 'completed', 'onTopLoaded');
       },
       // 待审批底部加载
       pendingLoadBottomFn() {
         loader.call(this, {
+          data: {
+            'Status': status['待处理']
+          },
           more: true
         }, 'pending', 'onBottomLoaded');
       },
@@ -157,7 +165,7 @@
       processLoadBottomFn() {
         loader.call(this, {
           data: {
-            'Status': '已交接'
+            'Status': status['处理中']
           },
           more: true
         }, 'process', 'onBottomLoaded');
@@ -166,7 +174,7 @@
       completedLoadBottomFn() {
         loader.call(this, {
           data: {
-            'Status': '已完成'
+            'Status': status['已完成']
           },
           more: true
         }, 'completed', 'onBottomLoaded');
@@ -176,11 +184,12 @@
         this.$router.push('search');
       },
       // To detail or create
-      toDetailFn(id) {
+      toDetailFn(item) {
         this.$router.push({
           name: 'detail',
           query: {
-            id: id
+            status: list[item.Status],
+            id: item.Id
           }
         });
       }

@@ -30,7 +30,7 @@
         </toggle>
       </div>
 
-      <div>
+      <div v-show="isPending">
         <mt-cell title="销售方式"
                  :value="form['Sales Type']"></mt-cell>
         <mt-cell title="指派安装工程师"
@@ -39,13 +39,13 @@
                  is-link></mt-cell>
       </div>
 
-      <div>
+      <div v-show="!isPending">
         <title-group>安装订单</title-group>
         <mt-cell class="multiple"
                   v-for="item in order"
+                  value="wwwww"
                   :key="item.code"
-                  @click.native="toDetailFn(item)"
-                  is-link>
+                  @click.native="toOrderFn(item)">
           <div class="mint-cell-title" slot="title">订单编号: {{item['code']}}</div>
           <div class="mint-cell-sub-title" slot="title">安装数量: {{item['number']}}</div>
         </mt-cell>
@@ -54,9 +54,11 @@
 
     <!--buttons-->
     <button-group>
-      <mt-button @click.native="rejectFn">驳回</mt-button>
-      <mt-button type="primary"
+      <mt-button v-show="isPending" @click.native="rejectFn">驳回</mt-button>
+      <mt-button v-show="isPending" type="primary"
         @click.native="confirmFn">确认分配</mt-button>
+      <mt-button v-show="!isPending" type="primary"
+        @click.native="toOrderFn">新增安装订单</mt-button>
     </button-group>
   </div>
 </template>
@@ -65,26 +67,33 @@
   import {mapState, mapActions, mapMutations} from 'vuex';
   import cusField from 'public/components/cus-field';
   import titleGroup from 'public/components/cus-title-group';
-  import buttonGroup from 'public/components/cus-button-group';
   import toggle from 'public/components/cus-toggle';
 
   const NAMESPACE = 'detail';
   export default {
     name: NAMESPACE,
-    components: {cusField, titleGroup, buttonGroup, toggle},
+    components: {cusField, titleGroup, toggle},
     // 初始化
     created() {
-      let param = this.$route.query;
+      let me = this;
+      let param = me.$route.query;
+      me.status = param.status;
       // 获取详情
       if (param.id) {
-        this.findTransferOrderById(param.id);
+        me.findTransferOrderById(param.id);
       }
     },
-    // data: () => {
-    // },
+    data: () => {
+      return {
+        status: ''
+      }
+    },
     computed: {
       ...mapState(NAMESPACE, ['form', 'order']),
-      ...mapState('engineer', ['select'])
+      ...mapState('engineer', ['select']),
+      isPending() {
+        return this.status === 'pending';
+      }
     },
     methods: {
       ...mapActions(NAMESPACE, ['findTransferOrderById', 'addPartner', 'update']),
@@ -93,7 +102,11 @@
       },
       // Close order
       closeFn() {
-        console.log('close order');
+        MessageBox({
+          title: '请确认',
+          message: '关闭交接单?',
+          showCancelButton: true
+        });
       },
       // Reject order
       rejectFn() {
@@ -101,11 +114,19 @@
       },
       // Confirm allocation transfer order
       confirmFn() {
-        this.update({
-          data: {
-            'Status': '已交接'
-          }
-        });
+        if (this.select.Id) {
+          this.update({
+            data: {
+              'Status': '已交接'
+            }
+          });
+        } else {
+          Toast('请选择安装工程师');
+        }
+      },
+      // Add Install Order
+      toOrderFn() {
+        this.$router.push('order');
       }
     }
   };
@@ -117,15 +138,18 @@
     padding-bottom: 10px;
   }
 
-  .mint-cell {
-    .mint-cell-title {
-      flex: 1;
-      width: 70px;
-      color: $gray-minor;
-    }
+  div.cus-field {
 
-    .mint-cell-value {
-      color: $black-base;
+    .mint-cell-wrapper {
+      .mint-cell-title {
+        flex: 1;
+        width: 80px;
+        color: $gray-minor;
+      }
+
+      .mint-cell-value {
+        color: $black-base;
+      }
     }
   }
 

@@ -18,12 +18,10 @@
 
 <script type="es6">
   import {mapActions} from 'vuex';
-  import buttonGroup from 'public/components/cus-button-group';
 
   let NameSpace = 'reject';
   export default {
     name: NameSpace,
-    components: {buttonGroup},
     data() {
       return {
         content: ''
