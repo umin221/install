@@ -5,9 +5,9 @@
 </template>
 
 <script type="es6">
-	export default {
-		name: 'cus-button-group'
-	};
+  export default {
+    name: 'cus-button-group'
+  };
 </script>
 
 <style lang="scss">

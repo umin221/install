@@ -42,14 +42,14 @@
           method: () => {
             console.log('调用拍照');
           }
-        },{
+        }, {
           name: '选图',
           method: () => {
             console.log('调用选图');
           }
         }],
         sheetVisible: false
-      }
+      };
     },
     computed: {
       empty() {

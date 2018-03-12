@@ -10,6 +10,9 @@ module.exports = {
   plugins: [
     'html'
   ],
+  settings: {
+    "html/javascript-mime-types": "/^es|javascript/", // same thing
+  },
   env: {
     'es6': true,
     'browser': true,

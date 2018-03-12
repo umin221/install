@@ -26,35 +26,35 @@
         list: [{
           userID: 'IM01',
           position: '产品安装主管_G40204_00000010'
-        },{
+        }, {
           userID: 'IM02',
           position: '产品安装主管_G40204_00000011'
-        },{
+        }, {
           userID: 'IE01',
           position: '产品安装工程师_G40204_00000001'
-        },{
+        }, {
           userID: 'IE02',
           position: '产品安装工程师_G40204_00000002'
-        },{
+        }, {
           userID: 'DPM01',
           position: '产品安装总监_G40204_00000030'
-        },{
+        }, {
           userID: 'DPM02',
           position: '产品安装部长_G40204_00000020'
-        },{
+        }, {
           userID: 'DM01',
           position: '门厂技术主管_G40204_00000040'
-        },{
+        }, {
           userID: 'DM02',
           position: '门厂技术主管_G40204_00000041'
-        },{
+        }, {
           userID: 'DE01',
           position: '门厂技术工程师_G40204_00000040'
-        },{
+        }, {
           userID: 'DE02',
           position: '门厂技术工程师_G40204_00000041'
         }]
-      }
+      };
     },
     methods: {
       switchFn(user) {
@@ -62,7 +62,7 @@
         KND.Util.back();
       }
     }
-  }
+  };
 
 </script>
 

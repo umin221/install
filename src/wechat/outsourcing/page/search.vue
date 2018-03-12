@@ -58,7 +58,7 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['result']),
+      ...mapState(NAMESPACE, ['result'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['getPartners']),

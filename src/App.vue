@@ -18,7 +18,7 @@
       let me = this;
       KND.Util.back = () => {
         me.$router.back();
-      }
+      };
     },
     data() {
       return {

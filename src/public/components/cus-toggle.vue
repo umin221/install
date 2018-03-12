@@ -14,14 +14,14 @@
     data() {
       return {
         visible: false
-      }
+      };
     },
     computed: {
       label() {
-        return this.visible ? '收起' : '展开'
+        return this.visible ? '收起' : '展开';
       }
     }
-  }
+  };
 
 </script>
 

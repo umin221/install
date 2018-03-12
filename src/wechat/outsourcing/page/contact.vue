@@ -51,7 +51,7 @@
           'User Type': '委外人员', // 用户类型
           'Login Name': ''
         }
-      }
+      };
     },
     methods: {
       ...mapActions(NAMESPACE, ['findContact', 'upsertContact']),
@@ -69,7 +69,7 @@
         this.upsertContact(this.contact);
       }
     }
-  }
+  };
 </script>
 
 <style lang="scss"></style>

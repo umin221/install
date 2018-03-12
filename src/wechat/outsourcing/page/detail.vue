@@ -125,7 +125,7 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['form', 'attach','record']),
+      ...mapState(NAMESPACE, ['form', 'attach', 'record']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -152,8 +152,8 @@
        * 查看&编辑标题一致
        */
       title() {
-        return this.type === 'add' ? '创建委外团队' :
-          this.type === 'edit' && this.state === 'invalid' ? '补充委外合约' : '委外团队详情';
+        return this.type === 'add' ? '创建委外团队'
+          : this.type === 'edit' && this.state === 'invalid' ? '补充委外合约' : '委外团队详情';
       }
     },
     methods: {
@@ -178,7 +178,10 @@
               console.log(data);
               Toast('伙伴名称已存在');
             }
-          }, error: error => {}
+          },
+          error: error => {
+            console.log(error);
+          }
         });
       },
       // Partner create & restart

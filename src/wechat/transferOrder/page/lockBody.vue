@@ -55,14 +55,14 @@
     data() {
       return {
         form: {}
-      }
+      };
     },
     methods: {
       saveFn() {
 
       }
     }
-  }
+  };
 
 </script>
 

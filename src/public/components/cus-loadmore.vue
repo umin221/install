@@ -28,8 +28,8 @@
 <script type="es6">
   let pageSize = config.pageSize;
 
-	export default {
-		name: 'cus-loadmore',
+  export default {
+    name: 'cus-loadmore',
     data() {
       return {
         topStatus: '',
@@ -37,8 +37,8 @@
         allLoaded: false
       };
     },
-		props: ['loadTop', 'loadBottom'],
-		methods: {
+    props: ['loadTop', 'loadBottom'],
+    methods: {
       handleTopChange(status) {
         this.topStatus = status;
       },
@@ -52,8 +52,8 @@
         this.$refs.loadmore.onBottomLoaded();
         this.allLoaded = len < pageSize;
       }
-		}
-	};
+    }
+  };
 </script>
 
 <style lang="scss">

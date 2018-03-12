@@ -64,7 +64,7 @@
 </template>
 
 <script type="es6">
-  import {mapState, mapActions, mapMutations} from 'vuex';
+  import {mapState, mapActions} from 'vuex';
   import cusField from 'public/components/cus-field';
   import titleGroup from 'public/components/cus-title-group';
   import toggle from 'public/components/cus-toggle';
@@ -86,7 +86,7 @@
     data: () => {
       return {
         status: ''
-      }
+      };
     },
     computed: {
       ...mapState(NAMESPACE, ['form', 'order']),

@@ -79,7 +79,7 @@
   </div>
 </template>
 
-<script type="application/javascript">
+<script type="es6">
   import {mapState, mapActions} from 'vuex';
   import cusHeader from 'public/components/cus-header';
   import cusLoadmore from 'public/components/cus-loadmore';

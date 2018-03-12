@@ -66,6 +66,7 @@
       <mt-popup v-show="showBox" v-model="showBox" position="bottom">
         <menuBox @my-enter="enter"
                  @my-cancel="showBox=false"
+                 :lovType="lovType"
                  :slots="slots"></menuBox>
       </mt-popup>
     </div>
@@ -88,7 +89,7 @@
             title: 'SZ6010指纹锁',
             direction: '左内开',
             number: '500'
-          },{
+          }, {
             id: '2',
             title: 'SZ6010指纹锁',
             direction: '左内开',
@@ -96,10 +97,10 @@
           }]
         },
         slots: [
-          {flex: 1, values: ['是', '否'], className: 'slot1', textAlign: 'center'},
+          {flex: 1, values: ['是', '否'], className: 'slot1', textAlign: 'center'}
         ],
         showBox: false
-      }
+      };
     },
     computed: {
       ...mapState(NameSpace, ['form']),
@@ -123,7 +124,7 @@
         console.log(values);
       }
     }
-  }
+  };
 </script>
 
 <style lang="scss">

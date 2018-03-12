@@ -30,9 +30,9 @@
         isLink: Boolean
       },
       data() {
-          return {
-            currentValue: this.value
-          }
+        return {
+          currentValue: this.value
+        };
       },
       methods: {
         handleInput(val) {
@@ -48,7 +48,7 @@
           this.$emit('input', val);
         }
       }
-    }
+    };
 </script>
 
 <style lang="scss">

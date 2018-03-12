@@ -22,7 +22,7 @@
       isLink: Boolean,
       value: {}
     }
-  }
+  };
 </script>
 
 <style lang="scss">

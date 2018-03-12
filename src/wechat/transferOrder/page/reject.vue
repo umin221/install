@@ -25,10 +25,10 @@
     data() {
       return {
         content: ''
-      }
+      };
     },
     methods: {
-      ...mapActions['detail', ['update']],
+      ...mapActions('detail', ['update']),
       rejectFn() {
         console.log(this.content);
         // this.update({
@@ -38,7 +38,7 @@
         // });
       }
     }
-  }
+  };
 
 </script>
 

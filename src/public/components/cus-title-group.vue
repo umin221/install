@@ -5,9 +5,9 @@
 </template>
 
 <script type="es6">
-	export default {
-		name: 'cus-title-group'
-	};
+  export default {
+    name: 'cus-title-group'
+  };
 </script>
 
 <style lang="scss">

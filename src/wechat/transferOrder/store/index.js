@@ -11,7 +11,7 @@ app.state.alive = ['index'];
 // 每页加载条数
 const PAGESIZE = config.pageSize;
 // mapp
-let mapp = config.mapp;
+let mapp = config.mapp['list'];
 
 export default new Vuex.Store({
   modules: {
@@ -48,7 +48,7 @@ export default new Vuex.Store({
          * @param {Function} error 选填 错误回调
          */
         getTransferOrder({state, commit, dispatch}, {data, more, callback, error}) {
-          let list = mapp.list[data['Status']] || 'result'; // 搜索所有时，没有状态
+          let list = mapp[data['Status']] || 'result'; // 搜索所有时，没有状态
           api.get({
             key: 'getTransferOrder',
             data: data,

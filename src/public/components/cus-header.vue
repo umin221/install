@@ -23,7 +23,7 @@
     data() {
       return {
         visible: false
-      }
+      };
     },
     props: {
       title: String,
@@ -44,7 +44,7 @@
         me.visible = false;
       }
     }
-  }
+  };
 
 </script>
 

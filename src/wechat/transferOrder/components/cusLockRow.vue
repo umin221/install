@@ -12,7 +12,7 @@
   export default {
     name: NameSpace,
     data() {
-      return {}
+      return {};
     },
     props: {
       title: String
@@ -22,7 +22,7 @@
         this.$emit('click');
       }
     }
-  }
+  };
 
 </script>
 
