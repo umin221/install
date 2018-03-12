@@ -26,7 +26,7 @@
   import cusSearch from 'public/components/cus-search';
   import cusCell from 'public/components/cus-cell';
   //
-  const NAMESPACE = 'searchTrans'
+  const NAMESPACE = 'searchTrans';
   export default {
     name: NAMESPACE,
     components: {cusLoadmore, cusSearch, cusCell},
@@ -37,7 +37,7 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['result']),
+      ...mapState(NAMESPACE, ['result'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['getProduct']),
@@ -46,7 +46,7 @@
         this.getProduct(val);
       },
       loadBottomFn() {
-      },
+      }
     }
   };
 </script>
