@@ -56,7 +56,7 @@ export default new Vuex.Store({
               StartRowNum: more ? state[list].length : 0,
               PageSize: PAGESIZE
             },
-            success: function(data) {
+            success: data => {
               let partners = KND.Util.toArray(data.SiebelMessage['Channel Partner']);
               commit(more ? 'addPartners' : 'setPartners', {
                 partners: partners,
@@ -114,7 +114,7 @@ export default new Vuex.Store({
             data: {
               id: id
             },
-            success: function(data) {
+            success: data => {
               commit('setPartner', data.SiebelMessage['Channel Partner']);
             }
           });
@@ -126,7 +126,7 @@ export default new Vuex.Store({
         findPartner({commit}, setting) {
           api.get(Object.extend({
             key: 'findPartner',
-            success: function(data) {
+            success: data => {
               commit('setPartner', data.items);
             }
           }, setting));
@@ -148,7 +148,7 @@ export default new Vuex.Store({
             data: {
               partner: partner
             },
-            success: (data) => {
+            success: data => {
               if (data.PrimaryRowId) {
                 Toast({
                   message: '提交成功'
@@ -172,7 +172,7 @@ export default new Vuex.Store({
           api.get(Object.extend({
             key: 'update',
             data: state.form,
-            success: (data) => {
+            success: data => {
               if (data['KL Partner Status'] !== status) {
                 Toast('更新成功');
                 KND.Util.back();
@@ -200,10 +200,10 @@ export default new Vuex.Store({
           api.get({
             key: 'findContact',
             data: data,
-            success: (data) => {
+            success: data => {
 
             },
-            error: (data) => {
+            error: data => {
               console.log(data);
             }
           });
@@ -223,7 +223,7 @@ export default new Vuex.Store({
                 }
               }
             },
-            success: (data) => {
+            success: data => {
               if (data.PrimaryRowId) {
                 Toast({
                   message: '提交成功'

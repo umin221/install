@@ -16,8 +16,7 @@
     data() {
       return {
         value: [],
-        value1: '',
-        lovType: this.type
+        value1: ''
       };
     },
     methods: {
@@ -27,13 +26,13 @@
       },
       enter() {                     // 确定
         let self = this;
-        self.$emit('my-enter', self.value, self.lovType);
+        self.$emit('my-enter', self.value, self.type);
       },
       onValuesChange(picker, values) {
         let self = this;
         self.value = values;
         if (self.value1 !== self.value[0]) {
-          self.$emit('my-change', self.value, self.lovType);
+          self.$emit('my-change', self.value, self.type);
         }
         self.value1 = values[0];
       }
@@ -55,5 +54,9 @@
     .picker>.picker-items>.slot2{
       display: none;
     }
+  }
+
+  .mint-popup{
+    width: 100%;
   }
 </style>

@@ -24,5 +24,6 @@
     background-color: #fff;
     line-height: 40px;
     padding: 0 10px;
+    text-align: center;
   }
 </style>
