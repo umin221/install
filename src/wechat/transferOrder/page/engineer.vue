@@ -9,11 +9,13 @@
                   :loadBottom="loadBottomFn"
                   :topStatus="topStatus">
         <mt-cell class="multiple"
-                  v-for="item in result"
-                  :key="item.id"
-                  @click.native="selectFn(item)"
-                  is-link>
-          <div class="mint-cell-title" slot="title">姓名: {{item['Last Name']}}</div>
+                 v-for="item in result"
+                 @click.native="selectFn(item)"
+                 :key="item.id"
+                 is-link>
+          <div class="mint-cell-title co-flex" slot="title">
+            <span class="co-f1">姓名: {{item['Last Name']}}</span> <span class="co-f1">{{item['KL Primary Position Type']}}</span>
+          </div>
           <div class="mint-cell-sub-title" slot="title">工号: {{item['Emp #']}}</div>
           <div class="mint-cell-sub-title" slot="title">部门: {{item['KL Primary Division Name']}}</div>
         </mt-cell>
@@ -49,7 +51,7 @@
 
   const NAMESPACE = 'engineer';
   export default {
-    name: 'search',
+    name: NAMESPACE,
     // 获取默认数据
     created() {
       loader.call(this, 'onBottomLoaded');

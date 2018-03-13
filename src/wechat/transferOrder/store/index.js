@@ -56,7 +56,7 @@ export default new Vuex.Store({
               StartRowNum: more ? state[list].length : 0,
               PageSize: PAGESIZE
             },
-            success: function(data) {
+            success: data => {
               let TransferOrders = KND.Util.toArray(data.SiebelMessage.Project);
               commit(more ? 'addTransferOrders' : 'setTransferOrders', {
                 TransferOrders: TransferOrders,
@@ -116,8 +116,36 @@ export default new Vuex.Store({
             data: {
               id: id
             },
-            success: function(data) {
+            success: data => {
               commit('setTransferOrder', data);
+            }
+          });
+        },
+        /**
+         * 驳回交接单
+         */
+        reject({state, dispatch}) {
+          // 交接单待办Id
+          let ownerInfoId = state.form['Inbox Task Id'];
+          // 更新待办
+          api.get({
+            key: 'deactivateInbox',
+            data: {
+              body: {
+                OwnerInfoId: ownerInfoId
+              }
+            },
+            success: data => {
+              tools.success(data, {
+                success: () => {
+                  // 更新交接单状态
+                  dispatch('update', {
+                    data: {
+                      'Status': '已拒绝'
+                    }
+                  });
+                }
+              });
             }
           });
         },
@@ -126,20 +154,45 @@ export default new Vuex.Store({
          * @param {Object} setting 必填 请求参数配置
          */
         update({state}, setting) {
+          // 交接单id
+          let Id = state.form.Id;
           api.get(Object.extend(true, {
             key: 'update',
             data: {
-              Id: state.form.Id
+              Id: Id
             },
-            success: (data) => {
-              if (data) {
-                Toast('更新成功');
-                KND.Util.back();
-              } else {
-                Toast('更新失败');
-              }
+            success: data => {
+              tools.success(data, {
+                back: true,
+                successTips: '更新成功'
+              });
             }
           }, setting));
+        },
+        /**
+         * 指派安装工程师
+         * @param {String} positionId 必填 选择的安装人员职位Id
+         */
+        transfer({state}, positionId) {
+          let form = state.form;
+          api.get({
+            key: 'transfer',
+            data: {
+              'body': {
+                'Object Id': form['Id'], // 安装交接单Id
+                'InboxTaskId': form['Inbox Task Id'], // 交接单待办Id
+                'PositionId': positionId, // 选择的安装人员职位Id
+                'Status': form['Status'], // 当前安装交接单状态
+                'ProcessName': 'KL Contract Delivery Assign Setter Process' // 固定 安装交接单指派安装工程师流程
+              }
+            },
+            success: data => {
+              tools.success(data, {
+                back: true,
+                successTips: '指派成功'
+              });
+            }
+          });
         }
       }
     },
@@ -179,14 +232,14 @@ export default new Vuex.Store({
               StartRowNum: more ? state.result.length : 0,
               PageSize: PAGESIZE
             },
-            success: (data) => {
+            success: data => {
               let engineer = KND.Util.toArray(data.items);
               commit(more ? 'addEngineer' : 'setEngineer', engineer);
               if (callback) {
                 callback(engineer);
               }
             },
-            error: (error) => {
+            error: error => {
               if (callback) {
                 callback();
               };
@@ -205,8 +258,53 @@ export default new Vuex.Store({
       state: {
         form: {}
       },
+      mutations: {
+        setForm(state, obj) {
+          Object.assign(state.form, obj);
+        }
+      },
       actions: {
         submit() {
+        },
+        save({state}, id) {
+          let form = state.form;
+          api.get({
+            key: 'saveOrder',
+            data: {
+              'body': Object.assign({
+                'ProcessName': 'KL Install Order Create Process',
+                'Project Id': id,
+                'KL Hole Type': '',
+                'KL Delivery Check Box 1': '',
+                'KL Delivery Check Box 2': ''
+              }, form)
+            },
+            success: data => {
+              tools.success(data);
+            }
+          });
+        }
+      }
+    },
+
+    /**
+     * 创建&更新订单行
+     */
+    orderLine: {
+      namespaced: true,
+      state: {},
+      mutations: {},
+      actions: {
+        saveOrderLine({state}, data) {
+          api.get({
+            key: 'saveOrderLine',
+            data: Object.assign({}, data),
+            success: data => {
+              tools.success(data, {
+                back: true
+              });
+            }
+          });
         }
       }
     }

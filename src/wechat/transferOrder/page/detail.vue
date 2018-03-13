@@ -54,11 +54,12 @@
 
     <!--buttons-->
     <button-group>
-      <mt-button v-show="isPending" @click.native="rejectFn">驳回</mt-button>
+      <mt-button v-show="isPending"
+                 @click.native="rejectFn">驳回</mt-button>
       <mt-button v-show="isPending" type="primary"
-        @click.native="confirmFn">确认分配</mt-button>
+                 @click.native="transferFn">确认分配</mt-button>
       <mt-button v-show="!isPending" type="primary"
-        @click.native="toOrderFn">新增安装订单</mt-button>
+                 @click.native="toOrderFn">新增安装订单</mt-button>
     </button-group>
   </div>
 </template>
@@ -96,7 +97,7 @@
       }
     },
     methods: {
-      ...mapActions(NAMESPACE, ['findTransferOrderById', 'addPartner', 'update']),
+      ...mapActions(NAMESPACE, ['findTransferOrderById', 'addPartner', 'transfer']),
       toEngineer() {
         this.$router.push('engineer');
       },
@@ -113,20 +114,22 @@
         this.$router.push('reject');
       },
       // Confirm allocation transfer order
-      confirmFn() {
-        if (this.select.Id) {
-          this.update({
-            data: {
-              'Status': '已交接'
-            }
-          });
+      transferFn() {
+        let positionId = this.select.Id;
+        if (positionId) {
+          this.transfer(positionId);
         } else {
           Toast('请选择安装工程师');
         }
       },
       // Add Install Order
       toOrderFn() {
-        this.$router.push('order');
+        this.$router.push({
+          path: 'order',
+          query: {
+            id: this.form.Id
+          }
+        });
       }
     }
   };

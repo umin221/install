@@ -1,5 +1,10 @@
 let apiList = {
-  // 交接单列表&搜索
+  /**
+   * 交接单列表&搜索
+   * @param {Object} option.data 必填 查询条件
+   * @param {Object} option.paging 必填 翻页参数
+   * @returns {{method: string, url: string, data: {body: {OutputIntObjectName: string, ViewMode: string, SearchSpec: *, StartRowNum: (*|string), PageSize: (*|string|PAGESIZE)}}}}
+   */
   getTransferOrder: option => {
     return {
       method: 'post',
@@ -16,7 +21,11 @@ let apiList = {
     };
   },
 
-  // id 查找交接单详情
+  /**
+   * 查找交接单详情
+   * @param {String} option.data.id 必填 交接单id
+   * @returns {{method: string, url: string, data: {}}}
+   */
   findTransferOrderById: option => {
     return {
       method: 'get',
@@ -25,7 +34,11 @@ let apiList = {
     };
   },
 
-  // 查找交接单详情
+  /**
+   * 查找交接单详情
+   * @param {data} option.data 查询条件
+   * @returns {{url: string, data: {}}}
+   */
   findTransferOrder: option => {
     return {
       url: 'data/Channel Partner/Channel Partner/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=2&StartRowNum=0',
@@ -33,7 +46,13 @@ let apiList = {
     };
   },
 
-  // 查找所有产品安装工程师&主管 搜索&获取列表
+  /**
+   * 查找所有产品安装工程师&主管 搜索&获取列表
+   * @param {String} option.data.position 必填 职位
+   * @param {String} option.data['Last Name'] 选填 用户名字 模糊查询
+   * @param {Object} option.paging 必填 翻页参数
+   * @returns {{url: string}}
+   */
   findEngineer: option => {
     let position = option.data.position.split('||');
     let name = option.data['Last Name'];
@@ -52,7 +71,11 @@ let apiList = {
     };
   },
 
-  // 更新安装交接单状态 已拒绝/已交接
+  /**
+   * 更新安装交接单状态 已拒绝/已交接
+   * @param {Object} option.data 必填 需要更新的实体字段
+   * @returns {{method: string, url: string}}
+   */
   update: option => {
     return {
       method: 'put',
@@ -64,10 +87,82 @@ let apiList = {
     };
   },
 
-  // 关闭安装交接单
+  /**
+   * 交接单指派工程师
+   * @param {String} option.data.body['Object Id'] 必填 安装交接单Id
+   * @param {String} option.data.body['InboxTaskId'] 必填 交接单待办Id
+   * @param {String} option.data.body['PositionId'] 必填 选择的安装人员职位Id
+   * @param {String} option.data.body['Status'] 必填 当前安装交接单状态
+   * @param {String} option.data.body['ProcessName'] 必填 安装交接单指派安装工程师流程
+   * @returns {{method: string, url: string, data: object}}
+   */
+  transfer: option => {
+    return {
+      method: 'post',
+      url: 'service/Workflow Process Manager/RunProcess'
+    };
+  },
+
+  /**
+   * 更新待办
+   * @param {String} option.data.body['OwnerInfoId'] 必填 交接单待办Id
+   * @returns {{method: string, url: string}}
+   */
+  deactivateInbox: option => {
+    return {
+      method: 'post',
+      url: 'service/Universal Inbox/DeactivateInboxOwner'
+    };
+  },
+
+  /**
+   * 关闭安装交接单
+   * @param option
+   * @returns {{url: string}}
+   */
   close: option => {
     return {
       url: ''
+    };
+  },
+
+  /**
+   * 创建&更新订单头
+   * @param {String} option.data.body['ProcessName'] 固定 KL Install Order Create Process
+   * @param {String} option.data.body['Project Id'] 必填 交接单id
+   * @param {String} option.data.body['KL Hole Type'] 必填 开孔方式
+   * @param {String} option.data.body['KL Delivery Check Box 1'] 必填 是否安装锁体
+   * @param {String} option.data.body['KL Delivery Check Box 2'] 必填 是否安装替代锁
+   * @returns {{method: string, url: string}}
+   */
+  saveOrder: option => {
+    return {
+      method: 'post',
+      url: 'service/Workflow Process Manager/RunProcess'
+    };
+  },
+
+  /**
+   * 新增或修改订单行项目(在订单下新建或修改）
+   * @param {String} option.data['KL Hole Direction'] 选填 开向 左开
+   * @param {String} option.data['KL World Flag'] 选填 Y
+   * @param {String} option.data['Scheduled Ship Date'] 选填 03/01/2018
+   * @param {String} option.data['KL Door Thickness'] 选填 锁舌导向板规格
+   * @param {String} option.data['KL Parts Requirement'] 选填 配件要求
+   * @param {String} option.data['Quantity Requested'] 选填 125
+   * @param {String} option.data['KL Agreement Item Id'] 选填 1-DGFJM0
+   * @param {String} option.data['KL Door Material Quality'] 选填 木门
+   * @param {String} option.data['KL Gate Plate Specification'] 选填 门扣板规格
+   * @param {String} option.data['Description'] 选填 备注
+   * @param {String} option.data['Id'] 选填 1-111
+   * @returns {{method: string, url: string}}
+   */
+  saveOrderLine: option => {
+    console.log(option);
+    return {
+      // method: 'put',
+      // url: 'data/Order Entry (Sales)/Order Entry - Orders/1-2BSAS9OT/Order Entry - Line Items'
+      // url: 'data/Order Entry (Sales)/Order Entry - Orders/1-2BSAS9OT/Order Entry - Line Items/1-2BSB7L33xxx'
     };
   }
 };

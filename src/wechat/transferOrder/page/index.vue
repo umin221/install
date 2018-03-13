@@ -27,6 +27,7 @@
                         @loadBottom="loadBottomFn"
                         :param="{status:'待处理', list:'pending'}"
                         :topStatus="topStatus">
+            <empty v-show="!pending.length"></empty>
             <cus-cell class="multiple"
                      :key="item.id"
                      :title="'合同编号:'+ item['Agree Number']"
@@ -34,7 +35,7 @@
                      v-for="item in pending"
                      is-link>
               <div class="mint-cell-sub-title" slot="title">项目名称: {{item['Lead Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Updated']}}</div>
+              <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
             </cus-cell>
           </cus-loadmore>
         </mt-tab-container-item>
@@ -45,6 +46,7 @@
                         @loadBottom="loadBottomFn"
                         :param="{status:'处理中', list:'process'}"
                         :topStatus="topStatus">
+            <empty v-show="!process.length"></empty>
             <cus-cell class="multiple"
                      :key="item.id"
                      :title="'合同编号:'+ item['Agree Number']"
@@ -52,7 +54,7 @@
                      v-for="item in process"
                      is-link>
               <div class="mint-cell-sub-title" slot="title">项目名称: {{item['Lead Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Updated']}}</div>
+              <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
             </cus-cell>
           </cus-loadmore>
         </mt-tab-container-item>
@@ -63,6 +65,7 @@
                         @loadBottom="loadBottomFn"
                         :param="{status:'已完成', list:'completed'}"
                         :topStatus="topStatus">
+            <empty v-show="!completed.length"></empty>
             <cus-cell class="multiple"
                       :key="item.id"
                       :title="'合同编号:'+ item['Agree Number']"
@@ -70,7 +73,7 @@
                       v-for="item in completed"
                       is-link>
               <div class="mint-cell-sub-title" slot="title">工程: {{item['Lead Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">更新日期: {{item['Updated']}}</div>
+              <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
             </cus-cell>
           </cus-loadmore>
 

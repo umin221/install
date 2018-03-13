@@ -9,6 +9,7 @@ import './util'; // Global Util
 import '../native'; // Register Native API
 import './filters'; // Global Vue Filter
 import './mixin'; // Global Mixin
+import './tools'; // Global Tools
 
 // Inject Global Css
 import 'public/sass/index.scss';

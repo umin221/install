@@ -7,14 +7,14 @@
         <cus-loadmore ref="result"
                       :loadBottom="loadBottomFn"
                       :topStatus="topStatus">
-          <cus-cell class="multiple"
-                    :key="item.id"
-                    :title="'合作伙伴名称:'+ item.Name"
-                    @click.native="toDetailFn(item)"
-                    v-for="item in result"
-                    is-link>
-            <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
-            <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Main Phone Number']}}</div>
+            <cus-cell class="multiple"
+                      :key="item.id"
+                      :title="'合同编号:'+ item['Agree Number']"
+                      @click.native="toDetailFn(item)"
+                      v-for="item in result"
+                      is-link>
+              <div class="mint-cell-sub-title" slot="title">工程: {{item['Lead Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
           </cus-cell>
         </cus-loadmore>
 
@@ -34,7 +34,7 @@
     let name = me.value;
     let param = {
       data: {
-        'Agree Number': name + '*',
+        'Lead Name': name + '*',
         'Setter': name + '*'
       },
       more: args.pop(),

@@ -19,23 +19,18 @@
 <script type="es6">
   import {mapActions} from 'vuex';
 
-  let NameSpace = 'reject';
+  let NAMESPACE = 'reject';
   export default {
-    name: NameSpace,
+    name: NAMESPACE,
     data() {
       return {
         content: ''
       };
     },
     methods: {
-      ...mapActions('detail', ['update']),
+      ...mapActions('detail', ['reject']),
       rejectFn() {
-        console.log(this.content);
-        // this.update({
-        //  data: {
-        //    'Status': '已拒绝'
-        //  }
-        // });
+        this.reject();
       }
     }
   };

@@ -48,9 +48,9 @@
 
 <script type="es6">
   import cusField from 'public/components/cus-field';
-  let NameSpace = 'lock-detail';
+  let NAMESPACE = 'lock-detail';
   export default {
-    name: NameSpace,
+    name: NAMESPACE,
     components: {cusField},
     data() {
       return {
@@ -59,6 +59,7 @@
     },
     methods: {
       saveFn() {
+
       }
     }
   };

@@ -1,7 +1,7 @@
 <template>
     <div>
       <!--header-->
-      <mt-header fixed title="安装交接单详情">
+      <mt-header fixed title="安装订单产品收集">
         <fallback slot="left"></fallback>
         <mt-button slot="right"
                    @click.native="saveFn">保存</mt-button>
@@ -11,117 +11,158 @@
       <div class="mint-content">
         <div class="order">
           <mt-cell title="开孔方式"
-                   @click.native="showBox=true"
-                   :value="form['Sales Type']"
+                   @click.native="getLovFn('Hole Type')"
+                   :value="form['Hole Type']"
                    is-link></mt-cell>
           <mt-cell title="门厂是否安装锁体"
-                   @click.native="showBox=true"
-                   :value="form['Last Name']"
+                   @click.native="getLovFn('HBS Check Box 1')"
+                   :value="form['HBS Check Box 1']"
                    is-link></mt-cell>
           <mt-cell title="是否安装替代锁"
-                   @click.native="showBox=true"
-                   :value="form['Last Name']"
+                   @click.native="getLovFn('HBS Check Box 2')"
+                   :value="form['HBS Check Box 2']"
                    is-link></mt-cell>
         </div>
 
-        <div class="lock-row">
-          <lock-row title="锁芯部分" @click="toRowFn">
-            <mt-cell v-for="row in data.row" class="lock-row-cell"
-                     @click.native="toRowFn(row)"
-                     :key="row['Id']"
+        <div class="lock-line">
+          <lock-line title="锁芯部分" @click="toLineFn">
+            <mt-cell v-for="line in data.line" class="lock-line-cell"
+                     @click.native="toLineFn(line)"
+                     :key="line['Id']"
                      is-link>
               <div class="co-flex co-jc" slot="title">
-                <span class="co-f1">{{row['title']}}</span>
-                <span class="co-f1">开向:{{row['direction']}}</span>
-                <span class="co-f1">数量:{{row['number']}}</span>
+                <span class="co-f1">{{line['Id']}}</span>
+                <span class="co-f1">开向:{{line['KL Hole Direction']}}</span>
+                <span class="co-f1">数量:{{line['Quantity Requested']}}</span>
               </div>
             </mt-cell>
-          </lock-row>
-          <lock-row title="锁体部分*真锁" @click="toRowFn">
-            <mt-cell v-for="row in data.row" class="lock-row-cell"
-                     @click.native="toRowFn(row)"
-                     :key="row['Id']"
+          </lock-line>
+          <lock-line title="锁体部分*真锁" @click="toLineFn">
+            <mt-cell v-for="line in data.line" class="lock-line-cell"
+                     @click.native="toLineFn(line)"
+                     :key="line['Id']"
                      is-link>
               <div class="co-flex co-jc" slot="title">
-                <span class="co-f1">{{row['title']}}</span>
-                <span class="co-f1">开向:{{row['direction']}}</span>
-                <span class="co-f1">数量:{{row['number']}}</span>
+                <span class="co-f1">{{line['Id']}}</span>
+                <span class="co-f1">开向:{{line['KL Hole Direction']}}</span>
+                <span class="co-f1">数量:{{line['Quantity Requested']}}</span>
               </div>
             </mt-cell>
-          </lock-row>
+          </lock-line>
         </div>
 
       </div>
 
       <!--buttons-->
       <button-group>
-        <mt-button v-show="isTransfer" @click.native="rejectFn">转发门厂确认</mt-button>
+        <mt-button v-show="isTransfer"
+                   @click.native="rejectFn">转发门厂确认</mt-button>
         <mt-button v-show="isTransfer" type="primary"
                    @click.native="confirmFn">发起安装</mt-button>
         <mt-button v-show="!isTransfer" type="primary"
-                   @click.native="toRowFn">确认提交</mt-button>
+                   @click.native="toLineFn">确认提交</mt-button>
       </button-group>
 
       <!--popup-->
-      <mt-popup v-show="showBox" v-model="showBox" position="bottom">
+      <mt-popup v-model="showBox" position="bottom">
         <menuBox @my-enter="enter"
                  @my-cancel="showBox=false"
-                 :lovType="lovType"
+                 :type="lovType"
                  :slots="slots"></menuBox>
       </mt-popup>
     </div>
 </template>
 
 <script type="es6">
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import menuBox from 'public/components/cus-menu.vue';
-  import lockRow from '../components/cusLockRow';
+  import lockLine from '../components/cusLockLine';
 
-  let NameSpace = 'order';
+  let NAMESPACE = 'order';
+  // 下拉列表
+  let option = config.mapp.option;
+
   export default {
-    name: NameSpace,
-    components: {lockRow, menuBox},
+    name: NAMESPACE,
+    components: {lockLine, menuBox},
     data() {
       return {
         data: {
-          row: [{
-            id: '1',
-            title: 'SZ6010指纹锁',
-            direction: '左内开',
-            number: '500'
+          line: [{
+            'KL Hole Direction': '左开',
+            'KL World Flag': 'Y',
+            'Scheduled Ship Date': '03/01/2018',
+            'KL Door Thickness': '门厚',
+            'KL Guide Plate Specification': '锁舌导向板规格',
+            'KL Parts Requirement': '配件要求',
+            'Quantity Requested': '125',
+            'KL Agreement Item Id': '1-DGFJM0',
+            'KL Door Material Quality': '木门',
+            'KL Gate Plate Specification': '门扣板规格',
+            'Description': '备注',
+            'Id': '1-111'
           }, {
-            id: '2',
-            title: 'SZ6010指纹锁',
-            direction: '左内开',
-            number: '500'
+            'KL Hole Direction': '左开',
+            'KL World Flag': 'Y',
+            'Scheduled Ship Date': '03/01/2018',
+            'KL Door Thickness': '门厚',
+            'KL Guide Plate Specification': '锁舌导向板规格',
+            'KL Parts Requirement': '配件要求',
+            'Quantity Requested': '125',
+            'KL Agreement Item Id': '1-DGFJM0',
+            'KL Door Material Quality': '木门',
+            'KL Gate Plate Specification': '门扣板规格',
+            'Description': '备注',
+            'Id': '1-112'
           }]
         },
         slots: [
           {flex: 1, values: ['是', '否'], className: 'slot1', textAlign: 'center'}
         ],
-        showBox: false
+        showBox: false,
+        lovType: ''
       };
     },
     computed: {
-      ...mapState(NameSpace, ['form']),
+      ...mapState(NAMESPACE, ['form']),
+      // 是否可发起安装状态
       isTransfer() {
         return true;
       }
     },
     methods: {
-      ...mapActions(NameSpace, ['submit', 'confirm']),
+      ...mapActions(NAMESPACE, ['submit', 'save']),
+      ...mapMutations(NAMESPACE, ['setForm']),
       // 订单行
-      toRowFn() {
-        this.$router.push('lockBody');
+      toLineFn(line) {
+        this.$router.push({
+          path: 'lockBody',
+          query: {
+            line: line
+          }
+        });
+      },
+      // 选择对话框
+      getLovFn(type) {
+        this.lovType = type;
+        this.showBox = true;
+        this.slots[0].values = option[type];
       },
       // 订单行保存
       saveFn() {
-
+        let form = this.form;
+        if (form['Hole Type'] && form['HBS Check Box 1'] && form['HBS Check Box 2']) {
+          this.save(this.$route.query.id);
+        } else {
+          Toast('请完整填写订单头信息');
+        }
       },
+      // 选择确认
       enter(values, type) {
         let me = this;
         me.showBox = false;
-        console.log(values);
+        // 选择填充
+        this.form[type] = values[0];
       }
     }
   };
@@ -133,13 +174,17 @@
       .mint-cell-title {
         color: $gray-minor;
       }
+
+      .mint-cell-value {
+        color: $black-base;
+      }
     }
   }
 
-  .lock-row {
+  .lock-line {
     margin-top: 10px;
 
-    .lock-row-cell {
+    .lock-line-cell {
       background-color: $bg-light;
     }
   }
