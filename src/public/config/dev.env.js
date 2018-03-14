@@ -10,5 +10,6 @@ export default {
   'context': '/siebel-rest/v1.0/',
   // 'host': 'https://kas.kinlong.cn:8090',
   // 'context': '/crm/dev/api/',
-  'pageSize': 10
+  'pageSize': 10,
+  'cacheExp': 60 * 60 * 24 // cache exp
 };

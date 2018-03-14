@@ -11,6 +11,10 @@ body {
   }
 }
 
+.disable {
+  @include disable;
+}
+
 .cus-overlay {
   display: none;
   position: fixed;

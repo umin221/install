@@ -62,8 +62,18 @@
 
     .mint-cell {
       background-image: none;
-    }
 
+      .mint-cell-title {
+        color: $gray-minor;
+      }
+
+      .mint-cell-value {
+        color: $black-base;
+      }
+    }
+  }
+
+  .readonly {
     .mint-cell-wrapper {
       .mint-cell-title {
         flex: 2;

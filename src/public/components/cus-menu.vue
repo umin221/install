@@ -4,13 +4,15 @@
       <div @click="cancel">取消</div>
       <div @click="enter">确定</div>
     </div>
-    <mt-picker :slots="slots" @change="onValuesChange"></mt-picker>
+    <mt-picker @change="onValuesChange"
+               :slots="slots"
+               :value-key="vk"></mt-picker>
   </div>
 </template>
 <script>
   export default {
     name: 'menu',
-    props: ['slots', 'type'],
+    props: ['slots', 'type', 'vk'],
     created() {
     },
     data() {
