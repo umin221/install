@@ -1,5 +1,11 @@
 let apiList = {
-  // 委外列表
+  /**
+   * 查询 或 搜索 委外厂商劣列表
+   * @param {String} option.data['Name'] 选填 厂商名称
+   * @param {Object} option.data 选填 查询条件
+   * @param {Object} option.paging 必填 翻页参数
+   * @returns {{method: string, url: string}}
+   */
   getPartners: option => {
     let name = option.data.Name;
     let spec = '';
@@ -12,7 +18,13 @@ let apiList = {
     };
   },
 
-  // 获取委外列表 只获取团队内的
+  /**
+   * 获取委外列表 只获取团队内的
+   * @param {String} option.data['Name'] 选填 厂商名称
+   * @param {Object} option.data 选填 查询条件
+   * @param {Object} option.paging 必填 翻页参数
+   * @returns {{method: string, url: string}}
+   */
   queryPartners: option => {
     let name = option.data.Name;
     let spec = '';
@@ -35,7 +47,11 @@ let apiList = {
     };
   },
 
-  // id 查找委外详情
+  /**
+   * 通过委外厂商id查找厂商详情
+   * @param {String} option.data['id'] 必填 厂商id
+   * @returns {{method: string, url: string}}
+   */
   findPartnerById: option => {
     return {
       method: 'post',
@@ -44,7 +60,11 @@ let apiList = {
     };
   },
 
-  // 查找委外详情
+  /**
+   * 查找委外详情
+   * @param {String} option.data 必填 厂商查询条件
+   * @returns {{method: string, url: string}}
+   */
   findPartner: option => {
     return {
       url: 'data/Channel Partner/Channel Partner/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=2&StartRowNum=0',
@@ -52,7 +72,11 @@ let apiList = {
     };
   },
 
-  // 添加委外团队
+  /**
+   * 添加委外团队
+   * @param {Object} option.data[partner] 必填 委外厂商信息 键值对
+   * @returns {{method: string, url: string}}
+   */
   addPartner: option => {
     return {
       method: 'post',
@@ -73,7 +97,11 @@ let apiList = {
     };
   },
 
-  // 更新团队状态
+  /**
+   * 更新委外厂商信息
+   * @param {Object} option.data 必填 委外厂商信息 键值对
+   * @returns {{method: string, url: string}}
+   */
   update: option => {
     return {
       method: 'put',
@@ -81,7 +109,11 @@ let apiList = {
     };
   },
 
-  // 创建&更新联系人
+  /**
+   * 创建 或 更新联系人
+   * @param {Object} option.data['partner'] 必填 委外厂商信息 键值对
+   * @returns {{method: string, url: string}}
+   */
   upsertContact: option => {
     return {
       method: 'post',
@@ -102,6 +134,11 @@ let apiList = {
     };
   },
 
+  /**
+   * 查询联系人
+   * @param {Object} option.data 必填 联系人查询条件 键值对
+   * @returns {{method: string, url: string}}
+   */
   findContact: (option) => {
     return {
       url: 'data/Base User/Base User/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=2&StartRowNum=0'
