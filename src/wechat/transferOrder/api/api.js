@@ -7,7 +7,6 @@ let apiList = {
    */
   getTransferOrder: option => {
     return {
-      method: 'post',
       url: 'service/EAI Siebel Adapter/QueryPage',
       data: {
         'body': {
@@ -36,6 +35,25 @@ let apiList = {
 
   /**
    * 查找交接单详情
+   * @param {String} option.data.body.OutputIntObjectName 必填 固定 KL Project
+   * @param {String} option.data.body.PrimaryRowId 必填 交接单Id
+   * @returns {{method: string, url: string, data: {}}}
+   */
+  queryTransferOrderById: option => {
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'KL Project',
+          'PrimaryRowId': option.data.id
+        }
+      }
+    };
+  },
+
+  /**
+   * 查找交接单详情
    * @param {data} option.data 查询条件
    * @returns {{url: string, data: {}}}
    */
@@ -43,6 +61,31 @@ let apiList = {
     return {
       url: 'data/Channel Partner/Channel Partner/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=2&StartRowNum=0',
       data: {}
+    };
+  },
+
+  /**
+   * 通过交接单id获取订单列表
+   * @param option
+   */
+  queryOrdersById: option => {
+    return {
+      method: 'get',
+      url: 'data/Order Entry (Sales)/Order Entry - Orders/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=100&StartRowNum=0'
+    };
+  },
+
+  /**
+   * 获取订单行
+   * @param option
+   */
+  queryOrderLines: option => {
+    return {
+      method: 'get',
+      url: 'data/Order Entry - Line Items/Order Entry - Line Items/?searchspec=' + KND.Util.condition(option.data),
+      error: data => {
+        console.log(data);
+      }
     };
   },
 
@@ -96,9 +139,8 @@ let apiList = {
    * @param {String} option.data.body['ProcessName'] 必填 安装交接单指派安装工程师流程
    * @returns {{method: string, url: string, data: object}}
    */
-  transfer: option => {
+  assign: option => {
     return {
-      method: 'post',
       url: 'service/Workflow Process Manager/RunProcess'
     };
   },
@@ -110,7 +152,6 @@ let apiList = {
    */
   deactivateInbox: option => {
     return {
-      method: 'post',
       url: 'service/Universal Inbox/DeactivateInboxOwner'
     };
   },
@@ -127,7 +168,7 @@ let apiList = {
   },
 
   /**
-   * 创建&更新订单头
+   * 创建订单
    * @param {String} option.data.body['ProcessName'] 固定 KL Install Order Create Process
    * @param {String} option.data.body['Project Id'] 必填 交接单id
    * @param {String} option.data.body['KL Hole Type'] 必填 开孔方式
@@ -137,8 +178,37 @@ let apiList = {
    */
   saveOrder: option => {
     return {
-      method: 'post',
       url: 'service/Workflow Process Manager/RunProcess'
+    };
+  },
+
+  /**
+   * 修改订单
+   * @param {Object} option.data 必填 需要修改的键值对对象
+   * @returns {{url: string}}
+   */
+  updateOrder: option => {
+    return {
+      method: 'put',
+      url: 'data/Order Entry (Sales)/Order Entry - Orders'
+    };
+  },
+
+  /**
+   * 查询安装订单详情（包括订单头、行项目、安装任务）
+   * @param {String} option.data.body['OutputIntObjectName'] 必填 固定 Base Order Entry (Sales)
+   * @param {String} option.data.body['SearchSpec'] 必填 查询条件 [Order Entry - Orders.Id]='1-2BSAS9OT'
+   * @returns {{method: string, url: string}}
+   */
+  getOrder: option => {
+    return {
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        body: {
+          OutputIntObjectName: 'Base Order Entry (Sales)',
+          SearchSpec: ''
+        }
+      }
     };
   },
 
@@ -158,11 +228,25 @@ let apiList = {
    * @returns {{method: string, url: string}}
    */
   saveOrderLine: option => {
-    console.log(option);
     return {
-      // method: 'put',
-      // url: 'data/Order Entry (Sales)/Order Entry - Orders/1-2BSAS9OT/Order Entry - Line Items'
+      method: 'put',
+      url: 'data/Order Entry (Sales)/Order Entry - Orders/' + option.data['Order Header Id'] + '/Order Entry - Line Items'
       // url: 'data/Order Entry (Sales)/Order Entry - Orders/1-2BSAS9OT/Order Entry - Line Items/1-2BSB7L33xxx'
+    };
+  },
+
+  /**
+   * 转发门厂技术 & 提交订单
+   * @param {String} option.data['id'] 必填 订单id
+   * @returns {{method: string, url: string}}
+   */
+  runProcess: option => {
+    return {
+      method: 'post',
+      url: 'service/Workflow Process Manager/RunProcess',
+      data: {
+        'body': option.data
+      }
     };
   }
 };

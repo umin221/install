@@ -52,17 +52,11 @@ export default new Router({
     component(resolve) {
       require(['../page/order'], resolve);
     }
-  }, { // 锁芯部分
-    path: '/lockCore',
-    name: 'lockCore',
+  }, { // 订单行
+    path: '/orderLine',
+    name: 'orderLine',
     component(resolve) {
-      require(['../page/lockCore'], resolve);
-    }
-  }, { // 锁体部分
-    path: '/lockBody',
-    name: 'lockBody',
-    component(resolve) {
-      require(['../page/lockBody'], resolve);
+      require(['../page/orderLine'], resolve);
     }
   }]
 });
