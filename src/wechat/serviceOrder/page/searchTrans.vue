@@ -9,18 +9,11 @@
           <cus-cell class="multiple"
                     :key="item.id"
                     :title="'配件名称:'+ item['KL Translated Name']"
-                    v-for="item in result">
+                    v-for="(item, index) in result">
             <div class="mint-cell-sub-title" slot="title">配件代码: {{item.Name}}</div>
             <div class="mint-cell-sub-title" slot="title">价格:{{item["List Price"]}} </div>
-            <div class="mint-cell-sub-title numberBox" slot="title">
-              <div></div>
-              <mt-button size="small" type="default" @click.native="miuns"><i class="xs-icon icon-minus" style="font-size: 12px"></i></mt-button>
-              <div style="width: 2rem;text-align: center;">{{number}}</div>
-              <mt-button size="small" type="default" @click.native="add"><i class="xs-icon icon-add" style="font-size: 12px"></i></mt-button>
-            </div>
           </cus-cell>
         </cus-loadmore>
-
     </cus-search>
   </div>
 </template>
@@ -31,12 +24,12 @@
     right: 1rem;
     top: 0;
     align-items: center;
-    background-color: $bg-cancel;
+    background-color: #ffffff;
     z-index: 1000;
   }
 </style>
 <script type="es6">
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import cusLoadmore from 'public/components/cus-loadmore';
   import cusSearch from 'public/components/cus-search';
   import cusCell from 'public/components/cus-cell';
@@ -48,7 +41,7 @@
     data: () => {
       return {
         value: '',
-        number: 0,
+        number: [],
         topStatus: ''
       };
     },
@@ -57,19 +50,17 @@
     },
     methods: {
       ...mapActions(NAMESPACE, ['getProduct']),
+      ...mapMutations(NAMESPACE, ['count']),
       searchFn(val) {
-        this.value = val;
         this.getProduct(val);
       },
       loadBottomFn() {
       },
-      add() {
-        this.number = this.number + 1;
+      add(index) {
+        this.count({index: index, type: 'add'});
       },
-      miuns() {
-        if (this.number) {
-          this.number = this.number - 1;
-        }
+      minus(index) {
+        this.count({index: index, type: 'minus'});
       }
     }
   };

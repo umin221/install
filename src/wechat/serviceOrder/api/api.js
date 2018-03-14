@@ -12,6 +12,19 @@ let ApiList = {
     };
     // 列表
   },
+  getSearchList: option => {
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base KL Service Request Interface BO',
+          'SearchSpec': '[Service Request.Owner]=' + option.data['Owner'] + ' AND [Service Request.SR Number] ~LIKE "*' + option.data.status + '*"'
+        }
+      }
+    };
+    // 列表搜索
+  },
   getDetail: option => {
     return {
       method: 'post',
@@ -37,21 +50,6 @@ let ApiList = {
       }
     };
     // 通过序列号查询
-  },
-  setStatus: option => {
-    return {
-      method: 'post',
-      url: 'service/Workflow Process Manager/RunProcess',
-      data: {
-        'body': {
-          'Object Id': option.data.obj['Object Id'],
-          'ActivityId': option.data.obj['ActivityId'],
-          'inStatus': option.data.obj['inStatus'],
-          'ProcessName': 'KL SR Action Status Change Process'
-        }
-      }
-    };
-    // 设置工单状态
   },
   getClose: option => {
     return {
@@ -81,13 +79,14 @@ let ApiList = {
       data: {
         'body': {
           'Object Id': option.data.id,
-          'function': 'Dispatch',
+          'function': option.data.type,
           'empId': option.data.empId,
           'ifRefresh': 'N',
           'empFullName': option.data.empFullName,
           'ProcessName': 'KL SR Pick Owner Process'
         }
       }
+      // 分配、派发工单
     };
   },
   getAccept: option => {
@@ -105,6 +104,21 @@ let ApiList = {
     };
     // 接单状态
   },
+  getAssign: option => {
+    return {
+      method: 'post',
+      url: 'service/Workflow Process Manager/RunProcess',
+      data: {
+        'body': {
+          'Object Id': option.data.obj['Object Id'],
+          'ActivityId': option.data.obj.ActivityId,
+          'inStatus': 'Accept',
+          'ProcessName': 'KL SR Action Status Change Process'
+        }
+      }
+    };
+    // 分配工单
+  },
   getAppoint: option => {
     return {
       method: 'post',
@@ -113,18 +127,49 @@ let ApiList = {
         'body': {
           'Object Id': option.data.obj['Object Id'],
           'ActivityId': option.data.obj.ActivityId,
-          'ActionPlanned': option.data.obj.ActivityId,  // 计划开始时间
-          'ActionPlanEnd': option.data.obj.ActivityId,   // 计划完成时间
-          'inStatus': 'Accept',
+          'ActionPlanned': option.data.obj.starTime,  // 计划开始时间
+          'ActionPlanEnd': option.data.obj.endTime,   // 计划完成时间
+          'inStatus': 'Appoint',
           'ProcessName': 'KL SR Action Status Change Process'
         }
       }
     };
     // 预约状态
   },
+  getDepart: option => {
+    let data = {};
+    if (option.data.obj.type === 'setOut') {
+      data['KL Departure Location'] = option.data.obj['KL Departure Location'];
+    } else {
+      data['MeetingLocation'] = option.data.obj['MeetingLocation'];
+    }
+    data.Id = option.data.obj['ActivityId'];
+    return {
+      method: 'put',
+      url: 'data/KL Service Request Interface BO/Service Request/' + option.data.obj['Object Id'] + '/Action',
+      data: data
+    };
+    // 出发 、 上门
+  },
+  getDone: option => {
+    return {
+      method: 'post',
+      url: 'service/Workflow Process Manager/RunProcess',
+      data: {
+        'body': {
+          'Object Id': option.data.obj['Object Id'],
+          'ActivityId': option.data.obj.ActivityId,
+          'inStatus': 'Done',
+          'DoneLoc': option.data.obj.DoneLoc,
+          'ProcessName': 'KL SR Action Status Change Process'
+        }
+      }
+    };
+    // 完成状态
+  },
   getSearch: option => {
     return {
-      url: 'data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] ~LIKE "*' + option.data.val + '*" &PageSize=10&StartRowNum=0'
+      url: 'data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] ~LIKE "' + option.data.val + '*" &PageSize=10&StartRowNum=0'
     };
     // 搜索电话联系人
   },
@@ -134,10 +179,11 @@ let ApiList = {
       url: 'data/KL Service Request Interface BO/Service Request/1-2BSB0DZ1',
       data: {
         // 'KL Contact Mobile Phone': option.data.form.Contact_Phone,
-        'Contact Last Name': option.data.form.Contact_Name,
         // 'KL Personal Province': option.data.form.PROVINCE,
         // 'Personal City': option.data.form.CITY,
         // 'Personal Street Address': option.data.form.Address,
+        'Contact Last Name': option.data.form.Contact_Name,
+        'Primary Personal Address Id': option.data.form['Primary Personal Address Id'],
         'Contact Id': option.data.form.Contact_Id,
         'Area': option.data.form.Area,
         'Sub-Area': option.data.form.SR_AREA,
@@ -172,13 +218,13 @@ let ApiList = {
     };
     // 名字过滤
     if (name) {
-      specName += '[Last Name] ~LIKE "' + name + '*" AND ';
+      specName += '[Last Name] ~LIKE "' + name + '*" OR ([KL Parent Service Region Name] ~LIKE "' + name + '*" OR [Service Region] ~LIKE "' + name + '*") AND';
     };
     return {
       url: 'data/KL Employee Interface BO/Employee/?searchspec=' + specName + '(' + specPosi.join(' OR ') + ')&' + KND.Util.param(option.paging)
     };
   },
-  upDateAddr: option => {
+  upDateContact: option => {
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/Upsert',
@@ -191,16 +237,19 @@ let ApiList = {
             'IntObjectFormat': 'Siebel Hierarchical',
             'ListOfBase KL Contact Interface BO': {
               'Contact': {
-                'Id': '1-2BSBQ0KF',
-                'ListOfContact_PersonalAddress': {
-                  'Contact_Personal Address': [
+                'Id': '1',
+                'M/F': '女',
+                'Type': option.data.form.SR_TYPE,
+                'Last Name': option.data.form.Contact_Name,
+                'Work Phone #': option.data.form.Contact_Phone,
+                'ListOfCUT Address': {
+                  'CUT Address': [
                     {
-                      'Id': '1-2BSBQ0KF',
-                      'Personal Country': '中国',
-                      'Personal Province': option.data.Province,
-                      'Personal City': option.data.City,
-                      'Personal Street Address': option.data.Address,
-                      'IsPrimaryMVG': 'Y'
+                      'Id': '1',
+                      'Country': '中国',
+                      'Province': option.data.form.PROVINCE,
+                      'City': option.data.form.CITY,
+                      'Street Address': option.data.form.Address
                     }
                   ]
                 }

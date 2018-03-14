@@ -3,12 +3,13 @@
     <div class="service-continer">
       <mt-header fixed :title="headTitle">
         <fallback slot="left"></fallback>
-        <mt-button slot="right" @click.native="openConfirm">关闭</mt-button>
+        <mt-button v-if="loginMeg['Job Title'] === '400'&&BtnStatu === 'status4'" slot="right" @click.native="openConfirm">关闭</mt-button>
+        <mt-button v-if="loginMeg['Job Title'] === 'install'" slot="right" @click.native="openConfirm">关闭</mt-button>
       </mt-header>
 
       <div class="mint-content service-detail">
         <div class="detail-title">
-          <div class="mt-Detail-title">服务单编号：{{ServiceRequest['SR Number']}}<span class="user-state">{{ServiceRequest.Status}}</span></div>
+          <div class="mt-Detail-title">服务单编号：{{ServiceRequest['SR Number']}}<span class="user-state">{{Action['Status']}}</span></div>
           <div class="mt-Detail-title">优先级：{{ServiceRequest['Priority']}}</div>
           <div class="mt-Detail-title">联系人：{{ServiceRequest['Contact Last Name']}}</div>
           <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call">{{ServiceRequest['Contact Business Phone']}}</a></div>
@@ -36,24 +37,23 @@
               </div>
             </mt-tab-container-item>
             <mt-tab-container-item id="tab-container2">
-              <div class="service-record" v-if="ServiceRequest['Status'] !== '未开始'">
-                <div>单据编号{{ServiceRequest['SR Number']}}
-                  <i :class="[icon,iconDown]" @click="openOrder"></i>
-                  <ul v-show="isOpenOrder">
-                    <li>故障记录</li>
+              <toggle :label="ServiceRequest['SR Number']">
+                <div v-if="Action">
+                  <div class="record-title">故障记录</div>
+                  <ul class="failure-record" style="list-style: none">
                     <li>产品序列号：{{ServiceRequest['KL SN']}}</li>
-                    <li>详细地址：{{ServiceRequest['KL SN']}}</li>
+                    <li>详细地址：{{ServiceRequest['Personal Street Address']}}</li>
                     <li>产品类型：{{ServiceRequest['KL Product Model']}}</li>
                     <li>故障描述：{{ServiceRequest['Sub-Area']}}</li>
                     <li>故障现象：{{ServiceRequest['Area']}}</li>
                     <li>照片附件</li>
                   </ul>
-                  <ul v-show="isOpenOrder">
-                    <li>完工确认单</li>
+                  <div class="record-title">完工确认单</div>
+                  <ul class="finish-enter">
                   </ul>
                 </div>
-              </div>
-              <div v-else style="line-height: 5rem;text-align: center">暂无数据</div>
+                <div v-else style="line-height: 5rem;text-align: center">暂无数据</div>
+              </toggle>
             </mt-tab-container-item>
             <mt-tab-container-item id="tab-container3">
               <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
@@ -75,7 +75,11 @@
         <mt-button type="primary" class="single" @click.native="toContact" >派单</mt-button>
       </button-group>
       <button-group v-if="loginMeg['Job Title'] === 'install'">
-        <mt-button v-show="BtnStatu === 'status1' && !callEnd" type="primary" class="single" @click.native="changeBtnStote"  >电话联系客户</mt-button>
+        <div v-show="BtnStatu === 'status5'" class="callPlan">
+          <mt-button  type="primary" class="single flax"  @click.native="changeMy" >接单</mt-button>
+          <mt-button type="primary" class="single flax" @click.native="toContact">派单</mt-button>
+        </div>
+        <mt-button v-show="BtnStatu === 'status1'&& !callEnd" type="primary" class="single" @click.native="changeBtnStote"  >电话联系客户</mt-button>
         <div v-show="BtnStatu === 'status2' || callEnd" class="callPlan">
           <mt-button  type="primary" class="single flax"  @click.native="callSolve" >电话已解决</mt-button>
           <mt-button type="primary" class="single flax" @click.native="clickShow"  >预约维修计划</mt-button>
@@ -90,27 +94,26 @@
       </div>
 
       <close :showBox1="showBox" @my-enter="boxEnter" @my-close="boxClose"></close>
-
       <!--工单操作-->
       <mt-popup v-model="popupVisible1" position="bottom" popup-transition="popup-fade" class="mint-popup-2">
-        <mt-cell class="setOut" title="出发" >
-          <mt-button @click="clickPosition('setOut')">签到</mt-button>
+        <mt-cell class="setOut" title="出发" :value="Action['KL Departure Location']" >
+          <mt-button v-if="Action['Status']==='已预约'" @click="clickPosition('setOut')">签到</mt-button>
         </mt-cell>
-        <mt-cell title="到达">
-          <mt-button @click="clickPosition('reach')">签到</mt-button>
+        <mt-cell title="到达" :value="Action['MeetingLocation']">
+          <mt-button v-if="Action['Status']==='已出发'" @click="clickPosition('reach')">签到</mt-button>
+          <mt-button v-else-if="Action['Status']==='已预约'" style="background: gainsboro">签到</mt-button>
         </mt-cell>
         <mt-cell title="记录故障">
-          <router-link to="comEnter">
-            <mt-button>填写</mt-button>
-          </router-link>
+          <mt-button v-if="Action['Status']==='已上门'" @click="clickPosition()">填写</mt-button>
+          <mt-button v-else style="background: gainsboro">填写</mt-button>
         </mt-cell>
         <mt-cell title="完工确认">
-          <router-link to="saveFault">
-            <mt-button >填写</mt-button>
-          </router-link>
+          <mt-button v-if="Action['Status']==='已上门'" @click="clickPosition()">填写</mt-button>
+          <mt-button v-else style="background: gainsboro">填写</mt-button>
         </mt-cell>
         <mt-cell class="completeEnd" title="结束">
-          <mt-button @click.native="clickPosition('end')">确认</mt-button>
+          <mt-button v-if="Action['Status']==='已上门'" @click.native="clickPosition('end')">确认</mt-button>
+          <mt-button v-else style="background: gainsboro">确认</mt-button>
         </mt-cell>
         <div class="cancelHandle" @click="popupVisible1 = !popupVisible1">取消</div>
       </mt-popup>
@@ -123,6 +126,7 @@
   import dateControl from './dateControl';
   import { MessageBox } from 'mint-ui';
   import buttonGroup from 'public/components/cus-button-group';
+  import toggle from 'public/components/cus-detail-toggle';
   //
   const NameSpace = 'detail';
   //
@@ -150,57 +154,53 @@
         showBox: false,
         showBox2: false,
         result: false,
-        tabList: [
-          {name: '基础信息', id: 'tab-container1'},
-          {name: '维修记录', id: 'tab-container2'},
-          {name: '流程记录', id: 'tab-container3'}
-        ],
         starTime: '',
         endTime: '',
-        callEnd: false
+        callEnd: false,
+        AppointEnd: false
       };
     },
     computed: {
       ...mapState('index', ['loginMeg']),
-      ...mapState(NameSpace, ['ServiceRequest', 'processDate', 'Statu', 'BtnStatu'])
+      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus']),
+      ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact']),
       boxClose(msg) {               // 关闭取消事件
         this.showBox = false;
       },
       boxEnter(msg) {               // 关闭确认
-        let self = this;
-        self.showBox = false;
+        let me = this;
+        me.showBox = false;
         if (msg) {
-          let Action = KND.Util.isArray(self.ServiceRequest.Action) ? self.ServiceRequest.Action[0] : self.ServiceRequest.Action;
           let obj = {
-            srId: self.ServiceRequest['Id'],
-            actionId: Action['Id'],
+            srId: me.ServiceRequest['Id'],
+            actionId: me.Action['Id'],
             closeMsg: msg
           };
-          self.getCloseReason(obj);
+          me.getCloseReason(obj);
         }
       },
       openConfirm() {               // 点击关闭弹出层
-        let self = this;
-        self.showBox = true;
+        let me = this;
+        me.showBox = true;
       },
       changeBtnStote() {            // 改变按钮状态
-        let self = this;
-        self.callEnd = true;
+        let me = this;
+        me.callEnd = true;
       },
       clickShow() {                 // 点击显示日历
-        let self = this;
-        self.showBox2 = true;
-        let parms = {
-          'Object Id': self.ServiceRequest.Id,
-          'ActivityId': self.ServiceRequest.Action.Id,
-          'inStatus': self.Statu['接单'],
-          'key': 'getAccept'
-        };
-        if (self.BtnStatu === 'status2') {
-          self.setStatus(parms);
+        let me = this;
+        me.showBox2 = true;
+        // 改变为接单状态
+        if (me.BtnStatu === 'status1') {
+          let parms = {
+            'Object Id': me.ServiceRequest.Id,
+            'ActivityId': me.Action.Id,
+            'inStatus': me.Statu['接单'],
+            'key': 'getAccept'
+          };
+          me.setStatus({parms: parms, srNum: me.srNumber});
         }
       },
       cancel(val) {                    // 日历取消事件
@@ -209,6 +209,8 @@
       },
       enter(val) {                     // 日历确定
         let me = this;
+          // 判断开始结束时间
+        console.log(val);
         if (val.Time1.time && val.Time2.time) {
           if (val.Time1.key <= val.Time2.key) {
             me.starTime = val.Time1.time;
@@ -217,11 +219,22 @@
             me.starTime = val.Time2.time;
             me.endTime = val.Time1.time;
           }
-          me.starTime = val.selectDay + ' ' + me.starTime + ':00';
-          me.endTime = val.selectDay + ' ' + me.endTime + ':00';
-          this.showBox2 = false;
-          console.log(me.starTime);
-          console.log(me.endTime);
+          // 转换时间格式
+          me.starTime = new Date(val.selectDay + ' ' + me.starTime + ':00').format('MM/dd/yyyy hh:mm:ss');
+          me.endTime = new Date(val.selectDay + ' ' + me.endTime + ':00').format('MM/dd/yyyy hh:mm:ss');
+          if (me.BtnStatu === 'status2') {
+            let parms = {
+              'Object Id': me.ServiceRequest.Id,
+              'ActivityId': me.Action.Id,
+              'inStatus': me.Statu['预约'],
+              'starTime': me.starTime,
+              'endTime': me.endTime,
+              'key': 'getAppoint'
+            };
+            me.setStatus({parms: parms, srNum: me.srNumber});
+          }
+          me.showBox2 = false;
+          me.callEnd = false;
         } else {
           MessageBox({
             title: '提示',
@@ -235,20 +248,50 @@
         });
       },
       clickPosition(value1) {
-        let self = this;
-        let parms = {
-          'Object Id': self.ServiceRequest.Id,
-          'ActivityId': self.ServiceRequest.Action.Id,
-          'inStatus': ''
-        };
+        let me = this;
+        let parms = {};
+        let statu = me.Action['Status'];
         if (value1 === 'setOut') {
-          parms['inStatus'] = self.Statu['接单'];
+          parms = {
+            'Object Id': me.ServiceRequest.Id,
+            'ActivityId': me.Action.Id,
+            'key': 'getDepart',
+            'KL Departure Location': '我是出发地址',
+            'type': 'setOut'
+          };
         } else if (value1 === 'reach') {
-          parms['inStatus'] = self.Statu['上门'];
+          parms = {
+            'Object Id': me.ServiceRequest.Id,
+            'ActivityId': me.Action.Id,
+            'key': 'getDepart',
+            'MeetingLocation': '我是上门地址',
+            'type': 'reach'
+          };
         } else if (value1 === 'end') {
-          parms['inStatus'] = self.Statu['完成'];
+          console.log('完成');
+          parms = {
+            'Object Id': me.ServiceRequest.Id,
+            'ActivityId': me.Action.Id,
+            'key': 'getDone',
+            'DoneLoc': '我是完成地址'
+          };
         }
-        self.setStatus(parms);
+        if ((value1 === 'setOut' && statu === '已预约') || (value1 === 'reach' && statu === '已出发') || (value1 === 'end' && statu === '已上门')) {
+          me.setStatus({parms: parms, srNum: me.srNumber});
+        }
+      },
+      changeMy() {              // 主管接单
+        let me = this;
+        MessageBox.confirm('确认维修责任人更新为你吗？', '提示').then(action => {
+          let params = {
+            id: me.ServiceRequest['Id'],
+            empId: me.loginMeg['Id'],
+            empFullName: me.loginMeg['KL Employee Full Name'],
+            type: 'Dispatch',
+            srNum: me.ServiceRequest['SR Number']
+          };
+          me.setContact(params);
+        });
       },
       completeEnd() {
         MessageBox({
@@ -277,7 +320,8 @@
     components: {
       close,
       dateControl,
-      buttonGroup
+      buttonGroup,
+      toggle
     }
   };
 </script>
@@ -304,7 +348,7 @@
         position: relative;
         padding: 0.5rem;
         height: 6rem;
-        font-size: 0.7rem;
+        font-size: $font-size-default;
         background: white;
         .mt-Detail-title{
           line-height: 1.5rem;
@@ -322,7 +366,7 @@
       .detail-content{
         position: relative;
         margin-top: 0.5rem;
-        font-size: 0.7rem;
+        font-size: $font-size-default;
         height: 80%;
         background-color: #ffffff;
         overflow: auto;
@@ -372,22 +416,12 @@
                 padding: 10px;
                 font-size: 0.15rem;
               }
-
               .mt-Detail-info{
                 div{
                   line-height: 1.5rem;
                   .detail-call{
                     @include remove-decoration();
                   }
-                }
-              }
-              .service-record>div{
-                border-bottom: 1px solid gray;
-                line-height: 2rem;
-                text-align: left;
-                i{
-                  float: right;
-                  margin-right: 1rem;
                 }
               }
             }

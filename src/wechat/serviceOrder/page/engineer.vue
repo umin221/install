@@ -6,7 +6,8 @@
                 :show="true">
 
       <cus-loadmore ref="result"
-                  :loadBottom="loadBottomFn"
+                  @loadTop="loadTop"
+                  @loadBottom="loadBottomFn"
                   :topStatus="topStatus">
         <mt-cell class="multiple"
                   v-for="item in result"
@@ -82,14 +83,16 @@
        */
       selectFn(item) {
         let me = this;
+        let type = item['KL Primary Position Type'];
         MessageBox.confirm('是否指派给该工程师！', '').then(action => {
           let params = {
             id: me.$route.query.id,
             empId: item['Id'],
-            empFullName: item['KL Employee Full Name']
+            empFullName: item['KL Employee Full Name'],
+            type: type === '产品安装工程师' ? 'Dispatch' : 'Distribute'
           };
           this.setContact(params);
-          me.$router.push('/');
+          me.$router.go(-2);
         });
       },
       /**
@@ -99,6 +102,11 @@
         loader.call(this, {
           more: true
         }, 'onBottomLoaded');
+      },
+      loadTop() {
+
+        this.$refs.result['onTopLoaded']();
+//        console.log(this.$refs);
       }
     }
   };

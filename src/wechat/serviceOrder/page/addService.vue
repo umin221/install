@@ -10,7 +10,7 @@
         <!--<mt-cell class="require mint-field"  @click.native="getLov('SR_TYPE')" title="联系人类型"  :value="SR_TYPE" placeholder="请选择" is-link></mt-cell>-->
         <mt-cell class="require mint-field margin-right" title="联系人类型"  :value="SR_TYPE"></mt-cell>
         <mt-cell class="require mint-field" @click.native="getLov('KL_PROVINCE','CN')" title="省市" :value="KL_PROVINCE" placeholder="请选择"  is-link></mt-cell>
-        <mt-field class="block require" id="addressText" :attr="isEdit" label="详细地址" placeholder="请输入详细地址..." v-model="Address" type="textarea" rows="2">
+        <mt-field class="block require" id="addressText" :attr="isEdit" label="详细地址" :placeholder="placeHold" v-model="Address" type="textarea" rows="2">
           <i class="xs-icon icon-edit" @click="editAddress" style="position: absolute;bottom: 1.8rem;right: 0.8rem;"></i>
         </mt-field>
         <mt-cell class="mint-field"  title="故障现象" :value="SR_AREA" @click.native="getLov('SR_AREA','')"  placeholder="请选择" is-link></mt-cell>
@@ -30,7 +30,7 @@
       </div>
       <mt-popup v-if="showBox" v-model="showBox" position="bottom">
         <menuBox v-show="lovType === 'KL_PROVINCE'" @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType" :slots="provinceSlots"></menuBox>
-        <menuBox v-show="lovType === 'SR_TYPE'" @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType" :slots="typeSlots"></menuBox>
+        <menuBox v-show="lovType === 'SR_TYPE'" @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType"  :slots="typeSlots"></menuBox>
         <menuBox v-show="lovType === 'SR_AREA'" @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType" :slots="areaSlots"></menuBox>
       </mt-popup>
       <mt-datetime-picker
@@ -48,7 +48,7 @@
         <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item)">{{item['Work Phone #']}} {{item['Last Name']}}</li>
       </ul>
       <div class="submitButton">
-        <mt-button size="normal" type="danger" @click="submit">提交</mt-button>
+        <mt-button size="normal" type="danger" @click.native="submit">提交</mt-button>
       </div>
     </div>
   </div>
@@ -72,6 +72,13 @@
       child[0].removeAttribute('disabled');
     };
   })();
+  const textCall = (function() {
+    return function(callNum) {
+      let phoneReg = new RegExp('^[1][3,4,5,7,8][0-9]{9}$');
+      let workPhoneReg = new RegExp('^(([0\\+]\\d{2,3})?(0\\d{2,3}))(\\d{7,8})((\\d{3,}))?$');
+      return (phoneReg.test(callNum) || phoneReg.test(workPhoneReg));
+    };
+  })();
   const NameSpace = 'addService';
   export default {
     name: NameSpace,
@@ -87,7 +94,7 @@
         lovType: '',
         Contact_Phone: '',     // 联系电话
         Contact_Name: '',   // 报修联系人
-        Contact_Id: '',
+        Contact_Id: '',     // 客户Id
         Address: '',       // 详细地址
         PROVINCE: '',      // 省
         CITY: '',           // 市
@@ -101,7 +108,8 @@
         KL_SN: '',           // 条形码
         isCall: {},
         isEdit: {disabled: false},
-        isClick: false
+        isClick: false,
+        placeHold: ''
       };
     },
     computed: {
@@ -116,18 +124,29 @@
       },
       submit() {
         let me = this;
-//        for (let i = 0; i < me.mustField.length; i++) {
-//          console.log(me[me.mustField[i].key]);
-//          if (!me[me.mustField[i].key]) {
-//            MessageBox({
-//              title: '提示',
-//              message: '请选择' + me.mustField[i].name + '！'
-//            });
-//            return;
-//          }
-//        }
+        for (let i = 0; i < me.mustField.length; i++) {
+          if (!me[me.mustField[i].key]) {
+            MessageBox({
+              title: '提示',
+              message: '请选择' + me.mustField[i].name + '！'
+            });
+            return;
+          }
+          if (me[me.mustField[i].name] === '联系人电话') {
+            if (textCall(me.Contact_Phone)) {
+              MessageBox({
+                title: '提示',
+                message: '联系电话格式错误请重新输入！'
+              });
+              me.Contact_Phone = '';
+              return;
+            }
+          }
+        }
+        let key = (!me.isEdit.id && !me.isClick) ? 'upDateContact' : 'submitService';
         let submitForm = {
           Contact_Id: me.Contact_Id,
+          AddressId: me.AddressId,
           Contact_Phone: me.Contact_Phone,
           Contact_Name: me.Contact_Name,
           PROVINCE: me.PROVINCE,
@@ -135,15 +154,18 @@
           Address: me.Address,
           Area: me.Area,
           SR_AREA: me.SR_AREA,
+          SR_TYPE: me.SR_TYPE,
           Priority: me.Priority,
           ProductFlag: me.ProductFlag,
           Start_Date: me.Start_Date,
           KL_SN: me.KL_SN,
           KL_Product_Model: me.form.KL_Product_Model,
           KL_Cutoff_Date: me.form.KL_Cutoff_Date,
-          Product_Warranty_Flag: me.form.Product_Warranty_Flag
+          Product_Warranty_Flag: me.form.Product_Warranty_Flag,
+          key: key
         };
         me.submitService(submitForm);
+        me.$router.go(-1);
       },
       getLov(type) {
         let me = this;
@@ -165,6 +187,7 @@
         let me = this;
         me.Contact_Id = val['Id'];
         me.Contact_Phone = val['Work Phone #'];
+        me.AddressId = val['Primary Personal Address Id'];
         me.Contact_Name = val['Last Name'];
         me.Address = val['Primary Personal Street Address'];
         me.PROVINCE = val['KL Primary Personal Province'];
@@ -199,6 +222,7 @@
       editAddress() {
         setAttrButt('addressText');
         this.isEdit = {};
+        this.placeHold = '请输入详细地址...';
       },
       cancel() {
         let me = this;
