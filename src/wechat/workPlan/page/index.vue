@@ -1,14 +1,16 @@
 <template>
-  <div>
+  <div id='calendar'>
     <mt-header fixed :title="headTitle">
       <fallback slot="left"></fallback>
+      <mt-button class="xs-icon icon-add" slot="right" @click.native="createPlan"></mt-button>
     </mt-header>
     <div class="date mint-content">
-      <!-- 年份 月份 -->
+      <div class="calendar-content">
+        <!-- 年份 月份 -->
       <div class="month">
-        <i class="el-icon-arrow" @click="pickPre(currentYear,currentMonth)"><</i>
-        <span>{{ currentYear }} 年 {{ currentMonth }} 月</span>
-        <i class="el-icon-arrow" @click="pickNext(currentYear,currentMonth)">></i>
+        <i class="el-icon-arrow" @click="pickPreNext(currentYear,currentMonth,0)"> < </i>
+        <span @click="openPicker">{{ currentYear }} 年 {{ currentMonth }} 月</span>
+        <i class="el-icon-arrow" @click="pickPreNext(currentYear,currentMonth,42)"> > </i>
       </div>
       <!-- 星期 -->
       <ul class="weekdays">
@@ -17,30 +19,66 @@
         <li>三</li>
         <li>四</li>
         <li>五</li>
-        <li style="color:#0A0A0A">六</li>
-        <li style="color:#0A0A0A">日</li>
+        <li>六</li>
+        <li>日</li>
       </ul>
       <!-- 日期 -->
       <div class="bodyDiv">
         <ul class="days" v-for="(value,index1) in daysUL">
-          <li @click="pick(day,index+index1*7)" v-for="(day, index) in value" :class="[{'ban':isBan[index+index1*7]},{'xiu':isXiu[index+index1*7]}]" >
+          <li @click="pick(day,index+index1*7)" v-for="(day, index) in value" >
             <!--本月-->
-            <span v-if="day.getMonth()+1 != currentMonth" class="other-month" :class="{'selected':isSelected[index+index1*7]}">{{ day.getDate() }}</span>
-            <span v-else :class="{'selected':isSelected[index+index1*7]}">
-          <!--今天-->
-          <span v-if="day.getFullYear() == new Date().getFullYear() && day.getMonth() == new Date().getMonth() && day.getDate() == new Date().getDate()" class="active">{{ day.getDate() }}</span>
-          <span v-else>{{ day.getDate() }}</span>
-          </span>
+            <div class="dateItem" :class="{'selected':(isSelected[(index+index1*7)] || (new Date(day).getFullYear() == new Date().getFullYear() && day.getMonth() == new Date().getMonth() && day.getDate() == new Date().getDate()))}">
+              <span v-if="day==='spaces'"></span>
+              <span v-else >{{ day.getDate() }}</span>
+              <b v-if="day!=='spaces'" class="flag"></b>
+           </div>
           </li>
         </ul>
       </div>
+      <div class="planList">
+        <mt-cell-swipe
+        @click.native="toDetail(1)"
+          class="planListItem"
+          title="标题文字"
+          label="这是一些项目信息"
+          :right="[
+            {
+              content: '删除',
+              style: { background: 'red', color: '#fff' },
+              handler: () => this.$messagebox('delete')
+            }
+          ]">
+          <div class="status">
+            <p>11:30 - 12:35</p>
+            <p class="text">已审批</p>
+          </div>
+        </mt-cell-swipe>
+        
+      </div>
+      </div>
+       <button-group class="singBtn">
+        <mt-button type="primary" 
+                   @click.native="handleSubmit">提交</mt-button>
+      </button-group>
+      <mt-datetime-picker
+        ref="picker"
+        v-model="pickerValue"
+        type="date"
+        year-format="{value} 年"
+        month-format="{value} 月"
+        date-format="{value} 日"
+        @confirm="handleConfirm"
+        >
+      </mt-datetime-picker>
     </div>
   </div>
 </template>
 <script>
+  import buttonGroup from 'public/components/cus-button-group';
+  import { DatetimePicker, CellSwipe } from 'mint-ui';
   export default {
+    components: {buttonGroup, DatetimePicker, CellSwipe},
     name: 'date',
-
     data() {
       return {
         headTitle: '工作计划',
@@ -68,15 +106,38 @@
         restDaysList: [],
         banList: [],
         xiuList: [],
-        selectIndex: ''
+        selectIndex: '',
+        pickerValue: ''
       };
     },
-
     created() {
       this.initData(null);
+      // 给定DatetimePicker组件默认值
+      this.pickerValue = this.currentYear + '-' + this.currentMonth + '-' + this.currentDay;
     },
-
     methods: {
+      // 新建计划
+      createPlan() {
+        console.log('new creat');
+      },
+      // 跳转详情
+      toDetail(index) {
+        console.log(index);
+      },
+      // 提交
+      handleSubmit() {
+        console.log('new plan');
+      },
+      // 打开日期面板
+      openPicker() {
+        this.$refs.picker.$el.lastChild.lastChild.children[2].style.display = 'none'; // 隐藏日选择
+        this.$refs.picker.open();
+      },
+      // 确认日期选择
+      handleConfirm(date) {
+        this.pickPreNext(date.getFullYear(), date.getMonth(), 42);
+      },
+      // 格式化日期
       formatDate(year, month, day) {
         const y = year;
         let m = month;
@@ -85,7 +146,7 @@
         if (d < 10) d = `0${d}`;
         return `${y}-${m}-${d}`;
       },
-
+      // 初始化日期
       initData(cur) {
         let date = '';
         if (cur) {
@@ -97,34 +158,38 @@
         this.currentYear = date.getFullYear();
         this.currentMonth = date.getMonth() + 1;
         this.currentWeek = date.getDay();
-        date.setDate(1);
+        // date.setDate(1);
         this.firstWeek = date.getDay();
-
+        // 如果是0 则换成7 代表星期天
         if (this.firstWeek === 0) {
           this.firstWeek = 7;
         }
         const str = this.formatDate(this.currentYear, this.currentMonth, 1);
         this.days.length = 0;
-
-        // 今天是周日，放在第一行第7个位置，前面6个 这里默认显示一周，如果需要显示一个月，则第二个循环为 i<= 42- this.firstWeek
-        for (let i = this.firstWeek - 1; i >= 0; i -= 1) {
+        // 没有的日期用 "spaces" 代替
+        var spaces = new Array(this.firstWeek - 1).fill('spaces', 0, this.firstWeek - 1);
+        spaces.forEach((item, index) => {
+          this.days.push(item);
+        });
+        // 把当前日期放入数组
+        const d = new Date(str);
+        this.days.push(d);
+        this.isSevenDay();
+        // 循环当月总天数
+        var curMonthDays = this.getcurMonthDays(this.currentYear, this.currentMonth);
+        for (let i = 1; i <= curMonthDays; i += 1) {
           const d = new Date(str);
-          d.setDate(d.getDate() - i);
-          this.days.push(d);
-        }
-        if (this.days.length % 7 === 0) {
-          this.daysUL.push(this.days);
-          this.days = [];
-        }
-
-        for (let i = 1; i <= 35 - this.firstWeek; i += 1) {
-          const d = new Date(str);
-          d.setDate(d.getDate() + i);
-          this.days.push(d);
-          if (this.days.length % 7 === 0) {
-            this.daysUL.push(this.days);
-            this.days = [];
+          if (i < curMonthDays) {
+            // 小于当月最大天数，放入数组
+            d.setDate(d.getDate() + i);
+            this.days.push(d);
+          } else {
+            // 不足7天用 "spaces" 代替
+            for (let j = this.days.length; j < 7; j++) {
+              this.days.push('spaces');
+            }
           }
+          this.isSevenDay();
         }
       },
       setRestOrWork(type) {
@@ -132,23 +197,24 @@
           this.params.type = type;
         }
       },
-      cancel() {
+      // 是否有7天数据，有的话push给 "daysUL"
+      isSevenDay() {
+        if (this.days.length % 7 === 0) {
+          this.daysUL.push(this.days);
+          this.days = [];
+        }
       },
-      // 上一個月   传入当前年份和月份
-      pickPre(year, month) {
+      // 获取当月有多少天
+      getcurMonthDays(year, month) {
+        var curMonthDays = new Date(year, month, 0).getDate();
+        return curMonthDays;
+      },
+      // 上一個月&下一个月   传入当前年份和月份
+      pickPreNext(year, month, num) {
         this.daysUL = [];
         this.isSelected = [];
         const d = new Date(this.formatDate(year, month, 1));
-        d.setDate(0);
-        this.initData(this.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
-      },
-
-      // 下一個月   传入当前年份和月份
-      pickNext(year, month) {
-        this.daysUL = [];
-        this.isSelected = [];
-        const d = new Date(this.formatDate(year, month, 1));
-        d.setDate(42);
+        d.setDate(num);
         this.initData(this.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
       },
       dealResult(currentYear, currentMonth) {
@@ -209,6 +275,9 @@
         this.isSelected = [];
         this.params.selectDay = this.formatDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
         console.log(this.params);
+        this.currentYear = date.getFullYear();
+        this.currentMonth = date.getMonth() + 1;
+        this.currentDay = date.getDate();
         for (let i = 0; i < 42; i++) {
           if (index === i) {
             this.isSelected.push(true);
@@ -227,6 +296,8 @@
         }
         return true;
       }
+    },
+    mounted() {
     }
   };
 
@@ -237,10 +308,16 @@
     margin: 0;
     padding: 0;
   }
+  .picker-items{
+    display: block;
+  }
   .date {
     color: #333;
     float: left;
     width: 100%;
+  }
+  .calendar-content{
+    background: #fff;
   }
   .button>div{
     margin-top:70px;
@@ -250,12 +327,14 @@
     text-align: center;
     width: 100%;
     border-bottom: 1px solid gainsboro;
+    line-height: 2rem;
   }
   .weekdays {
     opacity: 0.6;
     display: flex;
     font-size: 0.7rem;
-    border-bottom: 1px solid gainsboro;
+    border-bottom: 1px solid #eee;
+    background: #eee;
   }
   .weekdays>li{
     flex: 1;
@@ -286,14 +365,14 @@
     width: 2rem;
     height: 2rem;
     color: #fff;
-    background-color: #1E90FF;
+    background-color: #00599f;
   }
   .active {
     display: inline-block;
     width: 2rem;
     height: 2rem;
     color: #fff;
-    background-color: #324057;
+    background-color: #eee;
   }
   i{
     cursor:pointer
@@ -301,8 +380,47 @@
   .el-icon-arrow{
     font: 500 20px sans-serif;
     color: #888;
+    height: 2rem;
+    width: 2rem;
+    line-height: 2rem;
+    margin: 0 .5rem;
+    display: inline-block;
   }
   .other-month {
     color: #EEC591;
+  }
+  .dateItem{
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+  }
+  b.flag{
+    background: #ccc;
+    width: 8px;
+    height: 8px;
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  b.red{
+    background: red;
+  }
+  .planList{
+    font-size: 0.75rem;
+    margin-bottom: 2.4rem;
+  }
+  .planList .planListItem {
+    border-bottom: 1px solid #dcdcdc;
+  }
+  .planList .planListItem .status .text {
+    color: #888;
+    display: block;
+    font-size: 12px;
+    margin-top: 6px;
   }
 </style>
