@@ -81,28 +81,17 @@ export default new Vuex.Store({
         form: {},
         record: [{state: '已提交', time: '2017-02-01 18:00'},
           {state: '总部安装主管xx审批中', time: '2017-02-01 19:00'}],
-        order: [{
-          code: '1-182624597380',
-          number: '500',
-          state: 'pending'
-        }]
+        orders: ''
       },
       mutations: {
         setTransferOrder(state, form) {
           state.form = form;
-          if (form.User) {
-            state.form.User = KND.Util.toArray(form.User);
-          };
+        },
+        setOrders(state, orders) {
+          state.orders = orders;
         },
         clear(state) {
-          state.form = {
-            'Id': KND.Util.now(),
-            'Name': '',
-            'Alias': '',
-            'KL Partner Owner Name': '',
-            'Main Phone Number': '',
-            'Primary Address Street': ''
-          };
+          state.form = {};
         }
       },
       actions: {
@@ -110,14 +99,30 @@ export default new Vuex.Store({
          * 通过id获取安装交接单信息
          * @param {String} id 必填 id
          */
-        findTransferOrderById({commit}, id) {
+        findTransferOrderById({commit, dispatch}, id) {
           api.get({
-            key: 'findTransferOrderById',
+            key: 'findTransferOrderById', // 'queryTransferOrderById',
             data: {
               id: id
             },
             success: data => {
               commit('setTransferOrder', data);
+              // 获取订单行
+              dispatch('queryOrdersById', id);
+            }
+          });
+        },
+        /**
+         * 获取订单头
+         */
+        queryOrdersById({commit}, id) {
+          api.get({
+            key: 'queryOrdersById',
+            data: {
+              'Project Id': id
+            },
+            success: data => {
+              commit('setOrders', data.items);
             }
           });
         },
@@ -141,7 +146,7 @@ export default new Vuex.Store({
                   // 更新交接单状态
                   dispatch('update', {
                     data: {
-                      'Status': '已拒绝'
+                      'Status': '已驳回'
                     }
                   });
                 }
@@ -173,10 +178,10 @@ export default new Vuex.Store({
          * 指派安装工程师
          * @param {String} positionId 必填 选择的安装人员职位Id
          */
-        transfer({state}, positionId) {
+        assign({state}, positionId) {
           let form = state.form;
           api.get({
-            key: 'transfer',
+            key: 'assign',
             data: {
               'body': {
                 'Object Id': form['Id'], // 安装交接单Id
@@ -256,33 +261,54 @@ export default new Vuex.Store({
     order: {
       namespaced: true,
       state: {
-        form: {}
       },
       mutations: {
-        setForm(state, obj) {
-          Object.assign(state.form, obj);
-        }
       },
       actions: {
         submit() {
         },
-        save({state}, id) {
-          let form = state.form;
+        /**
+         * 保存安装订单
+         * @param {String} id 必填 交接单id
+         */
+        save({state}, data) {
           api.get({
             key: 'saveOrder',
             data: {
               'body': Object.assign({
-                'ProcessName': 'KL Install Order Create Process',
-                'Project Id': id,
-                'KL Hole Type': '',
-                'KL Delivery Check Box 1': '',
-                'KL Delivery Check Box 2': ''
-              }, form)
+                'ProcessName': 'KL Install Order Create Process'
+              }, data)
             },
             success: data => {
               tools.success(data);
             }
           });
+        },
+        /**
+         * 更新安装订单
+         */
+        update({state}, order) {
+          api.get({
+            key: 'updateOrder',
+            data: order,
+            success: data => {
+              tools.success(data);
+            }
+          });
+        },
+        /**
+         * 获取订单行
+         */
+        queryOrderLines({state}, setting) {
+          setting.key = 'queryOrderLines';
+          api.get(setting);
+        },
+        /**
+         * 转发或提交订单
+         */
+        runProcess({state}, setting) {
+          setting.key = 'runProcess';
+          api.get(setting);
         }
       }
     },

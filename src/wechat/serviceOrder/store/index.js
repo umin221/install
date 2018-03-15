@@ -34,16 +34,23 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
-        // loginMeg: {
-        //   'Last Name': '袁静',
-        //   'Emp #': '16113009',
-        //   'Job Title': '400'
-        // },
         loginMeg: {
-          'Last Name': '代一',
-          'Emp #': '16013107',
-          'Job Title': 'install'
+          'Last Name': '袁静',
+          'Emp #': '16113009',
+          'Job Title': '400'
         },
+        // loginMeg: {
+        //   'Last Name': '代一',
+        //   'Emp #': '16013107',
+        //   'Job Title': 'install'
+        // },
+        // loginMeg: {
+        //   'Last Name': 'IM01',
+        //   'Emp #': 'IM01',
+        //   'Job Title': 'install',
+        //   'KL Employee Full Name': 'IM01 IM01',
+        //   'Id': '1-2BSBYRFU'
+        // },
         // 待处理
         pending: [],
         // 处理中
@@ -80,7 +87,6 @@ export default new Vuex.Store({
       },
       actions: {
         getList({state, commit, dispatch}, {status, more, callback}) {
-          console.log(111);
           status = status || state.loginMeg['Emp #'];
           api.get({
             key: 'getList',
@@ -92,23 +98,13 @@ export default new Vuex.Store({
               PageSize: PAGESIZE
             },
             success: function(data) {
-              commit('dataType', data.SiebelMessage['Service Request']);
+              let partners = KND.Util.toArray(data.SiebelMessage['Service Request']);
+              commit('dataType', partners);
               if (callback) {
                 callback(data.SiebelMessage['Service Request'].length);
               }
             }
           });
-          // api.get({
-          //   key: 'getList',
-          //   data: {
-          //     'body': {
-          //       'OutputIntObjectName': 'Base KL Service Request Interface BO',
-          //       'SearchSpec': '[Service Request.Owner]="16013107"'
-          //     }
-          //   },
-          //   success: function(data) {
-          //   }
-          // });
         }
       }
     },
@@ -212,6 +208,9 @@ export default new Vuex.Store({
               } else {
                 commit('getSearch', data);
               }
+            },
+            error: function(data) {
+              commit('removeSearch', '');
             }
           });
         },
@@ -262,33 +261,33 @@ export default new Vuex.Store({
           });
         },
         submitService({commit}, form) {
+          console.log(this);
           api.get({
-            key: 'submitService',
+            key: form.key,
             data: {
               form
             },
             success: function(data) {
-              console.log(data);
+              if (form.key === 'upDateContact' && data) {
+                api.get({
+                  key: 'submitService',
+                  data: {
+                    form
+                  },
+                  success: function(data) {
+                    tipBox('新建成功！');
+                  },
+                  error: function(data) {
+                    commit('changeValue', 'error');
+                  }
+                });
+              }
               // commit('setSn', data['SiebelMessage']['Asset Mgmt - Asset']);
             },
             error: function(data) {
-              // commit('changeValue', 'error');
+              commit('changeValue', 'error');
             }
           });
-          // api.get({
-          //   key: 'searchAddress',
-          //   data: {
-          //     Province: form.PROVINCE,
-          //     City: form.CITY,
-          //     Address: form.Address
-          //   },
-          //   success: function(data) {
-          //     console.log(data);
-          //   },
-          //   error: function(data) {
-          //     // commit('changeValue', 'error');
-          //   }
-          // });
         }
       }
     },
@@ -296,6 +295,7 @@ export default new Vuex.Store({
       namespaced: true,
       state: {
         ServiceRequest: {},
+        Action: {},
         processDate: [],
         Statu: {
           '接单': 'Accept',
@@ -304,6 +304,11 @@ export default new Vuex.Store({
           '预约': 'Appoint',
           '完成': 'Done'
         },
+        tabList: [
+          {name: '基础信息', id: 'tab-container1'},
+          {name: '维修记录', id: 'tab-container2'},
+          {name: '流程记录', id: 'tab-container3'}
+        ],
         BtnStatu: ''
       },
       mutations: {
@@ -321,17 +326,21 @@ export default new Vuex.Store({
             state.processDate = [{Note: '暂无数据'}];
           }
           if (form.Action) {
-            if (Object.prototype.toString.call(form.Action) !== '[object Array]') {
-              if (form.Action.Status === '已派工' || form.Action.Status === '未开始') {
-                state.BtnStatu = 'status1';
-              } else if (form.Action.Status === '已接单') {
-                state.BtnStatu = 'status2';
-              } else if (form.Action.Status === '已预约' || form.Action.Status === '已出发' || form.Action.Status === '已完成') {
-                state.BtnStatu = 'status3';
-              }
+            let Action = KND.Util.isArray(form.Action) ? form.Action[0] : form.Action;
+            if (Action.Status === '已派工' || Action.Status === '未开始') {
+              state.BtnStatu = 'status1';
+            } else if (Action.Status === '已接单') {
+              state.BtnStatu = 'status2';
+            } else if (Action.Status === '已预约' || Action.Status === '已出发' || Action.Status === '已上门') {
+              state.BtnStatu = 'status3';
             }
+            state.Action = Action;
           } else {
-            state.BtnStatu = 'status4';
+            if (form.Status === '待分配') {
+              state.BtnStatu = 'status5';
+            } else if (form.Status === '未开始') {
+              state.BtnStatu = 'status4';
+            }
           }
         }
       },
@@ -359,14 +368,49 @@ export default new Vuex.Store({
             }
           });
         },
-        setStatus({commit}, obj) {
+        setStatus({commit}, obj) {          // 工单状态
+          // let key = obj.type ? obj.key : 'setStatus';
           api.get({
-            key: obj.key,
+            key: obj.parms.key,
             data: {
-              obj
+              obj: obj.parms
             },
             success: function(data) {
-              console.log(data);
+              if (data) {
+                api.get({
+                  key: 'getDetail',
+                  data: {
+                    srNumber: obj.srNum
+                  },
+                  success: function(data) {
+                    commit('setPartner', data.SiebelMessage['Service Request']);
+                  }
+                });
+              }
+            }
+          });
+        },
+        setContact({commit}, contacts) {        // 主管指派自己
+          api.get({
+            key: 'getActivity',
+            data: {
+              id: contacts.id,
+              empId: contacts.empId,
+              empFullName: contacts.empFullName,
+              type: contacts.type
+            },
+            success: function(data) {
+              if (data) {
+                api.get({
+                  key: 'getDetail',
+                  data: {
+                    srNumber: contacts.srNum
+                  },
+                  success: function(data) {
+                    commit('setPartner', data.SiebelMessage['Service Request']);
+                  }
+                });
+              }
             }
           });
         }
@@ -497,6 +541,15 @@ export default new Vuex.Store({
         result: []
       },
       mutations: {
+        count(state, val) {
+          if (val.type === 'add') {
+            let number = state.result[val.index].value + 1;
+            Vue.set(state.result[val.index], 'value', number);
+            console.log(state.result);
+          } else {
+            state.result[val.index].value = state.result[val.index].value - 1;
+          }
+        },
         setProduct(state, data) {
           state.result = [];
           for (let i = 0; i < data.length; i++) {
@@ -507,6 +560,9 @@ export default new Vuex.Store({
                 state.result.push(data[i].Product);
               }
             }
+          }
+          for (let i = 0; i < state.result.length;i++) {
+            state.result[i].value = 0;
           }
           console.log(state.result);
         }
@@ -586,10 +642,49 @@ export default new Vuex.Store({
             data: {
               id: contacts.id,
               empId: contacts.empId,
-              empFullName: contacts.empFullName
+              empFullName: contacts.empFullName,
+              type: contacts.type
             },
             success: function(data) {
               console.log(data);
+            }
+          });
+        }
+      }
+    },
+    searchList: {                     // 首页搜素列表
+      namespaced: true,
+      state: {
+        result: []
+      },
+      mutations: {
+        dataType(state, data) {
+          state.result = data;
+        }
+      },
+      actions: {
+        /**
+         * 查找安装工程师
+         * @param {Object} data 必填 查询条件 键值对
+         */
+        getList({state, commit, dispatch}, status) {
+          console.log(status);
+          api.get({
+            key: 'getSearchList',
+            data: {
+              status: status.data['SR Number'],
+              Owner: status.data['Owner']
+            },
+            paging: {
+              StartRowNum: status.data.more ? state[STATUS2LIST[status]].length : 0,
+              PageSize: PAGESIZE
+            },
+            success: function(data) {
+              let partners = KND.Util.toArray(data.SiebelMessage['Service Request']);
+              commit('dataType', partners);
+              if (status.data.callback) {
+                status.data.callback(data.SiebelMessage['Service Request'].length);
+              }
             }
           });
         }

@@ -249,8 +249,8 @@
         if (self.num === 2) {
           self.isTimeSelected = [];
           self.num = 0;
-          self.params.Time1 = '';
-          self.params.Time2 = '';
+          self.params.Time1 = {};
+          self.params.Time2 = {};
         }
         if (self.isTimeSelected.length) {
           for (let i = 0; i < 48; i++) {
@@ -273,6 +273,7 @@
             }
           }
         }
+        console.log(self.num);
         if (self.num === 1) {
           self.params.Time1.time = self.am[seleat].time[index - seleat * 8];
           self.params.Time1.key = (index1 + 1) * (index2 + 1);

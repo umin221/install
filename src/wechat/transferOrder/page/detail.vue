@@ -13,12 +13,9 @@
       <div class="readonly narrow-form">
         <cus-field label="合同编号" v-model="form['Agree Number']"></cus-field>
         <cus-field label="工程" v-model="form['Lead Name']"></cus-field>
-        <cus-field label="安装数量" type="tel" v-model="form['Main Phone Number']"></cus-field>
         <cus-field label="项目地址" v-model="form['Address']"></cus-field>
 
         <toggle>
-          <cus-field label="面板型号" v-model="form['Primary Address Street']"></cus-field>
-          <cus-field label="锁体型号" v-model="form['Primary Address Street']"></cus-field>
           <cus-field label="甲方联系人电话" v-model="form['Primary Address Street']"></cus-field>
           <cus-field label="门厂是否安装锁体" v-model="form['HBS Check Box 1']"></cus-field>
           <cus-field label="门厂名称" v-model="form['Partner Name']"></cus-field>
@@ -39,15 +36,17 @@
                  is-link></mt-cell>
       </div>
 
-      <div v-show="!isPending">
+      <div class="install-order" v-show="!isPending">
         <title-group>安装订单</title-group>
         <mt-cell class="multiple"
-                  v-for="item in order"
-                  value="wwwww"
-                  :key="item.code"
+                  v-for="item in orders"
+                 :key="item.Id"
                   @click.native="toOrderFn(item)">
-          <div class="mint-cell-title" slot="title">订单编号: {{item['code']}}</div>
-          <div class="mint-cell-sub-title" slot="title">安装数量: {{item['number']}}</div>
+          <div class="mint-cell-title co-flex co-jc" slot="title">
+            <span class="co-f1">订单编号: {{item['Order Number']}}</span>
+            <span>{{item['Status']}}</span>
+          </div>
+          <div class="mint-cell-sub-title" slot="title">安装数量: {{item['KL Install Amount']}}</div>
         </mt-cell>
       </div>
     </div>
@@ -57,7 +56,7 @@
       <mt-button v-show="isPending"
                  @click.native="rejectFn">驳回</mt-button>
       <mt-button v-show="isPending" type="primary"
-                 @click.native="transferFn">确认分配</mt-button>
+                 @click.native="assignFn">确认分配</mt-button>
       <mt-button v-show="!isPending" type="primary"
                  @click.native="toOrderFn">新增安装订单</mt-button>
     </button-group>
@@ -90,18 +89,18 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['form', 'order']),
+      ...mapState(NAMESPACE, ['form', 'orders']),
       ...mapState('engineer', ['select']),
       isPending() {
         return this.status === 'pending';
       }
     },
     methods: {
-      ...mapActions(NAMESPACE, ['findTransferOrderById', 'addPartner', 'transfer']),
+      ...mapActions(NAMESPACE, ['findTransferOrderById', 'addPartner', 'assign']),
       toEngineer() {
         this.$router.push('engineer');
       },
-      // Close order
+      // Close transfer order
       closeFn() {
         MessageBox({
           title: '请确认',
@@ -113,22 +112,28 @@
       rejectFn() {
         this.$router.push('reject');
       },
-      // Confirm allocation transfer order
-      transferFn() {
+      // Confirm allocation assign order
+      assignFn() {
         let positionId = this.select.Id;
         if (positionId) {
-          this.transfer(positionId);
+          this.assign(positionId);
         } else {
           Toast('请选择安装工程师');
         }
       },
       // Add Install Order
-      toOrderFn() {
+      toOrderFn(item) {
+        if (!item.Id) {
+          let form = this.form;
+          item = {
+            'KL Hole Type': form['Hole Type'],
+            'KL Delivery Check Box 1': form['HBS Check Box 1'],
+            'KL Delivery Check Box 2': form['HBS Check Box 2']
+          };
+        }
         this.$router.push({
           path: 'order',
-          query: {
-            id: this.form.Id
-          }
+          query: item
         });
       }
     }
@@ -147,16 +152,19 @@
       .mint-cell-title {
         flex: 1;
         width: 80px;
-        color: $gray-minor;
-      }
-
-      .mint-cell-value {
-        color: $black-base;
       }
     }
   }
 
   .mint-content {
     margin-bottom: 2.8rem;
+  }
+
+  .install-order {
+    .multiple {
+      .mint-cell-title {
+        font-size: $font-size-small;
+      }
+    }
   }
 </style>

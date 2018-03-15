@@ -79,7 +79,7 @@
         display: flex;
         line-height: 2.5rem;
         .mint-switch{
-          width: 35%;
+          width: 30%;
         }
         .PartsDetail{
           align-items: center;

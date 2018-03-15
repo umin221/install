@@ -1,19 +1,20 @@
 <template>
   <div class="search">
     <cus-search v-model="value"
-                placeholder="请输入合作伙伴名称">
+                placeholder="请输入服务单编号">
 
         <cus-loadmore ref="result"
                       :loadBottom="loadBottomFn"
                       :topStatus="topStatus">
           <cus-cell class="multiple"
                     :key="item.id"
-                    :title="'合作伙伴名称:'+ item.Name"
-                    @click.native="toDetailFn(item)"
+                    :title="'服务单编号:'+ item['SR Number']"
+                    @click.native="toDetailFn(item['SR Number'],item['Contact Id'])"
                     v-for="item in result"
                     is-link>
-            <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
-            <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Main Phone Number']}}</div>
+            <div class="mint-cell-sub-title" slot="title">申请时间: {{item.Created}}</div>
+            <div class="mint-cell-sub-title" slot="title">优先级: {{item.Priority}}</div>
+            <div class="mint-cell-sub-title" slot="title">地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}</div>
           </cus-cell>
         </cus-loadmore>
 
@@ -33,8 +34,8 @@
     let name = me.value;
     let param = {
       data: {
-        'KL Partner Status': '',
-        'Name': name
+        'Owner': me.loginMeg['Emp #'],
+        'SR Number': name
       },
       more: args.pop(),
       callback: (data) => {
@@ -42,10 +43,10 @@
       }
     };
     // 获取团队列表
-    me.getPartners(param);
+    me.getList(param);
   };
 
-  const NAMESPACE = 'index';
+  const NAMESPACE = 'searchList';
   export default {
     name: 'search',
     components: {cusLoadmore, cusSearch, cusCell},
@@ -57,10 +58,10 @@
     },
     computed: {
       ...mapState(NAMESPACE, ['result']),
-      ...mapState('index', ['status2list'])
+      ...mapState('index', ['loginMeg'])
     },
     methods: {
-      ...mapActions(NAMESPACE, ['getPartners']),
+      ...mapActions(NAMESPACE, ['getList']),
       /**
        * 搜索回调
        * @param {String} val 搜索值
@@ -73,14 +74,12 @@
        * To detail
        * @param {Object} item 行内容
        */
-      toDetailFn(item) {
+      toDetailFn(type, name) {
         this.$router.push({
-          name: 'detail',
+          name: 'serviceDetail',
           query: {
-            // detail
-            type: 'read',
-            state: this.status2list[item['KL Partner Status']],
-            id: item.Id
+            type: type,
+            id: name
           }
         });
       },

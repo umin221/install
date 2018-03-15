@@ -4,11 +4,15 @@
  * @description 工具库
  */
 import axios from 'axios';
+import cache from '../lib/cache';
+
+global.cache = cache;
 
 (function(context) {
 
   // 用户ID
   let userID;
+  let exp = config.cacheExp;
   let session = {
     set: (key, val) => {
       sessionStorage.setItem(key, val);
@@ -75,7 +79,7 @@ import axios from 'axios';
           'Authorization': 'Basic ' + btoa(userID + ':' + userID)
         },
         timeout: 30000,
-        method: 'get'
+        method: 'post'
       }, option);
       // url valid
       if (!/^http/i.test(option.url)) {
@@ -107,6 +111,29 @@ import axios from 'axios';
           });
         }
       });
+    };
+
+    /**
+     * 异步请求&cache
+     * @param option
+     */
+    ajaxCache(option) {
+      // 是否支持数据缓存
+      if (cache.isSupport) {
+        let data = cache.get(option.url);
+        if (data) {
+          option.success(data);
+        } else {
+          let success = option.success;
+          option.success = data => {
+            cache.set(option.url, data, {exp: exp});
+            success(data);
+          };
+          this.ajax(option);
+        }
+      } else {
+        this.ajax(option);
+      }
     };
 
   };

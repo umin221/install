@@ -1,6 +1,19 @@
 <template>
   <div style="background-color: #ebebeb;">
-    <mt-header fixed title="维修工单列表">
+    <!--<cusHeader fixed title="维修工单列表" :menu="[{title:'查看我的团队', key:'a'}]">-->
+      <!--<fallback slot="left"></fallback>-->
+      <!--<router-link v-if="loginMeg['Job Title'] === '400'" to="addService" slot="right">-->
+        <!--<mt-button>-->
+          <!--<i class="xs-icon icon-add"></i>-->
+        <!--</mt-button>-->
+      <!--</router-link>-->
+      <!--<router-link v-if="loginMeg['Job Title'] === 'install'" to="search" slot="right">-->
+        <!--<mt-button >-->
+          <!--<i class="xs-icon icon-search"></i>-->
+        <!--</mt-button>-->
+      <!--</router-link>-->
+    <!--</cusHeader>-->
+    <mt-header fixed title="配件领用">
       <fallback slot="left"></fallback>
       <router-link v-if="loginMeg['Job Title'] === '400'" to="addService" slot="right">
         <mt-button>
@@ -13,7 +26,8 @@
         </mt-button>
       </router-link>
     </mt-header>
-    <div v-if="loginMeg['Job Title'] === 'install'" class="mint-content indexService">
+
+    <div v-if="loginMeg['Job Title'] === 'install' || loginMeg['Job Title'] === 'charge'" class="mint-content indexService">
       <mt-navbar v-model="selected">
         <mt-tab-item id="pending">待处理</mt-tab-item>
         <mt-tab-item id="valid">处理中</mt-tab-item>
@@ -21,7 +35,7 @@
       </mt-navbar>
       <mt-tab-container v-model="selected">
         <mt-tab-container-item id="pending">
-          <loadmore ref="pending" :loadTop="pendingLoadTop" :loadBottom="pendingLoadBottom" :topStatus="topStatus" :allLoaded="true">
+          <loadmore ref="pending" @loadTop="loadTop()" @loadBottom="loadBottom()" :topStatus="topStatus" :allLoaded="true">
             <div class="list-content" v-for="(item,index) in pending" @click="toDetail(item['SR Number'])" :key="index">
               <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}<mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge></div>
               <mt-cell class="multiple" is-link>
@@ -33,7 +47,7 @@
           </loadmore>
         </mt-tab-container-item>
         <mt-tab-container-item id="valid">
-          <loadmore ref="valid" :loadTop="validLoadTop" :loadBottom="validLoadBottom" :topStatus="topStatus" :allLoaded="true">
+          <loadmore ref="valid" @loadTop="loadTop('valid')" @loadBottom="loadBottom('valid')" :topStatus="topStatus" :allLoaded="true">
             <div class="list-content" v-for="(item,index) in valid" @click="toDetail(item['SR Number'])" :key="index">
               <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}<mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge></div>
               <mt-cell class="multiple" is-link>
@@ -46,7 +60,7 @@
         </mt-tab-container-item>
 
         <mt-tab-container-item id="invalid">
-          <loadmore ref="invalid" :loadTop="invalidLoadTop" :loadBottom="invalidLoadBottom" :topStatus="topStatus" :allLoaded="true">
+          <loadmore ref="invalid" @loadTop="loadTop('invalid')" @loadBottom="loadBottom('invalid')" :topStatus="topStatus" :allLoaded="true">
             <div class="list-content" v-for="(item,index) in invalid" @click="toDetail(item['SR Number'])" :key="index">
               <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}<mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge></div>
               <mt-cell class="multiple" is-link>
@@ -60,7 +74,7 @@
       </mt-tab-container>
     </div>
     <div v-else-if="loginMeg['Job Title'] === '400'" class="mint-content customService" >
-      <loadmore :loadTop="loadTop" ref="pending">
+      <loadmore @loadTop="loadTop" @loadBottom="loadBottom" ref="pending">
         <div class="list-content" v-for="(item,index) in cusService" @click="toDetail(item['SR Number'],item['Contact Id'])" :key="index">
           <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}<mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge></div>
           <mt-cell class="multiple" is-link>
@@ -77,6 +91,7 @@
   import {mapState, mapActions} from 'vuex';
   import loadmore from 'public/components/cus-loadmore';
   import cusCell from 'public/components/cus-cell';
+  import cusHeader from 'public/components/cus-header';
   //
   const NameSpace = 'index';
   const COUNT = config.pageSize;
@@ -96,7 +111,7 @@
   export default {
     name: NameSpace,
     created() {
-      loader.call(this, 'pending', 'onBottomLoaded');
+      loader.call(this, 'pending', 'onTopLoaded');
     },
     data: () => {
       return {
@@ -111,44 +126,38 @@
     },
     methods: {
       ...mapActions(NameSpace, ['getList']),
+      menuFn(item) {
+        console.log(item);
+      },
       toSearch() {
         this.$router.push({path: '/search'});
       },
-      loadTop() {
-        loader.call(this, 'pending', 'onTopLoaded');
+      loadTop(type) {
+        type = type || 'pending';
+        loader.call(this, type, 'onTopLoaded');
       }, // 底部加载
-      loadBottom() {
+      loadBottom(type) {
+        type = type || 'pending';
+        loader.call(this, type, 'onBottomLoaded');
       },
-      pendingLoadTop() {
-        loader.call(this, 'pending', 'onTopLoaded');
-      },  // 待处理下拉
-      pendingLoadBottom() {
-        loader.call(this, {
-          more: true
-        }, 'pending', 'onBottomLoaded');
-      },  // 待处理上拉
-      validLoadTop() {
-        loader.call(this, {
-          status: '有效'
-        }, 'valid', 'onTopLoaded');
-      },  // 处理中下拉
-      validLoadBottom() {
-        loader.call(this, {
-          more: true,
-          status: '有效'
-        }, 'invalid', 'onBottomLoaded');
-      },  // 处理中上拉
-      invalidLoadTop() {
-        loader.call(this, {
-          status: '失效'
-        }, 'valid', 'onTopLoaded');
-      },  // 已完成下拉
-      invalidLoadBottom() {
-        loader.call(this, {
-          more: true,
-          status: '有效'
-        }, 'valid', 'onBottomLoaded');
-      },  // 已完成上拉
+//      pendingLoadTop() {
+//        loader.call(this, 'pending', 'onTopLoaded');
+//      },  // 待处理下拉
+//      pendingLoadBottom() {
+//        loader.call(this, 'pending', 'onBottomLoaded');
+//      },  // 待处理上拉
+//      validLoadTop() {
+//        loader.call(this, 'valid', 'onTopLoaded');
+//      },  // 处理中下拉
+//      validLoadBottom() {
+//        loader.call(this, 'valid', 'onBottomLoaded');
+//      },  // 处理中上拉
+//      invalidLoadTop() {
+//        loader.call(this, 'invalid', 'onTopLoaded');
+//      },  // 已完成下拉
+//      invalidLoadBottom() {
+//        loader.call(this, 'invalid', 'onBottomLoaded');
+//      },  // 已完成上拉
       clickAdd() {
         this.$router.push({path: '/addService'});
       },
@@ -162,16 +171,16 @@
         });
       }
     },
-    components: {loadmore, cusCell}
+    components: {loadmore, cusCell, cusHeader}
   };
 </script>
 <style lang="scss">
   .indexService,.customService{
     .mint-loadmore{
       .mint-loadmore-content{
-        padding: 0 10px ;
+        padding: 0 0.5rem;
         .mint-cell{
-          height: 100px;
+          height: 5rem;
         }
       }
     }
