@@ -58,6 +58,11 @@
   pointer-events: none;
 }
 
+// Enable
+@mixin enable() {
+  pointer-events: auto;
+}
+
 @mixin allow() {
   border: solid 2px #c8c8cd;
   border-bottom-width: 0;

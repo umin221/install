@@ -195,8 +195,10 @@
      * @returns {null}
      */
     getParam(name) {
+      let search = location.search || location.hash;
+      let param = search.substr(search.indexOf('?') + 1);
       let reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
-      let r = window.location.search.substr(1).match(reg);
+      let r = param.match(reg);
       if (r != null) return decodeURI(r[2]);
       return null;
     };

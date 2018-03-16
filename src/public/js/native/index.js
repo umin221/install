@@ -6,29 +6,37 @@
 import axios from 'axios';
 import cache from '../lib/cache';
 
-global.cache = cache;
-
 (function(context) {
-
+  // 工具类
+  let Util = context['Util'];
   // 用户ID
   let userID;
+  // 缓存超时
   let exp = config.cacheExp;
+  // 时间戳
+  const lock = 1521174072972;
+  // 会话缓存
   let session = {
     set: (key, val) => {
+      key += lock;
       sessionStorage.setItem(key, val);
     },
     get: (key) => {
+      key += lock;
       return sessionStorage.getItem(key);
     }
   };
 
+  /**
+   * 本地化服务
+   */
   class Native {
 
     /**
      * 构造函数
      */
     constructor() {
-      KND.Util.log('Native init...');
+      Util.log('Native init...');
 
       userID = this.getUserID();
       Object.defineProperty(this, 'userID', {
@@ -50,8 +58,21 @@ global.cache = cache;
      * 获取用户信息
      * @returns {string}
      */
-    getLoginInfo() {
-      return 'umin';
+    getUserInfo(callback) {
+      Util.log('获取用户信息 ' + userID);
+      let user = session.get('userInfo');
+      if (user) {
+        callback(Util.parse(user));
+      } else {
+        this.ajax({
+          method: 'get',
+          url: 'data/KL Employee Interface BO/Employee/?searchspec=[Login Name] = "' + userID + '" &PageSize=2&StartRowNum=0',
+          success: data => {
+            session.set('userInfo', JSON.stringify(data.items));
+            callback(data.items);
+          }
+        });
+      };
     };
 
     /**
@@ -59,14 +80,14 @@ global.cache = cache;
      * @returns {string}
      */
     getUserID() {
-      return session.get('userID') || 'XIEXW' || context['Util']['getParam']('userID');
+      return session.get('userID') || 'IM02' || Util['getParam']('userID');
     };
 
     /**
      * 异步请求
      * @param option
      */
-    ajax(option) {
+    online(option) {
       // loading
       if (option.loading !== false) {
         Indicator.open({
@@ -117,7 +138,7 @@ global.cache = cache;
      * 异步请求&cache
      * @param option
      */
-    ajaxCache(option) {
+    cache(option) {
       // 是否支持数据缓存
       if (cache.isSupport) {
         let data = cache.get(option.url);
@@ -129,12 +150,20 @@ global.cache = cache;
             cache.set(option.url, data, {exp: exp});
             success(data);
           };
-          this.ajax(option);
+          this.online(option);
         }
       } else {
-        this.ajax(option);
+        this.online(option);
       }
     };
+
+    /**
+     * 异步请求接口
+     * @param option
+     */
+    ajax(option) {
+      this[option.cache ? 'cache' : 'online'](option);
+    }
 
   };
 

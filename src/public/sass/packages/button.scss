@@ -16,7 +16,7 @@ button {
   }
 }
 
-.disable {
+button.disable {
   color: $gray-line-default !important;
-  background-color: #f6f8fa !important;
+  background-color: $gray-default !important;
 }
