@@ -44,6 +44,11 @@
 .icon-arrow-up:before {
   content: '\A159';
 }
+.icon-select:before {
+  content: '\A160';
+  color: $theme-color;
+  font-size: 1.4rem;
+}
 .icon-minus:before {
   content: '\A133';
 }

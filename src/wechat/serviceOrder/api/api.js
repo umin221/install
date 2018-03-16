@@ -53,9 +53,10 @@ let ApiList = {
   },
   getClose: option => {
     return {
+      method: 'get',
       url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="FIN_NO_SALE_REASON"'
     };
-    // 关闭工单
+    // 关闭工单 lov
   },
   getRunProcess: option => {
     return {
@@ -169,6 +170,7 @@ let ApiList = {
   },
   getSearch: option => {
     return {
+      method: 'get',
       url: 'data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] ~LIKE "' + option.data.val + '*" &PageSize=10&StartRowNum=0'
     };
     // 搜索电话联系人
@@ -202,6 +204,7 @@ let ApiList = {
   },
   searchAddress: option => {
     return {
+      method: 'get',
       url: 'data/CUT Address/CUT Address/?searchspec=[Street Address] = "' + option.data.Address + '"'
     };
     // 查找地址
@@ -261,29 +264,22 @@ let ApiList = {
     };
     // 更新地址
   },
-  getLov: option => {
-    return {
-      url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="' + option.data.val.values + '"' + option.data.val.parent + ' &PageSize=100&StartRowNum=0'
-    };
-  },
-  getParentLov: option => {
-    return {
-      url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="' + option.data.val.type + '" AND Parent Value="' + option.data.val.values[0] + '" &PageSize=100&StartRowNum=0'
-    };
-  },
   getAsset: option => {
     return {
+      method: 'get',
       url: 'data/KL Asset Interface BO/Asset Mgmt - Asset/?searchspec=[Serial Number] = "' + option.data.num + '"'
     };
   },
   getLov1: option => {
     option.data.parent = option.data.parent ? option.data.parent : 'Parent is null';
     return {
+      method: 'get',
       url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type= "' + option.data.type + '" AND ' + option.data.parent + ' &PageSize=100&StartRowNum=0'
     };
   },
   getParentLov1: option => {
     return {
+      method: 'get',
       url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type="' + option.data.type + '" AND Parent Value="' + option.data.value + '" &PageSize=100&StartRowNum=0'
     };
     // 下拉二级
@@ -303,6 +299,7 @@ let ApiList = {
   },
   getPrice: option => {
     return {
+      method: 'get',
       url: 'data/Price List/Price List/?searchspec=KL Default Flag="Y"'
     };
     // 产品价格
