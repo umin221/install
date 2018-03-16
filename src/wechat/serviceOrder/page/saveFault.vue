@@ -1,75 +1,168 @@
 <template>
   <div>
-    <mt-header fixed title="故障记录">
+    <mt-header fixed title="完工确认单">
       <fallback slot="left"></fallback>
-      <mt-button slot="right">提交</mt-button>
+      <mt-button slot="right" @click.native="submit">提交</mt-button>
     </mt-header>
 
     <div class="mint-content">
       <div class="saveFault">
-        <mt-cell title="单据编号：" ></mt-cell>
-        <mt-cell title="移交日期："></mt-cell>
-        <mt-cell class="require" title="是否保修范围" @click.native="showBox = !showBox" is-link>{{isBn}}</mt-cell>
+        <mt-cell title="单据编号：" >{{ServiceRequest['SR Number']}}</mt-cell>
+        <mt-cell title="移交日期：">{{ServiceRequest['KL Cutoff Date']}}</mt-cell>
+        <mt-cell class="require" title="是否保修范围" @click.native="getLov('bn')" is-link>{{isBn}}</mt-cell>
         <mt-cell title="维修配件"><i class="xs-icon icon-arrow-down"></i></mt-cell>
         <div class="servesParts">
-          <div class="Parts">
-            <mt-switch v-model="value">{{value?"保内":"保外"}}</mt-switch>
-            <div class="PartsDetail"><div>浴室锁</div><div class="toRed">￥100</div><div>X1</div></div>
+          <div class="Parts" v-for="(item, index) in Product">
+            <mt-switch
+            @click.native="change(index,switchStatus[index])"
+            v-model="switchStatus[index]">
+              {{switchStatus[index]?"保内":"保外"}}
+            </mt-switch>
+            <div class="PartsDetail">
+              <div>{{item['KL Translated Name']}}</div>
+              <div class="toRed">￥{{item['List Price']}}</div>
+              <num-box :index="index" :type="switchStatus[index]" @input="productNumber"></num-box>
+            </div>
           </div>
-          <div class="Parts">
+          <div class="Parts" v-show="isBn === '保外'">
             <div style="width: 30%"></div>
-            <div class="PartsDetail"><div>上门费</div><div div class="toRed">￥100</div><div></div></div>
+            <div class="PartsDetail"><div>上门费</div><div class="toRed">￥{{fee}}</div><div></div></div>
           </div>
           <div class="addBtn">
             <mt-button type="primary" @click.native="toTranslated"><i class="xs-icon icon-add"></i>添加配件</mt-button>
-            <mt-button type="primary" v-show="isBn === '保外'"><i class="xs-icon icon-add" ></i>添加上门费</mt-button>
+            <mt-button type="primary" v-show="isBn === '保外'" @click.native="getLov('wm')"><i class="xs-icon icon-add" ></i>添加上门费</mt-button>
           </div>
         </div>
-        <mt-cell class="require" title="总费用"></mt-cell>
+        <mt-cell class="require" title="总费用">￥{{allFee}}</mt-cell>
         <mt-cell class="require" title="附件"></mt-cell>
         <div style="background-color: #ffffff">
           <div style="color: #777;font-size: 0.75rem;text-indent:0.75em;line-height: 40px">上传图片</div>
           <div style="text-indent:0.75em"><i class="xs-icon icon-attach"></i></div>
         </div>
-        <mt-popup v-if="showBox" v-model="showBox" position="bottom" style="width: 100%">
-          <menuBox @my-enter="enter" @my-cancel="cancel" :slots="slots"></menuBox>
+        <mt-popup v-if="showBox" v-model="showBox" position="bottom">
+          <menu-box @my-enter="enter" @my-cancel="cancel" :slots="slots" :type="lovType"></menu-box>
         </mt-popup>
       </div>
     </div>
   </div>
 </template>
 <script>
-//  import api from '../api/api';
-  import menuBox from '../../../public/components/cus-menu.vue';
-  export default {
-    name: 'saveFault',
-    created() {
-    },
-    data: () => {
-      return {
-        isSwitch: false,
-        value: false,
-        isBn: '',
-        showBox: false,
-        slots: [{flex: 1, values: ['保内', '保外'], className: 'slot1', textAlign: 'center'}]
-      };
-    },
-    methods: {
-      submit() {
-      },
-      toTranslated() {
-        this.$router.push('searchTrans');
-      },
-      enter(val) {
-        this.showBox = !this.showBox;
-        this.isBn = val[0];
-      },
-      cancel() {
-        this.showBox = !this.showBox;
+import {mapState} from 'vuex';
+import menuBox from '../../../public/components/cus-menu';
+import numBox from '../components/number-box';
+export default {
+  name: 'saveFault',
+  created() {
+    let me = this;
+    me.isBn = me.ServiceRequest['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
+  },
+  data: () => {
+    return {
+      isSwitch: false,
+      value: '',
+      isBn: '',
+      showBox: false,
+      slots: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
+      productData: [],
+      switchStatus: [],
+      fee: 0,
+      allFee: 0,
+      one: 1
+    };
+  },
+  computed: {
+    ...mapState('searchTrans', ['returnSelect']),
+    ...mapState('detail', ['ServiceRequest']),
+    Product() {
+      let me = this;
+      let arr = [];
+      me.productData = me.returnSelect;
+      for (let i = 0; i < me.returnSelect.length; i++) {
+        if (me.isBn === '保内') {
+          arr.push(true);
+        } else {
+          arr.push(false);
+        }
+      }
+      me.switchStatus = arr;
+      return me.productData;
+    }
+  },
+  methods: {
+    productNumber(val, num, type) {
+      let me = this;
+      me.productData[num].num = val;
+      if (val) {
+        if (!me.switchStatus[num]) {
+          if (type === 'minus') {
+            me.allFee = me.allFee - parseInt(me.productData[num]['List Price'], 0);
+          } else {
+            me.allFee = me.allFee + parseInt(me.productData[num]['List Price'], 0);
+          }
+        }
+      } else {
+        if (me.allFee - me.fee !== 0 && !me.switchStatus[num]) {
+          me.allFee = me.allFee - parseInt(me.productData[num]['List Price'], 0);
+        }
       }
     },
-    components: {menuBox}
-  };
+    submit() {
+      console.log(this.switchStatus);
+    },
+    toTranslated() {
+      this.$router.push('searchTrans');
+    },
+    enter(val, type) {
+      let me = this;
+      me.showBox = !me.showBox;
+      me.allFee = me.allFee - me.fee;
+      if (type === 'bn') {
+        me.isBn = val[0];
+        me.allFee = 0;
+        if (me.isBn === '保外') {
+          for (let i = 0; i < me.productData.length; i++) {
+            if (me.switchStatus[i]) {
+              me.allFee += parseInt(me.productData[i]['List Price'], 0) * me.productData[i]['num'];
+            }
+          }
+          me.allFee = me.allFee + me.fee;
+        }
+      } else {
+        me.fee = val[0] === '工作时间' ? 100 : 150;
+        me.allFee = me.allFee + me.fee;
+      }
+    },
+    cancel() {
+      this.showBox = !this.showBox;
+    },
+    getLov(type) {
+      let me = this;
+      me.showBox = true;
+      me.lovType = type;
+      if (type === 'bn') {
+        me.slots[0].values = ['保内', '保外'];
+      } else {
+        me.slots[0].values = ['工作时间', '其他时间'];
+      }
+    },
+    change(index, type) {
+      let me = this;
+      me.one = me.one + 1;
+      if (me.one === 2) {
+        if (!me.switchStatus[index]) {
+          if (me.allFee) {
+            me.allFee = me.allFee - me.productData[index].num * parseInt(me.productData[index]['List Price'], 0);
+          }
+        } else {
+          me.allFee = me.allFee + me.productData[index].num * parseInt(me.productData[index]['List Price'], 0);
+        }
+      } else {
+        me.one = 1;
+      }
+    }
+  },
+  components: {menuBox, numBox}
+};
 </script>
 <style lang="scss">
   .saveFault{

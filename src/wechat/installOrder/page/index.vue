@@ -1,35 +1,37 @@
 <!--委外团队列表-->
 <template>
   <div>
-    <mt-header fixed title="我的安装订单">
+    <cus-header fixed title="我的安装订单" :menu="[{title:'查看我的团队', key:'a'}]">
       <fallback slot="left"></fallback>
       <mt-button @click.native="toSearchFn" slot="right">
         <i class="xs-icon icon-search"></i>
       </mt-button>
-    </mt-header>
+    </cus-header>
 
     <div class="mint-content">
 
       <mt-navbar v-model="selected">
         <mt-tab-item id="pending"
-          @click.native="!pending.length && pendingLoadBottomFn()">待处理</mt-tab-item>
-        <mt-tab-item id="valid"
-          @click.native="!valid.length && validLoadBottomFn()">处理中</mt-tab-item>
-        <mt-tab-item id="invalid"
-          @click.native="!invalid.length && invalidLoadBottomFn()">已完成</mt-tab-item>
+                     @click.native="!pending.length && loadBottomFn({status:'待处理', list:'pending'})">待处理</mt-tab-item>
+        <mt-tab-item id="process"
+                     @click.native="!process.length && loadBottomFn({status:'处理中', list:'process'})">处理中</mt-tab-item>
+        <mt-tab-item id="completed"
+                     @click.native="!completed.length && loadBottomFn({status:'已完成', list:'completed'})">已完成</mt-tab-item>
       </mt-navbar>
 
       <!-- tab-container -->
       <mt-tab-container v-model="selected">
         <mt-tab-container-item id="pending">
           <cus-loadmore ref="pending"
-                        :loadTop="pendingLoadTopFn"
-                        :loadBottom="pendingLoadBottomFn"
+                        @loadTop="loadTopFn"
+                        @loadBottom="loadBottomFn"
+                        :param="{status:'待处理', list:'pending'}"
                         :topStatus="topStatus">
+            <empty v-show="!pending.length"></empty>
             <cus-cell class="multiple"
                       :key="item.Id"
                       :title="'订单编码:'+ item['Order Number']"
-                      @click.native="toDetail(item.Id)"
+                      @click.native="toDetailFn(item.Id)"
                       v-for="item in pending"
                       is-link>
               <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
@@ -38,16 +40,19 @@
           </cus-loadmore>
         </mt-tab-container-item>
 
-        <mt-tab-container-item id="valid">
-          <cus-loadmore ref="valid"
-                        :loadTop="validLoadTopFn"
-                        :loadBottom="validLoadBottomFn"
+        <mt-tab-container-item id="process">
+          <cus-loadmore ref="process"
+                        @loadTop="loadTopFn"
+                        @loadBottom="loadBottomFn"
+                        :param="{status:'处理中', list:'process'}"
                         :topStatus="topStatus">
+            <empty v-show="!process.length"></empty>
+
             <cus-cell class="multiple"
                       :key="item.Id"
                       :title="'订单编码:'+ item['Order Number']"
-                      @click.native="toDetail(item.Id)"
-                      v-for="item in valid"
+                      @click.native="toDetailFn(item.Id)"
+                      v-for="item in process"
                       is-link>
               <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
               <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
@@ -55,16 +60,19 @@
           </cus-loadmore>
         </mt-tab-container-item>
 
-        <mt-tab-container-item id="invalid">
-          <cus-loadmore ref="invalid"
-                        :loadTop="invalidLoadTopFn"
-                        :loadBottom="invalidLoadBottomFn"
+        <mt-tab-container-item id="completed">
+          <cus-loadmore ref="completed"
+                        @loadTop="loadTopFn"
+                        @loadBottom="loadBottomFn"
+                        :param="{status:'已完成', list:'completed'}"
                         :topStatus="topStatus">
+            <empty v-show="!completed.length"></empty>
+
             <cus-cell class="multiple"
                       :key="item.Id"
                       :title="'订单编码:'+ item['Order Number']"
-                      @click.native="toDetail(item.Id)"
-                      v-for="item in invalid"
+                      @click.native="toDetailFn(item.Id)"
+                      v-for="item in completed"
                       is-link>
               <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
               <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
@@ -81,25 +89,20 @@
 
 <script type="application/javascript">
   import {mapState, mapActions} from 'vuex';
+  import cusHeader from 'public/components/cus-header';
   import cusLoadmore from 'public/components/cus-loadmore';
   import cusCell from 'public/components/cus-cell';
 
   const NAMESPACE = 'index';
-  //
+  // mapp
+  let mapp = config.mapp;
+  // 用户角色 => 状态
+  let status = mapp['manager'];
   let loader = function(...args) {
     let me = this;
     let event = args.pop();
     let list = args.pop();
-    let param = Object.assign({
-      data: {
-        'body': {
-          'OutputIntObjectName': 'KL Install Order',
-          'SearchSpec': '[Order Entry - Orders.Status]=\'安装中\'',
-          'ViewMode': 'Sales Rep',
-          'StartRowNum': '0',
-          'PageSize': '10'
-        }
-      },
+    let param = Object.extend({
       callback: (data) => {
         me.$refs[list][event](data.length);
       }
@@ -110,10 +113,13 @@
 
   export default {
     name: NAMESPACE,
-    components: {cusLoadmore, cusCell},
+    components: {cusHeader, cusLoadmore, cusCell},
     // 数据初始化
     created() {
-      loader.call(this, 'pending', 'onBottomLoaded');
+      this.loadBottomFn({
+        status: '待处理',
+        list: 'pending'
+      });
     },
     data: () => {
       return {
@@ -124,53 +130,30 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['pending', 'valid', 'invalid'])
+      ...mapState(NAMESPACE, ['pending', 'process', 'completed'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['getList']),
-      // 待审批顶部加载
-      pendingLoadTopFn() {
-        loader.call(this, 'pending', 'onTopLoaded');
+      // 标题栏菜单选择回调方法
+      menuFn(item) {
+        console.log(item);
       },
-      // 有效顶部加载
-      validLoadTopFn() {
+      // 已完成顶部加载
+      loadTopFn(param) {
         loader.call(this, {
           data: {
-            'KL Partner Status': '有效'
+            'Status': status[param.status]
           }
-        }, 'valid', 'onTopLoaded');
-      },
-      // 失效顶部加载
-      invalidLoadTopFn() {
-        loader.call(this, {
-          data: {
-            'KL Partner Status': '失效'
-          }
-        }, 'invalid', 'onTopLoaded');
+        }, param.list, 'onTopLoaded');
       },
       // 待审批底部加载
-      pendingLoadBottomFn() {
-        loader.call(this, {
-          more: true
-        }, 'pending', 'onBottomLoaded');
-      },
-      // 有效底部加载
-      validLoadBottomFn() {
+      loadBottomFn(param) {
         loader.call(this, {
           data: {
-            'KL Partner Status': '有效'
+            'Status': status[param.status]
           },
           more: true
-        }, 'valid', 'onBottomLoaded');
-      },
-      // 失效底部加载
-      invalidLoadBottomFn() {
-        loader.call(this, {
-          data: {
-            'KL Partner Status': '失效'
-          },
-          more: true
-        }, 'invalid', 'onBottomLoaded');
+        }, param.list, 'onBottomLoaded');
       },
       // 跳转搜索
       toSearchFn() {

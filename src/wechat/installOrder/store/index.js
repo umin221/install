@@ -1,14 +1,17 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import { app } from 'public/store';
 import api from '../api/api';
+import { app } from 'public/store';
 
 Vue.use(Vuex);
 
 // 缓存页面
 app.state.alive = ['index'];
+
 // 每页加载条数
 const PAGESIZE = config.pageSize;
+// map
+let mapp = config.mapp['list'];
 
 export default new Vuex.Store({
   modules: {
@@ -18,26 +21,19 @@ export default new Vuex.Store({
       state: {
         // 待审批
         pending: [],
-        // 有效
-        valid: [],
-        // 失效
-        invalid: [],
+        // 处理中
+        process: [],
+        // 已完成
+        completed: [],
         // 搜索结果
-        result: [],
-        // status 2 list
-        status2list: {
-          '待处理': 'pending',
-          '处理中': 'valid',
-          '已完成': 'invalid',
-          '': 'result'
-        }
+        result: []
       },
       mutations: {
-        setPartners(state, {partners, list}) {
-          state[list] = partners;
+        setTransferOrders(state, {TransferOrders, list}) {
+          state[list] = TransferOrders;
         },
-        addPartners(state, {partners, list}) {
-          state[list].push(...partners);
+        addTransferOrders(state, {TransferOrders, list}) {
+          state[list].push(...TransferOrders);
         }
       },
       actions: {
@@ -49,7 +45,7 @@ export default new Vuex.Store({
          * @param {Function} error 选填 错误回调
          */
         getList({state, commit, dispatch}, {data, more, callback, error}) {
-          let list = state.status2list[data['Order Entry - Orders']];
+          let list = mapp[data['Status']] || 'result'; // 搜索所有时，没有状态
           api.get({
             key: 'getList',
             method: 'POST',
@@ -58,14 +54,14 @@ export default new Vuex.Store({
               StartRowNum: more ? state[list].length : 0,
               PageSize: PAGESIZE
             },
-            success: function(data) {
-              let partners = KND.Util.toArray(data.SiebelMessage['Order Entry - Orders']);
-              commit(more ? 'addPartners' : 'setPartners', {
-                partners: partners,
+            success: data => {
+              let TransferOrders = KND.Util.toArray(data.SiebelMessage['Order Entry - Orders']);
+              commit(more ? 'addTransferOrders' : 'setTransferOrders', {
+                TransferOrders: TransferOrders,
                 list: list
               });
               if (callback) {
-                callback(partners);
+                callback(TransferOrders);
               }
             },
             error
@@ -78,6 +74,58 @@ export default new Vuex.Store({
       state: {
       }
     },
+    /**
+     * 指派安装工程师
+     */
+    engineer: {
+      namespaced: true,
+      state: {
+        result: [],
+        select: {
+          'Last Name': '请选择'
+        }
+      },
+      mutations: {
+        setEngineer(state, engineer) {
+          state.result = engineer;
+        },
+        addEngineer(state, engineer) {
+          state.result.push(...engineer);
+        },
+        selEngineer(state, engineer) {
+          state.select = engineer;
+        }
+      },
+      actions: {
+        /**
+         * 查找安装工程师
+         * @param {Object} data 必填 查询条件 键值对
+         */
+        findEngineer({state, commit}, {data, more, callback}) {
+          api.get({
+            key: 'findEngineer',
+            data: data,
+            paging: {
+              StartRowNum: more ? state.result.length : 0,
+              PageSize: PAGESIZE
+            },
+            success: data => {
+              let engineer = KND.Util.toArray(data.items);
+              commit(more ? 'addEngineer' : 'setEngineer', engineer);
+              if (callback) {
+                callback(engineer);
+              }
+            },
+            error: error => {
+              if (callback) {
+                callback();
+              };
+              console.log(error);
+            }
+          });
+        }
+      }
+    },
     sign: {
       namespaced: true,
       state: {
@@ -87,6 +135,101 @@ export default new Vuex.Store({
           edit: false,
           title: '合同附件'
         } // 附件
+      },
+      mutations: {
+        setSign(state, form) {
+          state.form = form;
+        },
+        clear(state) {
+          state.form = {
+            'KL Signed Amount': '',
+            'Description': ''
+          };
+        }
+      },
+      actions: {
+        getSign({commit}, item) {
+          var obj = {
+            'KL Signed Amount': item['KL Signed Amount'],
+            'Description': item.Description
+          };
+          commit('setSign', obj);
+        },
+        getUPData({state}, id) {
+          let partner = state.form;
+          api.get({ // 提交数据
+            key: 'getUPData',
+            method: 'PUT',
+            data: {
+              'KL Signed Amount': partner['KL Signed Amount'],
+              'Description': partner.Description,
+              'Id': id
+            },
+            success: function(data) {
+              history.go(-1);
+            }
+          });
+        }
+      }
+    },
+    batch: {
+      namespaced: true,
+      actions: {
+      }
+    },
+    updateDoor: {
+      namespaced: true,
+      state: {
+        form: '',
+        attach: {
+          list: [{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}],
+          edit: false,
+          title: '合同附件'
+        } // 附件
+      },
+      mutations: {
+        setSign(state, form) {
+          state.form = form;
+        },
+        clear(state) {
+          state.form = {
+            'KL Signed Amount': '',
+            'KL Spot Check Amount': '',
+            'Qualified Amount': '',
+            'Unqualified Desc': '',
+            'Unqualified Solve Desc': ''
+          };
+        }
+      },
+      actions: {
+        getSign({commit}, item) { // 详情接口
+          var obj = {
+            'KL Signed Amount': item['KL Signed Amount'],
+            'KL Spot Check Amount': item['KL Spot Check Amount'],
+            'Qualified Amount': item['Qualified Amount'],
+            'Unqualified Desc': item['Unqualified Desc'],
+            'Unqualified Solve Desc': item['Unqualified Solve Desc']
+          };
+          commit('setSign', obj);
+        },
+        getUPData({state}, id) {
+          let partner = state.form;
+          api.get({ // 提交数据
+            key: 'getUPData',
+            method: 'PUT',
+            data: {
+              'KL Signed Amount': partner['KL Signed Amount'],
+              'KL Spot Check Amount': partner['KL Spot Check Amount'],
+              'Qualified Amount': partner['Qualified Amount'],
+              'Unqualified Desc': partner['Unqualified Desc'],
+              'Unqualified Solve Desc': partner['Unqualified Solve Desc'],
+              'Id': id
+            },
+            success: function(data) {
+              history.go(-1);
+            }
+          });
+        }
       }
     },
     zsBatch: {

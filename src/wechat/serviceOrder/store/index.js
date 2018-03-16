@@ -34,23 +34,23 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
-        loginMeg: {
-          'Last Name': '袁静',
-          'Emp #': '16113009',
-          'Job Title': '400'
-        },
+        // loginMeg: {
+        //   'Last Name': '袁静',
+        //   'Emp #': '16113009',
+        //   'Job Title': '400'
+        // },
         // loginMeg: {
         //   'Last Name': '代一',
         //   'Emp #': '16013107',
         //   'Job Title': 'install'
         // },
-        // loginMeg: {
-        //   'Last Name': 'IM01',
-        //   'Emp #': 'IM01',
-        //   'Job Title': 'install',
-        //   'KL Employee Full Name': 'IM01 IM01',
-        //   'Id': '1-2BSBYRFU'
-        // },
+        loginMeg: {
+          'Last Name': 'IM01',
+          'Emp #': 'IM01',
+          'Job Title': 'install',
+          'KL Employee Full Name': 'IM01 IM01',
+          'Id': '1-2BSBYRFU'
+        },
         // 待处理
         pending: [],
         // 处理中
@@ -155,7 +155,7 @@ export default new Vuex.Store({
           for (let i = 0; i < val.data.length; i++) {
             if (val.type === 'KL_PROVINCE') {
               state.provinceSlots[0].values.push(val.data[i].Value);
-            } else if (val.type === 'SR_TYPE') {
+            } else if (val.type === 'CONTACT_TYPE') {
               state.typeSlots[0].values.push(val.data[i].Value);
             } else if (val.type === 'SR_AREA') {
               state.areaSlots[0].values.push(val.data[i].Value);
@@ -333,6 +333,8 @@ export default new Vuex.Store({
               state.BtnStatu = 'status2';
             } else if (Action.Status === '已预约' || Action.Status === '已出发' || Action.Status === '已上门') {
               state.BtnStatu = 'status3';
+            } else {
+              state.BtnStatu = '';
             }
             state.Action = Action;
           } else {
@@ -444,35 +446,36 @@ export default new Vuex.Store({
       namespaced: true,
       state: {
         tips: '查询无此资产',
-        form: {
-          ProductFlag: '', // 故障描述
-          ProductModel: '', // 产品型号
-          Personal: '',    // 省市
-          Address: '',       // 详细地址
-          Responsbility: '', // 责任划分
-          Area: '',           // 故障现象
-          Description: '' // 故障描述
-        },
         slots: [
           {flex: 1, values: [], className: 'slot1', textAlign: 'center'},
           {divider: false, values: [], content: '-', className: 'slot2'},
           {flex: 1, values: [], className: 'slot3', textAlign: 'center'}
-        ]
+        ],
+        slots1: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
+        form: {
+          ProductModel: '', // 产品型号
+          Personal: '',    // 省市
+          Address: ''      // 详细地址
+        }
       },
       mutations: {
         errorTips(state) {
-          tipBox(state.tips);
+          Toast(state.tips);
         },
         successCall(state, data) {
-          console.log(data);
-          state.form.ProductModel = data['KL Product Model']; // 产品型号
-          state.form.Personal = data['KL Personal Province'] + data['Personal City'];   // 省市
-          state.form.Address = data['Personal Address'];    // 详细地址
+          state.ProductModel = data['KL Product Model']; // 产品型号
+          state.Personal = data['KL Personal Province'] + data['Personal City'];   // 省市
+          state.Address = data['Personal Address'];    // 详细地址
         },
-        addValue1(state, data) {
+        addValue1(state, val) {
           state.slots[0].values = [];
-          for (let i = 0; i < data.length; i++) {
-            state.slots[0].values.push(data[i].Value);
+          state.slots1[0].values = [];
+          for (let i = 0; i < val.data.length; i++) {
+            if (val.type === 'SR_AREA') {
+              state.slots[0].values.push(val.data[i].Value);
+            } else {
+              state.slots1[0].values.push(val.data[i].Value);
+            }
           }
         },
         changeValue1(state, data) {
@@ -514,7 +517,7 @@ export default new Vuex.Store({
               type
             },
             success: function(data) {
-              commit('addValue1', data.items);
+              commit('addValue1', {data: data.items, type: type});
             }
           });
         },
@@ -522,7 +525,8 @@ export default new Vuex.Store({
           api.get({
             key: 'getParentLov1',
             data: {
-              val
+              value: val.value,
+              type: val.type
             },
             success: function(data) {
               console.log(data);
@@ -538,20 +542,32 @@ export default new Vuex.Store({
     searchTrans: {
       namespaced: true,
       state: {
-        result: []
+        result: [],
+        selected: [],
+        returnSelect: []
       },
       mutations: {
         count(state, val) {
-          if (val.type === 'add') {
-            let number = state.result[val.index].value + 1;
-            Vue.set(state.result[val.index], 'value', number);
-            console.log(state.result);
+          if (val.isShow) {
+            state.selected.splice(val.index, 1, false);
           } else {
-            state.result[val.index].value = state.result[val.index].value - 1;
+            state.selected.splice(val.index, 1, true);
+          }
+        },
+        selectProduct(state) {                    // 确认选择的配件
+          state.returnSelect = [];
+          for (let i = 0; i < state.result.length; i++) {
+            if (state.selected[i]) {
+              state.returnSelect.push(state.result[i]);
+            }
+          }
+          if (!state.returnSelect.length) {
+            Toast('请选择配件');
           }
         },
         setProduct(state, data) {
           state.result = [];
+          state.selected = [];
           for (let i = 0; i < data.length; i++) {
             if (data[i].Product) {
               if (KND.Util.isArray(data[i].Product)) {
@@ -562,9 +578,8 @@ export default new Vuex.Store({
             }
           }
           for (let i = 0; i < state.result.length;i++) {
-            state.result[i].value = 0;
+            state.selected.push(false);
           }
-          console.log(state.result);
         }
       },
       actions: {

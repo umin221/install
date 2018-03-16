@@ -7,8 +7,8 @@
       <div class="addform">
         <mt-field label="联系电话" type="number" placeholder="请输入联系电话" v-model.trim="Contact_Phone" class="textRight require"></mt-field>
         <mt-field label="报修联系人" type="text" :attr="isCall" placeholder="请输入联系人" v-model="Contact_Name" class="textRight require"></mt-field>
-        <!--<mt-cell class="require mint-field"  @click.native="getLov('SR_TYPE')" title="联系人类型"  :value="SR_TYPE" placeholder="请选择" is-link></mt-cell>-->
-        <mt-cell class="require mint-field margin-right" title="联系人类型"  :value="SR_TYPE"></mt-cell>
+        <mt-cell class="require mint-field"  @click.native="getLov('CONTACT_TYPE')" title="联系人类型"  :value="SR_TYPE" placeholder="请选择" is-link></mt-cell>
+        <!--<mt-cell class="require mint-field margin-right" title="联系人类型"  :value="SR_TYPE"></mt-cell>-->
         <mt-cell class="require mint-field" @click.native="getLov('KL_PROVINCE','CN')" title="省市" :value="KL_PROVINCE" placeholder="请选择"  is-link></mt-cell>
         <mt-field class="block require" id="addressText" :attr="isEdit" label="详细地址" :placeholder="placeHold" v-model="Address" type="textarea" rows="2">
           <i class="xs-icon icon-edit" @click="editAddress" style="position: absolute;bottom: 1.8rem;right: 0.8rem;"></i>
@@ -30,7 +30,7 @@
       </div>
       <mt-popup v-if="showBox" v-model="showBox" position="bottom">
         <menuBox v-show="lovType === 'KL_PROVINCE'" @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType" :slots="provinceSlots"></menuBox>
-        <menuBox v-show="lovType === 'SR_TYPE'" @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType"  :slots="typeSlots"></menuBox>
+        <menuBox v-show="lovType === 'CONTACT_TYPE'" @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType"  :slots="typeSlots"></menuBox>
         <menuBox v-show="lovType === 'SR_AREA'" @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType" :slots="areaSlots"></menuBox>
       </mt-popup>
       <mt-datetime-picker
@@ -55,7 +55,6 @@
 </template>
 <script>
   import {mapState, mapActions, mapMutations} from 'vuex';
-//  import api from '../api/api';
   import menuBox from '../../../public/components/cus-menu.vue';
 //  import { MessageBox } from 'mint-ui';
   const delay = (function() {
