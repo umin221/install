@@ -1,19 +1,6 @@
 <template>
   <div style="background-color: #ebebeb;">
-    <!--<cusHeader fixed title="维修工单列表" :menu="[{title:'查看我的团队', key:'a'}]">-->
-      <!--<fallback slot="left"></fallback>-->
-      <!--<router-link v-if="loginMeg['Job Title'] === '400'" to="addService" slot="right">-->
-        <!--<mt-button>-->
-          <!--<i class="xs-icon icon-add"></i>-->
-        <!--</mt-button>-->
-      <!--</router-link>-->
-      <!--<router-link v-if="loginMeg['Job Title'] === 'install'" to="search" slot="right">-->
-        <!--<mt-button >-->
-          <!--<i class="xs-icon icon-search"></i>-->
-        <!--</mt-button>-->
-      <!--</router-link>-->
-    <!--</cusHeader>-->
-    <mt-header fixed title="配件领用">
+    <mt-header fixed title="维修工单列表">
       <fallback slot="left"></fallback>
       <router-link v-if="loginMeg['Job Title'] === '400'" to="addService" slot="right">
         <mt-button>
@@ -45,6 +32,7 @@
               </mt-cell>
             </div>
           </loadmore>
+          <no-data v-if="!pending.length"></no-data>
         </mt-tab-container-item>
         <mt-tab-container-item id="valid">
           <loadmore ref="valid" @loadTop="loadTop('valid')" @loadBottom="loadBottom('valid')" :topStatus="topStatus" :allLoaded="true">
@@ -57,6 +45,7 @@
               </mt-cell>
             </div>
           </loadmore>
+          <no-data v-if="!valid.length"></no-data>
         </mt-tab-container-item>
 
         <mt-tab-container-item id="invalid">
@@ -70,6 +59,7 @@
               </mt-cell>
             </div>
           </loadmore>
+          <no-data v-if="!invalid.length"></no-data>
         </mt-tab-container-item>
       </mt-tab-container>
     </div>
@@ -92,6 +82,7 @@
   import loadmore from 'public/components/cus-loadmore';
   import cusCell from 'public/components/cus-cell';
   import cusHeader from 'public/components/cus-header';
+  import noData from 'public/components/cus-empty';
   //
   const NameSpace = 'index';
   const COUNT = config.pageSize;
@@ -171,7 +162,7 @@
         });
       }
     },
-    components: {loadmore, cusCell, cusHeader}
+    components: {loadmore, cusCell, cusHeader, noData}
   };
 </script>
 <style lang="scss">

@@ -8,12 +8,12 @@
     <div class="mint-content addService">
       <div class="addform">
         <mt-field label="产品条形码" type="text" placeholder="输入或扫门锁条形码" @change="sarech" v-model="SerialNumber" class="textRight"></mt-field>
-        <mt-cell class="mint-field" title="所在省市区" placeholder="请选择" :value="form.Personal"></mt-cell>
-        <mt-field class="block" label="详细地址" v-model="form.Address" placeholder="如设备过旧未贴条码,允许为空" type="textarea" rows="2"></mt-field>
-        <mt-cell class="require mint-field" title="产品型号" placeholder="请选择" :value="form.ProductModel" is-link></mt-cell>
-        <mt-cell class="mint-field require" title="故障现象" :value="form.Area" placeholder="请选择" @click.native="showArea" is-link></mt-cell>
-        <mt-cell class="mint-field require" :value="form.Responsbility" title="责任划分"></mt-cell>
-        <mt-field class="block" label="故障描述" v-model="form.Description" placeholder="详细描述或附加需求..." type="textarea" rows="3">
+        <mt-cell class="mint-field" title="所在省市区" placeholder="请选择" >{{Personal}}</mt-cell>
+        <mt-field class="block" label="详细地址" v-model="Address" placeholder="如设备过旧未贴条码,允许为空" type="textarea" rows="2"></mt-field>
+        <mt-cell class="require mint-field" title="产品型号" placeholder="请选择" is-link>{{ProductModel}}</mt-cell>
+        <mt-cell class="mint-field require" title="故障现象" placeholder="请选择" @click.native="showArea('SR_AREA')" is-link>{{Area}}</mt-cell>
+        <mt-cell class="mint-field require" :value="Responsbility" @click.native="showArea('KL_SR_RESP')" title="责任划分" is-link></mt-cell>
+        <mt-field class="block" label="故障描述" v-model="Description" placeholder="详细描述或附加需求..." type="textarea" rows="3">
           <div style="line-height: 2rem"><i class="xs-icon icon-mic" style="float: right;"></i></div>
         </mt-field>
         <div>
@@ -22,9 +22,22 @@
         </div>
       </div>
       <mt-popup v-if="showBox" v-model="showBox" position="bottom" style="width: 100%">
-        <menuBox @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :slots="slots"></menuBox>
+        <menuBox
+          v-show="lovType === 'SR_AREA'"
+          @my-enter="enter" @my-change="
+          onValuesChange" @my-cancel="cancel"
+          :type="lovType"
+          :slots="slots">
+        </menuBox>
+        <menuBox
+          v-show="lovType === 'KL_SR_RESP'"
+          @my-enter="enter"
+          @my-change="onValuesChange"
+          @my-cancel="cancel"
+          :type="lovType"
+          :slots="slots1">
+        </menuBox>
       </mt-popup>
-      <secrchPage></secrchPage>
     </div>
   </div>
 </template>
@@ -46,11 +59,19 @@
     data: () => {
       return {
         SerialNumber: '', // 产品条形码
-        showBox: false
+        showBox: false,
+        ProductFlag: '', // 故障描述
+        ProductModel: '', // 产品型号
+        Personal: '',    // 省市
+        Address: '',       // 详细地址
+        Responsbility: '', // 责任划分
+        Area: '',           // 故障现象
+        Description: '', // 故障描述
+        lovType: ''
       };
     },
     computed: {
-      ...mapState(NameSpace, ['form', 'slots'])
+      ...mapState(NameSpace, ['form', 'slots', 'slots1'])
     },
     methods: {
       ...mapActions(NameSpace, ['getAsset', 'getLov1', 'valueChange1']),
@@ -65,21 +86,29 @@
           }
         }, 300);
       },
-      showArea() {
+      showArea(type) {
         let me = this;
         me.showBox = true;
-        me.getLov1('SR_AREA');
+        me.lovType = type;
+        me.getLov1(type);
       },
-      enter(value) {
-        console.log(value);
+      enter(value, type) {
+        this.showBox = false;
+        if (type === 'SR_AREA') {
+          this.Area = value[2];
+        } else {
+          this.Responsbility = value[0];
+        }
       },
-      onValuesChange(value) {
-        if (value[0]) {
-          this.valueChange1(value[0]);
+      onValuesChange(value, type) {
+        if (type === 'SR_AREA') {
+          if (value[0]) {
+            this.valueChange1({type: 'SR_AREA', value: value[0]});
+          }
         }
       },
       cancel(value) {
-        console.log(value);
+        this.showBox = false;
       }
     },
     components: {menuBox}

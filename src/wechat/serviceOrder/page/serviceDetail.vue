@@ -37,10 +37,10 @@
               </div>
             </mt-tab-container-item>
             <mt-tab-container-item id="tab-container2">
-              <toggle :label="ServiceRequest['SR Number']">
-                <div v-if="Action">
+              <toggle v-if="ServiceRequest['Action']" label="单据编号">
+                <div>
                   <div class="record-title">故障记录</div>
-                  <ul class="failure-record" style="list-style: none">
+                  <ul class="failure-record">
                     <li>产品序列号：{{ServiceRequest['KL SN']}}</li>
                     <li>详细地址：{{ServiceRequest['Personal Street Address']}}</li>
                     <li>产品类型：{{ServiceRequest['KL Product Model']}}</li>
@@ -52,8 +52,8 @@
                   <ul class="finish-enter">
                   </ul>
                 </div>
-                <div v-else style="line-height: 5rem;text-align: center">暂无数据</div>
               </toggle>
+              <div v-else style="line-height: 5rem;text-align: center">暂无数据</div>
             </mt-tab-container-item>
             <mt-tab-container-item id="tab-container3">
               <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
@@ -104,11 +104,11 @@
           <mt-button v-else-if="Action['Status']==='已预约'" style="background: gainsboro">签到</mt-button>
         </mt-cell>
         <mt-cell title="记录故障">
-          <mt-button v-if="Action['Status']==='已上门'" @click="clickPosition()">填写</mt-button>
+          <mt-button v-if="Action['Status']==='已上门'" @click="clickPosition('comEnter')">填写</mt-button>
           <mt-button v-else style="background: gainsboro">填写</mt-button>
         </mt-cell>
         <mt-cell title="完工确认">
-          <mt-button v-if="Action['Status']==='已上门'" @click="clickPosition()">填写</mt-button>
+          <mt-button v-if="Action['Status']==='已上门'" @click="clickPosition('failureRecord')">填写</mt-button>
           <mt-button v-else style="background: gainsboro">填写</mt-button>
         </mt-cell>
         <mt-cell class="completeEnd" title="结束">
@@ -126,7 +126,7 @@
   import dateControl from './dateControl';
   import { MessageBox } from 'mint-ui';
   import buttonGroup from 'public/components/cus-button-group';
-  import toggle from 'public/components/cus-detail-toggle';
+  import toggle from '../components/detail-toggle';
   //
   const NameSpace = 'detail';
   //
@@ -279,6 +279,22 @@
         if ((value1 === 'setOut' && statu === '已预约') || (value1 === 'reach' && statu === '已出发') || (value1 === 'end' && statu === '已上门')) {
           me.setStatus({parms: parms, srNum: me.srNumber});
         }
+        if (value1 === 'failureRecord') {
+          this.$router.push({
+            name: 'saveFault',
+            query: {
+              id: this.ServiceRequest['Id']
+            }
+          });
+        }
+        if (value1 === 'comEnter') {
+          this.$router.push({
+            name: 'comEnter',
+            query: {
+              id: this.ServiceRequest['Id']
+            }
+          });
+        }
       },
       changeMy() {              // 主管接单
         let me = this;
@@ -306,15 +322,6 @@
             id: this.ServiceRequest['Id']
           }
         });
-      },
-      openOrder() {
-        if (this.iconDown === 'icon-arrow-down') {
-          this.iconDown = 'icon-arrow-up';
-          this.isOpenOrder = true;
-        } else {
-          this.iconDown = 'icon-arrow-down';
-          this.isOpenOrder = false;
-        }
       }
     },
     components: {
@@ -471,5 +478,17 @@
         border-radius: 0.5rem;
       }
     }
+  }
+  .record-title{
+    line-height: 1.5rem;
+    font-size: $font-size-large;
+    background-color: $bg-cancel;
+  }
+  .failure-record{
+    list-style: none;
+    padding-left: 1rem;
+    li{
+      line-height: 1.5rem;
+    };
   }
 </style>
