@@ -1,19 +1,12 @@
 <template>
   <div>
-    <mt-header fixed title="工作台">
-      <router-link to="switch" slot="right">
-        <mt-button>切换用户</mt-button>
-      </router-link>
+    <mt-header fixed title="待办审批中心">
     </mt-header>
 
-    <mt-cell title="标题文字" is-link>
-      <span style="color: green">这里是元素</span>
-    </mt-cell>
-    <mt-cell  v-for="(item, index) in listObj" :key="index" :title="item.vul"  @click.native="getUrl(item.id)" is-link>
-<!--
-      <img slot="icon" src="" width="24" height="24">
--->
-    </mt-cell>
+    <div class="mint-content">
+      <mt-cell  v-for="(item, index) in listObj" :key="index" :title="item.vul"  @click.native="getUrl(item.id)" is-link>
+      </mt-cell>
+    </div>
   </div>
 </template>
 
@@ -24,7 +17,10 @@
   export default {
     name: NameSpace,
     created: () => {
-      KND.Native.getUserInfo();
+      let module = KND.Util.getParam('module');
+      let search = location.hash;
+      MessageBox('模块', module);
+      MessageBox('参数', search);
     },
     data: () => {
       return {
