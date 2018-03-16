@@ -99,10 +99,11 @@
               <span class="icon"></span>
             </li>
             <li style="margin-right: 8px">{{item['KL Detail Type']}}</li>
-            <div class="content-div" v-if="index===2"  @click.nataive="sporadic(index)">
-              <div>批次</div>
-              <div>已开孔/开孔批次</div>
-              <div>时间</div>
+            <div class="content-div"  v-if="index===2"  @click.nataive="sporadic(index)">
+              <!--v-for="(itemTask, index) in item['KL Installation Task']" :key="index"-->
+                <div>批次</div>
+                <div>已开孔/开孔批次</div>
+                <div>时间</div>
             </div>
           </ul>
         </div>
@@ -365,7 +366,7 @@
     components: {toggle},
     created() {
       let me = this;
-      me.id = me.$route.query.id || '1-2BSATYIN';
+      me.id = me.$route.query.id;
       api.get({
         key: 'getDetail',
         method: 'POST',

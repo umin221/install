@@ -35,8 +35,8 @@
     <button-group>
       <mt-button type="primary" class="single"
                  @click.native="previewFn">编辑预览</mt-button>
-     <!-- <mt-button type="primary" class="single"
-                 @click.native="submitFn">保存提交</mt-button>-->
+      <mt-button type="primary" class="single"
+                 @click.native="submitFn">保存提交</mt-button>
     </button-group>
   </div>
 </template>

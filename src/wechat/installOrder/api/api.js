@@ -107,7 +107,7 @@ let ajax = (api) => {
     timeout: 30000,
     method: 'get',
     headers: {
-      'Authorization': 'Basic REUwMTpERTAx'
+      'Authorization': 'Basic WFlKOlhZSg=='
     }
   }, api));
 };

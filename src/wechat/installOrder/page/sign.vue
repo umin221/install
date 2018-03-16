@@ -9,11 +9,12 @@
 
     <div class="mint-content wide-form">
       <div :class="{'readonly':read}">
-        <mt-field label="涉及开孔锁签收" placeholder="是"
-                  :class="heartVisible"></mt-field>
+        <mt-cell title="涉及开孔锁签收">
+          <mt-switch v-model="value"></mt-switch>
+        </mt-cell>
         <mt-field label="签收数量" placeholder="请输入签收数量"
-                  :class="heartVisible"></mt-field>
-        <mt-field label="备注说明" type="textarea" rows="4"></mt-field>
+                  :class="heartVisible" v-model="form['KL Signed Amount']"></mt-field>
+        <mt-field label="备注说明" type="textarea" rows="4" v-model="form['Description']"></mt-field>
       </div>
       <attach :attach="attach.list"
               :edit="!read"
@@ -22,14 +23,14 @@
     </div>
 
     <button-group>
-      <mt-button type="primary" class="single"
+      <mt-button type="primary" class="single" v-show="!read"
                  @click.native="submitFn">提交</mt-button>
     </button-group>
   </div>
 </template>
 
 <script type="es6">
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import titleGroup from 'public/components/cus-title-group';
   import buttonGroup from 'public/components/cus-button-group';
   import api from '../api/api';
@@ -48,14 +49,20 @@
       let param = this.$route.query;
       this.state = param.state;
       this.type = param.type;
-      this.id = param.id;
+      this.id = param.item.Id;
+      this.item = param.item;
       console.dir('=====' + this.id);
       // 获取详情
-     // this.getSign(param.id);
+      if (param.id) {
+        this.getSign(this.item);
+      } else {
+        this.clear();
+      }
     },
     data: () => {
       return {
         id: '',
+        item: '',
         type: 'add', // add 新增 / edit 编辑 / read 只读
         state: 'pending', // pending 待审批 / valid 已生效 / invalid 未生效
         button: {
@@ -96,12 +103,13 @@
       }
     },
     methods: {
-      ...mapActions(NameSpace, ['getSign']),
+      ...mapMutations(NameSpace, ['clear']),
+      ...mapActions(NameSpace, ['getSign', 'getUPData']),
       submitFn() {
         // pending
         var self = this;
         this.state = this.state === 'add' ? 'edit' : 'read';
-        api.get({
+        api.get({ // 更改按钮状态
           key: 'getUPStatus',
           method: 'POST',
           data: {
@@ -111,7 +119,7 @@
             }
           },
           success: function(data) {
-            history.go(-1);
+            self.getUPData(self.id);
           }
         });
       }

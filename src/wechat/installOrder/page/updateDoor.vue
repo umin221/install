@@ -4,7 +4,7 @@
       <fallback slot="left"></fallback>
     </mt-header>
     <div class="mint-content zsBatch">
-      <div :class="{'readonly':raddead}">
+      <div :class="{'readonly':read}">
         <mt-field label="今日完成数量" placeholder="请输入"
                   :class="heartVisible"></mt-field>
         <mt-field is-link label="抽查数量" placeholder="请输入"
@@ -19,7 +19,7 @@
       </div>
       <button-group>
         <mt-button type="primary" class="single"
-                   @click.native="handleClick">提交</mt-button>
+                   @click.native="submitFn">提交</mt-button>
       </button-group>
       <!--<mt-cell title="批次">
         <span>201712010001</span>
@@ -57,7 +57,8 @@
 </style>
 <script type="application/javascript">
   import buttonGroup from 'public/components/cus-button-group';
-  import {mapState} from 'vuex';
+  import api from '../api/api';
+  import {mapState, mapActions, mapMutations} from 'vuex';
 
   let right = [{
     content: '删除',
@@ -68,12 +69,23 @@
 
   export default {
     name: 'updateDoor',
-    created: () => {
-      console.dir(1);
+    created() {
+      let param = this.$route.query;
+      this.type = param.type;
+      this.id = param.item.Id;
+      this.item = param.item;
+      console.dir('=====' + this.id);
+      // 获取详情
+      if (param.id) {
+        this.getSign(this.item);
+      } else {
+        this.clear();
+      }
     },
     data: () => {
       return {
-        value: '',
+        id: '',
+        item: '',
         type: 'add', // add 新增 / edit 编辑 / read 只读
         titleVal: '挂门进度更新',
         active: 'tab-container'
@@ -106,13 +118,28 @@
        */
       title() {
         let type = this.type;
-        return type === 'add' ? (this.state === 'invalid' ? '补充委外合约' : '开孔锁签收') : '开孔锁签收详情';
+        return type === 'add' ? '挂门进度更新' : '挂门进度更新详情';
       }
     },
     methods: {
-      butXttd() {
+      ...mapMutations(NameSpace, ['clear']),
+      ...mapActions(NameSpace, ['getSign', 'getUPData']),
+      submitFn() {
+        // pending
         var self = this;
-        self.$router.go('/xttd');
+        api.get({ // 更改按钮状态
+          key: 'getUPStatus',
+          method: 'POST',
+          data: {
+            'body': {
+              'ProcessName': 'KL Install Task Submit For Approval Workflow',
+              'RowId': self.id
+            }
+          },
+          success: function(data) {
+            self.getUPData(self.id); // 提交数据
+          }
+        });
       }
     },
     components: {buttonGroup}
