@@ -1,7 +1,7 @@
 <!--交接单列表-->
 <template>
   <div>
-    <cus-header fixed title="我的交接单" :menu="[{title:'查看我的团队', key:'a'}]">
+    <cus-header fixed title="我的交接单" :menu="isManager ? [{title:'查看我的团队', key:'a'}] : undefined">
       <fallback slot="left"></fallback>
       <mt-button @click.native="toSearchFn" slot="right">
         <i class="xs-icon icon-search"></i>
@@ -14,6 +14,7 @@
         <mt-tab-item id="pending"
           @click.native="!pending.length && loadBottomFn({status:'待处理', list:'pending'})">待处理</mt-tab-item>
         <mt-tab-item id="process"
+                     v-show="isManager"
           @click.native="!process.length && loadBottomFn({status:'处理中', list:'process'})">处理中</mt-tab-item>
         <mt-tab-item id="completed"
           @click.native="!completed.length && loadBottomFn({status:'已完成', list:'completed'})">已完成</mt-tab-item>
@@ -34,6 +35,7 @@
                      @click.native="toDetailFn(item)"
                      v-for="item in pending"
                      is-link>
+              <div slot="after">{{item['Status']}}</div>
               <div class="mint-cell-sub-title" slot="title">工程名称: {{item['Opportunity Name']}}</div>
               <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
             </cus-cell>
@@ -72,6 +74,7 @@
                       @click.native="toDetailFn(item)"
                       v-for="item in completed"
                       is-link>
+              <div slot="after">{{item['Status']}}</div>
               <div class="mint-cell-sub-title" slot="title">工程名称: {{item['Opportunity Name']}}</div>
               <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
             </cus-cell>
@@ -86,23 +89,22 @@
 </template>
 
 <script type="es6">
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import cusHeader from 'public/components/cus-header';
   import cusLoadmore from 'public/components/cus-loadmore';
   import cusCell from 'public/components/cus-cell';
 
   const NAMESPACE = 'index';
   // mapp
-  let mapp = config.mapp;
-  // 用户角色 => 状态
-  let status = mapp['manager'];
-  let list = mapp['list'];
+  let mappList = config.mapp['list'];
+  let userInfo = {};
   //
   let loader = function(...args) {
+    console.log(userInfo);
     let me = this;
     let event = args.pop();
     let list = args.pop();
-    let param = Object.extend({
+    let param = Object.extend(true, {
       callback: (data) => {
         me.$refs[list][event](data.length);
       }
@@ -116,13 +118,14 @@
     components: {cusHeader, cusLoadmore, cusCell},
     // 数据初始化
     created() {
-      this.loadBottomFn({
-        status: '待处理',
-        list: 'pending'
-      });
-
+      let me = this;
       KND.Native.getUserInfo((info) => {
-        console.log(info);
+        userInfo = info;
+        me.setManager(info['KL Primary Position Type LIC'] === 'Field Service Manager');
+        me.loadBottomFn({
+          status: '待处理',
+          list: 'pending'
+        });
       });
     },
     data: () => {
@@ -134,10 +137,11 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['pending', 'process', 'completed'])
+      ...mapState(NAMESPACE, ['pending', 'process', 'completed', 'isManager'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['getTransferOrder']),
+      ...mapMutations(NAMESPACE, ['setManager']),
       // 标题栏菜单选择回调方法
       menuFn(item) {
         console.log(item);
@@ -146,7 +150,7 @@
       loadTopFn(param) {
         loader.call(this, {
           data: {
-            'Status': status[param.status]
+            'Status': param.status
           }
         }, param.list, 'onTopLoaded');
       },
@@ -154,7 +158,7 @@
       loadBottomFn(param) {
         loader.call(this, {
           data: {
-            'Status': status[param.status]
+            'Status': param.status
           },
           more: true
         }, param.list, 'onBottomLoaded');
@@ -168,7 +172,7 @@
         this.$router.push({
           name: 'detail',
           query: {
-            status: list[item.Status],
+            status: mappList[item.Status],
             id: item.Id
           }
         });

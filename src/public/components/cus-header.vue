@@ -1,9 +1,10 @@
 <template>
     <div class="cus-header"
       :class="{visible:visible}">
-      <mt-header fixed class="xs-icon icon-arrow-up"
-                 :title="title"
-                 @click.native="toggleFn">
+      <mt-header fixed class="xs-icon"
+                 @click.native="toggleFn"
+                 :class="{'icon-arrow-up': hasMenu}"
+                 :title="title">
         <slot name="left" slot="left"></slot>
         <slot name="right" slot="right"></slot>
       </mt-header>
@@ -25,6 +26,11 @@
         visible: false
       };
     },
+    computed: {
+      hasMenu() {
+        return !!this.menu;
+      }
+    },
     props: {
       title: String,
       menu: Array
@@ -33,7 +39,7 @@
       // toggle menu
       toggleFn(evt) {
         let me = this;
-        if (evt.target.nodeName === 'H1') {
+        if (me.hasMenu && evt.target.nodeName === 'H1') {
           me.visible = !me.visible;
         }
       },

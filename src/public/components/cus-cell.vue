@@ -1,6 +1,8 @@
 <template>
   <div class="cus-cell">
-    <div class="cus-title" v-text="title"></div>
+    <div class="co-flex co-jt">
+      <div class="cus-title co-f2" v-text="title"></div><slot name="after"></slot>
+    </div>
     <mt-cell :to="to"
           :icon="icon"
           :label="label"
@@ -35,7 +37,7 @@
     overflow: hidden;
     font-size: $font-size-default;
 
-    >.cus-title {
+    .cus-title {
       padding-bottom: 10px;
       color: $black-base;
     }

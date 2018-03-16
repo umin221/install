@@ -134,7 +134,6 @@
       // 是否显示 转发门厂技术 按钮
       showTransfer() {
         let me = this;
-        console.log(me.order['KL Delivery Setter Full Name'] !== me.$route.query.DFEngineer);
         return (me.order['KL Hole Type'] === '门厂开孔') || (me.order['KL Delivery Setter Full Name'] !== me.$route.query.DFEngineer);
       },
       // 是否安装锁体 switch

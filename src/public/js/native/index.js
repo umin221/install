@@ -78,6 +78,7 @@ import cache from '../lib/cache';
     /**
      * 获取用户ID
      * @returns {string}
+     * IM02 IE01
      */
     getUserID() {
       return session.get('userID') || 'IM02' || Util['getParam']('userID');

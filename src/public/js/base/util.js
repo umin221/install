@@ -178,7 +178,7 @@
     /**
      * SIEBEL 查询条件转换
      */
-    condition(obj, entity, jion = ' AND ', operator = '=') {
+    condition(obj, entity, join = ' AND ', operator = '=') {
       let arr = [];
       entity = entity ? entity + '.' : '';
       for (let i in obj) {
@@ -186,7 +186,28 @@
           arr.push('[' + entity + i + ']' + operator + '"' + obj[i] + '"');
         }
       }
-      return arr.join(jion);
+      return arr.join(join);
+    };
+
+    /**
+     * SIEBEL 查询条件转换
+     */
+    condition2D(obj, entity, join = ' AND ', operator = '=') {
+      let arr = [];
+      entity = entity ? entity + '.' : '';
+      for (let i in obj) {
+        let item = obj[i];
+        if (item) {
+          if (this.isArray(item)) {
+            for (let j in item) {
+              arr.push('[' + entity + i + ']' + operator + '"' + item[j] + '"');
+            }
+          } else {
+            arr.push('[' + entity + i + ']' + operator + '"' + item + '"');
+          }
+        }
+      }
+      return arr.join(join);
     };
 
     /**

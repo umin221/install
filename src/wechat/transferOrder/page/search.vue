@@ -2,7 +2,7 @@
 <template>
   <div class="search">
     <cus-search v-model="value"
-                placeholder="请输入项目名称或负责人">
+                placeholder="请输入工程名称或负责人">
 
         <cus-loadmore ref="result"
                       :loadBottom="loadBottomFn"

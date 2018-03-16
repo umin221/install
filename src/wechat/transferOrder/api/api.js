@@ -6,13 +6,19 @@ let apiList = {
    * @returns {{method: string, url: string, data: {body: {OutputIntObjectName: string, ViewMode: string, SearchSpec: *, StartRowNum: (*|string), PageSize: (*|string|PAGESIZE)}}}}
    */
   getTransferOrder: option => {
+    let condition = Object.assign({}, option.data);
+    let status = condition.Status;
+    if (status) {
+      condition['Status'] = status.split(',');
+    };
+    let operator = option.data.Status ? ' = ' : ' ~LIKE ';
     return {
       url: 'service/EAI Siebel Adapter/QueryPage',
       data: {
         'body': {
           'OutputIntObjectName': 'Base Project',
           'ViewMode': 'Sales Rep',
-          'SearchSpec': KND.Util.condition(option.data, 'Project', ' OR ', ' ~LIKE '), // '[Project.Status]="' + option.data.Status + '"',
+          'SearchSpec': KND.Util.condition2D(condition, 'Project', ' OR ', operator), // '[Project.Status]="' + option.data.Status + '"',
           'StartRowNum': option.paging.StartRowNum,
           'PageSize': option.paging.PageSize
         }

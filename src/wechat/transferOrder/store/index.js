@@ -11,7 +11,8 @@ app.state.alive = ['index'];
 // 每页加载条数
 const PAGESIZE = config.pageSize;
 // mapp
-let mapp = config.mapp['list'];
+let mappList = config.mapp['list'];
+let mappStatus;
 
 export default new Vuex.Store({
   modules: {
@@ -22,6 +23,7 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
+        isManager: false,
         // 待审批
         pending: [],
         // 处理中
@@ -37,6 +39,10 @@ export default new Vuex.Store({
         },
         addTransferOrders(state, {TransferOrders, list}) {
           state[list].push(...TransferOrders);
+        },
+        setManager(state, isManager) {
+          mappStatus = config.mapp[isManager ? 'manager' : 'employee'];
+          state.isManager = isManager;
         }
       },
       actions: {
@@ -48,7 +54,8 @@ export default new Vuex.Store({
          * @param {Function} error 选填 错误回调
          */
         getTransferOrder({state, commit, dispatch}, {data, more, callback, error}) {
-          let list = mapp[data['Status']] || 'result'; // 搜索所有时，没有状态
+          data['Status'] = mappStatus[data['Status']];
+          let list = mappList[data['Status']] || 'result'; // 搜索所有时，没有状态
           api.get({
             key: 'getTransferOrder',
             data: data,
