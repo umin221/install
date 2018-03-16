@@ -2,7 +2,7 @@
   <div id='calendar'>
     <mt-header fixed :title="headTitle">
       <fallback slot="left"></fallback>
-      <mt-button class="xs-icon icon-add" slot="right" @click.native="createPlan"></mt-button>
+      <mt-button v-show="isShowBtn" class="xs-icon icon-add" slot="right" @click.native="createPlan"></mt-button>
     </mt-header>
     <div class="date mint-content">
       <div class="calendar-content">
@@ -27,7 +27,7 @@
         <ul class="days" v-for="(value,index1) in daysUL">
           <li @click="pick(day,index+index1*7)" v-for="(day, index) in value" >
             <!--本月-->
-            <div class="dateItem" :class="{'selected':(isSelected[(index+index1*7)] || (new Date(day).getFullYear() == new Date().getFullYear() && day.getMonth() == new Date().getMonth() && day.getDate() == new Date().getDate()))}">
+            <div class="dateItem" :class="{'selected':(isSelected[(index+index1*7)] || (new Date(day).getFullYear() == new Date().getFullYear() && day.getMonth() == new Date().getMonth() && day.getDate() == new Date().getDate() && isSelected.length ==0))}">
               <span v-if="day==='spaces'"></span>
               <span v-else >{{ day.getDate() }}</span>
               <b v-if="day!=='spaces'" class="flag"></b>
@@ -37,7 +37,7 @@
       </div>
       <div class="planList">
         <mt-cell-swipe
-        @click.native="toDetail(1)"
+          @click.native="toDetail()"
           class="planListItem"
           title="标题文字"
           label="这是一些项目信息"
@@ -45,19 +45,38 @@
             {
               content: '删除',
               style: { background: 'red', color: '#fff' },
-              handler: () => this.$messagebox('delete')
+              handler: () => this.deletePlan()
             }
           ]">
           <div class="status">
             <p>11:30 - 12:35</p>
             <p class="text">已审批</p>
           </div>
+          <check-box :checkList="checkList" @change="change"></check-box>
+        </mt-cell-swipe>
+        <mt-cell-swipe
+          @click.native="toDetail()"
+          class="planListItem"
+          title="标题文字"
+          label="这是一些项目信息"
+          :right="[
+            {
+              content: '删除',
+              style: { background: 'red', color: '#fff' },
+              handler: () => this.deletePlan()
+            }
+          ]">
+          <div class="status">
+            <p>11:30 - 12:35</p>
+            <p class="text">已审批</p>
+          </div>
+          <check-box :checkList="checkList" @change="change"></check-box>
         </mt-cell-swipe>
         
       </div>
       </div>
        <button-group class="singBtn">
-        <mt-button type="primary" 
+        <mt-button class="submitBtn" type="primary" 
                    @click.native="handleSubmit">提交</mt-button>
       </button-group>
       <mt-datetime-picker
@@ -74,19 +93,19 @@
   </div>
 </template>
 <script>
+  import {mapState, mapActions} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
+  import checkBox from '../components/checkbox';
   import { DatetimePicker, CellSwipe } from 'mint-ui';
+
+  const NAMESPACE = 'index';
+
   export default {
-    components: {buttonGroup, DatetimePicker, CellSwipe},
+    components: {buttonGroup, DatetimePicker, CellSwipe, checkBox},
     name: 'date',
     data() {
       return {
         headTitle: '工作计划',
-        currentYear: 1970,   // 年份
-        currentMonth: 1,  // 月份
-        currentDay: 1,    // 日期
-        currentWeek: 1,    // 星期
-        firstWeek: 1,
         days: [],
         daysUL: [],
         params: {
@@ -107,22 +126,57 @@
         banList: [],
         xiuList: [],
         selectIndex: '',
-        pickerValue: ''
+        pickerValue: '', // DatetimePicker组件默认值
+        checkList: [], // 选中项
+        beforeSpaces: [], // 前面需要空几天
+        isShowBtn: true // 是否显示新建按钮
       };
     },
     created() {
-      this.initData(null);
+      var date = new Date();
+      this.initData(this.formatDate(date.getFullYear(), date.getMonth() + 1, 1), true);
       // 给定DatetimePicker组件默认值
       this.pickerValue = this.currentYear + '-' + this.currentMonth + '-' + this.currentDay;
     },
+    computed: {
+      ...mapState(NAMESPACE, ['currentYear', 'currentMonth', 'currentDay', 'firstWeek'])
+    },
     methods: {
+      ...mapActions(NAMESPACE, ['setYear', 'setMonth', 'setDay', 'setWeek']),
       // 新建计划
       createPlan() {
-        console.log('new creat');
+        this.$router.push({
+          path: './add',
+          query: {
+            year: this.currentYear,
+            month: this.currentMonth,
+            day: this.selectIndex - (this.beforeSpaces.length - 1)
+          }
+        });
+      },
+      // 是否选中
+      change(val) {
+        // 如果是选中就添加到数组中
+        if (event.target.checked) {
+          this.checkList.push(val);
+        }
+        this.checkList.forEach((item, index) => {
+          if (item === val) {
+            // 如果是取消就从数组中删除
+            if (!event.target.checked) {
+              this.checkList.splice(index, 1);
+            }
+          }
+        });
+        console.log(val, event.target.checked);
+      },
+      // 删除计划
+      deletePlan() {
+        this.$messagebox('删除成功');
       },
       // 跳转详情
       toDetail(index) {
-        console.log(index);
+        this.$router.push('./detail');
       },
       // 提交
       handleSubmit() {
@@ -147,28 +201,26 @@
         return `${y}-${m}-${d}`;
       },
       // 初始化日期
-      initData(cur) {
+      initData(cur, init) {
         let date = '';
         if (cur) {
           date = new Date(cur);
         } else {
           date = new Date();
         }
-        this.currentDay = date.getDate();
-        this.currentYear = date.getFullYear();
-        this.currentMonth = date.getMonth() + 1;
-        this.currentWeek = date.getDay();
-        // date.setDate(1);
-        this.firstWeek = date.getDay();
-        // 如果是0 则换成7 代表星期天
-        if (this.firstWeek === 0) {
-          this.firstWeek = 7;
-        }
+        // this.currentDay = date.getDate();
+        this.setDay(date.getDate());
+        // this.currentYear = date.getFullYear();
+        this.setYear(date.getFullYear());
+        // this.currentMonth = date.getMonth() + 1;
+        this.setMonth(date.getMonth() + 1);
+        this.setWeek(date.getDay());
         const str = this.formatDate(this.currentYear, this.currentMonth, 1);
         this.days.length = 0;
         // 没有的日期用 "spaces" 代替
-        var spaces = new Array(this.firstWeek - 1).fill('spaces', 0, this.firstWeek - 1);
-        spaces.forEach((item, index) => {
+        var beforeSpaces = new Array(this.firstWeek - 1).fill('spaces', 0, this.firstWeek - 1);
+        this.beforeSpaces = beforeSpaces;
+        beforeSpaces.forEach((item, index) => {
           this.days.push(item);
         });
         // 把当前日期放入数组
@@ -190,6 +242,10 @@
             }
           }
           this.isSevenDay();
+          var initDay = init ? new Date().getDate() : this.currentDay;
+          if (i === initDay && this.isToDay(this.currentYear, this.currentMonth, initDay)) {
+            this.selectIndex = this.firstWeek + i - 2;
+          }
         }
       },
       setRestOrWork(type) {
@@ -204,6 +260,22 @@
           this.days = [];
         }
       },
+      // 是否的当天
+      isToDay(year, month, day) {
+        var toDate = new Date();
+        return toDate.getFullYear() === year && toDate.getMonth() + 1 === month && toDate.getDate() === day;
+      },
+      // 是否的当月
+      isToMonth(year, month) {
+        var toDate = new Date();
+        var day = toDate.getDate();
+        if (toDate.getFullYear() === year && toDate.getMonth() + 1 === month) {
+          this.selectIndex = day + this.beforeSpaces.length;
+          return true;
+        } else {
+          return false;
+        }
+      },
       // 获取当月有多少天
       getcurMonthDays(year, month) {
         var curMonthDays = new Date(year, month, 0).getDate();
@@ -213,9 +285,18 @@
       pickPreNext(year, month, num) {
         this.daysUL = [];
         this.isSelected = [];
+        this.selectIndex = '';
         const d = new Date(this.formatDate(year, month, 1));
         d.setDate(num);
-        this.initData(this.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
+        if (this.isToMonth(d.getFullYear(), d.getMonth() + 1)) {
+          this.initData(this.formatDate(d.getFullYear(), d.getMonth() + 1, 1), true);
+          // 请求当天的数据
+          this.postData();
+          this.isShowBtn = true;
+        } else {
+          this.initData(this.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
+          this.isShowBtn = false;
+        }
       },
       dealResult(currentYear, currentMonth) {
         this.banList = [];
@@ -265,6 +346,11 @@
           }
         }
       },
+      // 数据请求
+      postData() {
+        console.log('请求数据...');
+      },
+      // 返回今天
       returnNow() {
         this.daysUL = [];
         this.initData(null);
@@ -275,15 +361,36 @@
         this.isSelected = [];
         this.params.selectDay = this.formatDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
         console.log(this.params);
-        this.currentYear = date.getFullYear();
-        this.currentMonth = date.getMonth() + 1;
-        this.currentDay = date.getDate();
+        // this.currentYear = date.getFullYear();
+        // this.currentMonth = date.getMonth() + 1;
+        // this.currentDay = date.getDate();
+        this.setDay(date.getDate());
+        this.setYear(date.getFullYear());
+        this.setMonth(date.getMonth() + 1);
         for (let i = 0; i < 42; i++) {
           if (index === i) {
             this.isSelected.push(true);
             continue;
           }
           this.isSelected.push(false);
+        }
+        this.isCreatePlan(date);
+      },
+      // 判断是否可以新建计划，小于当前日期不可新建
+      isCreatePlan(date) {
+        // 当前年月日
+        var nowDate = new Date();
+        var year = nowDate.getFullYear();
+        var month = nowDate.getMonth() + 1;
+        var day = nowDate.getDate();
+        // 点击的年月日数据
+        var tapDateTime = new Date(this.formatDate(date.getFullYear(), date.getMonth() + 1, date.getDate())).getTime();
+        var currDate = new Date(this.formatDate(year, month, day)).getTime();
+        console.log(currDate, tapDateTime, currDate > tapDateTime);
+        if (currDate > tapDateTime && this.selectIndex) {
+          this.isShowBtn = false;
+        } else {
+          this.isShowBtn = true;
         }
       },
       onlySelect() {
@@ -422,5 +529,8 @@
     display: block;
     font-size: 12px;
     margin-top: 6px;
+  }
+  .submitBtn{
+    background: #d9d9d9;
   }
 </style>

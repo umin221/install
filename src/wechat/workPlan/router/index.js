@@ -16,5 +16,11 @@ export default new Router({
     component(resolve) {
       require(['../page/index'], resolve);
     }
+  }, {
+    path: '/add', // 新建
+    name: 'add',
+    component(resolve) {
+      require(['../page/add'], resolve);
+    }
   }]
 });
