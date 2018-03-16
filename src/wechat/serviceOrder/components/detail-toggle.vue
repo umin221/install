@@ -1,7 +1,7 @@
 <template>
-    <div class="cus-toggle">
+    <div>
       <div :class="{visible:visible}" class="cus-toggle-btn"
-        @click="visible=!visible">{{label}}</div>
+        @click="visible=!visible">{{label1}}:{{ServiceRequest['SR Number']}}</div>
       <div v-show="visible">
         <slot></slot>
       </div>
@@ -9,16 +9,18 @@
 </template>
 
 <script type="es6">
+  import {mapState} from 'vuex';
   export default {
     name: 'cus-toggle',
+    props: ['label'],
     data() {
       return {
         visible: false,
-        label: this.label
+        label1: this.label
       };
     },
-    props: ['label'],
     computed: {
+      ...mapState('detail', ['ServiceRequest'])
     }
   };
 
