@@ -6,22 +6,21 @@
       </mt-header>
 
       <!--detail-->
-      <div class="mint-content">
+      <div class="mint-content" :data-date="date" :class="{disable: disable}">
         <cus-field label="产品名称"
-                   @click.native="showLovFn('KL Hole Direction')"
-                   v-model="line['Id']"
+                   @click.native="showLovFn('agreementItem')"
+                   :value="productName || line['KL Product Model No']"
                    is-link></cus-field>
         <cus-field label="开向"
                    @click.native="showLovFn('KL Hole Direction')"
                    v-model="line['KL Hole Direction']"
                    is-link></cus-field>
-        <cus-field label="是否带天地" v-show="!isPanel"
-                   @click.native="showLovFn('KL World Flag')"
-                   v-model="line['KL World Flag']"
-                   is-link></cus-field>
+        <mt-cell title="是否带天地" v-show="!isPanel">
+          <mt-switch v-model="flag"></mt-switch>
+        </mt-cell>
         <cus-field label="交货日期"
                    @click.native="openPicker"
-                   v-model="line['Scheduled Ship Date']"
+                   :value="line['Scheduled Ship Date']"
                    is-link></cus-field>
         <cus-field label="数量"
                    type="number"
@@ -50,36 +49,39 @@
       <!--buttons-->
       <button-group>
         <mt-button type="primary"
+                   v-show="!disable"
                    @click.native="saveFn">保存</mt-button>
       </button-group>
 
       <!--popup-->
       <mt-popup v-model="showBox" position="bottom">
-        <menu-box @my-enter="enter" vk="Value"
+        <menu-box @my-enter="enter"
                   @my-cancel="showBox=false"
+                  :vk="vk"
                   :type="lovType"
                   :slots="slots"></menu-box>
       </mt-popup>
 
       <mt-datetime-picker
-        ref="picker"
-        type="date"
+        ref="picker" type="date"
+        :startDate="startDate"
         year-format="{value} 年"
         month-format="{value} 月"
         date-format="{value} 日"
-        v-model="date">
+        v-model="pickerValue">
       </mt-datetime-picker>
     </div>
 </template>
 
 <script type="es6">
-  import {mapActions} from 'vuex';
+  import {mapState, mapActions} from 'vuex';
   import menuBox from 'public/components/cus-menu.vue';
   import cusField from 'public/components/cus-field';
 
   let NAMESPACE = 'orderLine';
   // mapp
   let mapp = config.mapp;
+  let today = new Date();
 
   export default {
     name: NAMESPACE,
@@ -88,17 +90,40 @@
       let me = this;
       // 获取参数
       let param = me.$route.query;
-      let line = param.line;
+      let line = KND.Util.parse(param.line);
+
+      // 行默认参数
       if (line) {
         me.line = line;
-      }
+        me.line.Id = me.line.Id || KND.Util.now();
+      };
+      // 是否面板
       me.isPanel = param.isPanel;
+      me.disable = param.disable;
+      if (me.disable) return;
+
+      // 合同行
+      let agreementItems = me.form['MACD FS Agreement Item'];
+      // 合同下所有 海贝思 的行项目，作为产品选择
+      if (agreementItems) {
+        mapp.option['agreementItem'] = agreementItems.filter(i => i['KL Product Type  LIC'] === (me.isPanel ? 'Panel' : 'Lock Body'));
+      } else {
+        MessageBox('错误', '没有找到合同行，无法创建订单');
+        this.$router.back();
+        return;
+      };
+
+      // 填充产品名称
+      if (!line['KL Product Model No']) {
+        mapp.option['agreementItem'][0];
+      };
 
       // 取 lov 开向
       me.getLov({
         type: 'KL_HOLE_DIRECTION',
         success: data => {
-          mapp.option['KL Hole Direction'] = data.items;
+          // 锁体 和 面板 的开向，取值不一样，通过 High 的取值 判断
+          mapp.option['KL Hole Direction'] = data.items.filter(i => me.isPanel ? i.High === 'Panel' : i.High === 'Lock Body');
         }
       });
 
@@ -112,19 +137,48 @@
     },
     data() {
       return {
+        startDate: today,
+        agreementItem: {},
+        vk: 'Value',
         slots: [
           {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
         ],
         showBox: false,
         lovType: '',
-        date: '',
+        pickerValue: today,
         line: {},
+        disable: true,
         isPanel: false // 是否面板
       };
     },
     computed: {
-      value() {
-        return new Date(this.date).format('yyyy-MM-dd');
+      ...mapState('detail', ['form']),
+      // 日期
+      date: {
+        get() {
+          let date = this.pickerValue.format('MM/dd/yyyy');
+          this.line['Scheduled Ship Date'] = date;
+          return date;
+        },
+        set(val) {
+          console.log(val);
+        }
+      },
+      // 产品名称 menu box
+      productName: {
+        get() {
+          if (this.agreementItem['Id']) this.line['KL Agreement Item Id'] = this.agreementItem['Id']; // 面板：1-DGFJM0  锁体：1-2BS58K4I
+          return this.agreementItem['KL Product Model No'];
+        }
+      },
+      // 是否带天地 switch
+      flag: {
+        get() {
+          return this.line['KL World Flag'] === 'Y';
+        },
+        set(flag) {
+          this.line['KL World Flag'] = flag ? 'Y' : 'N';
+        }
       }
     },
     methods: {
@@ -138,6 +192,8 @@
       showLovFn(type) {
         this.lovType = type;
         this.showBox = true;
+        // 选择产品的 value-key 为 KL Product Model No ， 其他为 Value
+        this.vk = type === 'agreementItem' ? 'KL Product Model No' : 'Value';
         this.slots[0].values = mapp.option[type];
       },
       // 选择日期
@@ -146,14 +202,21 @@
       },
       // 选择确认
       enter(values, type) {
+        console.log(values, type);
         let me = this;
         me.showBox = false;
         // 选择填充
         this.line[type] = values[0]['Value'];
+        console.log(this[type]);
+        this[type] = values[0];
       }
     }
   };
 
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+  .mint-cell-title {
+    color: $gray-minor;
+  }
+</style>

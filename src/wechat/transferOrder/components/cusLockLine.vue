@@ -35,6 +35,8 @@
       line-height: 48px;
       color: $theme-color;
       z-index: 1;
+
+      @include disable;
     }
 
     .mint-cell-wrapper {

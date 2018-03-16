@@ -34,7 +34,7 @@
                      @click.native="toDetailFn(item)"
                      v-for="item in pending"
                      is-link>
-              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['Lead Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">工程名称: {{item['Opportunity Name']}}</div>
               <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
             </cus-cell>
           </cus-loadmore>
@@ -53,7 +53,7 @@
                      @click.native="toDetailFn(item)"
                      v-for="item in process"
                      is-link>
-              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['Lead Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">工程名称: {{item['Opportunity Name']}}</div>
               <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
             </cus-cell>
           </cus-loadmore>
@@ -72,7 +72,7 @@
                       @click.native="toDetailFn(item)"
                       v-for="item in completed"
                       is-link>
-              <div class="mint-cell-sub-title" slot="title">工程: {{item['Lead Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">工程名称: {{item['Opportunity Name']}}</div>
               <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
             </cus-cell>
           </cus-loadmore>
@@ -119,6 +119,10 @@
       this.loadBottomFn({
         status: '待处理',
         list: 'pending'
+      });
+
+      KND.Native.getUserInfo((info) => {
+        console.log(info);
       });
     },
     data: () => {

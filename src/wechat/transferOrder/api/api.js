@@ -36,7 +36,7 @@ let apiList = {
   /**
    * 查找交接单详情
    * @param {String} option.data.body.OutputIntObjectName 必填 固定 KL Project
-   * @param {String} option.data.body.PrimaryRowId 必填 交接单Id
+   * @param {String} option.data.body.id 必填 交接单Id
    * @returns {{method: string, url: string, data: {}}}
    */
   queryTransferOrderById: option => {
@@ -45,8 +45,8 @@ let apiList = {
       url: 'service/EAI Siebel Adapter/Query',
       data: {
         'body': {
-          'OutputIntObjectName': 'KL Project',
-          'PrimaryRowId': option.data.id
+          'OutputIntObjectName': 'KL Install Delivery IO',
+          'SearchSpec': '[Project.Id]="' + option.data.id + '" AND [MACD FS Agreement Item.KL Product Division Name]="海贝斯事业部"' // '[Project.Status]="' + option.data.Status + '"',
         }
       }
     };
@@ -110,6 +110,7 @@ let apiList = {
       specName += '[Last Name] ~LIKE "' + name + '*" AND ';
     };
     return {
+      method: 'get',
       url: 'data/KL Employee Interface BO/Employee/?searchspec=' + specName + '(' + specPosi.join(' OR ') + ')&' + KND.Util.param(option.paging)
     };
   },
@@ -125,7 +126,7 @@ let apiList = {
       url: 'data/Project/Project/'
       // data: {
       //  'Status': '', // 已拒绝/已交接
-      //  'Id': ''
+      //  'Id': '' // 交接单id
       // }
     };
   },
@@ -237,16 +238,25 @@ let apiList = {
 
   /**
    * 转发门厂技术 & 提交订单
-   * @param {String} option.data['id'] 必填 订单id
+   * @param {String} option.data.body['ProcessName'] 必填 操作流程 转发门厂 KL Install Order Transfer Process / 提交订单 KL Product Model No
+   * @param {String} option.data.body['Object Id'] 必填 订单id
    * @returns {{method: string, url: string}}
    */
   runProcess: option => {
     return {
       method: 'post',
-      url: 'service/Workflow Process Manager/RunProcess',
-      data: {
-        'body': option.data
-      }
+      url: 'service/Workflow Process Manager/RunProcess'
+    };
+  },
+
+  /**
+   *
+   * @param {String} option.data.id 必填 订单id
+   */
+  deleteOrder: option => {
+    return {
+      method: 'delete',
+      url: 'data/Order Entry (Sales)/Order Entry - Orders/' + option.data.id
     };
   }
 };

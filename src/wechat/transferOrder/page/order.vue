@@ -3,31 +3,30 @@
       <!--header-->
       <mt-header fixed title="安装订单产品收集">
         <fallback slot="left"></fallback>
-        <mt-button slot="right"
+        <mt-button v-show="isDraft"
+                   slot="right"
                    @click.native="saveFn">保存</mt-button>
       </mt-header>
 
       <!--detail-->
-      <div class="mint-content">
+      <div class="mint-content" :class="{'disable': !isDraft}">
         <div class="order">
           <mt-cell title="开孔方式"
                    @click.native="showLovFn('KL Hole Type')"
                    :value="order['KL Hole Type']"
                    is-link></mt-cell>
-          <mt-cell title="门厂是否安装锁体"
-                   @click.native="showLovFn('KL Delivery Check Box 1')"
-                   :value="box1"
-                   is-link></mt-cell>
-          <mt-cell title="是否安装替代锁"
-                   @click.native="showLovFn('KL Delivery Check Box 2')"
-                   :value="box2"
-                   is-link></mt-cell>
+          <mt-cell title="门厂是否安装锁体">
+            <mt-switch v-model="box1"></mt-switch>
+          </mt-cell>
+          <mt-cell title="是否安装替代锁">
+            <mt-switch v-model="box2"></mt-switch>
+          </mt-cell>
         </div>
 
         <div class="lock-line">
           <lock-line title="锁体" @click="toLineFn(undefined, '锁体')">
-            <mt-cell v-for="line in lines" class="lock-line-cell"
-                     v-if="line['KL Product Type']==='锁芯'"
+            <mt-cell v-for="line in lines" class="lock-line-cell enable" ref="body"
+                     v-if="line['KL Product Type']==='锁体'"
                      @click.native="toLineFn(line)"
                      :key="line['Id']"
                      is-link>
@@ -39,8 +38,8 @@
             </mt-cell>
           </lock-line>
           <lock-line title="面板" @click="toLineFn(undefined, '面板')">
-            <mt-cell v-for="line in lines" class="lock-line-cell"
-                     v-if="line['KL Product Type']==='锁体'"
+            <mt-cell v-for="line in lines" class="lock-line-cell enable" ref="panel"
+                     v-if="line['KL Product Type'] === '面板'"
                      @click.native="toLineFn(line)"
                      :key="line['Id']"
                      is-link>
@@ -56,21 +55,18 @@
       </div>
 
       <!--buttons-->
-      <button-group>
-        <mt-button v-show="isTransfer"
-                   :class="{'disable':!transferAble}"
+      <button-group v-show="isDraft">
+        <mt-button v-show="showTransfer" :class="{'disable': !lineComplete}"
                    @click.native="transferFn">转门厂技术</mt-button>
-        <mt-button v-show="isTransfer" type="primary"
-                   :class="{'disable':!submitAble}"
+        <mt-button v-show="showSubmit" type="primary"
+                   :class="{'disable': !lineComplete}"
                    @click.native="submitFn">发起安装</mt-button>
-        <mt-button v-show="!isTransfer" type="primary"
-                   @click.native="toLineFn">确认提交</mt-button>
       </button-group>
 
       <!--popup-->
       <mt-popup v-model="showBox" position="bottom">
         <menu-box @my-enter="enter" vk="Value"
-                 @my-cancel="showBox=false"
+                 @my-cancel="showBox = false"
                  :type="lovType"
                  :slots="slots"></menu-box>
       </mt-popup>
@@ -91,7 +87,7 @@
     components: {lockLine, menuBox},
     created() {
       let me = this;
-      me.order = me.$route.query;
+      me.order = KND.Util.parse(me.$route.query.order);
       // 取 lov 开孔方式
       me.getLov({
         type: 'KL_HOLE_TYPE',
@@ -109,7 +105,7 @@
             me.lines = data.items ? data.items : KND.Util.toArray(data);
           }
         });
-      }
+      };
     },
     data() {
       return {
@@ -120,20 +116,56 @@
         lovType: '',
         lines: '',
         order: {},
+        value: false,
         transferAble: true,
         submitAble: true
       };
     },
     computed: {
-      // 是否可发起安装状态
-      isTransfer() {
-        return true;
+      // 是否草稿状态
+      isDraft() {
+        let status = this.order['Status'];
+        return !status || status === '草稿';
       },
-      box1() {
-        return mapp.kv[this.order['KL Delivery Check Box 1']];
+      // 是否显示 发起提交 按钮
+      showSubmit() {
+        return this.isDraft && !this.showTransfer;
       },
-      box2() {
-        return mapp.kv[this.order['KL Delivery Check Box 2']];
+      // 是否显示 转发门厂技术 按钮
+      showTransfer() {
+        let me = this;
+        console.log(me.order['KL Delivery Setter Full Name'] !== me.$route.query.DFEngineer);
+        return (me.order['KL Hole Type'] === '门厂开孔') || (me.order['KL Delivery Setter Full Name'] !== me.$route.query.DFEngineer);
+      },
+      // 是否安装锁体 switch
+      box1: {
+        get() {
+          return this.order['KL Delivery Check Box 1'] === 'Y';
+        },
+        set(flag) {
+          this.order['KL Delivery Check Box 1'] = flag ? 'Y' : 'N';
+        }
+      },
+      // 是否安装替代锁 switch
+      box2: {
+        get() {
+          return this.order['KL Delivery Check Box 2'] === 'Y';
+        },
+        set(flag) {
+          this.order['KL Delivery Check Box 2'] = flag ? 'Y' : 'N';
+        }
+      },
+      // 行是否完成
+      lineComplete() {
+        let panel = false;
+        let body = false;
+        let type;
+        return Array.prototype.some.call(this.lines, function(l) {
+          type = l['KL Product Type'];
+          if (type === '锁体') body = true;
+          if (type === '面板') panel = true;
+          return panel && body;
+        });
       }
     },
     methods: {
@@ -141,16 +173,38 @@
       ...mapActions('app', ['getLov']),
       // 订单行
       toLineFn(line = {}, type) {
+        let me = this;
+        let order = me.order;
+        // 是否面板
         let isPanel = (line['KL Product Type'] || type) === '面板';
         // 填充订单id，保存编辑行时需要
-        line['Order Header Id'] = this.order.Id;
-        this.$router.push({
-          path: 'orderLine',
-          query: {
-            line: line,
-            isPanel: isPanel
-          }
-        });
+        line['Order Header Id'] = order.Id;
+
+        // 跳转订单行
+        let toLine = () => {
+          me.$router.push({
+            path: 'orderLine',
+            query: {
+              line: JSON.stringify(line),
+              isPanel: isPanel,
+              disable: !this.isDraft
+            }
+          });
+        };
+
+        // 跳转订单行
+        if (line['Order Header Id']) {
+          toLine();
+        } else {
+          // 保存订单头
+          me.save({
+            data: order,
+            success: data => { // data => {"Object Id":"1-2BSEEOC3"}
+              me.order.Id = data['Object Id'];
+              toLine();
+            }
+          });
+        }
       },
       // 选择对话框
       showLovFn(type) {
@@ -166,7 +220,7 @@
           delete order['Link'];
           me.update(order);
         } else {
-          me.save(order);
+          me.save({data: order});
         }
       },
       // 选择确认
@@ -180,13 +234,15 @@
       transferFn() {
         this.runProcess({
           data: {
-            'ProcessName': 'KL Install Order Transfer Process',
-            'Object Id': this.order.Id
+            body: {
+              'ProcessName': 'KL Install Order Transfer Process',
+              'Object Id': this.order.Id
+            }
           },
           success: data => {
             if (!data.ERROR) {
               Toast('转发成功');
-              this.transferAble = false;
+              this.order['Status'] = '门厂工程师确认中';
             }
           }
         });
@@ -195,13 +251,14 @@
       submitFn() {
         this.runProcess({
           data: {
-            'ProcessName': 'KL Product Model No',
-            'Object Id': this.order.Id
+            body: {
+              'ProcessName': 'KL Product Model No',
+              'Object Id': this.order.Id
+            }
           },
           success: data => {
             if (!data.ERROR) {
               Toast('提交成功');
-              this.submitAble = false;
             }
           }
         });
@@ -233,5 +290,11 @@
 
   .mint-content {
     margin-bottom: 2.8rem;
+  }
+
+  .disable {
+    .cus-lock:before {
+      content: '';
+    }
   }
 </style>

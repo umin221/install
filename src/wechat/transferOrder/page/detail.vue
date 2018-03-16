@@ -12,18 +12,17 @@
     <div class="mint-content">
       <div class="readonly narrow-form">
         <cus-field label="合同编号" v-model="form['Agree Number']"></cus-field>
-        <cus-field label="工程" v-model="form['Lead Name']"></cus-field>
+        <cus-field label="工程名称" v-model="form['Opportunity Name']"></cus-field>
         <cus-field label="项目地址" v-model="form['Address']"></cus-field>
 
         <toggle>
-          <cus-field label="甲方联系人电话" v-model="form['Primary Address Street']"></cus-field>
-          <cus-field label="门厂是否安装锁体" v-model="form['HBS Check Box 1']"></cus-field>
           <cus-field label="门厂名称" v-model="form['Partner Name']"></cus-field>
           <cus-field label="门厂联系人" v-model="form['Partner Contact Name']"></cus-field>
           <cus-field label="门厂技术员" v-model="form['Door Factory Engineer']"></cus-field>
           <cus-field label="开孔方式" v-model="form['Hole Type']"></cus-field>
-          <cus-field label="是否安装替代锁" v-model="form['HBS Check Box 2']"></cus-field>
-          <cus-field label="是否销售审批" v-model="form['Need Approval Flag']"></cus-field>
+          <cus-field label="门厂是否安装锁体" v-model="k2v[form['HBS Check Box 1']]"></cus-field>
+          <cus-field label="是否安装替代锁" v-model="k2v[form['HBS Check Box 2']]"></cus-field>
+          <cus-field label="是否销售审批" v-model="k2v[form['Need Approval Flag']]"></cus-field>
         </toggle>
       </div>
 
@@ -38,16 +37,21 @@
 
       <div class="install-order" v-show="!isPending">
         <title-group>安装订单</title-group>
-        <mt-cell class="multiple"
-                  v-for="item in orders"
-                 :key="item.Id"
-                  @click.native="toOrderFn(item)">
+        <mt-cell-swipe class="multiple"
+                       @click.native="toOrderFn(item)"
+                       v-for="(item, index) in orders"
+                       :right="[{
+                                 content: '删除',
+                                 style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
+                                 handler: () => deleteFn(item, index)
+                               }]"
+                       :key="item.Id">
           <div class="mint-cell-title co-flex co-jc" slot="title">
             <span class="co-f1">订单编号: {{item['Order Number']}}</span>
             <span>{{item['Status']}}</span>
           </div>
           <div class="mint-cell-sub-title" slot="title">安装数量: {{item['KL Install Amount']}}</div>
-        </mt-cell>
+        </mt-cell-swipe>
       </div>
     </div>
 
@@ -70,6 +74,7 @@
   import toggle from 'public/components/cus-toggle';
 
   const NAMESPACE = 'detail';
+
   export default {
     name: NAMESPACE,
     components: {cusField, titleGroup, toggle},
@@ -79,13 +84,16 @@
       let param = me.$route.query;
       me.status = param.status;
       // 获取详情
-      if (param.id) {
-        me.findTransferOrderById(param.id);
+      me.findTransferOrderById(param.id);
+      if (param.id && !me.isPending) {
+        // 获取安装订单
+        me.queryOrdersById(param.id);
       }
     },
     data: () => {
       return {
-        status: ''
+        status: '',
+        k2v: config.mapp.k2v
       };
     },
     computed: {
@@ -96,7 +104,7 @@
       }
     },
     methods: {
-      ...mapActions(NAMESPACE, ['findTransferOrderById', 'addPartner', 'assign']),
+      ...mapActions(NAMESPACE, ['findTransferOrderById', 'queryOrdersById', 'addPartner', 'assign', 'delete']),
       toEngineer() {
         this.$router.push('engineer');
       },
@@ -123,18 +131,35 @@
       },
       // Add Install Order
       toOrderFn(item) {
+        let me = this;
+        delete item['Link'];
         if (!item.Id) {
-          let form = this.form;
+          let form = me.form;
           item = {
+            'Project Id': form.Id,
             'KL Hole Type': form['Hole Type'],
             'KL Delivery Check Box 1': form['HBS Check Box 1'],
             'KL Delivery Check Box 2': form['HBS Check Box 2']
           };
-        }
-        this.$router.push({
+        };
+        me.$router.push({
           path: 'order',
-          query: item
+          query: {
+            order: JSON.stringify(item),
+            DFEngineer: me.form['Door Factory Engineer']
+          }
         });
+      },
+      // Delete Install Order
+      deleteFn(item, index) {
+        if (item['Status'] === '草稿') {
+          this.delete({
+            id: item.Id,
+            index: index
+          });
+        } else {
+          Toast('非草稿状态不允许删除');
+        }
       }
     }
   };
@@ -150,7 +175,7 @@
 
     .mint-cell-wrapper {
       .mint-cell-title {
-        flex: 1;
+        flex: 1.5;
         width: 80px;
       }
     }

@@ -88,10 +88,13 @@ export default new Vuex.Store({
           state.form = form;
         },
         setOrders(state, orders) {
-          state.orders = orders;
+          state.orders = KND.Util.toArray(orders);
         },
         clear(state) {
           state.form = {};
+        },
+        removeOrder(state, index) {
+          state.orders.splice(index, 1);
         }
       },
       actions: {
@@ -99,16 +102,14 @@ export default new Vuex.Store({
          * 通过id获取安装交接单信息
          * @param {String} id 必填 id
          */
-        findTransferOrderById({commit, dispatch}, id) {
+        findTransferOrderById({commit}, id) {
           api.get({
-            key: 'findTransferOrderById', // 'queryTransferOrderById',
+            key: 'queryTransferOrderById', // 'findTransferOrderById', //
             data: {
               id: id
             },
             success: data => {
-              commit('setTransferOrder', data);
-              // 获取订单行
-              dispatch('queryOrdersById', id);
+              commit('setTransferOrder', data.SiebelMessage.Project);
             }
           });
         },
@@ -198,6 +199,21 @@ export default new Vuex.Store({
               });
             }
           });
+        },
+        /**
+         * 删除订单
+         */
+        delete({commit}, setting) {
+          api.get({
+            key: 'deleteOrder',
+            data: {
+              id: setting.id
+            },
+            success: data => {
+              commit('removeOrder', setting.index);
+              tools.success(data);
+            }
+          });
         }
       }
     },
@@ -269,19 +285,20 @@ export default new Vuex.Store({
         },
         /**
          * 保存安装订单
-         * @param {String} id 必填 交接单id
+         * @param {Object} data 必填 交接单对象
+         * @param {Function} success 选填 成功回调
          */
-        save({state}, data) {
+        save({state}, setting) {
           api.get({
             key: 'saveOrder',
             data: {
               'body': Object.assign({
                 'ProcessName': 'KL Install Order Create Process'
-              }, data)
+              }, setting.data)
             },
-            success: data => {
+            success: setting.success || (data => {
               tools.success(data);
-            }
+            })
           });
         },
         /**

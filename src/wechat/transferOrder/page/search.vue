@@ -34,7 +34,7 @@
     let name = me.value;
     let param = {
       data: {
-        'Lead Name': name + '*',
+        'Opportunity Name': name + '*',
         'Setter': name + '*'
       },
       more: args.pop(),
