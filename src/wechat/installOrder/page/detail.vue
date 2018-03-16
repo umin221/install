@@ -18,7 +18,7 @@
             <div slot="title" class="list-text"><span class="list-text-span">锁芯部分</span></div>
           </mt-cell>
           <div class="mint-sx-div">
-            <mt-cell   @click.native="getLock(item.Id, item['KL Product Type'])" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='锁芯'"  :title="item['KL Product Series Code']">
+            <mt-cell   @click.native="getLock(item.Id, item['KL Product Type'], item)" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='锁芯'"  :title="item['KL Product Series Code']">
               <span style="width: 120px">开向：{{item['KL Hole Direction']}}</span>
               <span>数量：{{item['Quantity Requested']}}</span>
             </mt-cell>
@@ -27,7 +27,7 @@
             <div slot="title" class="list-text"><span class="list-text-span">锁体部分* 真锁</span></div>
           </mt-cell>
           <div class="mint-sx-div">
-            <mt-cell  @click.native="getLock(item.Id, item['KL Product Type'])" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='锁体'"  :title="item['KL Product Series Code']">
+            <mt-cell  @click.native="getLock(item.Id, item['KL Product Type'], item)" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='锁体'"  :title="item['KL Product Series Code']">
               <span style="width: 120px">开向：{{item['KL Hole Direction']}}</span>
               <span>数量：{{item['Quantity Requested']}}</span>
             </mt-cell>
@@ -50,7 +50,7 @@
                 </div>
                 <div class="name present" @click="updateTask(index)">{{item['KL Detail Type']}}</div>
               </a>
-              <a>
+              <!--<a>
                 <div class="icon">
 
                   <span class="point mui-icon"><span></span></span>
@@ -87,14 +87,14 @@
               <div class="name grey">
                 商务谈判
               </div>
-            </a>
+            </a>-->
             </div>
           </div>
         </div>
       </div>
       <div class="mint-content-info">
         <div class="crm-zyList" v-for="(item, index) in taskDataList" :key="index">
-          <ul class="content" @click.nataive="routerPage(index, item.Id, '')">
+          <ul class="content" @click.nataive="routerPage(index, item, '')">
             <li class="bd-radius">
               <span class="icon"></span>
             </li>
@@ -421,20 +421,25 @@
           self.is_show_sx = true;
         }
       },*/
-      getLock(id, type) { // 锁芯锁体详情事件
-        var self = this;
+      getLock(id, type, item) { // 锁芯锁体详情事件
         // 跳转锁芯锁体详情
-        self.$router.push({
+        this.$router.push({
           name: 'lock',
           query: {
             id: id,
-            type: type
+            type: type,
+            item: item
           }
         });
       },
       butXttd() { // 跳转协同团队
-        var self = this;
-        self.$router.push('xttd');
+        let me = this;
+        this.$router.push({
+          name: 'xttd',
+          query: {
+            id: me.id
+          }
+        });
       },
       updateState(status, id, index) { // 任务事件 ；1.还没开始先开始 ； 2.已开始就跳转关闭页面
         var self = this;
@@ -478,15 +483,17 @@
           });
         }
       },
-      routerPage(index, id, state) { // 子任务事件
-        var self = this;
+      routerPage(index, item, state) { // 子任务事件
+        // var self = this;
         if (index === 0) {
           if (index === 0) {
             // 新曾
             this.$router.push({
               name: 'sign',
               query: {
-                id: id
+                type: 'read',
+                state: state,
+                item: item
               }
             });
           } else {
@@ -494,14 +501,39 @@
             this.$router.push({
               name: 'sign',
               query: {
+                item: item
+              }
+            });
+
+          }
+        } else if (index === 2) {
+         // self.$router.push('batch');
+          // 跳转详情
+          this.$router.push({
+            name: 'batch',
+            query: {
+              item: item
+            }
+          });
+        } else if (index === 4) {
+          // 详情
+          if (index === 4) {
+            this.$router.push({
+              name: 'updateDoor',
+              query: {
+                item: item
+              }
+            });
+          } else { // 新曾
+            this.$router.push({
+              name: 'updateDoor',
+              query: {
                 type: 'read',
                 state: state,
-                id: id
+                item: item
               }
             });
           }
-        } else {
-          self.$router.push('batch');
         }
       },
       sporadic(index) { // 子任务数据集事件

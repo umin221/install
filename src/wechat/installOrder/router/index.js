@@ -37,6 +37,15 @@ export default new Router({
     component(resolve) {
       require(['../page/xttd'], resolve);
     }
+  }, { // 选择工程师
+    path: '/engineer',
+    name: 'engineer',
+    component(resolve) {
+      require(['../page/engineer'], resolve);
+    },
+    meta: {
+      transition: 'push'
+    }
   }, {
     path: '/updateState', // 更新状态页面
     name: 'updateState',
@@ -54,6 +63,12 @@ export default new Router({
     name: 'batch',
     component(resolve) {
       require(['../page/batch'], resolve);
+    }
+  }, {
+    path: '/updateDoor', // 挂门验收
+    name: 'updateDoor',
+    component(resolve) {
+      require(['../page/updateDoor'], resolve);
     }
   }, {
     path: '/journal', // 日志页面
