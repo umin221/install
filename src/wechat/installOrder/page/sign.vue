@@ -9,16 +9,18 @@
 
     <div class="mint-content wide-form">
       <div :class="{'readonly':read}">
-        <mt-cell title="涉及开孔锁签收">
-          <mt-switch v-model="value"></mt-switch>
+        <mt-cell title="是否涉及签收">
+          <mt-switch v-model="box1"></mt-switch>
         </mt-cell>
-        <mt-field label="签收数量" placeholder="请输入签收数量"
-                  :class="heartVisible" v-model="form['KL Signed Amount']"></mt-field>
-        <mt-field label="备注说明" type="textarea" rows="4" v-model="form['Description']"></mt-field>
+        <div v-show="box1">
+          <mt-field label="签收数量" placeholder="请输入签收数量"
+                    :class="heartVisible" v-model="form['KL Signed Amount']"></mt-field>
+          <mt-field label="备注说明" type="textarea" rows="4" v-model="form['Description']"></mt-field>
+        </div>
       </div>
       <attach :attach="attach.list"
               :edit="!read"
-              :title="title">
+              :title="title" v-show="box1">
       </attach>
     </div>
 
@@ -53,7 +55,7 @@
       this.item = param.item;
       console.dir('=====' + this.id);
       // 获取详情
-      if (param.id) {
+      if (this.type === 'read') {
         this.getSign(this.item);
       } else {
         this.clear();
@@ -63,6 +65,8 @@
       return {
         id: '',
         item: '',
+        box1: true,
+        switch_show: true,
         type: 'add', // add 新增 / edit 编辑 / read 只读
         state: 'pending', // pending 待审批 / valid 已生效 / invalid 未生效
         button: {
@@ -119,7 +123,9 @@
             }
           },
           success: function(data) {
-            self.getUPData(self.id);
+            if (self.box1) { // 涉及签收 才提交数据  不涉及只更新状态
+              self.getUPData(self.id);
+            }
           }
         });
       }

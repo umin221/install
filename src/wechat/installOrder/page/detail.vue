@@ -50,6 +50,14 @@
                 </div>
                 <div class="name present" @click="updateTask(index)">{{item['KL Detail Type']}}</div>
               </a>
+              <a>
+                <div class="icon" @click="getClose()">
+                  <span class="left line l_grey"></span>
+                  <span class="point mui-icon p_grey"><span></span></span>
+
+                </div>
+                <div class="name grey">关闭</div>
+              </a>
               <!--<a>
                 <div class="icon">
 
@@ -99,7 +107,28 @@
               <span class="icon"></span>
             </li>
             <li style="margin-right: 8px">{{item['KL Detail Type']}}</li>
-            <div class="content-div"  v-if="index===2"  @click.nataive="sporadic(index)">
+            <li style="margin-right: 8px"
+                v-if="item['KL Detail Type LIC'] === 'Trompil Lock Sign' ||
+                 item['KL Detail Type LIC'] === 'Working Drawing Sign' ||
+                 (item['KL Detail Type LIC'] === 'Ship From Door Factory' && item['Calculated Activity Status'] != 'Not Started') ||
+                 item['KL Detail Type LIC'] === 'Lock Body Sign' ||
+                 item['KL Detail Type LIC'] === 'Substitution Lock Sign' ||
+                item['KL Detail Type LIC'] === 'Lock Sign' ||
+                item['KL Detail Type LIC'] === 'Substitution Lock Trans Return'">
+              <span>{{item['Planned Completion']}}</span>
+              <span>{{item.Status}}</span>
+            </li>
+            <li style="margin-right: 8px" v-if="item['KL Detail Type LIC'] === 'Ship From Door Factory' && item['Calculated Activity Status'] === 'Not Started'">
+              <span class="mt-switch"><mt-switch v-model="shipmentVal"  @click.native="shipment(item)"></mt-switch></span>
+            </li>
+            <div class="content-div"  v-if="item['KL Detail Type LIC']==='Trompil Batch Summary' ||
+            item['KL Detail Type LIC']==='Lock Body Install Summary' ||
+            item['KL Detail Type LIC']==='Door Hanging Acceptance' ||
+            item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
+            item['KL Detail Type LIC'] === 'Substitution Lock Transfer' ||
+            item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
+            item['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
+            item['KL Detail Type LIC'] === 'Transfer Summary'"  @click.nataive="sporadic(index)">
               <!--v-for="(itemTask, index) in item['KL Installation Task']" :key="index"-->
                 <div>批次</div>
                 <div>已开孔/开孔批次</div>
@@ -190,6 +219,20 @@
       margin-top: 5px;
       color: #999;
       line-height: 27px;
+    }
+    .content li {
+      height: 27px;
+    }
+    .content li span {
+      font-size: 14px;
+      margin-top: 5px;
+      color: #999;
+      line-height: 27px;
+    }
+    .content li :nth-of-type(2),.mt-switch {
+      position: absolute;
+      top: 23px;
+      right: 10px;
     }
     .content-div {
       border: 1px solid #81B92C;
@@ -361,6 +404,7 @@
   import api from '../api/api';
   import { MessageBox, Toast } from 'mint-ui';
   import toggle from 'public/components/cus-toggle';
+  let userInfo = {};
   export default {
     name: 'detail',
     components: {toggle},
@@ -381,12 +425,15 @@
           console.dir(data.SiebelMessage);
           me.detailData = data.SiebelMessage['Order Entry - Orders'];
           me.taskData = KND.Util.toArray(me.detailData['KL Installation Task']);
-          console.dir('=====');
           console.dir(me.taskData);
           me.taskDataList = KND.Util.toArray(me.taskData[0]['KL Installation Task']);
           me.taskDataST = KND.Util.toArray(me.detailData['Order Entry - Line Items']);
           console.dir(me.taskDataST);
         }
+      });
+      KND.Native.getUserInfo((info) => {
+        userInfo = info;
+        console.log(userInfo);
       });
     },
     data: () => {
@@ -398,6 +445,7 @@
         taskDataList: '', // 任务集子任务
         taskDataST: '', // 锁芯锁体
         // is_show_sx: false, // 是否显示锁芯锁体
+        shipmentVal: false, // 发运开关，判断值
         active: 'tab-container'
       };
     },
@@ -413,6 +461,24 @@
         let me = this;
         me.taskDataList = KND.Util.toArray(me.taskData[index]['KL Installation Task']);
         console.dir(me.taskDataList);
+      },
+      getClose() { // 关闭日志
+        let self = this;
+        api.get({ // 更改按钮状态
+          key: 'getUPStatus',
+          method: 'POST',
+          data: {
+            'body': {
+              'ProcessName': 'KL Install Task Close Action Workflow',
+              'RowId': self.id
+            }
+          },
+          success: function(data) {
+            if (self.box1) { // 涉及签收 才提交数据  不涉及只更新状态
+              self.getUPData(self.id);
+            }
+          }
+        });
       },
       /* is_show_fun() { // 是否显示锁体锁芯
         var self = this;
@@ -484,12 +550,64 @@
           });
         }
       },
+      /*
+      * 任务中所有门厂发运
+      * */
+      shipment(item) {
+        var self = this;
+        if (self.shipmentVal) {
+          return;
+        }
+        MessageBox({
+          title: '提示',
+          message: ' 确认提交？数据提交后不可修改。',
+          showCancelButton: true
+        }).then(action => {
+          if (action === 'confirm') {
+            api.get({ // 更改按钮状态
+              key: 'getUPStatus',
+              method: 'POST',
+              data: {
+                'body': {
+                  'ProcessName': 'KL Install Task Submit For Approval Workflow',
+                  'RowId': item.Id
+                }
+              },
+              success: function(data) {
+              }
+            });
+          } else {
+            self.shipmentVal = false;
+          }
+        });
+      },
       routerPage(index, item, state) { // 子任务事件
-        // var self = this;
-        if (index === 0) {
-          if (index === 0) {
-            // 新曾
-            this.$router.push({
+        // 子任务跳转页面
+        /*
+        * 根据KL Detail Type LIC 判断跳转页面
+        * Trompil Lock Sign 开孔锁签收
+        * Working Drawing Sign 开孔图纸签收
+        * Lock Body Sign 锁体安装签收
+        * Substitution Lock Sign 替代锁到货确认
+        * Lock Sign 真锁到货
+        * Substitution Lock Trans Return 替代锁回收
+        * */
+        if (item['KL Detail Type LIC'] === 'Trompil Lock Sign' ||
+          item['KL Detail Type LIC'] === 'Working Drawing Sign' ||
+          item['KL Detail Type LIC'] === 'Lock Body Sign' ||
+          item['KL Detail Type LIC'] === 'Substitution Lock Sign' ||
+          item['KL Detail Type LIC'] === 'Lock Sign' ||
+          item['KL Detail Type LIC'] === 'Substitution Lock Trans Return') {  // 签收页面
+          if (userInfo.Id) { // 判断是否有权限编辑   登陆者信息与任务负责人匹配则可以编辑
+            this.$router.push({ // 编辑
+              name: 'sign',
+              query: {
+                type: 'edit',
+                item: item
+              }
+            });
+          } else {
+            this.$router.push({ // 只读
               name: 'sign',
               query: {
                 type: 'read',
@@ -497,22 +615,31 @@
                 item: item
               }
             });
-          } else {
-            // 跳转详情
-            this.$router.push({
-              name: 'sign',
-              query: {
-                item: item
-              }
-            });
-
           }
-        } else if (index === 2) {
+        } else if (item['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
+          item['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
+          item['KL Detail Type LIC'] === 'Door Hanging Acceptance' ||
+          item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
+          item['KL Detail Type LIC'] === 'Substitution Lock Transfer' ||
+          item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
+          item['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
+          item['KL Detail Type LIC'] === 'Transfer Summary') { // 批次页面
+          /*
+          * Trompil Batch Summary 开孔锁批次
+          * Lock Body Install Summary 锁体安装汇总
+          * Door Hanging Acceptance 挂门验收
+          * Substitution Lock Inst Summary  替代锁安装汇总
+          * Substitution Lock Transfer 替代锁移交
+          * Lock Installation Summary 真锁安装汇总
+          * Check Before Trans Summary 移交前自检汇总
+          * Transfer Summary 移交汇总
+          * */
          // self.$router.push('batch');
           // 跳转详情
           this.$router.push({
             name: 'batch',
             query: {
+              type: 'add',
               item: item
             }
           });

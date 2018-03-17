@@ -34,7 +34,6 @@
         month-format="{value} 月"
         date-format="{value} 日"
         class="datetime"
-        :startDate=start_Date
         @confirm="handleChangeEnd">
       </mt-datetime-picker>
     </div>
@@ -75,12 +74,13 @@
       this.item = param.item;
       console.dir('=====' + this.id);
       // 获取详情
-      if (this.id) {
-        this.getBatch(this.item);
-      } else {
+      if (this.type === 'add') {
         this.start_Date = ''; // 开始时间
         this.end_Date = ''; // 开始时间
         this.batchNum = 0; // 数量
+        this.batchCode = '10001'; // 随机默认
+      } else {
+        this.getBatch(this.item);
       }
     },
     data: () => {
@@ -141,7 +141,7 @@
           },
           success: data => {
             console.dir(data);
-            self.batchCode = data.Id; // 开始时间
+            self.batchCode = data.Id; // 批次
             self.start_Date = data.Planned; // 开始时间
             self.end_Date = data['Planned Completion']; // 结束时间
             self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
@@ -166,9 +166,12 @@
               method: 'PUT',
               data: {
                 'Planned': self.startDate,
-                'Planned Completion': '02/02/2018',
+                'Planned Completion': self.endDate,
                 'KL Install Amount Requested': self.batchNum,
-                'Id': '1-2BSE7VMC'
+                'Id': self.batchCode,
+                'KL Detail Type': self.item['KL Detail Type'],
+                'Parent Activity Id': self.item.Id
+
               },
               success: function(data) {
                 history.go(-1);
