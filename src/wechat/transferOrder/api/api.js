@@ -1,24 +1,29 @@
 let apiList = {
   /**
    * 交接单列表&搜索
-   * @param {Object} option.data 必填 查询条件
+   * @param {String} option.data.ViewMode 必填 视图
+   * @param {Object} option.data 必填 其他查询条件
    * @param {Object} option.paging 必填 翻页参数
    * @returns {{method: string, url: string, data: {body: {OutputIntObjectName: string, ViewMode: string, SearchSpec: *, StartRowNum: (*|string), PageSize: (*|string|PAGESIZE)}}}}
    */
   getTransferOrder: option => {
     let condition = Object.assign({}, option.data);
     let status = condition.Status;
+    let viewMode = condition.ViewMode;
+    delete condition.ViewMode;
+    // 状态多匹配 逗号分隔
     if (status) {
       condition['Status'] = status.split(',');
     };
+    // 运算符
     let operator = option.data.Status ? ' = ' : ' ~LIKE ';
     return {
       url: 'service/EAI Siebel Adapter/QueryPage',
       data: {
         'body': {
           'OutputIntObjectName': 'Base Project',
-          'ViewMode': 'Sales Rep',
-          'SearchSpec': KND.Util.condition2D(condition, 'Project', ' OR ', operator), // '[Project.Status]="' + option.data.Status + '"',
+          'ViewMode': viewMode,
+          'SearchSpec': KND.Util.condition2D(condition, 'Project', ' OR ', operator),
           'StartRowNum': option.paging.StartRowNum,
           'PageSize': option.paging.PageSize
         }
@@ -256,13 +261,25 @@ let apiList = {
   },
 
   /**
-   *
+   * 删除订单
    * @param {String} option.data.id 必填 订单id
    */
   deleteOrder: option => {
     return {
       method: 'delete',
       url: 'data/Order Entry (Sales)/Order Entry - Orders/' + option.data.id
+    };
+  },
+
+  /**
+   * 删除订单行
+   * @param {String} option.data.id 必填 订单行id
+   * @returns {{method: string, url: string}}
+   */
+  deleteOrderLine: option => {
+    return {
+      method: 'delete',
+      url: 'data/Order Entry - Line Items/Order Entry - Line Items/' + option.data.id
     };
   }
 };

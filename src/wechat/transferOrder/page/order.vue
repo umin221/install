@@ -3,13 +3,13 @@
       <!--header-->
       <mt-header fixed title="安装订单产品收集">
         <fallback slot="left"></fallback>
-        <mt-button v-show="isDraft"
+        <mt-button v-show="isDraft && !isTeam"
                    slot="right"
                    @click.native="saveFn">保存</mt-button>
       </mt-header>
 
       <!--detail-->
-      <div class="mint-content" :class="{'disable': !isDraft}">
+      <div class="mint-content" :class="{'disable': !isDraft || isTeam}">
         <div class="order">
           <mt-cell title="开孔方式"
                    @click.native="showLovFn('KL Hole Type')"
@@ -25,43 +25,45 @@
 
         <div class="lock-line">
           <lock-line title="锁体" @click="toLineFn(undefined, '锁体')">
-            <mt-cell v-for="line in lines" class="lock-line-cell enable" ref="body"
+            <mt-cell-swipe v-for="(line, index) in lines" class="lock-line-cell enable" ref="body"
                      v-if="line['KL Product Type']==='锁体'"
                      @click.native="toLineFn(line)"
                      :key="line['Id']"
+                     :right="getSwipeBtn(line, index)"
                      is-link>
               <div class="co-flex co-jc" slot="title">
                 <span class="co-f1">{{line['KL Product Model No']}}</span>
                 <span class="co-f1">开向:{{line['KL Hole Direction']}}</span>
                 <span class="co-f1">数量:{{line['Quantity Requested']}}</span>
               </div>
-            </mt-cell>
+            </mt-cell-swipe>
           </lock-line>
           <lock-line title="面板" @click="toLineFn(undefined, '面板')">
-            <mt-cell v-for="line in lines" class="lock-line-cell enable" ref="panel"
+            <mt-cell-swipe v-for="(line, index) in lines" class="lock-line-cell enable" ref="panel"
                      v-if="line['KL Product Type'] === '面板'"
                      @click.native="toLineFn(line)"
                      :key="line['Id']"
+                     :right="getSwipeBtn(line, index)"
                      is-link>
               <div class="co-flex co-jc" slot="title">
                 <span class="co-f1">{{line['KL Product Model No']}}</span>
                 <span class="co-f1">开向:{{line['KL Hole Direction']}}</span>
                 <span class="co-f1">数量:{{line['Quantity Requested']}}</span>
               </div>
-            </mt-cell>
+            </mt-cell-swipe>
           </lock-line>
         </div>
 
-      </div>
+        <!--buttons-->
+        <button-group v-show="isDraft">
+          <mt-button v-show="showTransfer" :class="{'disable': !lineComplete}"
+                     @click.native="transferFn">转门厂技术</mt-button>
+          <mt-button v-show="showSubmit" type="primary"
+                     :class="{'disable': !lineComplete}"
+                     @click.native="submitFn">发起安装</mt-button>
+        </button-group>
 
-      <!--buttons-->
-      <button-group v-show="isDraft">
-        <mt-button v-show="showTransfer" :class="{'disable': !lineComplete}"
-                   @click.native="transferFn">转门厂技术</mt-button>
-        <mt-button v-show="showSubmit" type="primary"
-                   :class="{'disable': !lineComplete}"
-                   @click.native="submitFn">发起安装</mt-button>
-      </button-group>
+      </div>
 
       <!--popup-->
       <mt-popup v-model="showBox" position="bottom">
@@ -74,7 +76,7 @@
 </template>
 
 <script type="es6">
-  import {mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import menuBox from 'public/components/cus-menu.vue';
   import lockLine from '../components/cusLockLine';
 
@@ -87,7 +89,10 @@
     components: {lockLine, menuBox},
     created() {
       let me = this;
-      me.order = KND.Util.parse(me.$route.query.order);
+      let query = me.$route.query;
+      let order = KND.Util.parse(query.order);
+
+      me.setOrder(order);
       // 取 lov 开孔方式
       me.getLov({
         type: 'KL_HOLE_TYPE',
@@ -97,13 +102,8 @@
       });
       // 获取订单行
       if (me.order.Id) {
-        me.queryOrderLines({
-          data: {
-            'Order Header Id': me.order.Id
-          },
-          success: data => {
-            me.lines = data.items ? data.items : KND.Util.toArray(data);
-          }
+        me.queryLines({
+          'Order Header Id': me.order.Id
         });
       };
     },
@@ -114,14 +114,14 @@
         ],
         showBox: false,
         lovType: '',
-        lines: '',
-        order: {},
         value: false,
         transferAble: true,
         submitAble: true
       };
     },
     computed: {
+      ...mapState('index', ['isTeam']),
+      ...mapState(NAMESPACE, ['order', 'lines']),
       // 是否草稿状态
       isDraft() {
         let status = this.order['Status'];
@@ -165,11 +165,22 @@
           if (type === '面板') panel = true;
           return panel && body;
         });
+      },
+      swiperRight() {
+
       }
     },
     methods: {
-      ...mapActions(NAMESPACE, ['submit', 'save', 'update', 'queryOrderLines', 'runProcess']),
+      ...mapActions(NAMESPACE, ['save', 'update', 'queryLines', 'runProcess', 'delete']),
       ...mapActions('app', ['getLov']),
+      ...mapMutations(NAMESPACE, ['setOrder']),
+      getSwipeBtn(line, index) {
+        return this.isDraft ? [{
+          content: '删除',
+          style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
+          handler: () => this.deleteFn(line, index)
+        }] : [];
+      },
       // 订单行
       toLineFn(line = {}, type) {
         let me = this;
@@ -199,7 +210,9 @@
           me.save({
             data: order,
             success: data => { // data => {"Object Id":"1-2BSEEOC3"}
-              me.order.Id = data['Object Id'];
+              line['Order Header Id'] = data['Object Id'];
+              order.Id = data['Object Id'];
+              KND.Util.setParam('order', JSON.stringify(order));
               toLine();
             }
           });
@@ -260,6 +273,13 @@
               Toast('提交成功');
             }
           }
+        });
+      },
+      // Delete Install Order Line
+      deleteFn(line, index) {
+        this.delete({
+          id: line.Id,
+          index: index
         });
       }
     }

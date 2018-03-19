@@ -225,6 +225,16 @@
     };
 
     /**
+     * 设置url参数
+     * @param name
+     * @param value
+     */
+    setParam(name, value) {
+      let content = this.getParam(name);
+      location.replace(decodeURI(location.href).replace(content, value));
+    };
+
+    /**
      * 日志输出
      */
     log(...args) {

@@ -1,5 +1,5 @@
 <template>
-    <div class="cus-toggle">
+    <div class="cus-toggle enable">
       <div :class="{visible:visible}" class="cus-toggle-btn"
         @click="visible=!visible">{{label}}</div>
       <div v-show="visible">

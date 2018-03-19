@@ -1,3 +1,8 @@
+@mixin disable() {
+  color: $gray-line-default !important;
+  background-color: $gray-default !important;
+}
+
 header.mint-header {
 
   .mint-button {
@@ -16,7 +21,12 @@ button {
   }
 }
 
-button.disable {
-  color: $gray-line-default !important;
-  background-color: $gray-default !important;
+.disable {
+  button {
+    &.disable {
+      @include disable;
+    }
+
+    @include disable;
+  }
 }

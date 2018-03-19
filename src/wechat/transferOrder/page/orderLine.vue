@@ -6,7 +6,7 @@
       </mt-header>
 
       <!--detail-->
-      <div class="mint-content" :data-date="date" :class="{disable: disable}">
+      <div class="mint-content" :data-date="date" :class="{disable: disable || isTeam}">
         <cus-field label="产品名称"
                    @click.native="showLovFn('agreementItem')"
                    :value="productName || line['KL Product Model No']"
@@ -18,10 +18,10 @@
         <mt-cell title="是否带天地" v-show="!isPanel">
           <mt-switch v-model="flag"></mt-switch>
         </mt-cell>
-        <cus-field label="交货日期"
-                   @click.native="openPicker"
-                   :value="line['Scheduled Ship Date']"
-                   is-link></cus-field>
+        <!--<cus-field label="交货日期"-->
+                   <!--@click.native="openPicker"-->
+                   <!--:value="line['Scheduled Ship Date']"-->
+                   <!--is-link></cus-field>-->
         <cus-field label="数量"
                    type="number"
                    v-model="line['Quantity Requested']"></cus-field>
@@ -44,14 +44,13 @@
         <cus-field label="备注"
                    type="textarea"
                    v-model="line['Description']"></cus-field>
-      </div>
 
-      <!--buttons-->
-      <button-group>
-        <mt-button type="primary"
-                   v-show="!disable"
-                   @click.native="saveFn">保存</mt-button>
-      </button-group>
+        <!--buttons-->
+        <button-group>
+          <mt-button type="primary"
+                     @click.native="saveFn">保存</mt-button>
+        </button-group>
+      </div>
 
       <!--popup-->
       <mt-popup v-model="showBox" position="bottom">
@@ -62,14 +61,14 @@
                   :slots="slots"></menu-box>
       </mt-popup>
 
-      <mt-datetime-picker
-        ref="picker" type="date"
-        :startDate="startDate"
-        year-format="{value} 年"
-        month-format="{value} 月"
-        date-format="{value} 日"
-        v-model="pickerValue">
-      </mt-datetime-picker>
+      <!--<mt-datetime-picker-->
+        <!--ref="picker" type="date"-->
+        <!--:startDate="startDate"-->
+        <!--year-format="{value} 年"-->
+        <!--month-format="{value} 月"-->
+        <!--date-format="{value} 日"-->
+        <!--v-model="pickerValue">-->
+      <!--</mt-datetime-picker>-->
     </div>
 </template>
 
@@ -106,16 +105,17 @@
       let agreementItems = me.form['MACD FS Agreement Item'];
       // 合同下所有 海贝思 的行项目，作为产品选择
       if (agreementItems) {
-        mapp.option['agreementItem'] = agreementItems.filter(i => i['KL Product Type  LIC'] === (me.isPanel ? 'Panel' : 'Lock Body'));
+        mapp.option['agreementItem'] = agreementItems.filter(i => i['KL Product Type LIC'] === (me.isPanel ? 'Panel' : 'Lock Body'));
       } else {
-        MessageBox('错误', '没有找到合同行，无法创建订单');
-        this.$router.back();
+        MessageBox('错误', '没有找到合同行，无法创建订单').then(action => {
+          this.$router.back();
+        });
         return;
       };
 
       // 填充产品名称
       if (!line['KL Product Model No']) {
-        mapp.option['agreementItem'][0];
+        this.agreementItem = mapp.option['agreementItem'][0] || {};
       };
 
       // 取 lov 开向
@@ -152,6 +152,7 @@
       };
     },
     computed: {
+      ...mapState('index', ['isTeam']),
       ...mapState('detail', ['form']),
       // 日期
       date: {
@@ -167,7 +168,7 @@
       // 产品名称 menu box
       productName: {
         get() {
-          if (this.agreementItem['Id']) this.line['KL Agreement Item Id'] = this.agreementItem['Id']; // 面板：1-DGFJM0  锁体：1-2BS58K4I
+          if (this.agreementItem['Id']) this.line['KL Agreement Item Id'] = this.agreementItem['Id']; // this.agreementItem['Id']; // 面板：1-DGFJM0  锁体：1-2BS58K4I
           return this.agreementItem['KL Product Model No'];
         }
       },

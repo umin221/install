@@ -3,18 +3,13 @@
  */
 config.mapp = {
   'manager': {
-    '待处理': '已提交',
-    '处理中': '已交接',
-    '已完成': '已完成,已驳回'
+    '待处理': {status: '已提交', list: 'pending'},
+    '处理中': {status: '已交接', list: 'process'},
+    '已完成': {status: '已完成,已驳回', list: 'completed'}
   },
   'employee': {
-    '待处理': '已交接',
-    '已完成': '已完成,已驳回'
-  },
-  'list': {
-    '已提交': 'pending',
-    '已交接': 'process',
-    '已完成,已驳回': 'completed'
+    '待处理': {status: '已交接', list: 'pending'},
+    '已完成': {status: '已完成,已驳回', list: 'completed'}
   },
   'option': {
     'KL Hole Type': [], // 开孔方式

@@ -34,6 +34,9 @@
       $route(to, from) {
         let me = this;
         let transition = 'turn';
+        // 同一个页面，不做记录
+        if (to.name === from.name) return;
+
         if (to.name === me.prevRoutes[me.prevRoutes.length - 1]) {
           transition = (from.meta.transition || transition) + '-off';
           me.setTransition(transition);

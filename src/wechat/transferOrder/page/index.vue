@@ -1,7 +1,7 @@
 <!--交接单列表-->
 <template>
   <div>
-    <cus-header fixed title="我的交接单" :menu="isManager ? [{title:'查看我的团队', key:'a'}] : undefined">
+    <cus-header fixed :title="isTeam ? '团队的交接单' : '我的交接单'" :menu="isManager ? [isTeam ? {title:'我的交接单', key:'my'} : {title:'查看我的团队', key:'team'}] : undefined">
       <fallback slot="left"></fallback>
       <mt-button @click.native="toSearchFn" slot="right">
         <i class="xs-icon icon-search"></i>
@@ -95,12 +95,8 @@
   import cusCell from 'public/components/cus-cell';
 
   const NAMESPACE = 'index';
-  // mapp
-  let mappList = config.mapp['list'];
-  let userInfo = {};
   //
   let loader = function(...args) {
-    console.log(userInfo);
     let me = this;
     let event = args.pop();
     let list = args.pop();
@@ -120,7 +116,6 @@
     created() {
       let me = this;
       KND.Native.getUserInfo((info) => {
-        userInfo = info;
         me.setManager(info['KL Primary Position Type LIC'] === 'Field Service Manager');
         me.loadBottomFn({
           status: '待处理',
@@ -137,14 +132,21 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['pending', 'process', 'completed', 'isManager'])
+      ...mapState(NAMESPACE, ['pending', 'process', 'completed', 'isManager', 'isTeam'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['getTransferOrder']),
-      ...mapMutations(NAMESPACE, ['setManager']),
+      ...mapMutations(NAMESPACE, ['setManager', 'setTeam']),
       // 标题栏菜单选择回调方法
       menuFn(item) {
-        console.log(item);
+        this.setTeam(item.key === 'team');
+        // 刷新数据
+        this.loadBottomFn({
+          status: '待处理',
+          list: 'pending'
+        });
+        // 切换回待处理
+        this.selected = 'pending';
       },
       // 已完成顶部加载
       loadTopFn(param) {
@@ -172,7 +174,6 @@
         this.$router.push({
           name: 'detail',
           query: {
-            status: mappList[item.Status],
             id: item.Id
           }
         });
