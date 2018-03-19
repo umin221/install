@@ -5,7 +5,8 @@
     <mt-header fixed title="安装交接单详情">
       <fallback slot="left"></fallback>
       <mt-button slot="right"
-        @click.native="closeFn">关闭</mt-button>
+                 @click.native="$router.push('close')"
+                 v-show="!isTeam">关闭</mt-button>
     </mt-header>
 
     <!--detail-->
@@ -30,6 +31,7 @@
         <mt-cell title="销售方式"
                  :value="form['Sales Type']"></mt-cell>
         <mt-cell title="指派安装工程师"
+                 v-show="!isTeam"
                  :value="select['Last Name']"
                  @click.native="toEngineer"
                  is-link></mt-cell>
@@ -56,9 +58,9 @@
     </div>
 
     <!--buttons-->
-    <button-group>
+    <button-group v-show="!isTeam">
       <mt-button v-show="isPending"
-                 @click.native="rejectFn">驳回</mt-button>
+                 @click.native="$router.push('reject')">驳回</mt-button>
       <mt-button v-show="isPending" type="primary"
                  @click.native="assignFn">确认分配</mt-button>
       <mt-button v-show="!isPending" type="primary"
@@ -82,43 +84,26 @@
     created() {
       let me = this;
       let param = me.$route.query;
-      me.status = param.status;
       // 获取详情
       me.findTransferOrderById(param.id);
-      if (param.id && !me.isPending) {
-        // 获取安装订单
-        me.queryOrdersById(param.id);
-      }
     },
     data: () => {
       return {
-        status: '',
         k2v: config.mapp.k2v
       };
     },
     computed: {
+      ...mapState('index', ['isTeam']),
       ...mapState(NAMESPACE, ['form', 'orders']),
       ...mapState('engineer', ['select']),
       isPending() {
-        return this.status === 'pending';
+        return this.form['Status'] === '已提交';
       }
     },
     methods: {
       ...mapActions(NAMESPACE, ['findTransferOrderById', 'queryOrdersById', 'addPartner', 'assign', 'delete']),
       toEngineer() {
         this.$router.push('engineer');
-      },
-      // Close transfer order
-      closeFn() {
-        MessageBox({
-          title: '请确认',
-          message: '关闭交接单?',
-          showCancelButton: true
-        });
-      },
-      // Reject order
-      rejectFn() {
-        this.$router.push('reject');
       },
       // Confirm allocation assign order
       assignFn() {
@@ -133,6 +118,7 @@
       toOrderFn(item) {
         let me = this;
         delete item['Link'];
+        // 构造默认参数
         if (!item.Id) {
           let form = me.form;
           item = {

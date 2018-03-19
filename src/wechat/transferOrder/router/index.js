@@ -40,11 +40,17 @@ export default new Router({
     meta: {
       transition: 'push'
     }
-  }, { // 驳回
+  }, { // 驳回交接单
     path: '/reject',
     name: 'reject',
     component(resolve) {
       require(['../page/reject'], resolve);
+    }
+  }, { // 关闭交接单
+    path: '/close',
+    name: 'close',
+    component(resolve) {
+      require(['../page/close'], resolve);
     }
   }, { // 安装交接单详情
     path: '/order',

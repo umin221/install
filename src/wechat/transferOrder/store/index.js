@@ -10,9 +10,8 @@ app.state.alive = ['index'];
 
 // 每页加载条数
 const PAGESIZE = config.pageSize;
-// mapp
-let mappList = config.mapp['list'];
-let mappStatus;
+// mapps
+let mapps;
 
 export default new Vuex.Store({
   modules: {
@@ -24,6 +23,8 @@ export default new Vuex.Store({
       namespaced: true,
       state: {
         isManager: false,
+        // 查看团队
+        isTeam: false,
         // 待审批
         pending: [],
         // 处理中
@@ -41,8 +42,15 @@ export default new Vuex.Store({
           state[list].push(...TransferOrders);
         },
         setManager(state, isManager) {
-          mappStatus = config.mapp[isManager ? 'manager' : 'employee'];
+          mapps = config.mapp[isManager ? 'manager' : 'employee'];
           state.isManager = isManager;
+        },
+        setTeam(state, isTeam) {
+          state.isTeam = isTeam;
+          // 清空列表数据
+          state.pending = [];
+          state.process = [];
+          state.completed = [];
         }
       },
       actions: {
@@ -54,8 +62,11 @@ export default new Vuex.Store({
          * @param {Function} error 选填 错误回调
          */
         getTransferOrder({state, commit, dispatch}, {data, more, callback, error}) {
-          data['Status'] = mappStatus[data['Status']];
-          let list = mappList[data['Status']] || 'result'; // 搜索所有时，没有状态
+          let mapp = mapps[data['Status']];
+          // 搜索时，没有状态
+          let list = mapp['list'] || 'result';
+          // 状态切换
+          data['Status'] = mapp['status'];
           api.get({
             key: 'getTransferOrder',
             data: data,
@@ -86,8 +97,6 @@ export default new Vuex.Store({
       namespaced: true,
       state: {
         form: {},
-        record: [{state: '已提交', time: '2017-02-01 18:00'},
-          {state: '总部安装主管xx审批中', time: '2017-02-01 19:00'}],
         orders: ''
       },
       mutations: {
@@ -96,9 +105,6 @@ export default new Vuex.Store({
         },
         setOrders(state, orders) {
           state.orders = KND.Util.toArray(orders);
-        },
-        clear(state) {
-          state.form = {};
         },
         removeOrder(state, index) {
           state.orders.splice(index, 1);
@@ -109,14 +115,19 @@ export default new Vuex.Store({
          * 通过id获取安装交接单信息
          * @param {String} id 必填 id
          */
-        findTransferOrderById({commit}, id) {
+        findTransferOrderById({commit, dispatch}, id) {
           api.get({
             key: 'queryTransferOrderById', // 'findTransferOrderById', //
             data: {
               id: id
             },
             success: data => {
-              commit('setTransferOrder', data.SiebelMessage.Project);
+              let form = data.SiebelMessage.Project;
+              commit('setTransferOrder', form);
+              if (form['Status'] !== '已提交') {
+                // 获取安装订单
+                dispatch('queryOrdersById', id);
+              }
             }
           });
         },
@@ -284,12 +295,23 @@ export default new Vuex.Store({
     order: {
       namespaced: true,
       state: {
+        order: '',
+        lines: ''
       },
       mutations: {
+        setOrder(state, order) {
+          state.lines = [];
+          state.order = order;
+        },
+        removeLine(state, index) {
+          state.lines.splice(index, 1);
+        },
+        setLines(state, lines) {
+          if (lines.items) lines = lines.items;
+          state.lines = KND.Util.toArray(lines);
+        }
       },
       actions: {
-        submit() {
-        },
         /**
          * 保存安装订单
          * @param {Object} data 必填 交接单对象
@@ -323,9 +345,16 @@ export default new Vuex.Store({
         /**
          * 获取订单行
          */
-        queryOrderLines({state}, setting) {
-          setting.key = 'queryOrderLines';
-          api.get(setting);
+        queryLines({commit}, data) {
+          commit('setLines', []);
+          api.get({
+            key: 'queryOrderLines',
+            data: data,
+            success: data => {
+              commit('setLines', data);
+            }
+          });
+
         },
         /**
          * 转发或提交订单
@@ -333,6 +362,21 @@ export default new Vuex.Store({
         runProcess({state}, setting) {
           setting.key = 'runProcess';
           api.get(setting);
+        },
+        /**
+         * 删除订单行
+         */
+        delete({commit}, setting) {
+          api.get({
+            key: 'deleteOrderLine',
+            data: {
+              id: setting.id
+            },
+            success: data => {
+              commit('removeLine', setting.index);
+              tools.success(data);
+            }
+          });
         }
       }
     },
