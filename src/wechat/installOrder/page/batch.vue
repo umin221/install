@@ -161,18 +161,25 @@
             }
           },
           success: function(data) {
+            var parma = {
+              'Planned': self.startDate,
+              'Planned Completion': self.endDate,
+              'KL Install Amount Requested': self.batchNum,
+              'Id': self.batchCode,
+              'KL Detail Type': self.item['KL Detail Type'],
+              'Parent Activity Id': self.item.Id
+            };
+            if (self.type === 'add') {
+              parma.Status = '设定计划';
+              parma['KL Detail Type'] = self.item['KL Installation Task']['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
+              parma['Template Id'] = self.item['KL Installation Task']['Template Id'];
+            } else {
+              parma['KL Detail Type'] = self.item['KL Detail Type'];
+            }
             api.get({ // 提交数据
               key: 'getUPData',
               method: 'PUT',
-              data: {
-                'Planned': self.startDate,
-                'Planned Completion': self.endDate,
-                'KL Install Amount Requested': self.batchNum,
-                'Id': self.batchCode,
-                'KL Detail Type': self.item['KL Detail Type'],
-                'Parent Activity Id': self.item.Id
-
-              },
+              data: parma,
               success: function(data) {
                 history.go(-1);
               }

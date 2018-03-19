@@ -12,7 +12,8 @@
 
       <mt-navbar v-model="selected">
         <mt-tab-item id="pending"
-                     @click.native="!pending.length && loadBottomFn({status:'待处理', list:'pending'})">待处理</mt-tab-item>
+                     @click.native="!pending.length && loadBottomFn({status:'待处理', list:'pending'})"
+        v-if="userInfo['KL Primary Position Type LIC'] === 'Door Factory Engineer'">待处理</mt-tab-item>
         <mt-tab-item id="process"
                      @click.native="!process.length && loadBottomFn({status:'处理中', list:'process'})">处理中</mt-tab-item>
         <mt-tab-item id="completed"
@@ -108,6 +109,7 @@
       }
     }, args.pop() || {});
     // 获取安装订单
+    console.dir('00000');
     me.getList(param);
   };
 
@@ -116,15 +118,33 @@
     components: {cusHeader, cusLoadmore, cusCell},
     // 数据初始化
     created() {
+      var self = this;
+      KND.Native.getUserInfo((info) => {
+        self.userInfo = info;
+        console.log(self.userInfo);
+        if (self.userInfo['KL Primary Position Type LIC'] === 'Door Factory Engineer') {
+          self.tabVal = 'pending';
+          self.tabStatus = '待处理';
+          self.selected = 'pending';
+        } else {
+          self.tabVal = 'process';
+          self.tabStatus = '处理中';
+          self.selected = 'process';
+
+        }
+      });
       this.loadBottomFn({
-        status: '待处理',
-        list: 'pending'
+        status: self.tabStatus,
+        list: self.tabVal
       });
     },
     data: () => {
       return {
+        tabVal: '',
+        tabStatus: '',
         // 活跃tab
         selected: 'pending',
+        userInfo: '',
         // 下拉状态
         topStatus: ''
       };

@@ -9,7 +9,8 @@
 
     <div class="mint-content wide-form">
       <div :class="{'readonly':read}">
-        <mt-cell title="是否涉及签收">
+        <mt-cell title="是否涉及签收" v-if="item['KL Detail Type LIC'] === 'Trompil Lock Sign' ||
+          item['KL Detail Type LIC'] === 'Working Drawing Sign'">
           <mt-switch v-model="box1"></mt-switch>
         </mt-cell>
         <div v-show="box1">
@@ -109,10 +110,8 @@
     methods: {
       ...mapMutations(NameSpace, ['clear']),
       ...mapActions(NameSpace, ['getSign', 'getUPData']),
-      submitFn() {
-        // pending
+      submit() {
         var self = this;
-        this.state = this.state === 'add' ? 'edit' : 'read';
         api.get({ // 更改按钮状态
           key: 'getUPStatus',
           method: 'POST',
@@ -128,6 +127,23 @@
             }
           }
         });
+      },
+      submitFn() {
+        var item = this.item;
+        if (item['KL Detail Type LIC'] === 'Trompil Lock Sign' ||
+          item['KL Detail Type LIC'] === 'Working Drawing Sign') { // 提交后可编辑
+          this.submit();
+        } else { // 提交后不可编辑
+          MessageBox({
+            title: '提示',
+            message: ' 确认提交？一经提交不可修改',
+            showCancelButton: true
+          }).then(action => {
+            if (action === 'confirm') {
+              this.submit();
+            }
+          });
+        }
       }
     },
     components: {titleGroup, buttonGroup}

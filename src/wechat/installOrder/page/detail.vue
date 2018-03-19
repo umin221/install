@@ -15,10 +15,10 @@
         <div style="height: 0.5rem;background: #eaeaea;"></div>
         <div class="mint-content-info">
           <mt-cell>
-            <div slot="title" class="list-text"><span class="list-text-span">锁芯部分</span></div>
+            <div slot="title" class="list-text"><span class="list-text-span">面板部分</span></div>
           </mt-cell>
           <div class="mint-sx-div">
-            <mt-cell   @click.native="getLock(item.Id, item['KL Product Type'], item)" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='锁芯'"  :title="item['KL Product Series Code']">
+            <mt-cell   @click.native="getLock(item.Id, item['KL Product Type'], item)" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='面板'"  :title="item['KL Product Series Code']">
               <span style="width: 120px">开向：{{item['KL Hole Direction']}}</span>
               <span>数量：{{item['Quantity Requested']}}</span>
             </mt-cell>
@@ -118,19 +118,29 @@
               <span>{{item['Planned Completion']}}</span>
               <span>{{item.Status}}</span>
             </li>
+            <div class="butLi" v-if="item['KL Detail Type LIC']==='Trompil Batch Summary' ||
+            item['KL Detail Type LIC']==='Lock Body Install Summary' ||
+            item['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
+            item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
+            item['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
+            item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
+            item['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
+            item['KL Detail Type LIC'] === 'Transfer Summary'" >
+              <span @click.nataive="closeTask(item)">关闭</span>
+              <span @click.nataive="addTask(item)">新增</span>
+            </div>
             <li style="margin-right: 8px" v-if="item['KL Detail Type LIC'] === 'Ship From Door Factory' && item['Calculated Activity Status'] === 'Not Started'">
-              <span class="mt-switch"><mt-switch v-model="shipmentVal"  @click.native="shipment(item)"></mt-switch></span>
+              <span class="mt-switch"><mt-switch v-model="shipmentVal"  @click.nataive.stop="shipment(item)"></mt-switch></span>
             </li>
             <div class="content-div"  v-if="item['KL Detail Type LIC']==='Trompil Batch Summary' ||
             item['KL Detail Type LIC']==='Lock Body Install Summary' ||
-            item['KL Detail Type LIC']==='Door Hanging Acceptance' ||
+            item['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
             item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
-            item['KL Detail Type LIC'] === 'Substitution Lock Transfer' ||
+            item['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
             item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
             item['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
-            item['KL Detail Type LIC'] === 'Transfer Summary'"  @click.nataive="sporadic(index)">
-              <!--v-for="(itemTask, index) in item['KL Installation Task']" :key="index"-->
-                <div>批次</div>
+            item['KL Detail Type LIC'] === 'Transfer Summary'"  @click.nataive.stop="sporadic(item)"  v-for="(itemTask, index) in upList(item['KL Installation Task'])" :key="index">
+                <div>{{itemTask.Id}}</div>
                 <div>已开孔/开孔批次</div>
                 <div>时间</div>
             </div>
@@ -191,6 +201,19 @@
     }
     .crm-zyList ul li {
       list-style: none;
+    }
+    .crm-zyList ul .butLi{
+      position: absolute;
+      right: 10px;
+      top: 0px;
+      line-height: 27px;
+      height: 27px;
+    }
+    .crm-zyList ul .butLi span {
+      display: inline-block;
+      text-align: center;
+      font-size: 14px!important;
+      color: #999!important;
     }
     .crm-zyList .content {
       position: relative;
@@ -443,8 +466,8 @@
         detailData: '', // 详情整体数据
         taskData: '', // 任务集
         taskDataList: '', // 任务集子任务
-        taskDataST: '', // 锁芯锁体
-        // is_show_sx: false, // 是否显示锁芯锁体
+        taskDataST: '', // 面板锁体
+        // is_show_sx: false, // 是否显示面板锁体
         shipmentVal: false, // 发运开关，判断值
         active: 'tab-container'
       };
@@ -457,14 +480,20 @@
       });
     },
     methods: {
+      upList(obj) {
+        return KND.Util.toArray(obj);
+      },
       updateTask(index) { // 点击任务切换子任务
         let me = this;
         me.taskDataList = KND.Util.toArray(me.taskData[index]['KL Installation Task']);
         console.dir(me.taskDataList);
+        if (me.taskDataList.length === 0) {
+          me.taskDataList = KND.Util.toArray(me.taskData[index]);
+        }
       },
-      getClose() { // 关闭日志
+      getClose() { // 关闭整个任务
         let self = this;
-        api.get({ // 更改按钮状态
+        api.get({ // 更改状态
           key: 'getUPStatus',
           method: 'POST',
           data: {
@@ -474,13 +503,10 @@
             }
           },
           success: function(data) {
-            if (self.box1) { // 涉及签收 才提交数据  不涉及只更新状态
-              self.getUPData(self.id);
-            }
           }
         });
       },
-      /* is_show_fun() { // 是否显示锁体锁芯
+      /* is_show_fun() { // 是否显示锁体面板
         var self = this;
         if (self.is_show_sx) {
           self.is_show_sx = false;
@@ -488,8 +514,8 @@
           self.is_show_sx = true;
         }
       },*/
-      getLock(id, type, item) { // 锁芯锁体详情事件
-        // 跳转锁芯锁体详情
+      getLock(id, type, item) { // 面板锁体详情事件
+        // 跳转面板锁体详情
         this.$router.push({
           name: 'lock',
           query: {
@@ -581,6 +607,32 @@
           }
         });
       },
+      addTask(item) {
+        console.dir('0');
+        // 跳转详情
+        this.$router.push({
+          name: 'batch',
+          query: {
+            type: 'add',
+            item: item
+          }
+        });
+      },
+      closeTask(item) { // 关闭当前批次
+        console.dir(item);
+        api.get({ // 更改状态
+          key: 'getUPStatus',
+          method: 'POST',
+          data: {
+            'body': {
+              'ProcessName': 'KL Install Task Close Action Workflow',
+              'RowId': item.id
+            }
+          },
+          success: function(data) {
+          }
+        });
+      },
       routerPage(index, item, state) { // 子任务事件
         // 子任务跳转页面
         /*
@@ -618,24 +670,24 @@
           }
         } else if (item['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
           item['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
-          item['KL Detail Type LIC'] === 'Door Hanging Acceptance' ||
+          item['KL Detail Type LIC'] === 'Door Hanging Acc Batch' ||
           item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
-          item['KL Detail Type LIC'] === 'Substitution Lock Transfer' ||
+          item['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
           item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
           item['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
           item['KL Detail Type LIC'] === 'Transfer Summary') { // 批次页面
           /*
           * Trompil Batch Summary 开孔锁批次
           * Lock Body Install Summary 锁体安装汇总
-          * Door Hanging Acceptance 挂门验收
+          * Door Hanging Acc Batch 挂门验收批次
           * Substitution Lock Inst Summary  替代锁安装汇总
-          * Substitution Lock Transfer 替代锁移交
+          * Subst Lock Trans Summary 替代锁移交
           * Lock Installation Summary 真锁安装汇总
           * Check Before Trans Summary 移交前自检汇总
           * Transfer Summary 移交汇总
           * */
          // self.$router.push('batch');
-          // 跳转详情
+          // 跳转批次新曾
           this.$router.push({
             name: 'batch',
             query: {
@@ -664,12 +716,17 @@
           }
         }
       },
-      sporadic(index) { // 子任务数据集事件
-        var self = this;
-        if (index === 0) {
-        } else {
-          self.$router.push('sporadic');
-        }
+      sporadic(item) { // 子任务数据集事件
+        // 跳转批次新曾
+        this.$router.push({
+          name: 'batch',
+          query: {
+            type: 'edit',
+            item: item
+          }
+        });
+       /* var self = this;
+        self.$router.push('sporadic');*/
       }
     }
   };
