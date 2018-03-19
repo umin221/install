@@ -89,7 +89,7 @@
 </template>
 
 <script type="application/javascript">
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import cusHeader from 'public/components/cus-header';
   import cusLoadmore from 'public/components/cus-loadmore';
   import cusCell from 'public/components/cus-cell';
@@ -110,7 +110,7 @@
     }, args.pop() || {});
     // 获取安装订单
     console.dir('00000');
-    me.getList(param);
+    me.getList(param, me.userInfo);
   };
 
   export default {
@@ -121,6 +121,7 @@
       var self = this;
       KND.Native.getUserInfo((info) => {
         self.userInfo = info;
+        self.setInfoUser(info);
         console.log(self.userInfo);
         if (self.userInfo['KL Primary Position Type LIC'] === 'Door Factory Engineer') {
           self.tabVal = 'pending';
@@ -154,6 +155,7 @@
     },
     methods: {
       ...mapActions(NAMESPACE, ['getList']),
+      ...mapMutations(NAMESPACE, ['setInfoUser']),
       // 标题栏菜单选择回调方法
       menuFn(item) {
         console.log(item);

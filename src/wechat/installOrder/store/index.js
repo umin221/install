@@ -26,7 +26,8 @@ export default new Vuex.Store({
         // 已完成
         completed: [],
         // 搜索结果
-        result: []
+        result: [],
+        infoUser: ''
       },
       mutations: {
         setTransferOrders(state, {TransferOrders, list}) {
@@ -34,6 +35,9 @@ export default new Vuex.Store({
         },
         addTransferOrders(state, {TransferOrders, list}) {
           state[list].push(...TransferOrders);
+        },
+        setInfoUser(state, infoUser) {
+          state.infoUser = infoUser;
         }
       },
       actions: {
@@ -46,6 +50,7 @@ export default new Vuex.Store({
          */
         getList({state, commit, dispatch}, {data, more, callback, error}) {
           let list = mapp[data['Status']] || 'result'; // 搜索所有时，没有状态
+          data['infoUser'] = state.infoUser;
           api.get({
             key: 'getList',
             method: 'POST',

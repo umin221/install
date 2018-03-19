@@ -4,16 +4,25 @@ let apiList = {
     // 列表
   },*/
   getList: option => {
+
+    var boby = {
+      'OutputIntObjectName': 'KL Install Order',
+      'StartRowNum': option.paging.StartRowNum,
+      'PageSize': option.paging.PageSize
+    };
+    var bing = ''; // 安装工程师跟安装主管需要参数Primary Postion Id
+    if (option.data.infoUser['KL Primary Position Type LIC'] === 'Door Factory Engineer') { // 门厂技术安装员
+      boby.ViewMode = 'Sales Rep';
+
+    } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Manager' || option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Engineer') { // 安装工程师、安装主管
+      // boby.ViewMode = 'Manager';
+      // bing = '[Order Entry - Orders.Primary Postion Id]="' + option.data.infoUser['Primary Position Id'] + '" AND ';
+    }
+    boby.SearchSpec = bing + '(' + KND.Util.condition2D({Status: option.data.Status.split(',')}, 'Order Entry - Orders', ' OR ', '=') + ')';
     return {
       url: 'service/EAI Siebel Adapter/QueryPage',
       data: {
-        'body': {
-          'OutputIntObjectName': 'KL Install Order',
-          'ViewMode': 'Sales Rep',
-          'SearchSpec': '[Order Entry - Orders.Status]="' + option.data.Status + '"',
-          'StartRowNum': option.paging.StartRowNum,
-          'PageSize': option.paging.PageSize
-        }
+        'body': boby
       }
     };
   },
