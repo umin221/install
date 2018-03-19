@@ -95,8 +95,6 @@
   import cusCell from 'public/components/cus-cell';
 
   const NAMESPACE = 'index';
-
-  let userInfo = {};
   //
   let loader = function(...args) {
     let me = this;
@@ -107,10 +105,6 @@
         me.$refs[list][event](data.length);
       }
     }, args.pop() || {});
-    // 主管查询自己的交接单，需要增加字段 Project Primary Member Id
-    if (this.isManager) {
-      if (!this.isTeam) param.data['Primary Postion Id'] = userInfo['Primary Position Id'];
-    };
     // 获取团队列表
     me.getTransferOrder(param);
   };
@@ -122,7 +116,6 @@
     created() {
       let me = this;
       KND.Native.getUserInfo((info) => {
-        userInfo = info;
         me.setManager(info['KL Primary Position Type LIC'] === 'Field Service Manager');
         me.loadBottomFn({
           status: '待处理',

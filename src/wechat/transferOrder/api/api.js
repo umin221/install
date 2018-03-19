@@ -1,34 +1,29 @@
 let apiList = {
   /**
    * 交接单列表&搜索
-   * @param {Object} option.data 必填 查询条件
+   * @param {String} option.data.ViewMode 必填 视图
+   * @param {Object} option.data 必填 其他查询条件
    * @param {Object} option.paging 必填 翻页参数
    * @returns {{method: string, url: string, data: {body: {OutputIntObjectName: string, ViewMode: string, SearchSpec: *, StartRowNum: (*|string), PageSize: (*|string|PAGESIZE)}}}}
    */
   getTransferOrder: option => {
-    let specId = '';
     let condition = Object.assign({}, option.data);
     let status = condition.Status;
-    let id = condition['Primary Postion Id'];
+    let viewMode = condition.ViewMode;
+    delete condition.ViewMode;
     // 状态多匹配 逗号分隔
     if (status) {
       condition['Status'] = status.split(',');
     };
-    // 查询主管下的 使用 AND ，其他查询条件使用 OR
-    if (id) {
-      specId += ' AND [Project.Primary Postion Id] = "' + id + '"';
-      delete condition['Primary Postion Id'];
-    }
-    // 条件操作符
+    // 运算符
     let operator = option.data.Status ? ' = ' : ' ~LIKE ';
-
     return {
       url: 'service/EAI Siebel Adapter/QueryPage',
       data: {
         'body': {
           'OutputIntObjectName': 'Base Project',
-          'ViewMode': 'Sales Rep',
-          'SearchSpec': '(' + KND.Util.condition2D(condition, 'Project', ' OR ', operator) + ')' + specId, // '[Project.Status]="' + option.data.Status + '"',
+          'ViewMode': viewMode,
+          'SearchSpec': KND.Util.condition2D(condition, 'Project', ' OR ', operator),
           'StartRowNum': option.paging.StartRowNum,
           'PageSize': option.paging.PageSize
         }

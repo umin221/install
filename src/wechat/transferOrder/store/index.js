@@ -22,6 +22,7 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
+        // 是否主管
         isManager: false,
         // 查看团队
         isTeam: false,
@@ -62,10 +63,13 @@ export default new Vuex.Store({
          * @param {Function} error 选填 错误回调
          */
         getTransferOrder({state, commit, dispatch}, {data, more, callback, error}) {
-          let mapp = mapps[data['Status']];
+          let status = data['Status'];
+          let mapp = mapps[status] || {};
           // 搜索时，没有状态
           let list = mapp['list'] || 'result';
-          // 状态切换
+          // ViewMode 随当前状态切换
+          data['ViewMode'] = state.isManager ? (status === '待处理' ? 'Sales Rep' : (state.isTeam ? 'Manager' : 'Personal')) : 'Personal';
+
           data['Status'] = mapp['status'];
           api.get({
             key: 'getTransferOrder',

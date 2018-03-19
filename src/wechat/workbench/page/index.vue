@@ -17,7 +17,7 @@
   </div>
 </template>
 
-<script type="application/javascript">
+<script type="es6">
   import {mapState} from 'vuex';
 
   const NameSpace = 'index';
