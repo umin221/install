@@ -107,7 +107,11 @@
       if (agreementItems) {
         mapp.option['agreementItem'] = agreementItems.filter(i => i['KL Product Type LIC'] === (me.isPanel ? 'Panel' : 'Lock Body'));
       } else {
-        MessageBox('错误', '没有找到合同行，无法创建订单').then(action => {
+        MessageBox({
+          closeOnClickModal: false,
+          title: '错误',
+          message: '没有找到合同行，无法创建订单'
+        }).then(action => {
           this.$router.back();
         });
         return;

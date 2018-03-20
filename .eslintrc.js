@@ -27,7 +27,8 @@ module.exports = {
     'Indicator': true,
     'Toast': true,
     'MessageBox': true,
-    'tools': true
+    'tools': true,
+    'wx': true
   },
   rules: {
     'accessor-pairs': 2,
