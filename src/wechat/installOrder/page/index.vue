@@ -1,7 +1,7 @@
 <!--委外团队列表-->
 <template>
   <div>
-    <cus-header fixed :title="isManager ? '我的安装订单' : '团队的安装订单'" :menu="isShowT ?[{title:'查看我的团队', key:'a'}]: undefined">
+    <cus-header fixed :title="isManager ? '我的安装订单' : '团队的安装订单'" :menu="isShowT ?[{title:'查看我的团队', key:'a'}]: [{title:'我的安装订单', key:'a'}]">
       <fallback slot="left"></fallback>
       <mt-button @click.native="toSearchFn" slot="right">
         <i class="xs-icon icon-search"></i>

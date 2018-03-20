@@ -126,8 +126,8 @@
             item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
             item['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
             item['KL Detail Type LIC'] === 'Transfer Summary'" >
-              <span @click.nataive="closeTask(item)">关闭</span>
-              <span @click.nataive="addTask(item)">新增</span>
+              <span @click.nataive.stop="closeTask(item)">关闭</span>
+              <span @click.nataive.stop="addTask(item)">新增</span>
             </div>
             <li style="margin-right: 8px" v-if="item['KL Detail Type LIC'] === 'Ship From Door Factory' && item['Calculated Activity Status'] === 'Not Started'">
               <span class="mt-switch"><mt-switch v-model="shipmentVal"  @click.nataive.stop="shipment(item)"></mt-switch></span>
@@ -139,7 +139,7 @@
             item['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
             item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
             item['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
-            item['KL Detail Type LIC'] === 'Transfer Summary'" v-for="(itemTask, index) in upList(item['KL Installation Task'])" :key="index" @click.nataive.stop="sporadic(itemTask)">
+            item['KL Detail Type LIC'] === 'Transfer Summary'" v-for="(itemTask, index) in upList(item['KL Installation Task'])" :key="index" @click.nataive.stop="taskClick(itemTask)">
               <div class="readonly">
                 <mt-field label="批次" :value="itemTask.Id"></mt-field>
                 <mt-field label="已完成/计划数量"  v-if="item['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
@@ -621,14 +621,37 @@
       },
       addTask(item) {
         console.dir('0');
-        // 跳转详情
-        this.$router.push({
-          name: 'batch',
-          query: {
-            type: 'add',
-            item: item
+        var self = this;
+        if (item['KL Detail Type LIC'] === 'Lock Installation Summary') {
+          if (!self.detailData['KL Delivery Sales Type'] === '工程') { // 真锁---工程
+            // 跳转真锁安装批次新增页面
+            this.$router.push({
+              name: 'zsBatch',
+              query: {
+                type: 'add',
+                item: item
+              }
+            });
+          } else { // 真锁---零星
+            // 跳转真锁安装批次新增页面
+            this.$router.push({
+              name: 'sporadic',
+              query: {
+                type: 'add',
+                item: item
+              }
+            });
           }
-        });
+        } else {
+          // 跳转统一批次新增页面
+          this.$router.push({
+            name: 'batch',
+            query: {
+              type: 'add',
+              item: item
+            }
+          });
+        }
       },
       closeTask(item) { // 关闭当前批次
         console.dir(item);
@@ -728,7 +751,7 @@
           }
         }
       },
-      sporadic(item) { // 子任务数据集事件
+      taskClick(item) { // 子任务数据集事件
         // 跳转批次新曾
         this.$router.push({
           name: 'batch',

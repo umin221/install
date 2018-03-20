@@ -5,33 +5,19 @@
     </mt-header>
     <div class="mint-content batch">
       <div :class="{'readonly':read}">
-        <mt-cell title="批次">
-          <span>{{batchCode}}</span>
-        </mt-cell>
+        <cus-field label="计划类型"
+                   @click.native="showLovFn('KL Door Material Quality')"
+                   v-model="line['KL Door Material Quality']"
+                   is-link></cus-field>
         <mt-cell title="计划开始日期" @click.native="open('picker')" :value="start_Date" is-link></mt-cell>
         <mt-cell title="计划完成日期" @click.native="open('pickerEnd')" :value="end_Date" is-link></mt-cell>
-        <mt-field label="计划开孔数量" placeholder="请输入"
-                  :class="heartVisible" v-model="batchNum"></mt-field>
-      </div>
-      <div class="lock-line">
-        <lock-line title="详细计划" @click="toLineFn()">
-          <!--<mt-cell-swipe v-for="(line, index) in lines" class="lock-line-cell enable" ref="body"
-                         v-if="line['KL Product Type']==='锁体'"
-                         @click.native="toLineFn(line)"
-                         :key="line['Id']"
-                         :right="getSwipeBtn(line, index)"
-                         is-link>
-            <div class="co-flex co-jc" slot="title">
-              <span class="co-f1">{{line['KL Product Model No']}}</span>
-              <span class="co-f1">开向:{{line['KL Hole Direction']}}</span>
-              <span class="co-f1">数量:{{line['Quantity Requested']}}</span>
-            </div>
-          </mt-cell-swipe>-->
-        </lock-line>
+        <cus-field label="备注"
+                   type="textarea"
+                   v-model="line['Description']"></cus-field>
       </div>
       <button-group>
         <mt-button type="primary" class="single"
-                   @click.native="submitFn">提交</mt-button>
+                   @click.native="submitFn">保存</mt-button>
       </button-group>
       <mt-datetime-picker
         ref="picker"
@@ -53,6 +39,13 @@
         @confirm="handleChangeEnd">
       </mt-datetime-picker>
     </div>
+    <mt-popup v-model="showBox" position="bottom">
+      <menu-box @my-enter="enter"
+                @my-cancel="showBox=false"
+                :vk="vk"
+                :type="lovType"
+                :slots="slots"></menu-box>
+    </mt-popup>
   </div>
 </template>
 <style lang="scss">
@@ -81,20 +74,21 @@
   }
 </style>
 <script type="application/javascript">
-  import {mapState} from 'vuex';
+  import {mapState, mapActions} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
   import lockLine from '../components/cusLockLine';
+  import cusField from 'public/components/cus-field';
+  import menuBox from 'public/components/cus-menu.vue';
   import api from '../api/api';
   const NameSpace = 'batch';
+  // mapp
+  let mapp = config.mapp;
   export default {
     name: 'detail',
     created() {
       console.dir(1);
       var self = this;
-      self.titleVal = '新建开孔批次';
       let param = this.$route.query;
-      this.state = param.state;
-      this.type = param.type;
       this.id = param.item.Id;
       this.item = param.item;
       console.dir('=====' + this.id);
@@ -107,11 +101,18 @@
       } else {
         this.getBatch(this.item);
       }
+      // 取 lov 门材质
+      self.getLov({
+        type: 'KL_DOOR_MATERIAL_QUALITY',
+        success: data => {
+          mapp.option['KL Door Material Quality'] = data.items;
+        }
+      });
     },
     data: () => {
       return {
         value: '',
-        batchCode: '', // 批次
+        line: {},
         start_Date: new Date(),        // 开始时间
         startDate: null,
         end_Date: new Date(),        // 结束时间
@@ -121,7 +122,13 @@
         id: '',
         item: '',
         type: 'add', // add 新增 / edit 编辑 / read 只读
-        titleVal: '新建开孔批次',
+        titleVal: '新建详细计划',
+        vk: 'Value',
+        slots: [
+          {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
+        ],
+        showBox: false,
+        lovType: '',
         active: 'tab-container'
       };
     },
@@ -144,6 +151,7 @@
       }
     },
     methods: {
+      ...mapActions('app', ['getLov']),
       open(picker) {
         this.$refs[picker].open();
       },
@@ -157,10 +165,28 @@
         me.end_Date = value.format('yyyy/MM/dd');
         me.endDate = value.format('MM/dd/yyyy');
       },
+      // 选择对话框
+      showLovFn(type) {
+        this.lovType = type;
+        this.showBox = true;
+        // 选择产品的 value-key 为 KL Product Model No ， 其他为 Value
+        this.vk = type === 'agreementItem' ? 'KL Product Model No' : 'Value';
+        this.slots[0].values = mapp.option[type];
+      },
+      // 选择确认
+      enter(values, type) {
+        console.log(values, type);
+        let me = this;
+        me.showBox = false;
+        // 选择填充
+        this.line[type] = values[0]['Value'];
+        console.log(this[type]);
+        this[type] = values[0];
+      },
       toLineFn() {
         let me = this;
         this.$router.push({
-          name: 'detailPlan',
+          name: 'xttd',
           query: {
             id: me.id,
             item: this.item
@@ -186,45 +212,8 @@
         });
       },
       submitFn() {
-        // pending
-        var self = this;
-        api.get({ // 更改按钮状态
-          key: 'getUPStatus',
-          method: 'POST',
-          data: {
-            'body': {
-              'ProcessName': 'KL Install Task Submit For Approval Workflow',
-              'RowId': self.id
-            }
-          },
-          success: function(data) {
-            var parma = {
-              'Planned': self.startDate,
-              'Planned Completion': self.endDate,
-              'KL Install Amount Requested': self.batchNum,
-              'Id': self.batchCode,
-              'KL Detail Type': self.item['KL Detail Type'],
-              'Parent Activity Id': self.item.Id
-            };
-            if (self.type === 'add') {
-              parma.Status = '设定计划';
-              parma['KL Detail Type'] = self.item['KL Installation Task'][0]['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
-              parma['Template Id'] = self.item['KL Installation Task']['Template Id'];
-            } else {
-              parma['KL Detail Type'] = self.item['KL Detail Type'];
-            }
-            api.get({ // 提交数据
-              key: 'getUPData',
-              method: 'PUT',
-              data: parma,
-              success: function(data) {
-                history.go(-1);
-              }
-            });
-          }
-        });
       }
     },
-    components: {buttonGroup, lockLine}
+    components: {buttonGroup, cusField, menuBox, lockLine}
   };
 </script>

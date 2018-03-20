@@ -65,6 +65,12 @@ export default new Router({
       require(['../page/batch'], resolve);
     }
   }, {
+    path: '/detailPlan', // 批次详细计划页面
+    name: 'detailPlan',
+    component(resolve) {
+      require(['../page/detailPlan'], resolve);
+    }
+  }, {
     path: '/updateDoor', // 挂门验收
     name: 'updateDoor',
     component(resolve) {

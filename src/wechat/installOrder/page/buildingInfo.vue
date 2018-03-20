@@ -102,10 +102,13 @@
     name: 'buildingInfo',
     created: () => {
       console.dir(1);
+      let param = this.$route.query;
+      this.item = param.item;
     },
     data: () => {
       return {
         value: '',
+        item: '',
         active: 'tab-container'
       };
     },
