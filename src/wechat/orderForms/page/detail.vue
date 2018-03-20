@@ -7,16 +7,16 @@
 
       <div class="mint-content orderForms">
         <div class="detail-title">
-          <div class="mt-Detail-title">维修订单号：ST201712280001</div>
-          <div class="mt-Detail-title">服务订单号：SR201712280001</div>
-          <div class="mt-Detail-title">负责人：李好好 16013107</div>
-          <div class="mt-Detail-title">保修期：保内</div>
+          <div class="mt-Detail-title">维修订单号：{{orderDatail['Order Number']}}</div>
+          <div class="mt-Detail-title">服务订单号：{{orderDatail['Service Request Number']}}</div>
+          <div class="mt-Detail-title">负责人：{{orderDatail['KL Primary Owner']}}</div>
+          <div class="mt-Detail-title">保修期：{{orderDatail['KL Warranty Flag']}}</div>
         </div>
-        <div class="detail-content">
-          <div class="mt-Detail-title">产品名称：锁舌导向板A组件</div>
-          <div class="mt-Detail-title">型号：S050</div>
-          <div class="mt-Detail-title">单价：CNY 100.000</div>
-          <div class="mt-Detail-title">订单总额：CNY 0.000</div>
+        <div class="detail-content" v-for="(item, index) in lineItems" :key="index">
+          <div class="mt-Detail-title">产品名称：{{item['KL Product Name Join']}}</div>
+          <div class="mt-Detail-title">型号：{{item['KL Product Model Join']}}</div>
+          <div class="mt-Detail-title">单价：CNY {{item['Adjusted List Price - Display']}} x {{item['Quantity Requested']}}</div>
+          <div class="mt-Detail-title">订单总额：CNY {{item['NRC CxTotal']}}</div>
         </div>
       </div>
     </div>
@@ -30,16 +30,17 @@
   export default {
     name: NameSpace,
     created() {
+      this.getDetail(this.$route.query.type);
     },
     data: () => {
       return {
       };
     },
     computed: {
-      ...mapState(NameSpace, [])
+      ...mapState(NameSpace, ['orderDatail', 'lineItems'])
     },
     methods: {
-      ...mapActions(NameSpace, [])
+      ...mapActions(NameSpace, ['getDetail'])
     },
     components: {}
   };
@@ -47,13 +48,17 @@
 <style lang="scss">
   .orderForms{
     .detail-title{
+      font-size: $font-size-large;
+      line-height: 2rem;
       background-color: #ffffff;
       padding: 1rem;
     }
     .detail-content{
-      margin-top: 1.5rem;
+      margin-top: 1rem;
       background-color: #ffffff;
       padding: 1rem;
+      font-size: $font-size-large;
+      line-height: 2rem;
     }
   }
 

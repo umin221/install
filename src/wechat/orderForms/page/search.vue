@@ -8,11 +8,11 @@
                       :topStatus="topStatus">
           <cus-cell class="multiple"
                     :key="item.id"
-                    :title="'合作伙伴名称:'+ item.Name"
+                    :title="'维修订单号:'+ item['Order Number']"
                     v-for="item in result"
+                    @click.native="toDetail(item['Order Number'])"
                     is-link>
-            <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: </div>
-            <div class="mint-cell-sub-title" slot="title">联系电话: </div>
+            <div class="mint-cell-sub-title" slot="title">订单总额:{{item['Order Total']}}</div>
           </cus-cell>
         </cus-loadmore>
 
@@ -26,7 +26,7 @@
   import cusSearch from 'public/components/cus-search';
   import cusCell from 'public/components/cus-cell';
   //
-  const NAMESPACE = 'searchTrans';
+  const NAMESPACE = 'searchList';
   export default {
     name: NAMESPACE,
     components: {cusLoadmore, cusSearch, cusCell},
@@ -40,10 +40,19 @@
       ...mapState(NAMESPACE, ['result'])
     },
     methods: {
-      ...mapActions(NAMESPACE, ['getProduct']),
+      ...mapActions(NAMESPACE, ['getSearchList']),
       searchFn(val) {
+        console.log(val);
         this.value = val;
-        this.getProduct(val);
+        this.getSearchList(val);
+      },
+      toDetail(orNumber) {
+        this.$router.push({
+          name: 'detail',
+          query: {
+            type: orNumber
+          }
+        });
       },
       loadBottomFn() {
       }
