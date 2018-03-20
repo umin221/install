@@ -30,6 +30,29 @@ export const app = {
           console.log(data);
         }
       }, option));
+    },
+
+    /**
+     * 获取企业微信 js sdk 权限
+     */
+    getAuthority({state}, option) {
+      ajax({
+        method: 'get',
+        url: ('http://kas.kinlong.cn/webchat/api/local/permission?url=http://mp.weixin.qq.com?params=' + location.href.split('#')[0] + '&appNO=CONTACT'),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        success: data => {
+          data.debug = true;
+          wx.config(data);
+          wx.ready(() => {
+            console.log('WeChatAPI success');
+          });
+          wx.error(() => {
+            console.log('WeChartAPI fail');
+          });
+        }
+      });
     }
   }
 };

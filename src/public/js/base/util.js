@@ -216,9 +216,9 @@
      * @returns {null}
      */
     getParam(name) {
-      let search = location.search || location.hash;
-      let param = search.substr(search.indexOf('?') + 1);
-      let reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+      let h = location.href;
+      let param = h.substr(h.indexOf('?'));
+      let reg = new RegExp('(^|\\?|&)' + name + '=([^&]*)(&|$)', 'i');
       let r = param.match(reg);
       if (r != null) return decodeURI(r[2]);
       return null;
@@ -231,7 +231,7 @@
      */
     setParam(name, value) {
       let content = this.getParam(name);
-      location.replace(decodeURI(location.href).replace(content, value));
+      location.replace((decodeURI(location.href).replace(content, value)));
     };
 
     /**

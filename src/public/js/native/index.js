@@ -24,6 +24,10 @@ import cache from '../lib/cache';
     get: (key) => {
       key += lock;
       return sessionStorage.getItem(key);
+    },
+    remove: (key) => {
+      key += lock;
+      return sessionStorage.removeItem(key);
     }
   };
 
@@ -47,6 +51,7 @@ import cache from '../lib/cache';
           return userID;
         },
         set: (val) => {
+          session.remove('userInfo');
           console.info('设置用户ID：' + val);
           userID = val;
           session.set('userID', val);
@@ -56,7 +61,8 @@ import cache from '../lib/cache';
 
     /**
      * 获取用户信息
-     * @returns {string}
+     * @param {Function} callback 必填 回调函数
+     * @response {Object} data 用户信息 包含职位等数据
      */
     getUserInfo(callback) {
       Util.log('获取用户信息 ' + userID);
@@ -77,7 +83,7 @@ import cache from '../lib/cache';
 
     /**
      * 获取用户ID
-     * @returns {string}
+     * @returns {string} 用户userID
      * IM02 IE01
      */
     getUserID() {
@@ -85,8 +91,48 @@ import cache from '../lib/cache';
     };
 
     /**
+     * 扫一扫
+     * @param {String} option.desc
+     * @param {Number} option.needResult 默认为0，扫描结果由企业微信处理，1则直接返回扫描结果，
+     * @param {String} option.scanType 可以指定扫二维码还是一维码，默认二者都有
+     * @response {String} res 扫描结果
+     */
+    scanQRCode(option) {
+      wx.scanQRCode(Object.assign({
+        desc: 'scanQRCode desc',
+        needResult: 1,
+        scanType: ['qrCode', 'barCode'],
+        success: function(res) {
+          console.log(res);
+        },
+        error: function(res) {
+          if (res.errMsg.indexOf('function_not_exist') > 0) {
+            alert('版本过低请升级');
+          }
+        }
+      }, option));
+    };
+
+    /**
+     * 获取当前位置信息
+     * @param {String} option.type 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+     * @response {String} res.latitude 纬度，浮点数，范围为90 ~ -90
+     * @response {String} res.longitude 经度，浮点数，范围为180 ~ -180。
+     * @response {String} res.speed 速度，以米/每秒计
+     * @response {String} res.accuracy 位置精度
+     */
+    getLocation(option) {
+      wx.getLocation(Object.assign({
+        type: 'wgs84',
+        success: function(res) {
+          console.log(res);
+        }
+      }, option));
+    };
+
+    /**
      * 异步请求
-     * @param option
+     * @param {Object} option 必填 ajax setting
      */
     online(option) {
       // loading
@@ -137,7 +183,7 @@ import cache from '../lib/cache';
 
     /**
      * 异步请求&cache
-     * @param option
+     * @param {Object} option 必填 ajax setting
      */
     cache(option) {
       // 是否支持数据缓存
@@ -160,7 +206,7 @@ import cache from '../lib/cache';
 
     /**
      * 异步请求接口
-     * @param option
+     * @param {Object} option 必填 ajax setting
      */
     ajax(option) {
       this[option.cache ? 'cache' : 'online'](option);
