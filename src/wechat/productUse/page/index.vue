@@ -17,34 +17,44 @@
       <mt-tab-container v-model="selected">
         <mt-tab-container-item id="pending">
           <loadmore ref="pending" :loadTop="pendingLoadTop" :loadBottom="pendingLoadBottom" :topStatus="topStatus" :allLoaded="true">
-            <div v-for="(item,index) in isSelect" :key="index">
-              <mt-cell @click.native="toDateil(item.No)" is-link>
-                <div class="productForm" slot="title" >领用编号:{{item.No}}</div>
-                <div class="productForm" slot="title">领用人: {{item.name}}</div>
-                <div class="productForm" slot="title">申请领用日期: {{item.num}}</div>
-              </mt-cell>
-            </div>
+            <cus-cell
+              class="multiple"
+              :title="'领用编号'+ item.No"
+              v-for="(item,index) in isSelect"
+              :key="index"
+              is-link>
+              <div class="mint-cell-sub-title" slot="title">领用人: {{item.name}}</div>
+              <div class="mint-cell-sub-title" slot="title">申请领用日期: {{item.num}}</div>
+            </cus-cell>
           </loadmore>
         </mt-tab-container-item>
         <mt-tab-container-item id="valid">
           <loadmore ref="valid" :loadTop="validLoadTop" :loadBottom="validLoadBottom" :topStatus="topStatus" :allLoaded="true">
             <div v-for="(item,index) in isSelect" :key="index">
-              <mt-cell @click.native="toDateil(item.No)" is-link>
-                <div class="productForm" slot="title" >领用编号:{{item.No}}</div>
-                <div class="productForm" slot="title">领用人: {{item.name}}</div>
-                <div class="productForm" slot="title">申请领用日期: {{item.num}}</div>
-              </mt-cell>
+              <cus-cell
+                class="multiple"
+                :title="'领用编号'+ item.No"
+                v-for="(item,index) in isSelect"
+                :key="index"
+                is-link>
+                <div class="mint-cell-sub-title" slot="title">领用人: {{item.name}}</div>
+                <div class="mint-cell-sub-title" slot="title">申请领用日期: {{item.num}}</div>
+              </cus-cell>
             </div>
           </loadmore>
         </mt-tab-container-item>
         <mt-tab-container-item id="invalid">
           <loadmore ref="invalid" :loadTop="invalidLoadTop" :loadBottom="invalidLoadBottom" :topStatus="topStatus" :allLoaded="true">
             <div v-for="(item,index) in isSelect" :key="index">
-              <mt-cell @click.native="toDateil(item.No)" is-link>
-                <div class="productForm" slot="title" >领用编号:{{item.No}}</div>
-                <div class="productForm" slot="title">领用人: {{item.name}}</div>
-                <div class="productForm" slot="title">申请领用日期: {{item.num}}</div>
-              </mt-cell>
+              <cus-cell
+                class="multiple"
+                :title="'领用编号'+ item.No"
+                v-for="(item,index) in isSelect"
+                :key="index"
+                is-link>
+              <div class="mint-cell-sub-title" slot="title">领用人: {{item.name}}</div>
+                <div class="mint-cell-sub-title" slot="title">申请领用日期: {{item.num}}</div>
+              </cus-cell>
             </div>
           </loadmore>
         </mt-tab-container-item>
@@ -54,6 +64,7 @@
 </template>
 <script type="application/javascript">
   import loadmore from 'public/components/cus-loadmore';
+  import cusCell from 'public/components/cus-cell';
   //
   const NameSpace = 'index';
 
@@ -96,7 +107,7 @@
       invalidLoadBottom() {
       }
     },
-    components: {loadmore}
+    components: {loadmore, cusCell}
   };
 </script>
 <style lang="scss">
