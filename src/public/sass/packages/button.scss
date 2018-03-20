@@ -19,14 +19,14 @@ button {
     color: $theme-color;
     background-color: #f6f8fa;
   }
+
+  &.disable {
+    @include disable;
+  }
 }
 
 .disable {
   button {
-    &.disable {
-      @include disable;
-    }
-
     @include disable;
   }
 }

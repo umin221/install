@@ -1,13 +1,13 @@
 <template>
   <div style="background-color: #ebebeb;">
-    <mt-header fixed title="我的配件">
+    <cus-header fixed title="我的配件" :menu="[{title:'查看我的团队', key:'a'}]">
       <fallback slot="left"></fallback>
       <router-link to="search" slot="right">
         <mt-button >
           <i class="xs-icon icon-search"></i>
         </mt-button>
       </router-link>
-    </mt-header>
+    </cus-header>
     <div class="mint-content">
       <mt-navbar v-model="selected">
         <mt-tab-item id="pending">配件库</mt-tab-item>
@@ -16,24 +16,26 @@
       <mt-tab-container v-model="selected">
         <mt-tab-container-item id="pending">
           <loadmore ref="pending" :loadTop="pendingLoadTop" :loadBottom="pendingLoadBottom" :topStatus="topStatus" :allLoaded="true">
-            <div v-for="(item,index) in isSelect" :key="index">
-              <mt-cell>
-                <div class="productForm" slot="title" >配件型号:{{item.No}}<span>{{item.type}}</span></div>
-                <div class="productForm" slot="title">配件名称: {{item.name}}</div>
-                <div class="productForm" slot="title">库存量: {{item.num}}</div>
-              </mt-cell>
-            </div>
+            <cus-cell
+              :title="'配件型号'+item.No"
+              v-for="(item,index) in isSelect"
+              :key="index">
+              <div class="productForm" slot="title">配件名称： {{item.name}}</div>
+              <div class="productForm" slot="title">库存量： {{item.num}}</div>
+              <div class="productForm" slot="title" >配件类型：{{item.type}}</div>
+            </cus-cell>
           </loadmore>
         </mt-tab-container-item>
         <mt-tab-container-item id="valid">
           <loadmore ref="valid" :loadTop="validLoadTop" :loadBottom="validLoadBottom" :topStatus="topStatus" :allLoaded="true">
-            <div v-for="(item,index) in isSelect" :key="index">
-              <mt-cell>
-                <div class="productForm" slot="title" >配件型号:<span>{{item.type}}</span></div>
-                <div class="productForm" slot="title">配件名称: {{item.name}}</div>
-                <div class="productForm" slot="title">库存量: {{item.num}}</div>
-              </mt-cell>
-            </div>
+            <cus-cell
+              :title="'配件型号'+item.No"
+              v-for="(item,index) in isSelect"
+              :key="index">
+              <div class="productForm" slot="title">配件名称： {{item.name}}</div>
+              <div class="productForm" slot="title">库存量： {{item.num}}</div>
+              <div class="productForm" slot="title" >配件类型：{{item.type}}</div>
+            </cus-cell>
           </loadmore>
         </mt-tab-container-item>
       </mt-tab-container>
@@ -41,7 +43,9 @@
   </div>
 </template>
 <script type="application/javascript">
+  import cusHeader from 'public/components/cus-header';
   import loadmore from 'public/components/cus-loadmore';
+  import cusCell from 'public/components/cus-cell';
   //
   const NameSpace = 'index';
 
@@ -63,6 +67,9 @@
     computed: {
     },
     methods: {
+      menuFn(item) {
+        console.log(item);
+      },
       pendingLoadTop() {
       },
       pendingLoadBottom() {
@@ -72,7 +79,7 @@
       validLoadBottom() {
       }
     },
-    components: {loadmore}
+    components: {loadmore, cusHeader, cusCell}
   };
 </script>
 <style lang="scss">

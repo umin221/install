@@ -13,6 +13,7 @@
       <mt-cell title="icon" to="icon" is-link></mt-cell>
       <mt-cell title="detail" to="detail" is-link></mt-cell>
       <mt-cell title="getUserID" @click.native="getUserIDFn" is-link></mt-cell>
+      <mt-cell title="native" to="native" is-link></mt-cell>
     </div>
 
   </div>

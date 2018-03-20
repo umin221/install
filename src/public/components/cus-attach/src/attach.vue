@@ -16,6 +16,12 @@
           @click="deleteFn($index)"></span>
         <img src="../assets/tt.png"/>
       </div>
+      <div v-for="(item, $index) in localIds">
+        <span class="xs-icon"
+          :class="{'icon-delete': edit}"
+          @click="deleteFn($index)"></span>
+        <img src="../assets/tt.png"/>
+      </div>
     </div>
 
     <mt-actionsheet
@@ -37,6 +43,7 @@
     },
     data: () => {
       return {
+        localIds: [],
         actions: [{
           name: '拍照',
           method: () => {
@@ -57,11 +64,39 @@
       }
     },
     methods: {
-      // 添加文件
+      /**
+       * 添加图片/拍照
+       */
       addFn() {
-        this.sheetVisible = true;
+        // this.sheetVisible = true;
+        wx.chooseImage({
+          count: 1, // 默认9
+          sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+          success: function(res) {
+            var localIds = res.localIds; // 返回选定照片的本地ID列表，
+            // andriod中localId可以作为img标签的src属性显示图片；
+            // 而在IOS中需通过上面的接口getLocalImgData获取图片base64数据，从而用于img标签的显示
+            console.log(localIds);
+          }
+        });
       },
-      // 删除文件
+      /**
+       * 上传本地图片
+       */
+      uploadLocalIds() {
+        wx.uploadImage({
+          localId: this.localIds, // 需要上传的图片的本地ID，由chooseImage接口获得
+          isShowProgressTips: 1, // 默认为1，显示进度提示
+          success: function(res) {
+            var serverId = res.serverId; // 返回图片的服务器端ID
+            console.log(serverId);
+          }
+        });
+      },
+      /**
+       * 删除图片
+       */
       deleteFn(index) {
         this.attach.splice(index, 1);
       }

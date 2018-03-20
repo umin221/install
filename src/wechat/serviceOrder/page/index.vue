@@ -2,19 +2,19 @@
   <div style="background-color: #ebebeb;">
     <mt-header fixed title="维修工单列表">
       <fallback slot="left"></fallback>
-      <router-link v-if="loginMeg['Job Title'] === '400'" to="addService" slot="right">
+      <router-link v-if="role === 'Agent'" to="addService" slot="right">
         <mt-button>
           <i class="xs-icon icon-add"></i>
         </mt-button>
       </router-link>
-      <router-link v-if="loginMeg['Job Title'] === 'install'" to="search" slot="right">
+      <router-link v-else-if ="role === 'Field'" to="search" slot="right">
         <mt-button >
           <i class="xs-icon icon-search"></i>
         </mt-button>
       </router-link>
     </mt-header>
 
-    <div v-if="loginMeg['Job Title'] === 'install' || loginMeg['Job Title'] === 'charge'" class="mint-content indexService">
+    <div v-if="role === 'Field'" class="mint-content indexService">
       <mt-navbar v-model="selected">
         <mt-tab-item id="pending">待处理</mt-tab-item>
         <mt-tab-item id="valid">处理中</mt-tab-item>
@@ -63,7 +63,7 @@
         </mt-tab-container-item>
       </mt-tab-container>
     </div>
-    <div v-else-if="loginMeg['Job Title'] === '400'" class="mint-content customService" >
+    <div v-else-if="role === 'Agent'" class="mint-content customService" >
       <loadmore @loadTop="loadTop" @loadBottom="loadBottom" ref="pending">
         <div class="list-content" v-for="(item,index) in cusService" @click="toDetail(item['SR Number'],item['Contact Id'])" :key="index">
           <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}<mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge></div>
@@ -74,6 +74,7 @@
           </mt-cell>
         </div>
       </loadmore>
+      <no-data v-if="!cusService.length"></no-data>
     </div>
   </div>
 </template>
@@ -94,6 +95,7 @@
     let param = args.pop();
     me.getList(Object.assign({
       callback: (data) => {
+        console.log(data);
         me.$refs[list][event](data < COUNT);
       }
     }, param));
@@ -102,6 +104,7 @@
   export default {
     name: NameSpace,
     created() {
+//      let me = this;
       loader.call(this, 'pending', 'onTopLoaded');
     },
     data: () => {
@@ -113,7 +116,7 @@
       };
     },
     computed: {
-      ...mapState(NameSpace, ['loginMeg', 'pending', 'valid', 'invalid', 'cusService'])
+      ...mapState(NameSpace, ['loginMeg', 'pending', 'valid', 'invalid', 'cusService', 'role'])
     },
     methods: {
       ...mapActions(NameSpace, ['getList']),

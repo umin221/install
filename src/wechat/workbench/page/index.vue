@@ -24,7 +24,9 @@
   export default {
     name: NameSpace,
     created: () => {
-      KND.Native.getUserInfo();
+      KND.Native.getUserInfo((userInfo) => {
+        console.log(userInfo);
+      });
     },
     data: () => {
       return {

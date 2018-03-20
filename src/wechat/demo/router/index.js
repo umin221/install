@@ -58,5 +58,17 @@ export default new Router({
     component(resolve) {
       require(['../page/actionSheet'], resolve);
     }
+  }, {
+    path: '/native', // native 插件
+    name: 'native',
+    component(resolve) {
+      require(['../page/native'], resolve);
+    }
+  }, {
+    path: '/attach', // attach 附件
+    name: 'attach',
+    component(resolve) {
+      require(['../page/attach'], resolve);
+    }
   }]
 });

@@ -3,8 +3,7 @@
     <div class="service-continer">
       <mt-header fixed :title="headTitle">
         <fallback slot="left"></fallback>
-        <mt-button v-if="loginMeg['Job Title'] === '400'&&BtnStatu === 'status4'" slot="right" @click.native="openConfirm">关闭</mt-button>
-        <mt-button v-if="loginMeg['Job Title'] === 'install'" slot="right" @click.native="openConfirm">关闭</mt-button>
+        <mt-button  slot="right" @click.native="openConfirm">关闭</mt-button>
       </mt-header>
 
       <div class="mint-content service-detail">
@@ -71,10 +70,10 @@
           </mt-tab-container>
         </div>
       </div>
-      <button-group v-if="loginMeg['Job Title'] === '400'&& BtnStatu === 'status4'">
+      <button-group v-if="role === 'Agent'&& BtnStatu === 'status4'">
         <mt-button type="primary" class="single" @click.native="toContact" >派单</mt-button>
       </button-group>
-      <button-group v-if="loginMeg['Job Title'] === 'install'">
+      <button-group v-if="role === 'Field'">
         <div v-show="BtnStatu === 'status5'" class="callPlan">
           <mt-button  type="primary" class="single flax"  @click.native="changeMy" >接单</mt-button>
           <mt-button type="primary" class="single flax" @click.native="toContact">派单</mt-button>
@@ -104,15 +103,21 @@
           <mt-button v-else-if="Action['Status']==='已预约'" style="background: gainsboro">签到</mt-button>
         </mt-cell>
         <mt-cell title="记录故障">
-          <mt-button v-if="Action['Status']==='已上门'" @click="clickPosition('comEnter')">填写</mt-button>
+          <mt-button v-if="Action['Status']==='已上门'&& ServiceRequest['SR Rootcause']"
+                     @click="clickPosition('comEnter')">已填写</mt-button>
+          <mt-button v-else-if="Action['Status']==='已上门' && !ServiceRequest['SR Rootcause']"
+                     @click="clickPosition('comEnter')">填写</mt-button>
           <mt-button v-else style="background: gainsboro">填写</mt-button>
         </mt-cell>
         <mt-cell title="完工确认">
-          <mt-button v-if="Action['Status']==='已上门'" @click="clickPosition('failureRecord')">填写</mt-button>
+          <mt-button v-if="Action['Status']==='已上门'&& ServiceRequest['SR Rootcause'] && ServiceRequest['Status'] !== '已完成'"
+                     @click="clickPosition('failureRecord')">填写</mt-button>
+          <mt-button v-else-if="ServiceRequest['Status'] === '已完成'"
+                     @click="clickPosition('failureRecord')">再记一单</mt-button>
           <mt-button v-else style="background: gainsboro">填写</mt-button>
         </mt-cell>
         <mt-cell class="completeEnd" title="结束">
-          <mt-button v-if="Action['Status']==='已上门'" @click.native="clickPosition('end')">确认</mt-button>
+          <mt-button v-if="ServiceRequest['Status'] === '已完成'" @click.native="clickPosition('end')">确认</mt-button>
           <mt-button v-else style="background: gainsboro">确认</mt-button>
         </mt-cell>
         <div class="cancelHandle" @click="popupVisible1 = !popupVisible1">取消</div>
@@ -150,7 +155,6 @@
         srNumber: '',
         contactName: '',
         Created: '',
-        role: true,
         showBox: false,
         showBox2: false,
         result: false,
@@ -161,7 +165,7 @@
       };
     },
     computed: {
-      ...mapState('index', ['loginMeg']),
+      ...mapState('index', ['loginMeg', 'role']),
       ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList'])
     },
     methods: {
@@ -179,6 +183,7 @@
             closeMsg: msg
           };
           me.getCloseReason(obj);
+          me.$router.go(-1);
         }
       },
       openConfirm() {               // 点击关闭弹出层
@@ -268,13 +273,13 @@
             'type': 'reach'
           };
         } else if (value1 === 'end') {
-          console.log('完成');
           parms = {
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
             'key': 'getDone',
             'DoneLoc': '我是完成地址'
           };
+          me.popupVisible1 = !me.popupVisible1;
         }
         if ((value1 === 'setOut' && statu === '已预约') || (value1 === 'reach' && statu === '已出发') || (value1 === 'end' && statu === '已上门')) {
           me.setStatus({parms: parms, srNum: me.srNumber});
@@ -458,7 +463,7 @@
             background-color: $theme-color;
             color: #ffffff;
             font-size: 0.75rem;
-            width: 4rem;
+            width: 5rem;
             border-radius: 0.6rem;
           }
         }

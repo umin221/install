@@ -47,11 +47,12 @@
   </div>
 </template>
 <script>
-import {mapState} from 'vuex';
+import {mapState, mapActions, mapMutations} from 'vuex';
 import menuBox from '../../../public/components/cus-menu';
 import numBox from '../components/number-box';
+const NAMESPACE = 'saveFault';
 export default {
-  name: 'saveFault',
+  name: NAMESPACE,
   created() {
     let me = this;
     me.isBn = me.ServiceRequest['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
@@ -71,7 +72,7 @@ export default {
     };
   },
   computed: {
-    ...mapState('searchTrans', ['returnSelect']),
+    ...mapState('searchTrans', ['returnSelect', 'priceId']),
     ...mapState('detail', ['ServiceRequest']),
     Product() {
       let me = this;
@@ -83,12 +84,19 @@ export default {
         } else {
           arr.push(false);
         }
+        if (me.productData[i].num === undefined) {
+          me.productData[i].num = 0;
+        }
       }
       me.switchStatus = arr;
+      this.initSelect();
       return me.productData;
     }
   },
   methods: {
+    ...mapActions(NAMESPACE, ['addServiceOrder']),
+    ...mapMutations('searchTrans', ['initSelect']),
+    ...mapMutations('detail', ['setPartner']),
     productNumber(val, num, type) {
       let me = this;
       me.productData[num].num = val;
@@ -107,7 +115,36 @@ export default {
       }
     },
     submit() {
-      console.log(this.switchStatus);
+      let me = this;
+      let lineItems = [];
+      let obj = {};
+      for (let i = 0;i < me.productData.length; i++) {
+        obj = {
+          'Id': '1',
+          'Product': me.productData[i].Name, // 产品编码
+          'Quantity Requested': me.productData[i].num, // 数量
+          'KL Warranty Flag': me.switchStatus[i] ? 'Y' : 'N'
+        };
+        lineItems.push(obj);
+      }
+      obj = {
+        // 订单行
+        lineItems: lineItems,
+        // 订单头
+        ServiceRequestId: me['ServiceRequest'].Id,   // 服务请求ID
+        priceId: me.priceId,      // 价格列表ID
+        warrantyFlag: me.isBn === '保内' ? 'Y' : 'N',    // 订单头是否保内
+        contactId: me['ServiceRequest']['Contact Id'], // 联系人Id
+        assetId: me['ServiceRequest']['Asset Id'], // 资产Id
+        srNum: me['ServiceRequest']['SR Number'],
+        responsiblity: me['ServiceRequest']['KL Responsiblity'],
+        callBack: function(data) {
+          me.setPartner(data);
+          me.$router.go(-1);
+        }
+      };
+      console.log(me['ServiceRequest']);
+      me.addServiceOrder(obj);
     },
     toTranslated() {
       this.$router.push('searchTrans');
