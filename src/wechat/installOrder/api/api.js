@@ -16,7 +16,7 @@ let apiList = {
 
     } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Manager' || option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Engineer') { // 安装工程师、安装主管
       // boby.ViewMode = 'Manager';
-      // bing = '[Order Entry - Orders.Primary Postion Id]="' + option.data.infoUser['Primary Position Id'] + '" AND ';
+      // bing = '[Order Entry - Orders.Primary Position Id]="' + option.data.infoUser['Primary Position Id'] + '" AND ';
     }
     boby.SearchSpec = bing + '(' + KND.Util.condition2D({Status: option.data.Status.split(',')}, 'Order Entry - Orders', ' OR ', '=') + ')';
     return {
@@ -110,15 +110,15 @@ let apiList = {
   } // 批次详情
 };
 
-let ajax = (api) => {
-  // eslint-disable-next-line
-  KND.Native.ajax(Object.assign({
-    timeout: 30000,
-    method: 'get',
-    headers: {
-      'Authorization': 'Basic WFlKOlhZSg=='
-    }
-  }, api));
+let ajax = api => {
+  if (config.online) {
+    KND.Native.ajax(api);
+  } else {
+    let data = require('./data.json');
+    setTimeout(() => {
+      api.success(data[api.key]);
+    }, 100);
+  }
 };
 
 const get = option => {
