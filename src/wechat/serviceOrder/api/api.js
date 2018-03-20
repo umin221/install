@@ -7,6 +7,7 @@ let ApiList = {
         'body': {
           'OutputIntObjectName': 'Base KL Service Request Interface BO',
           'SearchSpec': '[Service Request.Owner]= "' + option.data.status + '"'
+          // AND [Service Request.SR Type]= "维修"
         }
       }
     };
@@ -191,6 +192,7 @@ let ApiList = {
         'Sub-Area': option.data.form.SR_AREA,
         'Priority': option.data.form.Priority,
         'Description': option.data.form.ProductFlag,
+        'SR Type': option.data.form.SR_TYPE,
         'CEM Planned Start Date': option.data.form.Start_Date,
         'KL SN': option.data.form.KL_SN,
         'KL Product Model': option.data.form.KL_Product_Model,
@@ -201,6 +203,21 @@ let ApiList = {
       }
     };
     // 提交服务请求
+  },
+  upDateService: option => {
+    return {
+      method: 'PUT',
+      url: 'data/Service Request/Service Request/1-2BSB0DZ1',
+      data: {
+        'Id': option.data.form['Id'],
+        'Asset Number': option.data.form['Asset Number'], // 产品ID
+        'SR Rootcause': option.data.form['SR Rootcause'],               // 故障反馈
+        'KL Responsbility': option.data.form['KL Responsibility'],     // 责任划分
+        'Repair Details': option.data.form['Repair Details'], // 解决方法明细
+        'KL Product Model': option.data.form['ProductModel']
+      }
+    };
+    // 更新服务请求
   },
   searchAddress: option => {
     return {
@@ -224,6 +241,7 @@ let ApiList = {
       specName += '[Last Name] ~LIKE "' + name + '*" OR ([KL Parent Service Region Name] ~LIKE "' + name + '*" OR [Service Region] ~LIKE "' + name + '*") AND';
     };
     return {
+      method: 'get',
       url: 'data/KL Employee Interface BO/Employee/?searchspec=' + specName + '(' + specPosi.join(' OR ') + ')&' + KND.Util.param(option.paging)
     };
   },
@@ -242,7 +260,7 @@ let ApiList = {
               'Contact': {
                 'Id': '1',
                 'M/F': '女',
-                'Type': option.data.form.SR_TYPE,
+                'Type': option.data.form.CONTACT_TYPE,
                 'Last Name': option.data.form.Contact_Name,
                 'Work Phone #': option.data.form.Contact_Phone,
                 'ListOfCUT Address': {
@@ -285,13 +303,19 @@ let ApiList = {
     // 下拉二级
   },
   getProduct: option => {
+    let model = '';
+    if (option.data.type) {
+      model = ' AND [Product.KL Translated Description] ~LIKE "*' + option.data.val + '*"';
+    } else {
+      model = 'AND [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*"';
+    }
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/Query',
       data: {
         'body': {
           'OutputIntObjectName': 'Base Catalog Category (Content Management)',
-          'SearchSpec': '[Catalog Category.Catalog Id]="1-UBGBGH" AND [Product.Price List Id]="' + option.data.id + '" AND [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*" AND [Catalog Category.KL Brand Name]="海贝斯"'
+          'SearchSpec': '[Catalog Category.Catalog Id]="1-UBGBGH" AND [Product.Price List Id]="' + option.data.id + '" ' + model + ' AND [Catalog Category.KL Brand Name]="海贝斯"'
         }
       }
     };
@@ -303,6 +327,52 @@ let ApiList = {
       url: 'data/Price List/Price List/?searchspec=KL Default Flag="Y"'
     };
     // 产品价格
+  },
+  addServiceOrder: option => {
+    console.log(option);
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Upsert',
+      data: {
+        'body': {
+          'SiebelMessage': {
+            'MessageId': '',
+            'MessageType': 'Integration Object',
+            'IntObjectName': 'Base Order Entry',
+            'IntObjectFormat': 'Siebel Hierarchical',
+            'ListOfBase Order Entry': {
+              'Order Entry - Orders': {
+                'Id': '1',
+                'Order Type': '服务订单',    // 设为服务订单
+                'KL Warranty Flag': option.data.form.warrantyFlag,     // 服务订单是否保内
+                'Price List Id': option.data.form.priceId,  // 价格列表的Id
+                'Service Request Id': option.data.form.ServiceRequestId, // 服务请求Id
+                'Contact Id': option.data.form.contactId, // 联系人Id
+                'KL Asset Id': option.data.form.assetId, // 资产Id
+                'ListOfOrderEntry-LineItems': {
+                  'Order Entry - Line Items': option.data.form.lineItems
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+  },
+  serviceDone: option => {
+    return {
+      method: 'post',
+      url: 'service/Workflow Process Manager/RunProcess',
+      data: {
+        'body': {
+          'Object Id': option.data['Object Id'], // 服务请求Id
+          'inStatus': 'Complete', // 完成
+          'ProcessName': 'KL SR Status Change Process', // 服务请求状态改变逻辑WF
+          'KL Responsbility': option.data['responsiblity']
+        }
+      }
+    };
+    //  服务请求完成状态
   }
 };
 // 16113009 袁静

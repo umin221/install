@@ -42,15 +42,16 @@ export default new Vuex.Store({
         // loginMeg: {
         //   'Last Name': '代一',
         //   'Emp #': '16013107',
-        //   'Job Title': 'install'
+        //   'Job Title': '产品安装工程师'
         // },
         loginMeg: {
           'Last Name': 'IM01',
           'Emp #': 'IM01',
-          'Job Title': 'install',
+          'Job Title': '产品安装工程师',
           'KL Employee Full Name': 'IM01 IM01',
           'Id': '1-2BSBYRFU'
         },
+        role: '',       // 角色
         // 待处理
         pending: [],
         // 处理中
@@ -62,7 +63,12 @@ export default new Vuex.Store({
       },
       mutations: {
         dataType(state, data) {
-          if (state.loginMeg['Job Title'] === 'install') {
+          if (state.role === 'Agent') {
+            state.cusService = [];
+            for (let i = 0; i < data.length; i++) {
+              state.cusService.push(data[i]);
+            }
+          } else {
             state.pending = [];
             state.valid = [];
             state.invalid = [];
@@ -77,33 +83,39 @@ export default new Vuex.Store({
                 }
               }
             }
-          } else {
-            state.cusService = [];
-            for (let i = 0; i < data.length; i++) {
-              state.cusService.push(data[i]);
-            }
           }
         }
       },
       actions: {
         getList({state, commit, dispatch}, {status, more, callback}) {
-          status = status || state.loginMeg['Emp #'];
-          api.get({
-            key: 'getList',
-            data: {
-              status
-            },
-            paging: {
-              StartRowNum: more ? state[STATUS2LIST[status]].length : 0,
-              PageSize: PAGESIZE
-            },
-            success: function(data) {
-              let partners = KND.Util.toArray(data.SiebelMessage['Service Request']);
-              commit('dataType', partners);
-              if (callback) {
-                callback(data.SiebelMessage['Service Request'].length);
-              }
+          KND.Native.getUserInfo((info) => {
+            state.loginMeg = info;
+            state.role = state.loginMeg['KL Primary Position Type LIC'];
+            if (state.role === 'Agent Manager' || state.role === 'Agent') {
+              state.role = 'Agent';                           // 客服角色
+            } else if (state.role === 'Field Service Engineer' || state.role === 'Field Service Manager') {
+              state.role = 'Field';                           // 安装角色
+            } else {
+              state.role = 'other';
             }
+            status = status || '待处理';
+            api.get({
+              key: 'getList',
+              data: {
+                status: state.loginMeg['Login Name']
+              },
+              paging: {
+                StartRowNum: more ? state[STATUS2LIST[status]].length : 0,
+                PageSize: PAGESIZE
+              },
+              success: function(data) {
+                let partners = KND.Util.toArray(data.SiebelMessage['Service Request']);
+                commit('dataType', partners);
+                if (callback) {
+                  callback(partners.length);
+                }
+              }
+            });
           });
         }
       }
@@ -114,9 +126,10 @@ export default new Vuex.Store({
         mustField: [
           {name: '联系电话', key: 'Contact_Phone'},
           {name: '报修联系人', key: 'Contact_Name'},
-          {name: '联系人类型', key: 'SR_TYPE'},
+          {name: '联系人类型', key: 'CONTACT_TYPE'},
           {name: '省市', key: 'KL_PROVINCE'},
-          {name: '详细地址', key: 'Address'}
+          {name: '详细地址', key: 'Address'},
+          {name: '服务类型', key: 'SR_TYPE'}
         ],
         search: [],
         provinceSlots: [
@@ -125,6 +138,7 @@ export default new Vuex.Store({
           {flex: 1, values: [], className: 'slot3', textAlign: 'center'}
         ],
         typeSlots: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
+        srTypeSlots: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
         areaSlots: [
           {flex: 1, values: [], className: 'slot1', textAlign: 'center'},
           {divider: false, values: [], content: '-', className: 'slot2'},
@@ -159,6 +173,8 @@ export default new Vuex.Store({
               state.typeSlots[0].values.push(val.data[i].Value);
             } else if (val.type === 'SR_AREA') {
               state.areaSlots[0].values.push(val.data[i].Value);
+            } else if (val.type === 'SR_TYPE') {
+              state.srTypeSlots[0].values.push(val.data[i].Value);
             }
           }
         },
@@ -340,7 +356,7 @@ export default new Vuex.Store({
           } else {
             if (form.Status === '待分配') {
               state.BtnStatu = 'status5';
-            } else if (form.Status === '未开始') {
+            } else if (form.Status === '未开始' && form['SR Type'] === '上门维修') {
               state.BtnStatu = 'status4';
             }
           }
@@ -447,31 +463,32 @@ export default new Vuex.Store({
       state: {
         tips: '查询无此资产',
         slots: [
-          {flex: 1, values: [], className: 'slot1', textAlign: 'center'},
-          {divider: false, values: [], content: '-', className: 'slot2'},
-          {flex: 1, values: [], className: 'slot3', textAlign: 'center'}
+          {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
         ],
         slots1: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
-        form: {
-          ProductModel: '', // 产品型号
-          Personal: '',    // 省市
-          Address: ''      // 详细地址
-        }
+        ProductModel: '',  // 产品型号
+        mustForm: [
+          {name: '产品型号', key: 'ProductModel'},
+          {name: '故障现象', key: 'rootcause'},
+          {name: '责任划分', key: 'Responsbility'},
+          {name: '解决方法', key: 'repairDetails'}
+        ]
       },
       mutations: {
+        successCall(state, data) {
+          console.log(data);
+          data.type = data.type || '';
+          state.ProductModel = data.item['KL Product Model' + data.type];
+          console.log(state);
+        },
         errorTips(state) {
           Toast(state.tips);
-        },
-        successCall(state, data) {
-          state.ProductModel = data['KL Product Model']; // 产品型号
-          state.Personal = data['KL Personal Province'] + data['Personal City'];   // 省市
-          state.Address = data['Personal Address'];    // 详细地址
         },
         addValue1(state, val) {
           state.slots[0].values = [];
           state.slots1[0].values = [];
           for (let i = 0; i < val.data.length; i++) {
-            if (val.type === 'SR_AREA') {
+            if (val.type === 'SR_ROOTCAUSE') {
               state.slots[0].values.push(val.data[i].Value);
             } else {
               state.slots1[0].values.push(val.data[i].Value);
@@ -494,15 +511,15 @@ export default new Vuex.Store({
         }
       },
       actions: {
-        getAsset({commit}, num) {
+        getAsset({commit}, {num, callback}) {
           api.get({
             key: 'getAsset',
             data: {
               num
             },
             success: function(data) {
-              console.log(data);
-              commit('successCall', data);
+              commit('successCall', {item: data});
+              callback(data);
             },
             error: function(data) {
               console.log(data);
@@ -530,10 +547,35 @@ export default new Vuex.Store({
             },
             success: function(data) {
               console.log(data);
-              commit('changeValue1', data.items);
+              // commit('changeValue1', data.items);
             },
             error: function(data) {
-              commit('changeValue1', 'error');
+              // commit('changeValue1', 'error');
+            }
+          });
+        },
+        upDateService({commit}, form) {
+          api.get({
+            key: 'upDateService',
+            data: {
+              form
+            },
+            success: function(data) {
+              if (data) {
+                api.get({
+                  key: 'getDetail',
+                  data: {
+                    srNumber: form.srNum
+                  },
+                  success: function(data) {
+                    form.callBack(data.SiebelMessage['Service Request']);
+                  }
+                });
+              }
+              console.log(data);
+            },
+            error: function(data) {
+              console.log('error');
             }
           });
         }
@@ -544,7 +586,8 @@ export default new Vuex.Store({
       state: {
         result: [],
         selected: [],
-        returnSelect: []
+        returnSelect: [],
+        priceId: ''
       },
       mutations: {
         count(state, val) {
@@ -580,19 +623,24 @@ export default new Vuex.Store({
           for (let i = 0; i < state.result.length;i++) {
             state.selected.push(false);
           }
+        },
+        initSelect(state) {
+          state.returnSelect = [];
         }
       },
       actions: {
-        getProduct({commit}, val) {
+        getProduct({state, commit}, val) {
           api.get({
             key: 'getPrice',
             success: function(data) {
+              state.priceId = data.Id;
               if (data.Id) {
                 api.get({
                   key: 'getProduct',
                   data: {
-                    val: val,
-                    id: data.Id
+                    val: val.value,
+                    id: data.Id,
+                    type: val.type
                   },
                   success: function(data) {
                     commit('setProduct', data.SiebelMessage['Catalog Category']);
@@ -699,6 +747,47 @@ export default new Vuex.Store({
               commit('dataType', partners);
               if (status.data.callback) {
                 status.data.callback(data.SiebelMessage['Service Request'].length);
+              }
+            }
+          });
+        }
+      }
+    },
+    saveFault: {                     // 完成工单
+      namespaced: true,
+      state: {
+      },
+      mutations: {
+      },
+      actions: {
+        addServiceOrder({state, commit}, form) {
+          api.get({
+            key: 'addServiceOrder',
+            data: {
+              form
+            },
+            success: function(data) {
+              if (data) {
+                api.get({
+                  key: 'serviceDone',
+                  data: {
+                    'Object Id': form.ServiceRequestId,
+                    'responsiblity': form.responsiblity
+                  },
+                  success: function(data) {
+                    if (data) {
+                      api.get({
+                        key: 'getDetail',
+                        data: {
+                          srNumber: form.srNum
+                        },
+                        success: function(data) {
+                          form.callBack(data.SiebelMessage['Service Request']);
+                        }
+                      });
+                    }
+                  }
+                });
               }
             }
           });
