@@ -139,10 +139,20 @@
             item['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
             item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
             item['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
-            item['KL Detail Type LIC'] === 'Transfer Summary'"  @click.nataive.stop="sporadic(item)"  v-for="(itemTask, index) in upList(item['KL Installation Task'])" :key="index">
-                <div>{{itemTask.Id}}</div>
-                <div>已开孔/开孔批次</div>
-                <div>时间</div>
+            item['KL Detail Type LIC'] === 'Transfer Summary'" v-for="(itemTask, index) in upList(item['KL Installation Task'])" :key="index" @click.nataive.stop="sporadic(itemTask)">
+              <div class="readonly">
+                <mt-field label="批次" :value="itemTask.Id"></mt-field>
+                <mt-field label="已完成/计划数量"  v-if="item['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
+          item['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
+          item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
+          item['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
+          item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
+          item['KL Detail Type LIC'] === 'Transfer Summary'" :value="item['KL Completed Install Amount']+'/'+item['KL Install Amount Requested']"></mt-field>
+                <mt-field label="合格/计划数量" v-if="item['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
+            item['KL Detail Type LIC'] === 'Check Before Trans Summary'" :value="item['KL Qualified Amount']+'/'+item['KL Spot Check Amount']"></mt-field>
+                <mt-field label="时间" :value="new Date(itemTask['Planned Completion']).format('yyyy-MM-dd')"></mt-field>
+                <mt-field label="状态" :value="itemTask.Status"></mt-field>
+               </div>
             </div>
           </ul>
         </div>
@@ -262,6 +272,7 @@
       border-radius: 5px;
       padding: 10px;
       font-size: 0.5rem;
+      margin-bottom: 10px;
     }
     /*横线滚动*/
     .stage_li {
@@ -530,7 +541,8 @@
         this.$router.push({
           name: 'xttd',
           query: {
-            id: me.id
+            id: me.id,
+            userInfo: userInfo
           }
         });
       },

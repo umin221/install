@@ -142,8 +142,10 @@
           success: data => {
             console.dir(data);
             self.batchCode = data.Id; // 批次
-            self.start_Date = data.Planned; // 开始时间
-            self.end_Date = data['Planned Completion']; // 结束时间
+            self.start_Date = new Date(data.Planned).format('yyyy-MM-dd'); // 开始时间
+            self.end_Date = new Date(data['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
+            self.startDate = self.start_Date.format('MM/dd/yyyy'); // 后台存值格式
+            self.endDate = self.end_Date.format('MM/dd/yyyy');
             self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
           }
         });
@@ -171,7 +173,7 @@
             };
             if (self.type === 'add') {
               parma.Status = '设定计划';
-              parma['KL Detail Type'] = self.item['KL Installation Task']['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
+              parma['KL Detail Type'] = self.item['KL Installation Task'][0]['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
               parma['Template Id'] = self.item['KL Installation Task']['Template Id'];
             } else {
               parma['KL Detail Type'] = self.item['KL Detail Type'];

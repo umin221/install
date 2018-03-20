@@ -13,10 +13,14 @@ let apiList = {
     var bing = ''; // 安装工程师跟安装主管需要参数Primary Postion Id
     if (option.data.infoUser['KL Primary Position Type LIC'] === 'Door Factory Engineer') { // 门厂技术安装员
       boby.ViewMode = 'Sales Rep';
-
-    } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Manager' || option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Engineer') { // 安装工程师、安装主管
-      // boby.ViewMode = 'Manager';
-      // bing = '[Order Entry - Orders.Primary Position Id]="' + option.data.infoUser['Primary Position Id'] + '" AND ';
+    } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Manager' && !option.data.isTeam) { // 安装主管(我的安装订单)
+      bing = '[Order Entry - Orders.Primary Position Id]="' + option.data.infoUser['Primary Position Id'] + '" AND ';
+    } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Engineer') { // 安装工程师(我的安装订单)
+      bing = '[Order Entry - Orders.Primary Position Id]="' + option.data.infoUser['Primary Position Id'] + '" AND ';
+    } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Manager' && option.data.isTeam) { // option.data.isTeam 等于true 是我的团队 安装主管我的团队
+      boby.ViewMode = 'Manager';
+    } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Door Factory Manager') { // 门厂技术主管
+      boby.ViewMode = 'Manager';
     }
     boby.SearchSpec = bing + '(' + KND.Util.condition2D({Status: option.data.Status.split(',')}, 'Order Entry - Orders', ' OR ', '=') + ')';
     return {

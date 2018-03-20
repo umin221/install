@@ -1,7 +1,7 @@
 <!--委外团队列表-->
 <template>
   <div>
-    <cus-header fixed title="我的安装订单" :menu="[{title:'查看我的团队', key:'a'}]">
+    <cus-header fixed :title="isManager ? '我的安装订单' : '团队的安装订单'" :menu="isShowT ?[{title:'查看我的团队', key:'a'}]: undefined">
       <fallback slot="left"></fallback>
       <mt-button @click.native="toSearchFn" slot="right">
         <i class="xs-icon icon-search"></i>
@@ -133,6 +133,16 @@
           self.selected = 'process';
 
         }
+        if (self.userInfo['KL Primary Position Type LIC'] === 'Door Factory Manager') { // 是否门厂技术主管
+          self.isManager = false;
+        } else {
+          self.isManager = true;
+        }
+        if (self.userInfo['KL Primary Position Type LIC'] === 'Field Service Manager') { // 安装主管
+          self.isShowT = true;
+        } else {
+          self.isShowT = false;
+        }
       });
       this.loadBottomFn({
         status: self.tabStatus,
@@ -145,20 +155,28 @@
         tabStatus: '',
         // 活跃tab
         selected: 'pending',
+        isManager: true, // 是否门厂技术主管 true 不是
+        isShowT: false, // 是否显示我的团队 true 不显示
         userInfo: '',
         // 下拉状态
         topStatus: ''
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['pending', 'process', 'completed'])
+      ...mapState(NAMESPACE, ['pending', 'process', 'completed', 'isTeam'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['getList']),
-      ...mapMutations(NAMESPACE, ['setInfoUser']),
+      ...mapMutations(NAMESPACE, ['setInfoUser', 'setTeam']),
+      // 标题栏菜单选择回调方法
       // 标题栏菜单选择回调方法
       menuFn(item) {
-        console.log(item);
+        var self = this;
+        self.setTeam();
+        self.loadBottomFn({
+          status: self.tabStatus,
+          list: self.tabVal
+        });
       },
       // 已完成顶部加载
       loadTopFn(param) {

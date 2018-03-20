@@ -103,8 +103,22 @@
        * 查看&编辑标题一致
        */
       title() {
-        let type = this.type;
-        return type === 'add' ? (this.state === 'invalid' ? '补充委外合约' : '开孔锁签收') : '开孔锁签收详情';
+        let item = this.item;
+        var val = '';
+        if (item['KL Detail Type LIC'] === 'Trompil Lock Sign') {
+          val = '开孔锁签收';
+        } else if (item['KL Detail Type LIC'] === 'Working Drawing Sign') {
+          val = '开孔图纸签收';
+        } else if (item['KL Detail Type LIC'] === 'Lock Body Sign') {
+          val = '锁体安装签收';
+        } else if (item['KL Detail Type LIC'] === 'Substitution Lock Sign') {
+          val = '替代锁到货确认';
+        } else if (item['KL Detail Type LIC'] === 'Lock Sign') {
+          val = '真锁到货';
+        } else if (item['KL Detail Type LIC'] === 'Substitution Lock Trans Return') {
+          val = '替代锁回收';
+        }
+        return val;
       }
     },
     methods: {
@@ -112,12 +126,23 @@
       ...mapActions(NameSpace, ['getSign', 'getUPData']),
       submit() {
         var self = this;
+        var item = self.item;
+        var processName = ''; // KL Record Install Process Flg == N 请求关闭接口 Y 提交接口
+        if (item['KL Record Install Process Flg'] === 'N') {
+          if (self.box1) { // 涉及签收
+            processName = 'KL Install Task Complete Action Workflow'; // 涉及签收接口
+          } else { // 不涉及签收 则是忽略
+            processName = 'KL Install Task Ignore Action Workflow'; // 忽略接口
+          }
+        } else {
+          processName = 'KL Install Task Submit For Approval Workflow'; // 一般正常提交接口
+        }
         api.get({ // 更改按钮状态
           key: 'getUPStatus',
           method: 'POST',
           data: {
             'body': {
-              'ProcessName': 'KL Install Task Submit For Approval Workflow',
+              'ProcessName': processName,
               'RowId': self.id
             }
           },
