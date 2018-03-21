@@ -19,21 +19,13 @@
   </div>
 </template>
 
-<script type="application/javascript">
+<script type="es6">
 //  import api from '../api/api';
   import {mapState, mapActions} from 'vuex';
 
   const NameSpace = 'index';
   export default {
     name: NameSpace,
-//    created() {
-//      api.get({
-//        key: 'getList',
-//        callback: function(data) {
-//          console.log(data);
-//        }
-//      });
-//    },
     data: () => {
       return {
         active: 'tab-container1'

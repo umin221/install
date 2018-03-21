@@ -80,7 +80,7 @@
       span.xs-icon {
 
         &:before {
-          content: '\A170';
+          content: '\A176';
           font-size: 1.4rem;
           color: #4e9cf2;
         }

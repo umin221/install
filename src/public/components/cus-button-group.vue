@@ -17,17 +17,18 @@
     width: 100%;
     box-sizing: border-box;
     background-color: #fbfbfb;
-    padding: 0 .8rem;
+    /*padding: 0 .8rem;*/
 
     a, button {
-      max-width: 7rem;
+      /*max-width: 7rem;*/
       flex: 1;
-      margin: .3rem .8rem;
+      border-radius: 0;
+      /*margin: .3rem .8rem;*/
 
       &.mint-button {
-        height: 1.8rem;
+        height: 2rem;
         font-size: $font-size-default;
-        padding: 0 6px;
+        /*padding: 0 6px;*/
       }
     }
   }

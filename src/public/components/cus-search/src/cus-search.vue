@@ -2,7 +2,7 @@
   <div class="cus-search">
     <fallback slot="left"></fallback>
 
-    <mt-search :value="currentValue"
+    <search :value="currentValue"
                :result.sync="result"
                :placeholder="placeholder"
                :autofocus="true"
@@ -19,15 +19,16 @@
       </slot>
 
       </mt-cell>
-    </mt-search>
+    </search>
   </div>
 </template>
 
 <script type="es6">
-  import 'public/js/lib/lodash.min.js';
+  import search from './search.vue';
 
   export default {
     name: 'cus-search',
+    components: {search},
     props: {
       result: Array,
       placeholder: String,
@@ -58,15 +59,6 @@
           this.$parent.searchFn(val);
         }
       }
-      // handleInput: _.debounce(
-      //  function (val) {
-      //    this.currentValue = val;
-      //    if (val.length) {
-      //      this.$parent.searchFn(val);
-      //    }
-      //  },
-      //  1000
-      // )
     }
   };
 </script>

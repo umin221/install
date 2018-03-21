@@ -27,9 +27,6 @@
         call: false
       };
     },
-    created() {
-      this.getAuthority();
-    },
     methods: {
       ...mapActions('app', ['getAuthority']),
       getLocation() {
