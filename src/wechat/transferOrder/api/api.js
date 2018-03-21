@@ -93,7 +93,7 @@ let apiList = {
   queryOrderLines: option => {
     return {
       method: 'get',
-      url: 'data/Order Entry - Line Items/Order Entry - Line Items/?searchspec=' + KND.Util.condition(option.data),
+      url: 'data/Order Entry - Line Items/Order Entry - Line Items/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=100&StartRowNum=0',
       error: data => {
         console.log(data);
       }

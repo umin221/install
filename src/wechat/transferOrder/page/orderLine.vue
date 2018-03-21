@@ -6,7 +6,7 @@
       </mt-header>
 
       <!--detail-->
-      <div class="mint-content" :data-date="date" :class="{disable: disable || isTeam}">
+      <div class="mint-content line" :data-date="date" :class="{disable: !editable}">
         <cus-field label="产品名称"
                    @click.native="showLovFn('agreementItem')"
                    :value="productName || line['KL Product Model No']"
@@ -98,8 +98,8 @@
       };
       // 是否面板
       me.isPanel = param.isPanel;
-      me.disable = param.disable;
-      if (me.disable) return;
+      me.editable = param.editable;
+      if (!me.editable) return;
 
       // 合同行
       let agreementItems = me.form['MACD FS Agreement Item'];
@@ -151,12 +151,11 @@
         lovType: '',
         pickerValue: today,
         line: {},
-        disable: true,
+        editable: false,
         isPanel: false // 是否面板
       };
     },
     computed: {
-      ...mapState('index', ['isTeam']),
       ...mapState('detail', ['form']),
       // 日期
       date: {
@@ -221,7 +220,9 @@
 </script>
 
 <style lang="scss">
-  .mint-cell-title {
-    color: $gray-minor;
+  .line {
+    .mint-cell-title {
+      color: $gray-minor;
+    }
   }
 </style>
