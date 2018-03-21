@@ -115,7 +115,8 @@
       };
     },
     computed: {
-      ...mapState(NameSpace, ['search', 'provinceSlots', 'typeSlots', 'areaSlots', 'srTypeSlots', 'form', 'mustField'])
+      ...mapState(NameSpace, ['search', 'provinceSlots', 'typeSlots', 'areaSlots', 'srTypeSlots', 'form', 'mustField']),
+      ...mapState('index', ['loginMeg'])
     },
     methods: {
       ...mapActions(NameSpace, ['getSearch', 'getValue', 'valueChange', 'getSn', 'submitService']),
@@ -146,7 +147,7 @@
           }
         }
         let key = (!me.isEdit.id && me.isClick) ? 'upDateContact' : 'submitService';
-        console.log(key);
+        console.log(me.loginMeg);
         let submitForm = {
           Contact_Id: me.Contact_Id,
           AddressId: me.AddressId,
@@ -166,7 +167,8 @@
           KL_Product_Model: me.form.KL_Product_Model,
           KL_Cutoff_Date: me.form.KL_Cutoff_Date,
           Product_Warranty_Flag: me.form.Product_Warranty_Flag,
-          key: key
+          key: key,
+          Owner: me.loginMeg['Login Name']
         };
         me.submitService(submitForm);
         me.$router.go(-1);

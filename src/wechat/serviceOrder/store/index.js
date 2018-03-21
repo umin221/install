@@ -10,13 +10,14 @@ Vue.use(Vuex);
 app.state.alive = ['index', 'close'];
 
 //
-const STATUS2LIST = {
-  '待处理': 'pending',
-  '处理中': 'valid',
-  '已处理': 'invalid'
-};
+// const STATUS2LIST = {
+//   '待处理': 'pending',
+//   '处理中': 'valid',
+//   '已处理': 'invalid'
+// };
 // 每页加载条数
 const PAGESIZE = config.pageSize;
+let mapps;
 
 // tipBox
 const tipBox = (function() {
@@ -34,16 +35,6 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
-        // loginMeg: {
-        //   'Last Name': '袁静',
-        //   'Emp #': '16113009',
-        //   'Job Title': '400'
-        // },
-        // loginMeg: {
-        //   'Last Name': '代一',
-        //   'Emp #': '16013107',
-        //   'Job Title': '产品安装工程师'
-        // },
         loginMeg: {
           'Last Name': 'IM01',
           'Emp #': 'IM01',
@@ -55,69 +46,123 @@ export default new Vuex.Store({
         // 待处理
         pending: [],
         // 处理中
-        valid: [],
+        process: [],
         // 已处理
-        invalid: [],
+        completed: [],
         // 客服
         cusService: []
       },
       mutations: {
-        dataType(state, data) {
-          if (state.role === 'Agent') {
-            state.cusService = [];
-            for (let i = 0; i < data.length; i++) {
-              state.cusService.push(data[i]);
-            }
-          } else {
-            state.pending = [];
-            state.valid = [];
-            state.invalid = [];
-            for (let i = 0; i < data.length; i++) {
-              if (data[i].Status !== '未开始') {
-                if (data[i].Status === '待分配' || data[i].Status === '已派工') {
-                  state.pending.push(data[i]);
-                } else if (data[i].Status === '维修中') {
-                  state.valid.push(data[i]);
-                } else if (data[i].Status === '已完成' || data[i].Status === '关闭' || data[i].Status === '已取消') {
-                  state.invalid.push(data[i]);
-                }
-              }
-            }
-          }
+        setManager(state, isManager) {
+          mapps = config.mapp[isManager];
+          state.role = isManager;
+        },
+        setOrders(state, {serviceOrders, list}) {
+          state[list] = serviceOrders;
+        },
+        addOrders(state, {serviceOrders, list}) {
+          state[list].push(...serviceOrders);
+        },
+        setLoginMeg(state, info) {
+          state['loginMeg'] = info;
         }
+        // dataType(state, data) {
+        //   if (state.role === 'Agent') {
+        //     state.cusService = [];
+        //     for (let i = 0; i < data.length; i++) {
+        //       state.cusService.push(data[i]);
+        //     }
+        //   } else {
+        //     state.pending = [];
+        //     state.valid = [];
+        //     state.invalid = [];
+        //     for (let i = 0; i < data.length; i++) {
+        //       if (data[i].Status !== '未开始') {
+        //         if (data[i].Status === '待分配' || data[i].Status === '已派工') {
+        //           state.pending.push(data[i]);
+        //         } else if (data[i].Status === '维修中') {
+        //           state.valid.push(data[i]);
+        //         } else if (data[i].Status === '已完成' || data[i].Status === '关闭' || data[i].Status === '已取消') {
+        //           state.invalid.push(data[i]);
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
       },
       actions: {
-        getList({state, commit, dispatch}, {status, more, callback}) {
-          KND.Native.getUserInfo((info) => {
-            state.loginMeg = info;
-            state.role = state.loginMeg['KL Primary Position Type LIC'];
-            if (state.role === 'Agent Manager' || state.role === 'Agent') {
-              state.role = 'Agent';                           // 客服角色
-            } else if (state.role === 'Field Service Engineer' || state.role === 'Field Service Manager') {
-              state.role = 'Field';                           // 安装角色
-            } else {
-              state.role = 'other';
-            }
-            status = status || '待处理';
-            api.get({
-              key: 'getList',
-              data: {
-                status: state.loginMeg['Login Name']
-              },
-              paging: {
-                StartRowNum: more ? state[STATUS2LIST[status]].length : 0,
-                PageSize: PAGESIZE
-              },
-              success: function(data) {
-                let partners = KND.Util.toArray(data.SiebelMessage['Service Request']);
-                commit('dataType', partners);
+        /**
+         * 获取交接
+         * @param {Object} data 必填 接口请求参数
+         * @param {Boolean} more 选填 是否加载更多
+         * @param {Function} callback 选填 处理回调
+         * @param {Function} error 选填 错误回调
+         */
+        getList({state, commit, dispatch}, {data, more, callback, error}) {
+          let status = data['Status'];
+          let mapp = mapps[status] || {};
+          // 搜索时，没有状态
+          let list = mapp['list'] || 'result';
+          data['Status'] = mapp['status'];
+          api.get({
+            key: 'getList',
+            data: data,
+            paging: {
+              StartRowNum: more ? state[list].length : 0,
+              PageSize: PAGESIZE
+            },
+            success: data => {
+              console.log(data);
+              let serviceOrders = KND.Util.toArray(data.SiebelMessage['Service Request']);
+              if (serviceOrders) {
+                commit(more ? 'addOrders' : 'setOrders', {
+                  serviceOrders: serviceOrders,
+                  list: list
+                });
                 if (callback) {
-                  callback(partners.length);
+                  callback(serviceOrders);
                 }
               }
-            });
+            },
+            error
+          });
+        },
+        getLoginMeg({commit}) {
+          KND.Native.getUserInfo((info) => {
+            commit('setLoginMeg', info);
           });
         }
+      //   getList({state, commit, dispatch}, {status, more, callback}) {
+      //     KND.Native.getUserInfo((info) => {
+      //       state.loginMeg = info;
+      //       state.role = state.loginMeg['KL Primary Position Type LIC'];
+      //       if (state.role === 'Agent Manager' || state.role === 'Agent') {
+      //         state.role = 'Agent';                           // 客服角色
+      //       } else if (state.role === 'Field Service Engineer' || state.role === 'Field Service Manager') {
+      //         state.role = 'Field';                           // 安装角色
+      //       } else {
+      //         state.role = 'other';
+      //       }
+      //       status = status || '待处理';
+      //       api.get({
+      //         key: 'getList',
+      //         data: {
+      //           status: state.loginMeg['Login Name']
+      //         },
+      //         paging: {
+      //           StartRowNum: more ? state[STATUS2LIST[status]].length : 0,
+      //           PageSize: PAGESIZE
+      //         },
+      //         success: function(data) {
+      //           let partners = KND.Util.toArray(data.SiebelMessage['Service Request']);
+      //           commit('dataType', partners);
+      //           if (callback) {
+      //             callback(partners.length);
+      //           }
+      //         }
+      //       });
+      //     });
+      //   }
       }
     },
     addService: {
@@ -737,10 +782,6 @@ export default new Vuex.Store({
             data: {
               status: status.data['SR Number'],
               Owner: status.data['Owner']
-            },
-            paging: {
-              StartRowNum: status.data.more ? state[STATUS2LIST[status]].length : 0,
-              PageSize: PAGESIZE
             },
             success: function(data) {
               let partners = KND.Util.toArray(data.SiebelMessage['Service Request']);

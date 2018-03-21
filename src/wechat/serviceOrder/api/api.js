@@ -1,13 +1,29 @@
 let ApiList = {
   getList: option => {
+    let condition = Object.assign({}, option.data);
+    let status = condition.Status;
+    let parmer = '';
+    if (status) {
+      condition['Status'] = status.split(',');
+      for (let i = 0; i < condition['Status'].length; i++) {
+        if (!parmer) {
+          parmer = '[Service Request.Status] = LookupValue("SR_STATUS",' + '"' + condition['Status'][i] + '"' + ')';
+        } else {
+          parmer = parmer + 'OR [Service Request.Status] = LookupValue("SR_STATUS",' + '"' + condition['Status'][i] + '"' + ')';
+        }
+      }
+    }
+    // let operator = option.data.Status ? ' = ' : ' ~LIKE ';
     return {
       method: 'post',
-      url: 'service/EAI Siebel Adapter/Query',
+      url: 'service/EAI Siebel Adapter/QueryPage?ViewMode=Personal',
       data: {
         'body': {
           'OutputIntObjectName': 'Base KL Service Request Interface BO',
-          'SearchSpec': '[Service Request.Owner]= "' + option.data.status + '"'
-          // AND [Service Request.SR Type]= "维修"
+          // 'SearchSpec': KND.Util.condition2D(condition, 'Service Request', ' OR ', operator),
+          'SearchSpec': parmer,
+          'StartRowNum': option.paging.StartRowNum,
+          'PageSize': option.paging.PageSize
         }
       }
     };
@@ -199,7 +215,7 @@ let ApiList = {
         'KL Cutoff Date': option.data.form.KL_Cutoff_Date,
         'Product Warranty Flag': option.data.form.Product_Warranty_Flag,
         'Id': '1',
-        'Owner': '16113009'
+        'Owner': option.data.form.Owner
       }
     };
     // 提交服务请求
@@ -207,7 +223,7 @@ let ApiList = {
   upDateService: option => {
     return {
       method: 'PUT',
-      url: 'data/Service Request/Service Request/1-2BSB0DZ1',
+      url: 'data/KL Service Request Interface BO/Service Request/1-2BSB0DZ1',
       data: {
         'Id': option.data.form['Id'],
         'Asset Number': option.data.form['Asset Number'], // 产品ID
@@ -329,7 +345,6 @@ let ApiList = {
     // 产品价格
   },
   addServiceOrder: option => {
-    console.log(option);
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/Upsert',

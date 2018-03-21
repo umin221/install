@@ -2,156 +2,230 @@
   <div style="background-color: #ebebeb;">
     <mt-header fixed title="维修工单列表">
       <fallback slot="left"></fallback>
-      <router-link v-if="role === 'Agent'" to="addService" slot="right">
+      <router-link v-if="role === 'custom'" to="addService" slot="right">
         <mt-button>
           <i class="xs-icon icon-add"></i>
         </mt-button>
       </router-link>
-      <router-link v-else-if ="role === 'Field'" to="search" slot="right">
+      <router-link v-else-if ="role === 'install'" to="search" slot="right">
         <mt-button >
           <i class="xs-icon icon-search"></i>
         </mt-button>
       </router-link>
     </mt-header>
 
-    <div v-if="role === 'Field'" class="mint-content indexService">
+    <div v-if="role === 'install'" class="mint-content indexService">
       <mt-navbar v-model="selected">
-        <mt-tab-item id="pending">待处理</mt-tab-item>
-        <mt-tab-item id="valid">处理中</mt-tab-item>
-        <mt-tab-item id="invalid">已完成</mt-tab-item>
+        <mt-tab-item id="pending"
+                     @click.native="!pending.length && loadBottomFn({status:'待处理', list:'pending'})">待处理</mt-tab-item>
+        <mt-tab-item id="process"
+                     @click.native="!process.length && loadBottomFn({status:'处理中', list:'process'})">处理中</mt-tab-item>
+        <mt-tab-item id="completed"
+                     @click.native="!completed.length && loadBottomFn({status:'已完成', list:'completed'})">已完成</mt-tab-item>
       </mt-navbar>
       <mt-tab-container v-model="selected">
         <mt-tab-container-item id="pending">
-          <loadmore ref="pending" @loadTop="loadTop()" @loadBottom="loadBottom()" :topStatus="topStatus" :allLoaded="true">
+          <empty v-show="!pending.length"></empty>
+          <loadmore ref="pending"
+                    @loadTop="loadTopFn"
+                    @loadBottom="loadBottomFn"
+                    :param="{status:'待处理', list:'pending'}"
+                    :topStatus="topStatus" :allLoaded="true">
             <div class="list-content" v-for="(item,index) in pending" @click="toDetail(item['SR Number'])" :key="index">
-              <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}<mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge></div>
+              <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}
+                <mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge>
+              </div>
               <mt-cell class="multiple" is-link>
-                <div class="my-cell-sub" slot="title">申请时间: {{item.Created}}</div>
-                <div class="my-cell-sub" slot="title">优先级: {{item.Priority}}</div>
-                <div class="my-cell-sub" slot="title">地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}</div>
+                <div class="my-cell-sub" slot="title">
+                  申请时间: {{item.Created}}
+                </div>
+                <div class="my-cell-sub" slot="title">
+                  优先级: {{item.Priority}}
+                </div>
+                <div class="my-cell-sub" slot="title">
+                  地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}
+                </div>
               </mt-cell>
             </div>
           </loadmore>
-          <no-data v-if="!pending.length"></no-data>
         </mt-tab-container-item>
-        <mt-tab-container-item id="valid">
-          <loadmore ref="valid" @loadTop="loadTop('valid')" @loadBottom="loadBottom('valid')" :topStatus="topStatus" :allLoaded="true">
-            <div class="list-content" v-for="(item,index) in valid" @click="toDetail(item['SR Number'])" :key="index">
-              <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}<mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge></div>
+        <mt-tab-container-item id="process">
+          <empty v-show="!process.length"></empty>
+          <loadmore ref="process"
+                    @loadTop="loadTopFn"
+                    @loadBottom="loadBottomFn"
+                    :param="{status:'处理中', list:'process'}"
+                    :topStatus="topStatus"
+                    :allLoaded="true">
+            <div class="list-content" v-for="(item,index) in process" @click="toDetail(item['SR Number'])" :key="index">
+              <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}
+                <mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge>
+              </div>
               <mt-cell class="multiple" is-link>
-                <div class="my-cell-sub" slot="title">申请时间: {{item.Created}}</div>
-                <div class="my-cell-sub" slot="title">优先级: {{item.Priority}}</div>
-                <div class="my-cell-sub" slot="title">地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}</div>
+                <div class="my-cell-sub" slot="title">
+                  申请时间: {{item.Created}}
+                </div>
+                <div class="my-cell-sub" slot="title">
+                  优先级: {{item.Priority}}
+                </div>
+                <div class="my-cell-sub" slot="title">
+                  地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}
+                </div>
               </mt-cell>
             </div>
           </loadmore>
-          <no-data v-if="!valid.length"></no-data>
         </mt-tab-container-item>
 
-        <mt-tab-container-item id="invalid">
-          <loadmore ref="invalid" @loadTop="loadTop('invalid')" @loadBottom="loadBottom('invalid')" :topStatus="topStatus" :allLoaded="true">
-            <div class="list-content" v-for="(item,index) in invalid" @click="toDetail(item['SR Number'])" :key="index">
-              <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}<mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge></div>
+        <mt-tab-container-item id="completed">
+          <empty v-show="!completed.length"></empty>
+          <loadmore ref="completed"
+                    @loadTop="loadTopFn"
+                    @loadBottom="loadBottomFn"
+                    :param="{status:'已完成', list:'completed'}"
+                    :topStatus="topStatus"
+                    :allLoaded="true">
+            <div class="list-content" v-for="(item,index) in completed" @click="toDetail(item['SR Number'])" :key="index">
+              <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}
+                <mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge>
+              </div>
               <mt-cell class="multiple" is-link>
-                <div class="my-cell-sub" slot="title">申请时间: {{item.Created}}</div>
-                <div class="my-cell-sub" slot="title">优先级: {{item.Priority}}</div>
-                <div class="my-cell-sub" slot="title">地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}</div>
+                <div class="my-cell-sub" slot="title">
+                  申请时间: {{item.Created}}
+                </div>
+                <div class="my-cell-sub" slot="title">
+                  优先级: {{item.Priority}}
+                </div>
+                <div class="my-cell-sub" slot="title">
+                  地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}
+                </div>
               </mt-cell>
             </div>
           </loadmore>
-          <no-data v-if="!invalid.length"></no-data>
         </mt-tab-container-item>
       </mt-tab-container>
     </div>
-    <div v-else-if="role === 'Agent'" class="mint-content customService" >
-      <loadmore @loadTop="loadTop" @loadBottom="loadBottom" ref="pending">
-        <div class="list-content" v-for="(item,index) in cusService" @click="toDetail(item['SR Number'],item['Contact Id'])" :key="index">
-          <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}<mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge></div>
+    <div v-else-if="role === 'custom'" class="mint-content customService" >
+      <empty v-show="!cusService.length"></empty>
+      <loadmore @loadTop="loadTopFn"
+                @loadBottom="loadBottomFn"
+                :param="{status:'all', list:'cusService'}"
+                ref="cusService">
+        <div class="list-content"
+             v-for="(item,index) in cusService"
+             @click="toDetail(item['SR Number'],item['Contact Id'])"
+             :key="index">
+          <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}
+            <mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge>
+          </div>
           <mt-cell class="multiple" is-link>
-            <div class="my-cell-sub" slot="title">申请时间: {{item.Created}}</div>
-            <div class="my-cell-sub" slot="title">优先级: {{item.Priority}}</div>
-            <div class="my-cell-sub" slot="title">地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}</div>
+            <div class="my-cell-sub" slot="title">
+              申请时间: {{item.Created}}
+            </div>
+            <div class="my-cell-sub" slot="title">
+              优先级: {{item.Priority}}
+            </div>
+            <div class="my-cell-sub" slot="title">
+              地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}
+            </div>
           </mt-cell>
         </div>
       </loadmore>
-      <no-data v-if="!cusService.length"></no-data>
     </div>
   </div>
 </template>
 <script type="application/javascript">
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import loadmore from 'public/components/cus-loadmore';
   import cusCell from 'public/components/cus-cell';
   import cusHeader from 'public/components/cus-header';
-  import noData from 'public/components/cus-empty';
   //
   const NameSpace = 'index';
-  const COUNT = config.pageSize;
   //
+//  let loader = function(...args) {
+//    let me = this;
+//    let event = args.pop();
+//    let list = args.pop();
+//    let param = args.pop();
+//    me.getList(Object.assign({
+//      callback: (data) => {
+//        console.log(data);
+//        me.$refs[list][event](data < COUNT);
+//      }
+//    }, param));
+//  };
   let loader = function(...args) {
     let me = this;
     let event = args.pop();
     let list = args.pop();
-    let param = args.pop();
-    me.getList(Object.assign({
+    let param = Object.extend(true, {
       callback: (data) => {
-        console.log(data);
-        me.$refs[list][event](data < COUNT);
+        me.$refs[list][event](data.length);
       }
-    }, param));
+    }, args.pop() || {});
+    // 获取团队列表
+    me.getList(param);
   };
 
   export default {
     name: NameSpace,
     created() {
-//      let me = this;
-      loader.call(this, 'pending', 'onTopLoaded');
+      let me = this;
+//      loader.call(this, 'pending', 'onTopLoaded');
+      KND.Native.getUserInfo((info) => {
+        let role = info['KL Primary Position Type LIC'];
+        let status = '';
+        let list = '';
+        if (role === 'Field Service Manager' || role === 'Field Service Engineer') {
+          role = 'install';
+          status = '待处理';
+          list = 'pending';
+        } else if (role === 'Agent Manager' || role === 'Agent') {
+          role = 'custom';
+          status = 'all';
+          list = 'cusService';
+        } else {
+          role = 'other';
+        }
+        me.setManager(role);
+        me.loadTopFn({status: status, list: list});
+      });
+      me.getLoginMeg();
     },
     data: () => {
       return {
         selected: 'pending',
-        topStatus: '',
-        list: [],
-        number: []
+        topStatus: ''
       };
     },
     computed: {
-      ...mapState(NameSpace, ['loginMeg', 'pending', 'valid', 'invalid', 'cusService', 'role'])
+      ...mapState(NameSpace, ['loginMeg', 'pending', 'process', 'completed', 'cusService', 'role'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getList']),
-      menuFn(item) {
-        console.log(item);
-      },
+      ...mapActions(NameSpace, ['getList', 'getLoginMeg']),
+      ...mapMutations(NameSpace, ['setManager', 'setLoginMeg']),
       toSearch() {
         this.$router.push({path: '/search'});
       },
-      loadTop(type) {
-        type = type || 'pending';
-        loader.call(this, type, 'onTopLoaded');
+      loadTopFn(param) {
+//        type = type || 'pending';
+//        loader.call(this, type, 'onTopLoaded');
+
+        loader.call(this, {
+          data: {
+            'Status': param.status
+          }
+        }, param.list, 'onTopLoaded');
       }, // 底部加载
-      loadBottom(type) {
-        type = type || 'pending';
-        loader.call(this, type, 'onBottomLoaded');
+      loadBottomFn(param) {
+//        type = type || 'pending';
+//        loader.call(this, type, 'onBottomLoaded');
+        loader.call(this, {
+          data: {
+            'Status': param.status
+          },
+          more: true
+        }, param.list, 'onBottomLoaded');
       },
-//      pendingLoadTop() {
-//        loader.call(this, 'pending', 'onTopLoaded');
-//      },  // 待处理下拉
-//      pendingLoadBottom() {
-//        loader.call(this, 'pending', 'onBottomLoaded');
-//      },  // 待处理上拉
-//      validLoadTop() {
-//        loader.call(this, 'valid', 'onTopLoaded');
-//      },  // 处理中下拉
-//      validLoadBottom() {
-//        loader.call(this, 'valid', 'onBottomLoaded');
-//      },  // 处理中上拉
-//      invalidLoadTop() {
-//        loader.call(this, 'invalid', 'onTopLoaded');
-//      },  // 已完成下拉
-//      invalidLoadBottom() {
-//        loader.call(this, 'invalid', 'onBottomLoaded');
-//      },  // 已完成上拉
       clickAdd() {
         this.$router.push({path: '/addService'});
       },
@@ -165,7 +239,7 @@
         });
       }
     },
-    components: {loadmore, cusCell, cusHeader, noData}
+    components: {loadmore, cusCell, cusHeader}
   };
 </script>
 <style lang="scss">

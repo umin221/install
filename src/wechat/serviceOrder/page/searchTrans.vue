@@ -33,9 +33,9 @@
         </cus-cell>
       </cus-loadmore>
     </cus-search>
-    <buttonGroup v-if="type !== 'fault'">
+    <button-group v-if="type !== 'fault'">
       <mt-button type="primary" class="single" @click.native="selectEnter">确认</mt-button>
-    </buttonGroup>
+    </button-group>
   </div>
 </template>
 <style lang="scss">
@@ -47,7 +47,6 @@
 </style>
 <script type="es6">
   import {mapState, mapActions, mapMutations} from 'vuex';
-  import buttonGroup from 'public/components/cus-button-group';
   import cusLoadmore from 'public/components/cus-loadmore';
   import cusSearch from 'public/components/cus-search';
   import cusCell from 'public/components/cus-cell';
@@ -58,7 +57,7 @@
     created() {
       this.type = this.$route.query.type;
     },
-    components: {cusLoadmore, cusSearch, cusCell, buttonGroup},
+    components: {cusLoadmore, cusSearch, cusCell},
     data: () => {
       return {
         value: '',

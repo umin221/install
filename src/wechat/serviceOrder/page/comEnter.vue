@@ -23,7 +23,6 @@
         </mt-field>
         <div>
           <div style="color: #777;font-size: 0.75rem;text-indent:0.75em;line-height: 40px">上传图片</div>
-          <div style="text-indent:0.75em"><i class="xs-icon icon-attach"></i></div>
         </div>
       </div>
       <mt-popup v-if="showBox" v-model="showBox" position="bottom" style="width: 100%">

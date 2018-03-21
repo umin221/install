@@ -29,18 +29,6 @@ export default new Router({
       require(['../page/serviceDetail'], resolve);
     }
   }, {
-    path: '/dateControl',   // 日历组件
-    name: 'dateControl',
-    component(resolve) {
-      require(['../page/dateControl'], resolve);
-    }
-  }, {
-    path: '/close',          // 关闭工单弹出层
-    name: 'close',
-    component(resolve) {
-      require(['../page/close'], resolve);
-    }
-  }, {
     path: '/search',        // 列表搜索
     name: 'search',
     component(resolve) {

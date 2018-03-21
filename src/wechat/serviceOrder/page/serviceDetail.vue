@@ -9,8 +9,9 @@
       <div class="mint-content service-detail">
         <div class="detail-title">
           <div class="mt-Detail-title">服务单编号：{{ServiceRequest['SR Number']}}<span class="user-state">{{Action['Status']}}</span></div>
-          <div class="mt-Detail-title">优先级：{{ServiceRequest['Priority']}}</div>
+          <div v-if="role === 'install'" class="mt-Detail-title" >优先级：{{ServiceRequest['Priority']}}</div>
           <div class="mt-Detail-title">联系人：{{ServiceRequest['Contact Last Name']}}</div>
+          <div v-if="role === 'custom'"   class="mt-Detail-title">服务类型：{{ServiceRequest['SR Type']}}</div>
           <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call">{{ServiceRequest['Contact Business Phone']}}</a></div>
         </div>
         <div class="detail-content">
@@ -70,20 +71,20 @@
           </mt-tab-container>
         </div>
       </div>
-      <button-group v-if="role === 'Agent'&& BtnStatu === 'status4'">
+      <button-group v-if="role === 'custom'&& BtnStatu === 'status4'">
         <mt-button type="primary" class="single" @click.native="toContact" >派单</mt-button>
       </button-group>
-      <button-group v-if="role === 'Field'">
+      <button-group v-if="role === 'install'">
         <div v-show="BtnStatu === 'status5'" class="callPlan">
-          <mt-button  type="primary" class="single flax"  @click.native="changeMy" >接单</mt-button>
+          <mt-button  class="single flax"  @click.native="changeMy" >接单</mt-button>
           <mt-button type="primary" class="single flax" @click.native="toContact">派单</mt-button>
         </div>
-        <mt-button v-show="BtnStatu === 'status1'&& !callEnd" type="primary" class="single" @click.native="changeBtnStote"  >电话联系客户</mt-button>
+        <mt-button v-show="BtnStatu === 'status1'&& !callEnd"  class="single" @click.native="changeBtnStote"  >电话联系客户</mt-button>
         <div v-show="BtnStatu === 'status2' || callEnd" class="callPlan">
-          <mt-button  type="primary" class="single flax"  @click.native="callSolve" >电话已解决</mt-button>
-          <mt-button type="primary" class="single flax" @click.native="clickShow"  >预约维修计划</mt-button>
+          <mt-button   class="single flax" type="primary"  @click.native="callSolve" >电话已解决</mt-button>
+          <mt-button  class="single flax" @click.native="clickShow"  >预约维修计划</mt-button>
         </div>
-        <mt-button v-show="BtnStatu === 'status3'"  type="primary" class="single" @click="popupVisible1 = !popupVisible1" >工单操作</mt-button>
+        <mt-button v-show="BtnStatu === 'status3'"  class="single" @click="popupVisible1 = !popupVisible1" >工单操作</mt-button>
       </button-group>
       <!--弹出日历-->
       <div v-if="showBox2">
@@ -127,11 +128,10 @@
 </template>
 <script>
   import {mapState, mapActions} from 'vuex';
-  import close from './close';
-  import dateControl from './dateControl';
   import { MessageBox } from 'mint-ui';
-  import buttonGroup from 'public/components/cus-button-group';
+  import close from '../components/close';
   import toggle from '../components/detail-toggle';
+  import dateControl from '../components/dateControl';
   //
   const NameSpace = 'detail';
   //
@@ -329,12 +329,7 @@
         });
       }
     },
-    components: {
-      close,
-      dateControl,
-      buttonGroup,
-      toggle
-    }
+    components: {close, dateControl, toggle}
   };
 </script>
 <style lang="scss">
