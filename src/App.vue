@@ -9,7 +9,7 @@
 </template>
 
 <script type="es6">
-  import {mapState, mapMutations} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
 
   const NameSpace = 'app';
   export default {
@@ -19,6 +19,8 @@
       KND.Util.back = () => {
         me.$router.back();
       };
+
+      this.getAuthority();
     },
     data() {
       return {
@@ -54,6 +56,7 @@
       ...mapState(NameSpace, ['transition', 'transitionName', 'alive'])
     },
     methods: {
+      ...mapActions(NameSpace, ['getAuthority']),
       ...mapMutations(NameSpace, ['setTransition', 'setTransitionName']),
       // Clear Transition Effects After Each Switch
       clearTransition() {

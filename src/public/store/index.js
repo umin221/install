@@ -22,10 +22,11 @@ export const app = {
      * @param {String} option['type'] 必填 lov type
      */
     getLov({state}, option) {
+      let data = option.data || {Type: option.type};
       ajax(Object.assign({
         method: 'get',
-        cache: true,
-        url: 'data/List Of Values/List Of Values/?searchspec=Active="Y"  AND Language="CHS" AND Type="' + option.type + '"',
+        cache: true, // PickList Hierarchical
+        url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND ' + KND.Util.condition(data),
         success: data => {
           console.log(data);
         }
@@ -38,7 +39,7 @@ export const app = {
     getAuthority({state}, option) {
       ajax({
         method: 'get',
-        url: ('http://kas.kinlong.cn/webchat/api/local/permission?url=http://mp.weixin.qq.com?params=' + location.href.split('#')[0] + '&appNO=CONTACT'),
+        url: ('https://kas.kinlong.cn:8090/webchat/api/local/permission?url=http://mp.weixin.qq.com?params=' + location.href.split('#')[0] + '&appNO=CONTACT'),
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
