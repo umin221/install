@@ -122,7 +122,7 @@
     },
     methods: {
       ...mapMutations(NameSpace, ['clear']),
-      ...mapActions(NameSpace, ['getSign', 'getUPData']),
+      ...mapActions(NameSpace, ['getSign', 'getUPData', 'getTpye']),
       submit() {
         var self = this;
         var item = self.item;
