@@ -67,10 +67,11 @@ export default new Vuex.Store({
           let mapp = mapps[status] || {};
           // 搜索时，没有状态
           let list = mapp['list'] || 'result';
+
+          data['Status'] = mapp['status'];
           // ViewMode 随当前状态切换
           data['ViewMode'] = state.isManager ? (status === '待处理' ? 'Sales Rep' : (state.isTeam ? 'Manager' : 'Personal')) : 'Personal';
 
-          data['Status'] = mapp['status'];
           api.get({
             key: 'getTransferOrder',
             data: data,
@@ -146,7 +147,8 @@ export default new Vuex.Store({
             },
             success: data => {
               commit('setOrders', data.items);
-            }
+            },
+            error: data => {}
           });
         },
         /**
@@ -311,7 +313,6 @@ export default new Vuex.Store({
           state.lines.splice(index, 1);
         },
         setLines(state, lines) {
-          if (lines.items) lines = lines.items;
           state.lines = KND.Util.toArray(lines);
         }
       },
@@ -355,7 +356,7 @@ export default new Vuex.Store({
             key: 'queryOrderLines',
             data: data,
             success: data => {
-              commit('setLines', data);
+              commit('setLines', data.items);
             }
           });
 

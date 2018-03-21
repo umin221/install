@@ -42,7 +42,7 @@
         <mt-cell-swipe class="multiple"
                        @click.native="toOrderFn(item)"
                        v-for="(item, index) in orders"
-                       :right="[{
+                       :right="isTeam ? [] : [{
                                  content: '删除',
                                  style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
                                  handler: () => deleteFn(item, index)
