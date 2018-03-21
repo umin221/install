@@ -159,13 +159,21 @@ export default new Vuex.Store({
       },
       actions: {
         getSign({commit}, item) {
-          var obj = {
-            'KL Signed Amount': item['KL Signed Amount'],
-            'Description': item.Description
-          };
-          commit('setSign', obj);
+          api.get({ // 批次详情
+            key: 'findBatchById', // 'findBatchById',
+            data: {
+              id: item.Id
+            },
+            success: data => {
+              var obj = {
+                'KL Signed Amount': data['KL Signed Amount'],
+                'Description': data.Description
+              };
+              commit('setSign', obj);
+            }
+          });
         },
-        getUPData({state}, id) {
+        getUPData({state, dispatch}, item) {
           let partner = state.form;
           api.get({ // 提交数据
             key: 'getUPData',
@@ -173,7 +181,33 @@ export default new Vuex.Store({
             data: {
               'KL Signed Amount': partner['KL Signed Amount'],
               'Description': partner.Description,
-              'Id': id
+              'Id': item.Id
+            },
+            success: function(data) {
+              history.go(-1);
+              dispatch('getTpye', item);
+            }
+          });
+        },
+        getTpye({commit}, item) {
+          var processName = ''; // KL Record Install Process Flg == N 请求关闭接口 Y 提交接口
+          if (item['KL Record Install Process Flg'] === 'N') {
+            if (item.box1) { // 涉及签收
+              processName = 'KL Install Task Complete Action Workflow'; // 涉及签收接口
+            } else { // 不涉及签收 则是忽略
+              processName = 'KL Install Task Ignore Action Workflow'; // 忽略接口
+            }
+          } else {
+            processName = 'KL Install Task Submit For Approval Workflow'; // 一般正常提交接口
+          }
+          api.get({ // 更改按钮状态
+            key: 'getUPStatus',
+            method: 'POST',
+            data: {
+              'body': {
+                'ProcessName': processName,
+                'RowId': item.Id
+              }
             },
             success: function(data) {
               history.go(-1);
@@ -184,7 +218,49 @@ export default new Vuex.Store({
     },
     batch: {
       namespaced: true,
+      state: {
+        planObj: ''
+      },
+      mutations: {
+        setSign(state, form) {
+          state.form = form;
+        }
+      },
       actions: {
+        getPlanObj(state, obj) {
+          api.get({ // 提交数据
+            key: 'getPlan',
+            method: 'GET',
+            data: {
+              id: obj['Parent Activity Id']
+            },
+            success: function(data) {
+              state.planObj = data;
+            }
+          });
+        },
+        setPlan(state, id) {
+          api.get({ // 提交详细计划数据
+            key: 'setPlan',
+            method: 'PUT',
+            data: state.planObj,
+            success: function(data) {
+              history.go(-1);
+              api.get({ // 更改按钮状态
+                key: 'getUPStatus',
+                method: 'POST',
+                data: {
+                  'body': {
+                    'ProcessName': 'KL Install Task Submit For Approval Workflow',
+                    'RowId': id
+                  }
+                },
+                success: function(data) {
+                }
+              });
+            }
+          });
+        }
       }
     },
     updateDoor: {

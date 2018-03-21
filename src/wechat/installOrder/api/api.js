@@ -30,21 +30,21 @@ let apiList = {
       }
     };
   },
-  getDetail: option => {
+  getDetail: option => { // 详情
     return {
       url: 'service/EAI Siebel Adapter/Query'
     };
-  }, // 详情
-  getTaskAdd: option => {
+  },
+  getTaskAdd: option => { // 任务开始更新状态
     return {
       url: 'service/Workflow Process Manager/RunProcess/'
     };
-  }, // 任务开始更新状态
-  getXttd: option => {
+  },
+  getXttd: option => { // 协同团队
     return {
       url: 'service/EAI Siebel Adapter/Query'
     };
-  }, // 协同团队
+  },
   /**
    * 查找所有产品安装工程师&主管 搜索&获取列表
    * @param {String} option.data.position 必填 职位
@@ -111,7 +111,21 @@ let apiList = {
       url: 'data/KL Installation Task/KL Installation Task/' + option.data.id,
       data: {}
     };
-  } // 批次详情
+  },
+  getPlan: option => { // 获取批次详情计划数据
+    return {
+      method: 'get',
+      url: 'data/KL Installation Task Detail Plan/KL Installation Task Detail Plan/?searchspec=[Parent Activity Id] = ' + option.data.id,
+      data: {}
+    };
+  },
+  setPlan: option => { // 批次详细计划提交
+    return {
+      method: 'get',
+      url: 'data/KL Installation Task Detail Plan/KL Installation Task Detail Plan/?searchspec=[Parent Activity Id] = ' + option.data.id,
+      data: {}
+    };
+  }
 };
 
 let ajax = api => {

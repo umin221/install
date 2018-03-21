@@ -6,14 +6,16 @@
     <div class="mint-content batch">
       <div :class="{'readonly':read}">
         <cus-field label="计划类型"
-                   @click.native="showLovFn('KL Door Material Quality')"
-                   v-model="line['KL Door Material Quality']"
+                   @click.native="showLovFn('TODO_TYPE')"
+                   v-model="planObj['TODO_TYPE']"
                    is-link></cus-field>
-        <mt-cell title="计划开始日期" @click.native="open('picker')" :value="start_Date" is-link></mt-cell>
-        <mt-cell title="计划完成日期" @click.native="open('pickerEnd')" :value="end_Date" is-link></mt-cell>
+        <mt-cell title="计划开始日期" @click.native="open('picker')" :value="planObj.Planned" is-link></mt-cell>
+        <mt-cell title="计划完成日期" @click.native="open('pickerEnd')" :value="planObj['Planned Completion']" is-link></mt-cell>
+        <mt-cell v-show="type==='edit'" title="实际开始日期" @click.native="open('picker')" :value="planObj.Planned" is-link></mt-cell>
+        <mt-cell v-show="type==='edit'" title="实际结束日期" @click.native="open('pickerEnd')" :value="planObj['Planned Completion']" is-link></mt-cell>
         <cus-field label="备注"
                    type="textarea"
-                   v-model="line['Description']"></cus-field>
+                   v-model="planObj['Description']"></cus-field>
       </div>
       <button-group>
         <mt-button type="primary" class="single"
@@ -90,20 +92,20 @@
       var self = this;
       let param = this.$route.query;
       this.id = param.item.Id;
+      this.type = param.item.type;
       this.item = param.item;
       console.dir('=====' + this.id);
       // 获取详情
       if (this.type === 'add') {
-        this.start_Date = ''; // 开始时间
-        this.end_Date = ''; // 开始时间
-        this.batchNum = 0; // 数量
-        this.batchCode = '10001'; // 随机默认
       } else {
         this.getBatch(this.item);
       }
       // 取 lov 门材质
       self.getLov({
-        type: 'KL_DOOR_MATERIAL_QUALITY',
+        data: {
+          'Type': 'TODO_TYPE',
+          'Parent Value': self.item['KL Detail Type']
+        },
         success: data => {
           mapp.option['KL Door Material Quality'] = data.items;
         }
@@ -112,12 +114,6 @@
     data: () => {
       return {
         value: '',
-        line: {},
-        start_Date: new Date(),        // 开始时间
-        startDate: null,
-        end_Date: new Date(),        // 结束时间
-        endDate: null,
-        batchNum: 0, // 数量
         pickerVisible: true,
         id: '',
         item: '',
@@ -140,7 +136,7 @@
       });
     },
     computed: {
-      ...mapState(NameSpace, ['form']),
+      ...mapState(NameSpace, ['planObj']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -156,14 +152,8 @@
         this.$refs[picker].open();
       },
       handleChange(value) {
-        let me = this;
-        me.start_Date = value.format('yyyy/MM/dd');
-        me.startDate = value.format('MM/dd/yyyy'); // 后台存值格式
       },
       handleChangeEnd(value) {
-        let me = this;
-        me.end_Date = value.format('yyyy/MM/dd');
-        me.endDate = value.format('MM/dd/yyyy');
       },
       // 选择对话框
       showLovFn(type) {
@@ -182,16 +172,6 @@
         this.line[type] = values[0]['Value'];
         console.log(this[type]);
         this[type] = values[0];
-      },
-      toLineFn() {
-        let me = this;
-        this.$router.push({
-          name: 'xttd',
-          query: {
-            id: me.id,
-            item: this.item
-          }
-        });
       },
       getBatch(obj) {
         var self = this;

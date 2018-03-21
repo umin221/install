@@ -36,7 +36,6 @@
   import {mapState, mapActions, mapMutations} from 'vuex';
   import titleGroup from 'public/components/cus-title-group';
   import buttonGroup from 'public/components/cus-button-group';
-  import api from '../api/api';
 
   // Right button
   let right = [{
@@ -127,31 +126,12 @@
       submit() {
         var self = this;
         var item = self.item;
-        var processName = ''; // KL Record Install Process Flg == N 请求关闭接口 Y 提交接口
-        if (item['KL Record Install Process Flg'] === 'N') {
-          if (self.box1) { // 涉及签收
-            processName = 'KL Install Task Complete Action Workflow'; // 涉及签收接口
-          } else { // 不涉及签收 则是忽略
-            processName = 'KL Install Task Ignore Action Workflow'; // 忽略接口
-          }
+        item.box1 = self.box1;
+        if (self.box1) { // 涉及签收 才提交数据  不涉及只更新状态
+          self.getUPData(item);
         } else {
-          processName = 'KL Install Task Submit For Approval Workflow'; // 一般正常提交接口
+          self.getTpye(item);
         }
-        api.get({ // 更改按钮状态
-          key: 'getUPStatus',
-          method: 'POST',
-          data: {
-            'body': {
-              'ProcessName': processName,
-              'RowId': self.id
-            }
-          },
-          success: function(data) {
-            if (self.box1) { // 涉及签收 才提交数据  不涉及只更新状态
-              self.getUPData(self.id);
-            }
-          }
-        });
       },
       submitFn() {
         var item = this.item;
