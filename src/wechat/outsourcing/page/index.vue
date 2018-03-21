@@ -7,7 +7,7 @@
         <i class="xs-icon icon-search"></i>
       </mt-button>
       <!--<router-link :to="toAdd" >-->
-      <mt-button @click.native="toDetailFn" slot="right">
+      <mt-button v-if="isManager" @click.native="toDetailFn" slot="right">
         <i class="xs-icon icon-add"></i>
       </mt-button>
       <!--</router-link>-->
@@ -15,7 +15,7 @@
 
     <div class="mint-content">
 
-      <mt-navbar v-model="selected">
+      <mt-navbar v-model="selected" v-if="isManager">
         <mt-tab-item id="pending"
           @click.native="!pending.length && loadBottomFn({status:'待审批', list:'pending'})">待审批</mt-tab-item>
         <mt-tab-item id="valid"
@@ -87,14 +87,12 @@
   </div>
 </template>
 
-<script type="application/javascript">
-  import {mapState, mapActions} from 'vuex';
+<script type="es6">
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import cusLoadmore from 'public/components/cus-loadmore';
   import cusCell from 'public/components/cus-cell';
 
   const NAMESPACE = 'index';
-  // mapp
-  let mapp = config.mapp['status'];
   //
   let loader = function(...args) {
     let me = this;
@@ -114,9 +112,15 @@
     components: {cusLoadmore, cusCell},
     // 数据初始化
     created() {
-      this.loadBottomFn({
-        status: '待审批',
-        list: 'pending'
+      let me = this;
+      KND.Native.getUserInfo((info) => {
+        // 是否主管
+        me.setManager(info['KL Primary Position Type LIC'] === 'Field Service Manager');
+        // 获取数据
+        me.loadBottomFn({
+          status: '待审批',
+          list: 'pending'
+        });
       });
     },
     data: () => {
@@ -128,15 +132,16 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['pending', 'valid', 'invalid'])
+      ...mapState(NAMESPACE, ['pending', 'valid', 'invalid', 'isManager'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['getPartners']),
+      ...mapMutations(NAMESPACE, ['setManager']),
       // 已失效顶部加载
       loadTopFn(param) {
         loader.call(this, {
           data: {
-            'KL Partner Status': mapp[param.status]
+            'KL Partner Status': param.status
           }
         }, param.list, 'onTopLoaded');
       },
@@ -144,7 +149,7 @@
       loadBottomFn(param) {
         loader.call(this, {
           data: {
-            'KL Partner Status': mapp[param.status]
+            'KL Partner Status': param.status
           },
           more: true
         }, param.list, 'onBottomLoaded');
@@ -158,7 +163,7 @@
         let query = typeof id === 'string' ? {
           // detail
           type: 'read',
-          state: this.selected,
+          state: this.isManager ? this.selected : 'valid',
           id: id
         } : {
           // create

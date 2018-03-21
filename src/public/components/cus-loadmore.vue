@@ -14,7 +14,9 @@
           </span>
     </div>
 
-    <slot></slot>
+    <slot>
+      <empty v-show="emptyTips"></empty>
+    </slot>
 
     <div slot="bottom" class="mint-loadmore-bottom">
       <span v-show="bottomStatus !== 'loading'" :class="{ 'is-rotate': bottomStatus === 'drop' }">↑</span>
@@ -37,7 +39,13 @@
         allLoaded: false
       };
     },
-    props: ['param'], // ['loadTop', 'loadBottom'],
+    props: {
+      param: '',
+      emptyTips: {
+        type: Boolean,
+        default: true
+      }
+    }, // ['loadTop', 'loadBottom'],
     methods: {
       loadTop() {
         this.$emit('loadTop', this.param);

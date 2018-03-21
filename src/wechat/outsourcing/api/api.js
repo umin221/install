@@ -8,13 +8,15 @@ let apiList = {
    */
   getPartners: option => {
     let name = option.data.Name;
-    let spec = '';
+    let arr = [];
     if (name) {
-      spec = '[Name] LIKE \'' + name + '*\'';
+      arr.push('[Name] LIKE "*' + name + '*"');
       delete option.data.Name;
-    }
+    };
+    let spec = KND.Util.condition(option.data);
+    if (spec) arr.push(spec);
     return {
-      url: 'data/Channel Partner/Channel Partner/?searchspec=' + spec + KND.Util.condition(option.data) + '&' + KND.Util.param(option.paging)
+      url: 'data/Channel Partner/Channel Partner/?searchspec=' + arr.join(' AND ') + '&' + KND.Util.param(option.paging)
     };
   },
 
@@ -27,18 +29,21 @@ let apiList = {
    */
   queryPartners: option => {
     let name = option.data.Name;
-    let spec = '';
+    let arr = [];
     if (name) {
-      spec = '[Channel Partner.Name] LIKE \'' + name + '*\'';
+      arr.push('[Channel Partner.Name] LIKE "*' + name + '*"');
       delete option.data.Name;
     };
+    let spec = KND.Util.condition(option.data, 'Channel Partner');
+    if (spec) arr.push(spec);
+
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/QueryPage',
       data: {
         'body': {
           'OutputIntObjectName': 'KL Channel Partner',
-          'SearchSpec': spec + KND.Util.condition(option.data, 'Channel Partner'),
+          'SearchSpec': arr.join(' AND '),
           'ViewMode': 'Sales Rep',
           'StartRowNum': option.paging.StartRowNum,
           'PageSize': option.paging.PageSize

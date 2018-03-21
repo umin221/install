@@ -7,6 +7,7 @@
 
         <cus-loadmore ref="result"
                       :loadBottom="loadBottomFn"
+                      :emptyTips="false"
                       :topStatus="topStatus">
             <cus-cell class="multiple"
                       :key="item.id"

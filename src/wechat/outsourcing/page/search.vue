@@ -1,10 +1,12 @@
 <template>
   <div>
     <cus-search v-model="value"
+                :show="true"
                 placeholder="请输入合作伙伴名称">
 
         <cus-loadmore ref="result"
                       :loadBottom="loadBottomFn"
+                      :emptyTips="false"
                       :topStatus="topStatus">
           <cus-cell class="multiple"
                     :key="item.id"
@@ -26,8 +28,6 @@
   import cusLoadmore from 'public/components/cus-loadmore';
   import cusSearch from 'public/components/cus-search';
   import cusCell from 'public/components/cus-cell';
-  // mapp
-  let mapp = config.mapp['list'];
   //
   let loader = function(...args) {
     let me = this;
@@ -40,8 +40,13 @@
       more: args.pop(),
       callback: (data) => {
         me.$refs.result[event](data.length);
-      }
+      },
+      // 结果渲染列表
+      lst: 'result'
     };
+    if (!this.isManager) {
+      param.data['KL Partner Status'] = '待审批';
+    }
     // 获取团队列表
     me.getPartners(param);
   };
@@ -57,7 +62,8 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['result'])
+      ...mapState(NAMESPACE, ['result']),
+      ...mapState('index', ['isManager'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['getPartners']),
@@ -78,7 +84,7 @@
           query: {
             // detail
             type: 'read',
-            state: mapp[item['KL Partner Status']],
+            state: config.mapp.k2v[item['KL Partner Status']],
             id: item.Id
           }
         });

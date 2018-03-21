@@ -2,14 +2,15 @@
  * Local Config
  */
 config.mapp = {
-  'status': {
-    '待审批': '待审批',
-    '已生效': '有效',
-    '已失效': '失效'
+  'manager': {
+    '待审批': {status: 'Approval Pending', list: 'pending'},
+    '已生效': {status: 'Active', list: 'valid'},
+    '已失效': {status: 'Inactive', list: 'invalid'}
   },
-  'list': {
-    '待审批': 'pending',
-    '有效': 'valid',
-    '失效': 'invalid'
+  'employee': {
+    '待审批': {status: 'Active', list: 'pending'}
+  },
+  'k2v': {
+    '有效': 'valid'
   }
 };

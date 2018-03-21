@@ -4,7 +4,7 @@
     <!--header-->
     <mt-header fixed :title="title">
       <fallback slot="left"></fallback>
-      <mt-button v-show="read && isValid" slot="right"
+      <mt-button v-show="read && isValid && isManager" slot="right"
                  @click="type = 'edit'">编辑</mt-button>
       <mt-button v-show="!read && isValid" slot="right"
                  @click="updateFn">完成</mt-button>
@@ -69,15 +69,12 @@
 
     <!--buttons-->
     <button-group>
-      <mt-button type="primary"
-        v-show="isSubmit"
+      <mt-button v-show="isSubmit"
         @click.native="submitFn">提交</mt-button>
-      <mt-button type="primary"
-        v-show="isValid"
+      <mt-button v-show="isValid"
         v-text="read ? '新增联系人' : '失效'"
         @click.native="multipleFn"></mt-button>
-      <mt-button type="primary"
-        v-show="read && state === 'invalid'"
+      <mt-button v-show="read && state === 'invalid'"
         @click="type = 'edit'">重新启用</mt-button>
     </button-group>
   </div>
@@ -125,6 +122,7 @@
       };
     },
     computed: {
+      ...mapState('index', ['isManager']),
       ...mapState(NAMESPACE, ['form', 'attach', 'record']),
       // 表单只读
       read() {
