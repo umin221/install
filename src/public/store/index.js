@@ -26,7 +26,7 @@ export const app = {
       ajax(Object.assign({
         method: 'get',
         cache: true, // PickList Hierarchical
-        url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND ' + KND.Util.condition(data),
+        url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND ' + KND.Util.condition(data) + '&PageSize=100&StartRowNum=0',
         success: data => {
           console.log(data);
         }
