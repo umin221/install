@@ -39,18 +39,14 @@ export const app = {
     getAuthority({state}, option) {
       ajax({
         method: 'get',
-        url: ('https://kas.kinlong.cn:8090/webchat/api/local/permission?url=http://mp.weixin.qq.com?params=' + location.href.split('#')[0] + '&appNO=CONTACT'),
+        url: ('https://kas.kinlong.cn:8090/webchat/api/local/permission?url=' + encodeURIComponent(location.href.split('#')[0]) + '&appNO=CONTACT'),
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
         success: data => {
-          data.debug = true;
           wx.config(data);
           wx.ready(() => {
             console.log('WeChatAPI success');
-          });
-          wx.error(() => {
-            console.log('WeChartAPI fail');
           });
         }
       });

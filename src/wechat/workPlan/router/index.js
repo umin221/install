@@ -22,5 +22,23 @@ export default new Router({
     component(resolve) {
       require(['../page/add'], resolve);
     }
+  }, {
+    path: '/edit', // 编辑
+    name: 'edit',
+    component(resolve) {
+      require(['../page/add'], resolve);
+    }
+  }, {
+    path: '/detail', // 详情
+    name: 'detail',
+    component(resolve) {
+      require(['../page/detail'], resolve);
+    }
+  }, {
+    path: '/select', // 选择项目
+    name: 'select',
+    component(resolve) {
+      require(['../page/select'], resolve);
+    }
   }]
 });

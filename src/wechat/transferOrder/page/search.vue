@@ -2,6 +2,7 @@
 <template>
   <div class="search">
     <cus-search v-model="value"
+                :show="true"
                 placeholder="请输入工程名称或负责人">
 
         <cus-loadmore ref="result"
@@ -34,8 +35,8 @@
     let name = me.value;
     let param = {
       data: {
-        'Opportunity Name': name + '*',
-        'Setter': name + '*'
+        'Opportunity Name': '*' + name + '*',
+        'Setter': '*' + name + '*'
       },
       more: args.pop(),
       callback: (data) => {

@@ -47,8 +47,7 @@
 
         <!--buttons-->
         <button-group>
-          <mt-button type="primary"
-                     @click.native="saveFn">保存</mt-button>
+          <mt-button @click.native="saveFn">保存</mt-button>
         </button-group>
       </div>
 
