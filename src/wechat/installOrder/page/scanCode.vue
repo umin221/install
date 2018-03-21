@@ -62,9 +62,8 @@
       });
     },
     methods: {
-      butXttd() {
-        var self = this;
-        self.$router.push('scanCode');
+      handleClick() {
+        console.dir('提交');
       }
     }
   };

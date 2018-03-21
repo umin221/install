@@ -36,7 +36,6 @@
   import {mapState, mapActions, mapMutations} from 'vuex';
   import titleGroup from 'public/components/cus-title-group';
   import buttonGroup from 'public/components/cus-button-group';
-  import api from '../api/api';
 
   // Right button
   let right = [{
@@ -103,30 +102,36 @@
        * 查看&编辑标题一致
        */
       title() {
-        let type = this.type;
-        return type === 'add' ? (this.state === 'invalid' ? '补充委外合约' : '开孔锁签收') : '开孔锁签收详情';
+        let item = this.item;
+        var val = '';
+        if (item['KL Detail Type LIC'] === 'Trompil Lock Sign') {
+          val = '开孔锁签收';
+        } else if (item['KL Detail Type LIC'] === 'Working Drawing Sign') {
+          val = '开孔图纸签收';
+        } else if (item['KL Detail Type LIC'] === 'Lock Body Sign') {
+          val = '锁体安装签收';
+        } else if (item['KL Detail Type LIC'] === 'Substitution Lock Sign') {
+          val = '替代锁到货确认';
+        } else if (item['KL Detail Type LIC'] === 'Lock Sign') {
+          val = '真锁到货';
+        } else if (item['KL Detail Type LIC'] === 'Substitution Lock Trans Return') {
+          val = '替代锁回收';
+        }
+        return val;
       }
     },
     methods: {
       ...mapMutations(NameSpace, ['clear']),
-      ...mapActions(NameSpace, ['getSign', 'getUPData']),
+      ...mapActions(NameSpace, ['getSign', 'getUPData', 'getTpye']),
       submit() {
         var self = this;
-        api.get({ // 更改按钮状态
-          key: 'getUPStatus',
-          method: 'POST',
-          data: {
-            'body': {
-              'ProcessName': 'KL Install Task Submit For Approval Workflow',
-              'RowId': self.id
-            }
-          },
-          success: function(data) {
-            if (self.box1) { // 涉及签收 才提交数据  不涉及只更新状态
-              self.getUPData(self.id);
-            }
-          }
-        });
+        var item = self.item;
+        item.box1 = self.box1;
+        if (self.box1) { // 涉及签收 才提交数据  不涉及只更新状态
+          self.getUPData(item);
+        } else {
+          self.getTpye(item);
+        }
       },
       submitFn() {
         var item = this.item;

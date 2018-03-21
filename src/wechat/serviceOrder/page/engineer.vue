@@ -45,6 +45,7 @@
         me.$refs.result[event](data.length);
       }
     };
+    console.log(me.value);
     // 获取团队列表
     me.findContact(param);
   };

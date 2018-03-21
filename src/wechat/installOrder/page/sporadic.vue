@@ -5,7 +5,7 @@
       <mt-button slot="right" @click.native="submit">提交</mt-button>
     </mt-header>
     <div class="mint-content">
-      <mt-cell v-for="item in list" :key="item.id" is-link to="detail?index=1">
+      <mt-cell v-for="item in list" :key="item.id" is-link @click.native="scavenging">
         <div slot="title" class="list-text"><span>产品型号:</span><span>{{item.code}}</span></div>
         <div slot="title" class="list-text"><span>产品条形码:</span><span>{{item.savrsNo}}</span></div>
         <div slot="title" class="list-text"><span></span><span>{{item.name}}</span></div>

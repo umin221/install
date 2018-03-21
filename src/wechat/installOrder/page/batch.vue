@@ -13,6 +13,23 @@
         <mt-field label="计划开孔数量" placeholder="请输入"
                   :class="heartVisible" v-model="batchNum"></mt-field>
       </div>
+      <div class="lock-line">
+        <lock-line title="详细计划" @click="addPlanList('add')">
+          <mt-cell-swipe v-for="(line, index) in planList" class="lock-line-cell enable" ref="body"
+                         @click.native="addPlanList('read')"
+                         :key=index
+                         is-link>
+            <div class="co-flex co-jc" slot="title">
+            <span class="co-f1">{{line.Description}}</span>
+            <span class="co-f1">{{line.TODO_TYPE}}</span>
+          </div>
+            <div class="co-flex co-jc" slot="title">
+              <span class="co-f1">{{line.Planned}}</span>
+              <span class="co-f1">{{line['Planned Completion']}}</span>
+            </div>
+          </mt-cell-swipe>
+        </lock-line>
+      </div>
       <button-group>
         <mt-button type="primary" class="single"
                    @click.native="submitFn">提交</mt-button>
@@ -54,11 +71,23 @@
     input {
       text-align: right!important;
     }
+
+    .lock-line {
+      margin-top: 10px;
+
+      .lock-line-cell {
+        background-color: $bg-light;
+      }
+      .co-flex {
+        line-height: 30px;
+      }
+    }
   }
 </style>
 <script type="application/javascript">
-  import {mapState} from 'vuex';
+  import {mapState, mapActions} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
+  import lockLine from '../components/cusLockLine';
   import api from '../api/api';
   const NameSpace = 'batch';
   export default {
@@ -66,7 +95,6 @@
     created() {
       console.dir(1);
       var self = this;
-      self.titleVal = '新建开孔批次';
       let param = this.$route.query;
       this.state = param.state;
       this.type = param.type;
@@ -75,12 +103,15 @@
       console.dir('=====' + this.id);
       // 获取详情
       if (this.type === 'add') {
+        self.titleVal = '新建开孔批次';
         this.start_Date = ''; // 开始时间
         this.end_Date = ''; // 开始时间
         this.batchNum = 0; // 数量
         this.batchCode = '10001'; // 随机默认
       } else {
+        self.titleVal = '开孔批次详情';
         this.getBatch(this.item);
+        this.getPlanList(this.item);
       }
     },
     data: () => {
@@ -108,7 +139,7 @@
       });
     },
     computed: {
-      ...mapState(NameSpace, ['form']),
+      ...mapState(NameSpace, ['planList']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -119,6 +150,10 @@
       }
     },
     methods: {
+      ...mapActions(NameSpace, ['getPlanList', 'setPlan']),
+      upList(obj) {
+        return KND.Util.toArray(obj);
+      },
       open(picker) {
         this.$refs[picker].open();
       },
@@ -132,6 +167,19 @@
         me.end_Date = value.format('yyyy/MM/dd');
         me.endDate = value.format('MM/dd/yyyy');
       },
+      addPlanList(type) {
+        let me = this;
+        let planType = me.item['KL Installation Task'][0]['KL Detail Type']; // 取统一批次
+        this.$router.push({
+          name: 'detailPlan',
+          query: {
+            type: type,
+            planType: planType,
+            id: me.id,
+            item: me.item
+          }
+        });
+      },
       getBatch(obj) {
         var self = this;
         api.get({ // 批次详情
@@ -142,52 +190,43 @@
           success: data => {
             console.dir(data);
             self.batchCode = data.Id; // 批次
-            self.start_Date = data.Planned; // 开始时间
-            self.end_Date = data['Planned Completion']; // 结束时间
+            self.start_Date = new Date(data.Planned).format('yyyy-MM-dd'); // 开始时间
+            self.end_Date = new Date(data['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
+            self.startDate = self.start_Date.format('MM/dd/yyyy'); // 后台存值格式
+            self.endDate = self.end_Date.format('MM/dd/yyyy');
             self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
           }
         });
       },
       submitFn() {
-        // pending
         var self = this;
-        api.get({ // 更改按钮状态
-          key: 'getUPStatus',
-          method: 'POST',
-          data: {
-            'body': {
-              'ProcessName': 'KL Install Task Submit For Approval Workflow',
-              'RowId': self.id
-            }
-          },
-          success: function(data) {
-            var parma = {
-              'Planned': self.startDate,
-              'Planned Completion': self.endDate,
-              'KL Install Amount Requested': self.batchNum,
-              'Id': self.batchCode,
-              'KL Detail Type': self.item['KL Detail Type'],
-              'Parent Activity Id': self.item.Id
-            };
-            if (self.type === 'add') {
-              parma.Status = '设定计划';
-              parma['KL Detail Type'] = self.item['KL Installation Task']['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
-              parma['Template Id'] = self.item['KL Installation Task']['Template Id'];
-            } else {
-              parma['KL Detail Type'] = self.item['KL Detail Type'];
-            }
-            api.get({ // 提交数据
-              key: 'getUPData',
-              method: 'PUT',
-              data: parma,
-              success: function(data) {
-                history.go(-1);
-              }
-            });
+        if (self.planList.length > 0) { // 详细计划不能为空   先提交批次再提交详细计划
+          var parma = {
+            'Planned': self.startDate,
+            'Planned Completion': self.endDate,
+            'KL Install Amount Requested': self.batchNum,
+            'Id': self.batchCode,
+            'KL Detail Type': self.item['KL Detail Type'],
+            'Parent Activity Id': self.item.Id
+          };
+          if (self.type === 'add') {
+            parma.Status = '设定计划';
+            parma['KL Detail Type'] = self.item['KL Installation Task'][0]['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
+            parma['Template Id'] = self.item['KL Installation Task']['Template Id'];
+          } else {
+            parma['KL Detail Type'] = self.item['KL Detail Type'];
           }
-        });
+          api.get({ // 提交数据
+            key: 'getUPData',
+            method: 'PUT',
+            data: parma,
+            success: function(data) {
+              self.setPlan(self.id);
+            }
+          });
+        }
       }
     },
-    components: {buttonGroup}
+    components: {buttonGroup, lockLine}
   };
 </script>

@@ -1,25 +1,25 @@
 @font-face {
-  font-family: "xSimple-icon";
-  src: url("../assets/xsimple.ttf") format("truetype");
+  font-family: "kinlong-icon";
+  src: url("../assets/kinlong.ttf") format("truetype");
 }
 
 .xs-icon {
-  font-family: "xSimple-icon" !important;
+  font-family: "kinlong-icon" !important;
   font-style: normal;
   font-size: 1rem;
 }
 
 .icon-back:before {
-  content: '\A001';
+  content: '\A131';
 }
 .icon-next:before {
-  content: '\A002';
+  content: '\A132';
 }
 .icon-add:before {
-  content: '\A025';
+  content: '\A148';
 }
 .icon-search:before {
-  content: '\A010';
+  content: '\A149';
 }
 .icon-mic:before {
   content: '\A018';
@@ -29,20 +29,20 @@
   font-size: 2.5rem;
 }
 .icon-addr:before {
-  content: '\A151';
+  content: '\A160';
 }
 .icon-delete:before {
-  content: '\A075';
+  content: '\A152';
   color: red;
 }
 .icon-edit:before {
-  content: '\A083';
+  content: '\A158';
 }
 .icon-arrow-down:before {
-  content: '\A152';
+  content: '\A151';
 }
 .icon-arrow-up:before {
-  content: '\A159';
+  content: '\A150';
 }
 .icon-select:before {
   content: '\A160';
@@ -53,6 +53,6 @@
   content: '\A133';
 }
 .icon-add-circle:before {
-  content: '\A074';
+  content: '\A153';
 }
 

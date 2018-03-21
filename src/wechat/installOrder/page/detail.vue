@@ -101,6 +101,7 @@
         </div>
       </div>
       <div class="mint-content-info">
+        <empty v-show="!taskDataList.length"></empty>
         <div class="crm-zyList" v-for="(item, index) in taskDataList" :key="index">
           <ul class="content" @click.nataive="routerPage(index, item, '')">
             <li class="bd-radius">
@@ -126,8 +127,8 @@
             item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
             item['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
             item['KL Detail Type LIC'] === 'Transfer Summary'" >
-              <span @click.nataive="closeTask(item)">关闭</span>
-              <span @click.nataive="addTask(item)">新增</span>
+              <span @click.nataive.stop="closeTask(item)">关闭</span>
+              <span @click.nataive.stop="addTask(item)">新增</span>
             </div>
             <li style="margin-right: 8px" v-if="item['KL Detail Type LIC'] === 'Ship From Door Factory' && item['Calculated Activity Status'] === 'Not Started'">
               <span class="mt-switch"><mt-switch v-model="shipmentVal"  @click.nataive.stop="shipment(item)"></mt-switch></span>
@@ -139,10 +140,20 @@
             item['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
             item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
             item['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
-            item['KL Detail Type LIC'] === 'Transfer Summary'"  @click.nataive.stop="sporadic(item)"  v-for="(itemTask, index) in upList(item['KL Installation Task'])" :key="index">
-                <div>{{itemTask.Id}}</div>
-                <div>已开孔/开孔批次</div>
-                <div>时间</div>
+            item['KL Detail Type LIC'] === 'Transfer Summary'" v-for="(itemTask, index) in upList(item['KL Installation Task'])" :key="index" @click.nataive.stop="taskClick(itemTask)">
+              <div class="readonly">
+                <mt-field label="批次" :value="itemTask.Id"></mt-field>
+                <mt-field label="已完成/计划数量"  v-if="item['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
+          item['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
+          item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
+          item['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
+          item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
+          item['KL Detail Type LIC'] === 'Transfer Summary'" :value="item['KL Completed Install Amount']+'/'+item['KL Install Amount Requested']"></mt-field>
+                <mt-field label="合格/计划数量" v-if="item['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
+            item['KL Detail Type LIC'] === 'Check Before Trans Summary'" :value="item['KL Qualified Amount']+'/'+item['KL Spot Check Amount']"></mt-field>
+                <mt-field label="时间" :value="new Date(itemTask['Planned Completion']).format('yyyy-MM-dd')"></mt-field>
+                <mt-field label="状态" :value="itemTask.Status"></mt-field>
+               </div>
             </div>
           </ul>
         </div>
@@ -262,6 +273,7 @@
       border-radius: 5px;
       padding: 10px;
       font-size: 0.5rem;
+      margin-bottom: 10px;
     }
     /*横线滚动*/
     .stage_li {
@@ -449,7 +461,10 @@
           me.detailData = data.SiebelMessage['Order Entry - Orders'];
           me.taskData = KND.Util.toArray(me.detailData['KL Installation Task']);
           console.dir(me.taskData);
-          me.taskDataList = KND.Util.toArray(me.taskData[0]['KL Installation Task']);
+          me.pStatus = me.taskData[0]['Calculated Activity Status'];
+          if (me.pStatus !== 'Not Started') { // 未开始时不获取子任务数据
+            me.taskDataList = KND.Util.toArray(me.taskData[0]['KL Installation Task']);
+          }
           me.taskDataST = KND.Util.toArray(me.detailData['Order Entry - Line Items']);
           console.dir(me.taskDataST);
         }
@@ -467,6 +482,7 @@
         taskData: '', // 任务集
         taskDataList: '', // 任务集子任务
         taskDataST: '', // 面板锁体
+        pStatus: '', // 父状态
         // is_show_sx: false, // 是否显示面板锁体
         shipmentVal: false, // 发运开关，判断值
         active: 'tab-container'
@@ -485,10 +501,14 @@
       },
       updateTask(index) { // 点击任务切换子任务
         let me = this;
-        me.taskDataList = KND.Util.toArray(me.taskData[index]['KL Installation Task']);
-        console.dir(me.taskDataList);
-        if (me.taskDataList.length === 0) {
-          me.taskDataList = KND.Util.toArray(me.taskData[index]);
+        me.taskDataList = [];
+        me.pStatus = me.taskData[index]['Calculated Activity Status'];
+        if (me.pStatus !== 'Not Started') { // 未开始时不获取子任务数据
+          me.taskDataList = KND.Util.toArray(me.taskData[index]['KL Installation Task']);
+          console.dir(me.taskDataList);
+          if (me.taskDataList.length === 0) {
+            me.taskDataList = KND.Util.toArray(me.taskData[index]);
+          }
         }
       },
       getClose() { // 关闭整个任务
@@ -530,7 +550,8 @@
         this.$router.push({
           name: 'xttd',
           query: {
-            id: me.id
+            id: me.id,
+            userInfo: userInfo
           }
         });
       },
@@ -609,14 +630,38 @@
       },
       addTask(item) {
         console.dir('0');
-        // 跳转详情
-        this.$router.push({
-          name: 'batch',
-          query: {
-            type: 'add',
-            item: item
+        var self = this;
+        this.setItem(item);
+        if (item['KL Detail Type LIC'] === 'Lock Installation Summary') {
+          if (self.detailData['KL Delivery Sales Type'] !== '工程') { // 真锁---工程
+            // 跳转真锁安装批次新增页面
+            this.$router.push({
+              name: 'zsBatch',
+              query: {
+                type: 'add',
+                item: item
+              }
+            });
+          } else { // 真锁---零星
+            // 跳转真锁安装批次新增页面
+            this.$router.push({
+              name: 'sporadic',
+              query: {
+                type: 'add',
+                item: item
+              }
+            });
           }
-        });
+        } else {
+          // 跳转统一批次新增页面
+          this.$router.push({
+            name: 'batch',
+            query: {
+              type: 'add',
+              item: item
+            }
+          });
+        }
       },
       closeTask(item) { // 关闭当前批次
         console.dir(item);
@@ -634,6 +679,7 @@
         });
       },
       routerPage(index, item, state) { // 子任务事件
+        var self = this;
         // 子任务跳转页面
         /*
         * 根据KL Detail Type LIC 判断跳转页面
@@ -650,19 +696,30 @@
           item['KL Detail Type LIC'] === 'Substitution Lock Sign' ||
           item['KL Detail Type LIC'] === 'Lock Sign' ||
           item['KL Detail Type LIC'] === 'Substitution Lock Trans Return') {  // 签收页面
-          if (userInfo.Id) { // 判断是否有权限编辑   登陆者信息与任务负责人匹配则可以编辑
-            this.$router.push({ // 编辑
-              name: 'sign',
-              query: {
-                type: 'edit',
-                item: item
-              }
-            });
-          } else {
+          if (item['Calculated Activity Status'] === 'Completed' || item['Calculated Activity Status'] === 'Ignore' || userInfo['Person UId'] !== item['Primary Owner Id'] || self.pStatus !== 'In Progress') { // Completed = 完成 ，Ignore = 忽略
+            /* if (userInfo['Person UId'] === item['Primary Owner Id']) { // 判断是否有权限编辑   登陆者信息与任务负责人匹配则可以编辑
+              this.$router.push({ // 编辑
+                name: 'sign',
+                query: {
+                  type: 'edit',
+                  item: item
+                }
+              });
+            } else {*/
             this.$router.push({ // 只读
               name: 'sign',
               query: {
                 type: 'read',
+                state: state,
+                item: item
+              }
+            });
+            // }
+          } else {
+            this.$router.push({ // 新增
+              name: 'sign',
+              query: {
+                type: 'add',
                 state: state,
                 item: item
               }
@@ -716,7 +773,7 @@
           }
         }
       },
-      sporadic(item) { // 子任务数据集事件
+      taskClick(item) { // 子任务数据集事件
         // 跳转批次新曾
         this.$router.push({
           name: 'batch',

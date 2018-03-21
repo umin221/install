@@ -3,13 +3,13 @@
       <!--header-->
       <mt-header fixed title="安装订单产品收集">
         <fallback slot="left"></fallback>
-        <mt-button v-show="isDraft && !isTeam"
+        <mt-button v-show="editable"
                    slot="right"
                    @click.native="saveFn">保存</mt-button>
       </mt-header>
 
       <!--detail-->
-      <div class="mint-content" :class="{'disable': !isDraft || isTeam}">
+      <div class="mint-content" :class="{'disable': !editable}">
         <div class="order">
           <mt-cell title="开孔方式"
                    @click.native="showLovFn('KL Hole Type')"
@@ -127,6 +127,10 @@
         let status = this.order['Status'];
         return !status || status === '草稿';
       },
+      // 是否可编辑
+      editable() {
+        return this.isDraft && !this.isTeam;
+      },
       // 是否显示 发起提交 按钮
       showSubmit() {
         return this.isDraft && !this.showTransfer;
@@ -175,7 +179,7 @@
       ...mapActions('app', ['getLov']),
       ...mapMutations(NAMESPACE, ['setOrder']),
       getSwipeBtn(line, index) {
-        return this.isDraft ? [{
+        return this.editable ? [{
           content: '删除',
           style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
           handler: () => this.deleteFn(line, index)
@@ -197,7 +201,7 @@
             query: {
               line: JSON.stringify(line),
               isPanel: isPanel,
-              disable: !this.isDraft
+              editable: this.editable
             }
           });
         };
@@ -240,7 +244,7 @@
         let me = this;
         me.showBox = false;
         // 选择填充
-        this.order[type] = values[0][mapp.optionKey[type]];
+        this.order[type] = values[0]['Value'];
       },
       // 转发门厂技术
       transferFn() {

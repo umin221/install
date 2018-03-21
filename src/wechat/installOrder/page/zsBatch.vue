@@ -13,7 +13,7 @@
                   :class="heartVisible"></mt-field>
         <mt-field label="是否委外" placeholder="请输入签收数量"
                   :class="heartVisible"></mt-field>
-        <mt-field is-link label="委外负责人" placeholder="请输入签收数量"
+        <mt-field is-link label="委外安装员" placeholder="请输入签收数量"
                   :class="heartVisible"></mt-field>
         <mt-field is-link label="真锁交接日期" placeholder="请输入签收数量"
                   :class="heartVisible"></mt-field>
@@ -25,22 +25,8 @@
       </attach>
       <button-group>
         <mt-button type="primary" class="single"
-                   @click.native="handleClick">下一步</mt-button>
+                   @click.native="nextClick">下一步</mt-button>
       </button-group>
-      <!--<mt-cell title="批次">
-        <span>201712010001</span>
-      </mt-cell>
-      <mt-cell title="委外负责人" is-link>
-        <span></span>
-      </mt-cell>
-      <mt-cell title="真锁交接日期" is-link>
-        <span></span>
-      </mt-cell>
-      <mt-cell>
-        <div slot="title" class="list-text"><span style="color:red">*</span>附件：签收单据归档</div>
-      </mt-cell>
-
-      <div class="button-cla"><mt-button type="primary" @click.native="handleClick()">下一步</mt-button></div>-->
     </div>
   </div>
 </template>
@@ -75,6 +61,8 @@
   export default {
     name: 'zsBatch',
     created: () => {
+      let param = this.$route.query;
+      this.item = param.item;
       console.dir(1);
     },
     data: () => {
@@ -82,6 +70,7 @@
         value: '',
         type: 'add', // add 新增 / edit 编辑 / read 只读
         titleVal: '新建安装批次',
+        item: '',
         active: 'tab-container'
       };
     },
@@ -116,9 +105,15 @@
       }
     },
     methods: {
-      butXttd() {
+      nextClick() {
         var self = this;
-        self.$router.go('/xttd');
+        this.$router.push({
+          name: 'buildingInfo',
+          query: {
+            type: 'add',
+            item: self.item
+          }
+        });
       }
     },
     components: {buttonGroup}

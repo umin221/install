@@ -42,7 +42,7 @@
         <mt-cell-swipe class="multiple"
                        @click.native="toOrderFn(item)"
                        v-for="(item, index) in orders"
-                       :right="[{
+                       :right="isTeam ? [] : [{
                                  content: '删除',
                                  style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
                                  handler: () => deleteFn(item, index)
@@ -116,25 +116,33 @@
       },
       // Add Install Order
       toOrderFn(item) {
-        let me = this;
-        delete item['Link'];
-        // 构造默认参数
-        if (!item.Id) {
-          let form = me.form;
-          item = {
-            'Project Id': form.Id,
-            'KL Hole Type': form['Hole Type'],
-            'KL Delivery Check Box 1': form['HBS Check Box 1'],
-            'KL Delivery Check Box 2': form['HBS Check Box 2']
+        let status = item.Status;
+        // 无状态 或者 状态 为 草稿，已驳回时
+        if (!status || status === '已驳回' || status === '草稿') {
+          // 安装订单编辑
+          let me = this;
+          delete item['Link'];
+          // 构造默认参数
+          if (!item.Id) {
+            let form = me.form;
+            item = {
+              'Project Id': form.Id,
+              'KL Hole Type': form['Hole Type'],
+              'KL Delivery Check Box 1': form['HBS Check Box 1'],
+              'KL Delivery Check Box 2': form['HBS Check Box 2']
+            };
           };
-        };
-        me.$router.push({
-          path: 'order',
-          query: {
-            order: JSON.stringify(item),
-            DFEngineer: me.form['Door Factory Engineer']
-          }
-        });
+          me.$router.push({
+            path: 'order',
+            query: {
+              order: JSON.stringify(item),
+              DFEngineer: me.form['Door Factory Engineer']
+            }
+          });
+        } else {
+          // 跳转安装订单模块
+          location.href = '../installOrder/index.html#/detail?id=' + item.Id;
+        }
       },
       // Delete Install Order
       deleteFn(item, index) {

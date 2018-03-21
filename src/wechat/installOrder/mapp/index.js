@@ -3,13 +3,16 @@
  */
 config.mapp = {
   'manager': {
-    '待处理': '门厂技术确认中',
-    '处理中': '安装中,销售已确认',
-    '已完成': '已完成,已取消'
+    '待处理': 'In Confirming',
+    '处理中': 'In Installing,Sales Confirmed',
+    '已完成': 'Closed,Cancelled'
   },
   'list': {
-    '门厂技术确认中': 'pending',
-    '安装中,销售已确认': 'process',
-    '已完成,已取消': 'completed'
+    'In Confirming': 'pending',
+    'In Installing,Sales Confirmed': 'process',
+    'Closed,Cancelled': 'completed'
+  },
+  'option': {
+    'TODO_TYPE': 'Value'
   }
 };
