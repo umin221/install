@@ -235,23 +235,30 @@ export default new Vuex.Store({
             }
           });
         },
-        setPlan({state}, id) {
+        setPlan({state}, obj) {
           api.get({ // 提交详细计划数据
             key: 'setPlan',
             method: 'PUT',
-            data: state.planList,
+            data: {
+              'Id': obj.pcId, // 新增批次返回的ID
+              'Planned': state.planList[0].Planned,
+              'Planned Completion': state.planList[0]['Planned Completion'],
+              'Started': '',
+              'Done': '',
+              'Description': state.planList[0].Description
+            },
             success: function(data) {
-              history.go(-1);
               api.get({ // 更改按钮状态
                 key: 'getUPStatus',
                 method: 'POST',
                 data: {
                   'body': {
                     'ProcessName': 'KL Install Task Submit For Approval Workflow',
-                    'RowId': id
+                    'RowId': obj.itemId
                   }
                 },
                 success: function(data) {
+                  history.go(-1);
                 }
               });
             }

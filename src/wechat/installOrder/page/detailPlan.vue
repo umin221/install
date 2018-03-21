@@ -73,11 +73,11 @@
   import cusField from 'public/components/cus-field';
   import menuBox from 'public/components/cus-menu.vue';
   import api from '../api/api';
-  const NameSpace = 'batch';
+  // const NameSpace = 'detailPlan';
   // mapp
   let mapp = config.mapp;
   export default {
-    name: 'batch',
+    name: 'detailPlan',
     created() {
       console.dir(1);
       var self = this;
@@ -141,7 +141,7 @@
       }
     },
     methods: {
-      ...mapActions(NameSpace, ['setPlanList']),
+      ...mapActions('batch', ['setPlanList']),
       ...mapActions('app', ['getLov']),
       open(picker, key) {
         this.timeKey = key;
@@ -150,7 +150,7 @@
       handleChangePlan(value) {
         let me = this;
         var key = me.timeKey;
-        me.planObj[key] = value.format('yyyy/MM/dd');
+        me.planObj[key] = value.format('MM/dd/yyyy');
         console.dir(me.planObj);
         // me.startDate = value.format('MM/dd/yyyy'); // 后台存值格式
       },
@@ -191,6 +191,7 @@
         self.setPlanList(self.planObj); // 把值添加到数组中 并清空
         self.planObj = {};
         Toast('保存成功');
+        history.go(-1);
       }
     },
     components: {buttonGroup, cusField, menuBox, lockLine}

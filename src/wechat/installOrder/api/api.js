@@ -121,9 +121,7 @@ let apiList = {
   },
   setPlan: option => { // 批次详细计划提交
     return {
-      method: 'get',
-      url: 'data/KL Installation Task Detail Plan/KL Installation Task Detail Plan/?searchspec=[Parent Activity Id] = ' + option.data.id,
-      data: {}
+      url: 'data/KL Installation Task Detail Plan/KL Installation Task Detail Plan/'
     };
   }
 };

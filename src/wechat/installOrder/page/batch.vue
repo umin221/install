@@ -91,7 +91,7 @@
   import api from '../api/api';
   const NameSpace = 'batch';
   export default {
-    name: 'detail',
+    name: 'batch',
     created() {
       console.dir(1);
       var self = this;
@@ -221,7 +221,10 @@
             method: 'PUT',
             data: parma,
             success: function(data) {
-              self.setPlan(self.id);
+              var obj = {};
+              obj.itemId = self.id;
+              obj.pcId = data.items.Id; // 新增批次返回的ID
+              self.setPlan(obj);
             }
           });
         }
