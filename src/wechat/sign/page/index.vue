@@ -20,6 +20,7 @@
         <mt-radio
           v-model="selected"
           :options="['选项A', '选项B', '选项C', '选项D', '选项E']">
+          <p>sadasdasdasd</p>
         </mt-radio>
        </div>
        <button-group class="singBtn">

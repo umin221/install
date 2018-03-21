@@ -1,30 +1,29 @@
+/**
+* @file 新增计划
+* @author  石
+* @date  2018/3/16
+*/
 <template>
   <div id="add-plan">
       <mt-header fixed :title="headTitle">
       <fallback slot="left"></fallback>
     </mt-header>
       <div class="mint-content add-plan">
-        <mt-cell title="工作类型" is-link class="borderBottom" @click.native="tapWorkType">
-          <span>{{submitData.workTypeName}}</span>
+        <mt-cell title="工作类型" class="borderBottom">
+          <span>日常活动</span>
         </mt-cell>
-        <mt-cell title="项目名称" is-link class="borderBottom" @click.native="tapProject">
-          <span>{{submitData.projectName}}</span>
+        <mt-cell title="工作描述" is-link  @click.native="tapWorkDescript">
+          <span>{{workDescDate.Value}}</span>
         </mt-cell>
-        <mt-cell title="工作阶段" is-link class="borderBottom" v-show='isStepShow'>
-          <span>{{submitData.workStepName}}</span>
-        </mt-cell>
-        <mt-cell title="工作描述" is-link v-show='isDescriptShow'>
-          <span>{{submitData.workDescriptName}}</span>
-        </mt-cell>
-        <button-group class="singBtn">
-        <mt-button class="submitBtn" type="primary" 
-                   @click.native="handleSave">保存</mt-button>
-      </button-group>
       <mt-cell title="全天活动" class="margin10 borderBottom">
-          <mt-switch v-model="allDay" @change="changeSwitch"></mt-switch>
+          <mt-switch :value="allDay" @change.native="changeSwitch" :disabled="switchDisabled"></mt-switch>
         </mt-cell>
          <mt-cell title="开始时间" class="borderBottom"><span @click='openStartTime'>{{initDate()}} {{startPickerValue}}</span></mt-cell>
-         <mt-cell title="结束时间" @click='openEndTime'><span @click='openEndTime'>{{initDate()}} {{endPickerValue}}</span></mt-cell>
+         <mt-cell title="结束时间" ><span @click='openEndTime'>{{initDate()}} {{endPickerValue}}</span></mt-cell>
+              <button-group class="singBtn" v-if='saveBtn'>
+        <mt-button class="submitBtn" type="primary" 
+                   @click.native="handleSave">保存</mt-button>
+        </button-group>
       </div>
       <mt-datetime-picker
         ref="startPicker"
@@ -37,96 +36,89 @@
         @confirm="endPickerConfirm"
         :startHour="startHour">
       </mt-datetime-picker>
-      <!--工作类型-->
-      <mt-popup position="bottom" v-model="showWorkType">
-         <menuBox  
-          @my-enter="workTypeEnter"
-          @my-cancel="corkTypeCancel" 
-          @my-change="workTypeChange" vk='name' :type='"workType"'  :slots="workType"></menuBox>
-      </mt-popup>
-      <!--项目名称-->
-      <mt-popup position="bottom" v-model="showProject">
-         <menuBox  
-          @my-enter="projectEnter"
-          @my-cancel="projectCancel" 
-          @my-change="projectChange" vk='name' :type='"project"'  :slots="project"></menuBox>
-      </mt-popup>
-      <!--工作阶段-->
-      <mt-popup position="bottom" v-model="showWorkStep">
-         <menuBox  
-          @my-enter="workStepEnter"
-          @my-cancel="workStepCancel" 
-          @my-change="workStepChange" vk='name' :type='"workStep"'  :slots="workStep"></menuBox>
-      </mt-popup>
       <!--工作描述-->
       <mt-popup position="bottom" v-model="showWorkDescript">
          <menuBox  
           @my-enter="workDescriptEnter"
           @my-cancel="workDescriptCancel" 
-          @my-change="workDescriptChange" vk='name' :type='"workDescript"'  :slots="workDescript"></menuBox>
+          vk='Value' :type='"workDescript"'  :slots="workDescript"></menuBox>
       </mt-popup>
 
   </div>
 </template>
 
 <script type="es6">
+  import api from '../api/api';
+  import {mapState, mapActions} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
   import menuBox from 'public/components/cus-menu.vue';
   import { Cell, DatetimePicker, Toast } from 'mint-ui';
+
+  const NAMESPACE = 'detail';
+
   export default {
     components: {Cell, buttonGroup, DatetimePicker, menuBox},
     name: 'add',
     data() {
       return {
         headTitle: '新建计划',
-        allDay: false, // 是否全天
-        startPickerValue: '', // 开始时间
-        endPickerValue: '',  // 结束时间
+        showWorkDescript: false,
         showWorkType: false, // 项目类型是否显示
-        showProject: false, // 项目名称是否显示
-        showWorkStep: false, // 工作阶段是否显示
-        showWorkDescript: false, // 工作描述是否显示
-        workType: [ // 工作类型
-          {
-            flex: 1,
-            values: [{
-              name: '安装管理',
-              id: 1
-            },
-            {
-              name: '项目管理',
-              id: 2
-            },
-            {
-              name: '其他',
-              id: 3
-            }],
-            textAlign: 'center'
-          }
-        ],
-        project: [], // 项目数据
-        workStep: [], // 工作阶段
-        workDescript: [], // 工作描述
-        submitData: { // 提交参数
-          workTypeName: '请选择',
-          projectName: '请选择',
-          workStepName: '请选择',
-          workDescriptName: '请选择'
-        },
-        isStepShow: true, // 是否显示工作阶段
-        isDescriptShow: true, // 是否显示工作描述
-        startHour: '00' // 结束时间的最小可选值
+        workDescript: [
+          {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
+        ], // 工作描述
+        switchDisabled: false, // 是否禁止全天
+        saveBtn: true // 是否显示保存按钮
       };
     },
     created() {
+      var self = this;
+      if (this.$route.path === '/edit') {
+        this.headTitle = '编辑计划详情';
+        this.setWorkDesc({
+          Value: this.currentDayData[this.$route.query.index]['KL Detail Type']
+        });
+        this.startPickerConfirm(this.currentDayData[this.$route.query.index]['Planned'].replace(/\d+\/\d+\/\d+\s/, ''));
+        this.setEndPicker(this.currentDayData[this.$route.query.index]['Planned Completion'].replace(/\d+\/\d+\/\d+\s/, ''));
+      }
+      // 获取工作描述选项
+      this.getLov({
+        type: 'TODO_TYPE',
+        success: data => {
+          self.workDescript[0].values = data.items;
+        }
+      });
+    },
+    computed: {
+      ...mapState(NAMESPACE, [
+        'workDescDate',
+        'allDay',
+        'startPickerValue',
+        'endPickerValue',
+        'startHour'
+      ]),
+      ...mapState('index', ['currentDayData'])
     },
     methods: {
+      ...mapActions(NAMESPACE, [
+        'setWorkDesc',
+        'setDayAll',
+        'setStartPicker',
+        'setEndPicker',
+        'setStartHour'
+      ]),
+      ...mapActions('app', ['getLov']),
       // 切换全天
-      changeSwitch() {
-        if (this.allDay) {
-          this.startPickerValue = '00:00';
-          this.endPickerValue = '23:59';
+      changeSwitch(val) {
+        if (this.$route.path === '/detail') {
+          this.switchDisabled = true;
+          return;
         }
+        if (event.target.checked) {
+          this.setStartPicker('00:00');
+          this.setEndPicker('23:59');
+        }
+        this.setDayAll(event.target.checked);
       },
       // 获取路由参数 年、月、日
       initDate() {
@@ -134,6 +126,9 @@
       },
       // 点击选开始时间
       openStartTime() {
+        if (this.$route.path === '/detail') {
+          return;
+        }
         if (this.allDay) {
           Toast('你选择了全天');
           return;
@@ -142,104 +137,94 @@
       },
       // 确定开始时间
       startPickerConfirm(date) {
-        this.startPickerValue = date;
+        this.setStartPicker(date);
         // 限制结束时间只能是开始时间之后
         date.replace(/^\d{2}/, (val, index) => {
-          this.startHour = val;
+          this.setStartHour(val);
         });
         // 如果开始时间 > 结束时间，则清空结束时间
         if (date >= this.endPickerValue) {
-          this.endPickerValue = '';
+          this.setEndPicker('');
         }
       },
       // 确定结束时间
       endPickerConfirm(date) {
         if (this.startPickerValue < date) {
-          this.endPickerValue = date;
+          this.setEndPicker(date);
         } else {
           Toast('结束时间必须大于开始时间');
         }
       },
       // 点击选结束时间
       openEndTime() {
+        if (this.$route.path === '/detail') {
+          return;
+        }
         if (this.allDay) {
           Toast('你选择了全天');
           return;
         }
         this.$refs.endPicker.open();
       },
-      // 点击工作类型
-      tapWorkType() {
-        this.showWorkType = true;
-      },
-      // 点击确定 (工作类型弹窗)
-      workTypeEnter(val) {
-        this.showWorkType = false;
-        this.submitData.workTypeName = val[0].name;
-        // 如果工作类型是 "其他" 隐藏 【项目名称】、【工作阶段】 字段
-        if (val[0].id === 3) {
-          this.isStepShow = false;
-          this.isDescriptShow = false;
-        } else {
-          this.isStepShow = true;
-          this.isDescriptShow = true;
+      // 点击工作阶段
+      tapWorkDescript() {
+        if (this.$route.path === '/detail') {
+          return;
         }
-        this.getProjectData(val[0].id);
-      },
-      // 取消工作类型弹窗
-      corkTypeCancel() {
-        this.showWorkType = false;
-      },
-      // 修改了工作类型数据
-      workTypeChange(val) {
-        console.log(val);
-      },
-      // 点击项目名称
-      tapProject() {
-        this.showProject = true;
-      },
-      // 点击确定 (项目名称弹窗)
-      projectEnter(val) {
-        this.showProject = false;
-        this.submitData.projectName = val[0].name;
-      },
-      // 取消项目名称弹窗
-      projectCancel() {
-        this.showProject = false;
-      },
-      // 修改了项目名称数据
-      projectChange(val) {
-        console.log(val);
-      },
-      // 点击确定 (工作阶段弹窗)
-      workStepEnter(val) {
-        this.showWorkStep = false;
-        this.submitData.workStepName = val[0].name;
-      },
-      // 取消工作阶段弹窗
-      workStepCancel() {
-        this.showWorkStep = false;
-      },
-      // 修改了工作阶段数据
-      workStepChange(val) {
-        console.log(val);
+        this.showWorkDescript = true;
       },
       // 点击确定 (工作描述弹窗)
       workDescriptEnter(val) {
         this.showWorkDescript = false;
-        this.submitData.workDescriptName = val[0].name;
+        this.setWorkDesc(val[0]);
       },
       // 取消工作描述弹窗
       workDescriptCancel() {
         this.showWorkDescript = false;
       },
-      // 修改了工作描述数据
-      workDescriptChange(val) {
-        console.log(val);
-      },
       // 根据工作类型获取项目数据
       getProjectData(id, callback) {
         console.log(id);
+      },
+      // 保存
+      handleSave() {
+        var self = this;
+        var year = this.$route.query.year;
+        var month = this.$route.query.month;
+        if (month < 10) month = `0${month}`;
+        var day = this.$route.query.day;
+        if (day < 10) day = `0${day}`;
+        var id = '';
+        if (this.$route.path === '/edit') {
+          id = this.currentDayData[this.$route.query.index]['Id'];
+          this.startPickerValue = this.startPickerValue.replace(/\d+:\d+:\d+/, (a, b) => {
+            this.setStartPicker(this.startPickerValue.substr(0, this.startPickerValue.length - 3));
+          });
+          this.endPickerValue = this.endPickerValue.replace(/\d+:\d+:\d+/, (a, b) => {
+            this.setEndPicker(this.endPickerValue.substr(0, this.endPickerValue.length - 3));
+          });
+        } else {
+          id = new Date().getTime();
+        }
+        api.get({
+          key: 'add',
+          data: {
+            'Id': id, // 对应的id
+            'Type': '日常活动', // 工作类型
+            'KL Detail Type': this.workDescDate.value, // 工作描述
+            'Planned': month + '/' + day + '/' + year + ' ' + this.startPickerValue + ':00', // 计划开始时间
+            'Planned Completion': month + '/' + day + '/' + year + ' ' + this.endPickerValue + ':00' // 计划结束时间
+          },
+          success: data => {
+            console.log(data);
+            if (data.items.Id) {
+              MessageBox('提示', '新建计划成功').then(action => {
+                self.$router.back();
+              });
+            }
+          }
+        });
+        console.log('save...');
       }
     }
   };

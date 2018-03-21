@@ -1,3 +1,8 @@
+/**
+* @file 复选框
+* @author  石
+* @date  2018/3/16
+*/
 <template>
   <div class="check-modle">
     <span class="mint-checkbox">
