@@ -14,15 +14,18 @@
                   :class="heartVisible" v-model="batchNum"></mt-field>
       </div>
       <div class="lock-line">
-        <lock-line title="详细计划" @click="addPlanObj('add')">
-          <mt-cell-swipe v-for="(line, index) in planObj" class="lock-line-cell enable" ref="body"
-                         @click.native="addPlanObj('read')"
-                         :key="line['Id']"
+        <lock-line title="详细计划" @click="addPlanList('add')">
+          <mt-cell-swipe v-for="(line, index) in planList" class="lock-line-cell enable" ref="body"
+                         @click.native="addPlanList('read')"
+                         :key=index
                          is-link>
             <div class="co-flex co-jc" slot="title">
-              <span class="co-f1">{{line['KL Product Model No']}}</span>
-              <span class="co-f1">开向:{{line['KL Hole Direction']}}</span>
-              <span class="co-f1">数量:{{line['Quantity Requested']}}</span>
+            <span class="co-f1">{{line.Description}}</span>
+            <span class="co-f1">{{line.TODO_TYPE}}</span>
+          </div>
+            <div class="co-flex co-jc" slot="title">
+              <span class="co-f1">{{line.Planned}}</span>
+              <span class="co-f1">{{line['Planned Completion']}}</span>
             </div>
           </mt-cell-swipe>
         </lock-line>
@@ -75,6 +78,9 @@
       .lock-line-cell {
         background-color: $bg-light;
       }
+      .co-flex {
+        line-height: 30px;
+      }
     }
   }
 </style>
@@ -105,7 +111,7 @@
       } else {
         self.titleVal = '开孔批次详情';
         this.getBatch(this.item);
-        this.getPlanObj(this.item);
+        this.getPlanList(this.item);
       }
     },
     data: () => {
@@ -133,7 +139,7 @@
       });
     },
     computed: {
-      ...mapState(NameSpace, ['planObj']),
+      ...mapState(NameSpace, ['planList']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -144,7 +150,10 @@
       }
     },
     methods: {
-      ...mapActions(NameSpace, ['getPlanObj', 'setPlan']),
+      ...mapActions(NameSpace, ['getPlanList', 'setPlan']),
+      upList(obj) {
+        return KND.Util.toArray(obj);
+      },
       open(picker) {
         this.$refs[picker].open();
       },
@@ -158,14 +167,16 @@
         me.end_Date = value.format('yyyy/MM/dd');
         me.endDate = value.format('MM/dd/yyyy');
       },
-      addPlanObj(type) {
+      addPlanList(type) {
         let me = this;
+        let planType = me.item['KL Installation Task'][0]['KL Detail Type']; // 取统一批次
         this.$router.push({
           name: 'detailPlan',
           query: {
             type: type,
+            planType: planType,
             id: me.id,
-            item: this.item
+            item: me.item
           }
         });
       },
@@ -189,29 +200,31 @@
       },
       submitFn() {
         var self = this;
-        var parma = {
-          'Planned': self.startDate,
-          'Planned Completion': self.endDate,
-          'KL Install Amount Requested': self.batchNum,
-          'Id': self.batchCode,
-          'KL Detail Type': self.item['KL Detail Type'],
-          'Parent Activity Id': self.item.Id
-        };
-        if (self.type === 'add') {
-          parma.Status = '设定计划';
-          parma['KL Detail Type'] = self.item['KL Installation Task'][0]['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
-          parma['Template Id'] = self.item['KL Installation Task']['Template Id'];
-        } else {
-          parma['KL Detail Type'] = self.item['KL Detail Type'];
-        }
-        api.get({ // 提交数据
-          key: 'getUPData',
-          method: 'PUT',
-          data: parma,
-          success: function(data) {
-            self.setPlan(self.id);
+        if (self.planList.length > 0) { // 详细计划不能为空   先提交批次再提交详细计划
+          var parma = {
+            'Planned': self.startDate,
+            'Planned Completion': self.endDate,
+            'KL Install Amount Requested': self.batchNum,
+            'Id': self.batchCode,
+            'KL Detail Type': self.item['KL Detail Type'],
+            'Parent Activity Id': self.item.Id
+          };
+          if (self.type === 'add') {
+            parma.Status = '设定计划';
+            parma['KL Detail Type'] = self.item['KL Installation Task'][0]['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
+            parma['Template Id'] = self.item['KL Installation Task']['Template Id'];
+          } else {
+            parma['KL Detail Type'] = self.item['KL Detail Type'];
           }
-        });
+          api.get({ // 提交数据
+            key: 'getUPData',
+            method: 'PUT',
+            data: parma,
+            success: function(data) {
+              self.setPlan(self.id);
+            }
+          });
+        }
       }
     },
     components: {buttonGroup, lockLine}

@@ -631,6 +631,7 @@
       addTask(item) {
         console.dir('0');
         var self = this;
+        this.setItem(item);
         if (item['KL Detail Type LIC'] === 'Lock Installation Summary') {
           if (self.detailData['KL Delivery Sales Type'] !== '工程') { // 真锁---工程
             // 跳转真锁安装批次新增页面

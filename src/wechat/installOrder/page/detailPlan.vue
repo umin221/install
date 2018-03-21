@@ -9,8 +9,8 @@
                    @click.native="showLovFn('TODO_TYPE')"
                    v-model="planObj['TODO_TYPE']"
                    is-link></cus-field>
-        <mt-cell title="计划开始日期" @click.native="open('picker')" :value="planObj.Planned" is-link></mt-cell>
-        <mt-cell title="计划完成日期" @click.native="open('pickerEnd')" :value="planObj['Planned Completion']" is-link></mt-cell>
+        <mt-cell title="计划开始日期" @click.native="open('picker','Planned')" :value="planObj.Planned" is-link></mt-cell>
+        <mt-cell title="计划完成日期" @click.native="open('picker', 'Planned Completion')" :value="planObj['Planned Completion']" is-link></mt-cell>
         <mt-cell v-show="type==='edit'" title="实际开始日期" @click.native="open('picker')" :value="planObj.Planned" is-link></mt-cell>
         <mt-cell v-show="type==='edit'" title="实际结束日期" @click.native="open('pickerEnd')" :value="planObj['Planned Completion']" is-link></mt-cell>
         <cus-field label="备注"
@@ -29,16 +29,7 @@
         month-format="{value} 月"
         date-format="{value} 日"
         class="datetime"
-        @confirm="handleChange">
-      </mt-datetime-picker>
-      <mt-datetime-picker
-        ref="pickerEnd"
-        type="date"
-        year-format="{value} 年"
-        month-format="{value} 月"
-        date-format="{value} 日"
-        class="datetime"
-        @confirm="handleChangeEnd">
+        @confirm="handleChangePlan">
       </mt-datetime-picker>
     </div>
     <mt-popup v-model="showBox" position="bottom">
@@ -76,7 +67,7 @@
   }
 </style>
 <script type="application/javascript">
-  import {mapState, mapActions} from 'vuex';
+  import {mapActions} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
   import lockLine from '../components/cusLockLine';
   import cusField from 'public/components/cus-field';
@@ -86,40 +77,44 @@
   // mapp
   let mapp = config.mapp;
   export default {
-    name: 'detail',
+    name: 'batch',
     created() {
       console.dir(1);
       var self = this;
       let param = this.$route.query;
-      this.id = param.item.Id;
-      this.type = param.item.type;
-      this.item = param.item;
-      console.dir('=====' + this.id);
+      self.id = param.Id;
+      self.planType = param.planType;
+      self.type = param.type;
+      self.planItem = param.item;
+      console.dir(self.planItem);
       // 获取详情
-      if (this.type === 'add') {
+      if (self.type === 'add') {
+        // 取 lov 门材质
+        self.getLov({
+          data: {
+            'Type': 'TODO_TYPE',
+            'Parent Value': self.planType
+          },
+          success: data => {
+            mapp.option['TODO_TYPE'] = KND.Util.toArray(data.items);
+          }
+        });
       } else {
-        this.getBatch(this.item);
+        self.getBatch(self.planItem);
       }
-      // 取 lov 门材质
-      self.getLov({
-        data: {
-          'Type': 'TODO_TYPE',
-          'Parent Value': self.item['KL Detail Type']
-        },
-        success: data => {
-          mapp.option['KL Door Material Quality'] = data.items;
-        }
-      });
     },
     data: () => {
       return {
         value: '',
         pickerVisible: true,
         id: '',
-        item: '',
+        timeKey: '', // 标记什么时间
+        planItem: '',
+        planType: '',
         type: 'add', // add 新增 / edit 编辑 / read 只读
         titleVal: '新建详细计划',
         vk: 'Value',
+        planObj: {},
         slots: [
           {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
         ],
@@ -136,7 +131,6 @@
       });
     },
     computed: {
-      ...mapState(NameSpace, ['planObj']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -147,20 +141,23 @@
       }
     },
     methods: {
+      ...mapActions(NameSpace, ['setPlanList']),
       ...mapActions('app', ['getLov']),
-      open(picker) {
+      open(picker, key) {
+        this.timeKey = key;
         this.$refs[picker].open();
       },
-      handleChange(value) {
-      },
-      handleChangeEnd(value) {
+      handleChangePlan(value) {
+        let me = this;
+        var key = me.timeKey;
+        me.planObj[key] = value.format('yyyy/MM/dd');
+        console.dir(me.planObj);
+        // me.startDate = value.format('MM/dd/yyyy'); // 后台存值格式
       },
       // 选择对话框
       showLovFn(type) {
         this.lovType = type;
         this.showBox = true;
-        // 选择产品的 value-key 为 KL Product Model No ， 其他为 Value
-        this.vk = type === 'agreementItem' ? 'KL Product Model No' : 'Value';
         this.slots[0].values = mapp.option[type];
       },
       // 选择确认
@@ -169,9 +166,7 @@
         let me = this;
         me.showBox = false;
         // 选择填充
-        this.line[type] = values[0]['Value'];
-        console.log(this[type]);
-        this[type] = values[0];
+        this.planObj[type] = values[0]['Value'];
       },
       getBatch(obj) {
         var self = this;
@@ -192,6 +187,10 @@
         });
       },
       submitFn() {
+        var self = this;
+        self.setPlanList(self.planObj); // 把值添加到数组中 并清空
+        self.planObj = {};
+        Toast('保存成功');
       }
     },
     components: {buttonGroup, cusField, menuBox, lockLine}

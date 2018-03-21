@@ -13,6 +13,6 @@ config.mapp = {
     'Closed,Cancelled': 'completed'
   },
   'option': {
-    'KL Door Material Quality': [] // 门材质
+    'TODO_TYPE': 'Value'
   }
 };

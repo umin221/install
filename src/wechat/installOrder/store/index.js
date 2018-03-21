@@ -6,7 +6,7 @@ import { app } from 'public/store';
 Vue.use(Vuex);
 
 // 缓存页面
-app.state.alive = ['index'];
+app.state.alive = ['index', 'batch'];
 
 // 每页加载条数
 const PAGESIZE = config.pageSize;
@@ -184,7 +184,6 @@ export default new Vuex.Store({
               'Id': item.Id
             },
             success: function(data) {
-              history.go(-1);
               dispatch('getTpye', item);
             }
           });
@@ -219,15 +218,12 @@ export default new Vuex.Store({
     batch: {
       namespaced: true,
       state: {
-        planObj: ''
+        planList: []
       },
       mutations: {
-        setSign(state, form) {
-          state.form = form;
-        }
       },
       actions: {
-        getPlanObj(state, obj) {
+        getPlanList({state}, obj) {
           api.get({ // 提交数据
             key: 'getPlan',
             method: 'GET',
@@ -235,15 +231,15 @@ export default new Vuex.Store({
               id: obj['Parent Activity Id']
             },
             success: function(data) {
-              state.planObj = data;
+              state.planList = data;
             }
           });
         },
-        setPlan(state, id) {
+        setPlan({state}, id) {
           api.get({ // 提交详细计划数据
             key: 'setPlan',
             method: 'PUT',
-            data: state.planObj,
+            data: state.planList,
             success: function(data) {
               history.go(-1);
               api.get({ // 更改按钮状态
@@ -260,6 +256,9 @@ export default new Vuex.Store({
               });
             }
           });
+        },
+        setPlanList({state}, obj) {
+          state.planList.push(obj);
         }
       }
     },
