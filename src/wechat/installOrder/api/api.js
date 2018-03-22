@@ -123,6 +123,18 @@ let apiList = {
     return {
       url: 'data/KL Installation Task Detail Plan/KL Installation Task Detail Plan/'
     };
+  },
+  getJournalData: option => {
+    return {
+      method: 'get',
+      url: 'data/KL Installation Detail/KL Installation Detail/?searchspec=[Activity Id] =' + "'" + option.data.id + "'",
+      data: {}
+    };
+  },
+  setJourna: option => {
+    return {
+      url: 'data/KL Installation Detail/KL Installation Detail'
+    };
   }
 };
 

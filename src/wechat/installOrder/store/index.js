@@ -189,6 +189,7 @@ export default new Vuex.Store({
           });
         },
         getTpye({commit}, item) {
+          var self = this;
           var processName = ''; // KL Record Install Process Flg == N 请求关闭接口 Y 提交接口
           if (item['KL Record Install Process Flg'] === 'N') {
             if (item.box1) { // 涉及签收
@@ -209,10 +210,39 @@ export default new Vuex.Store({
               }
             },
             success: function(data) {
-              history.go(-1);
+              if (!data.ERROR) {
+                Toast('提交成功');
+                self.$route().back();
+              }
             }
           });
         }
+      }
+    },
+    updateDoorNext: {
+      namespaced: true,
+      state: {
+        form: '',
+        attach: {
+          list: [{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}],
+          edit: false,
+          title: '合同附件'
+        } // 附件
+      },
+      mutations: {
+      }
+    },
+    journal: {
+      namespaced: true,
+      state: {
+        form: '',
+        attach: {
+          list: [{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}],
+          edit: false,
+          title: '合同附件'
+        } // 附件
+      },
+      mutations: {
       }
     },
     batch: {
@@ -236,6 +266,7 @@ export default new Vuex.Store({
           });
         },
         setPlan({state}, obj) {
+          var self = this;
           api.get({ // 提交详细计划数据
             key: 'setPlan',
             method: 'PUT',
@@ -258,7 +289,10 @@ export default new Vuex.Store({
                   }
                 },
                 success: function(data) {
-                  history.go(-1);
+                  if (!data.ERROR) {
+                    Toast('提交成功');
+                    self.$route().back();
+                  }
                 }
               });
             }

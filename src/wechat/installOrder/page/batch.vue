@@ -31,7 +31,7 @@
         </lock-line>
       </div>
       <button-group>
-        <mt-button type="primary" class="single"
+        <mt-button class="single"
                    @click.native="submitFn">提交</mt-button>
       </button-group>
       <mt-datetime-picker
@@ -151,6 +151,7 @@
     },
     methods: {
       ...mapActions(NameSpace, ['getPlanList', 'setPlan']),
+      ...mapActions('app', ['getLov']),
       upList(obj) {
         return KND.Util.toArray(obj);
       },
@@ -169,7 +170,7 @@
       },
       addPlanList(type) {
         let me = this;
-        let planType = me.item['KL Installation Task'][0]['KL Detail Type']; // 取统一批次
+        let planType = KND.Util.toArray(me.item['KL Installation Task'])[0]['KL Detail Type']; // 取统一批次
         this.$router.push({
           name: 'detailPlan',
           query: {
@@ -210,23 +211,46 @@
             'Parent Activity Id': self.item.Id
           };
           if (self.type === 'add') {
-            parma.Status = '设定计划';
-            parma['KL Detail Type'] = self.item['KL Installation Task'][0]['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
-            parma['Template Id'] = self.item['KL Installation Task']['Template Id'];
+            // Type:EVENT_STATUS code:Planning
+            // 取 lov Status '设定计划'
+            var Status = '';
+            self.getLov({ // 取类型值
+              data: {
+                'Type': 'EVENT_STATUS',
+                'Name': 'Planning'
+              },
+              success: data => {
+                Status = KND.Util.toArray(data.items)[0].Value;
+                parma.Status = Status;
+                parma['KL Detail Type'] = KND.Util.toArray(self.item['KL Installation Task'])[0]['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
+                parma['Template Id'] = KND.Util.toArray(self.item['KL Installation Task'])[0]['Template Id'];
+                parma['Order Id'] = KND.Util.toArray(self.item['KL Installation Task'])[0]['Order Id'];
+                api.get({ // 提交数据
+                  key: 'getUPData',
+                  method: 'PUT',
+                  data: parma,
+                  success: function(data) {
+                    var obj = {};
+                    obj.itemId = self.id;
+                    obj.pcId = data.items.Id; // 新增批次返回的ID
+                    self.setPlan(obj);
+                  }
+                });
+              }
+            });
           } else {
-            parma['KL Detail Type'] = self.item['KL Detail Type'];
+            api.get({ // 提交数据
+              key: 'getUPData',
+              method: 'PUT',
+              data: parma,
+              success: function(data) {
+                var obj = {};
+                obj.itemId = self.id;
+                obj.pcId = data.items.Id; // 新增批次返回的ID
+                self.setPlan(obj);
+              }
+            });
           }
-          api.get({ // 提交数据
-            key: 'getUPData',
-            method: 'PUT',
-            data: parma,
-            success: function(data) {
-              var obj = {};
-              obj.itemId = self.id;
-              obj.pcId = data.items.Id; // 新增批次返回的ID
-              self.setPlan(obj);
-            }
-          });
         }
       }
     },

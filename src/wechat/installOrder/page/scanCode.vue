@@ -15,7 +15,7 @@
       <mt-cell is-link >
         <div slot="title" class="list-text"><span style="color:red">*</span>产品型号</div>
       </mt-cell>
-      <div class="button-cla"><mt-button type="primary" @click.native="handleClick()">提交</mt-button></div>
+      <div class="button-cla"><mt-button @click.native="handleClick()">提交</mt-button></div>
     </div>
   </div>
 </template>

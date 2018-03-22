@@ -7,11 +7,14 @@
       <mt-cell  v-for="(item, index) in xttdDetailData" :key="index" :title="item['Active Last Name']" v-if="item['SSA Primary Field'] === 'N'">
         <span>{{item['Position Type']}}</span>
       </mt-cell>
-      <mt-cell :title="isPrimaryMVGName" is-link @click.native="upPerson()">
+      <mt-cell :title="isPrimaryMVGName" v-if="!isUpPrimary">
+        <span>{{isPrimaryMVGPosition}}</span>
+      </mt-cell>
+      <mt-cell :title="isPrimaryMVGName" is-link @click.native="upPerson()" v-if="isUpPrimary">
         <span>{{isPrimaryMVGPosition}}</span>
       </mt-cell>
     </div>
-    <button-group>
+    <button-group v-show="isUpPrimary">
       <mt-button type="primary" class="single"
                  @click.native="submitFn">确认分配</mt-button>
     </button-group>
@@ -29,6 +32,9 @@
     created() {
       let me = this;
       me.userInfo = me.$route.query.userInfo;
+      if (me.userInfo['KL Primary Position Type LIC'] === 'Field Service Manager') {
+        me.isUpPrimary = true;
+      }
       if (this.select.Id) { // 选择团队选回来的负责人
         this.isPrimaryMVGName = this.select['Last Name']; // 主要负责人名字
         this.isPrimaryMVGPosition = this.select['KL Primary Position Type'];  // 主要负责人职位
@@ -67,6 +73,7 @@
         id: '',
         value: '',
         userInfo: '',
+        isUpPrimary: false, // 是否有权限修改安装工程师 false==没有
         isPrimaryMVGName: 'XXX', // 主要负责人名字
         isPrimaryMVGPosition: '安装工程师',  // 主要负责人职位
         xttdDetail: '',
@@ -88,9 +95,7 @@
     methods: {
       upPerson() { // 选择安装工程师
         var me = this;
-        if (me.userInfo['KL Primary Position Type LIC'] === 'Field Service Manager') { // 安装主管才能修改安装工程师
-          this.$router.push('engineer');
-        }
+        me.$router.push('engineer');
       },
       submitFn() {
         var self = this;

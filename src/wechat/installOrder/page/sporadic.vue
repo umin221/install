@@ -11,7 +11,7 @@
         <div slot="title" class="list-text"><span></span><span>{{item.name}}</span></div>
       </mt-cell>
       <button-group>
-        <mt-button type="primary" class="single"
+        <mt-button class="single"
                    @click.native="scavenging">扫码安装</mt-button>
       </button-group>
     </div>

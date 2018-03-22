@@ -18,7 +18,7 @@
                    v-model="planObj['Description']"></cus-field>
       </div>
       <button-group>
-        <mt-button type="primary" class="single"
+        <mt-button class="single"
                    @click.native="submitFn">保存</mt-button>
       </button-group>
       <mt-datetime-picker
