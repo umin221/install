@@ -26,7 +26,7 @@
     </div>
 
     <button-group>
-      <mt-button type="primary" class="single" v-show="!read"
+      <mt-button class="single" v-show="!read"
                  @click.native="submitFn">提交</mt-button>
     </button-group>
   </div>
@@ -46,6 +46,7 @@
 
   const NameSpace = 'sign';
   export default {
+    name: 'sign',
     // 初始化
     created() {
       let param = this.$route.query;

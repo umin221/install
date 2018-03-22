@@ -71,10 +71,16 @@ export default new Router({
       require(['../page/detailPlan'], resolve);
     }
   }, {
-    path: '/updateDoor', // 挂门验收
+    path: '/updateDoor', // 验收1
     name: 'updateDoor',
     component(resolve) {
       require(['../page/updateDoor'], resolve);
+    }
+  }, {
+    path: '/updateDoorNext', // 验收2
+    name: 'updateDoorNext',
+    component(resolve) {
+      require(['../page/updateDoorNext'], resolve);
     }
   }, {
     path: '/journal', // 日志页面

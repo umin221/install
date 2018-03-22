@@ -7,26 +7,18 @@
     </mt-header>
     <div class="mint-content zsBatch">
       <div :class="{'readonly':read}">
-        <cus-field label="开孔数量"
+        <cus-field label="全检数量"
                    type="number"
                    :class="heartVisible"
                    v-model="line['Completed Install Amount']"></cus-field>
-        <cus-field label="合格数量"
-                   type="number"
-                   v-model="line['Qualified Amoun']"></cus-field>
-        <cus-field label="异常数量"
-                   type="number"
-                   v-model="line['Unqualified Amount']"></cus-field>
-        <cus-field label="异常处理数量"
-                   type="number"
-                   v-model="line['Unqualified Solve Amount']"></cus-field>
-        <cus-field label="异常描述"
-                   type="textarea"
-                   v-model="line['Unqualified Desc']"></cus-field>
-        <cus-field label="异常处理描述"
+        <cus-field label="备注说明"
                    type="textarea"
                    v-model="line['Unqualified Solve Desc']"></cus-field>
       </div>
+      <attach :attach="attach.list"
+              :edit="!read"
+              :title="title">
+      </attach>
       <button-group>
         <mt-button class="single"
                    @click="submitFn">提交</mt-button>
@@ -52,12 +44,18 @@
   }
 </style>
 <script type="application/javascript">
+  import {mapState} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
   import api from '../api/api';
-
+  let right = [{
+    content: '删除',
+    style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
+    handler: () => this.$messagebox('delete')
+  }];
+  const NameSpace = 'updateDoorNext';
   export default {
-    name: 'updateDoor',
+    name: 'updateDoorNext',
     created() {
       let param = this.$route.query;
       this.id = param.id;
@@ -80,9 +78,13 @@
       });
     },
     computed: {
+      ...mapState(NameSpace, ['form', 'attach']),
       // 表单只读
       read() {
         return this.type === 'read';
+      },
+      right() {
+        return this.state === 'valid' ? right : [];
       },
       // * 是否显示
       heartVisible() {
@@ -94,8 +96,6 @@
        * 查看&编辑标题一致
        */
       title() {
-        let type = this.type;
-        return type === 'add' ? '挂门进度更新' : '挂门进度更新详情';
       }
     },
     methods: {
@@ -105,7 +105,7 @@
           name: 'journal',
           query: {
             id: self.id,
-            type: 'updateDoor'
+            type: 'updateDoorNext'
           }
         });
       },

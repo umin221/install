@@ -24,7 +24,7 @@
               :title="title">
       </attach>
       <button-group>
-        <mt-button type="primary" class="single"
+        <mt-button class="single"
                    @click.native="nextClick">下一步</mt-button>
       </button-group>
     </div>

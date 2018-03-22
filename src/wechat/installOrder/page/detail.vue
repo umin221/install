@@ -103,7 +103,7 @@
       <div class="mint-content-info">
         <empty v-show="!taskDataList.length"></empty>
         <div class="crm-zyList" v-for="(item, index) in taskDataList" :key="index">
-          <ul class="content" @click.nataive="routerPage(index, item, '')">
+          <ul class="content" @click="routerPage(index, item, '')">
             <li class="bd-radius">
               <span class="icon"></span>
             </li>
@@ -127,11 +127,11 @@
             item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
             item['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
             item['KL Detail Type LIC'] === 'Transfer Summary'" >
-              <span @click.nataive.stop="closeTask(item)">关闭</span>
-              <span @click.nataive.stop="addTask(item)">新增</span>
+              <span @click.stop="closeTask(item)" class="batchClose"></span>
+              <span @click.stop="addTask(item)" class="batchAdd"></span>
             </div>
             <li style="margin-right: 8px" v-if="item['KL Detail Type LIC'] === 'Ship From Door Factory' && item['Calculated Activity Status'] === 'Not Started'">
-              <span class="mt-switch"><mt-switch v-model="shipmentVal"  @click.nataive.stop="shipment(item)"></mt-switch></span>
+              <span class="mt-switch"><mt-switch v-model="shipmentVal"  @click.native.stop="shipment(item)"></mt-switch></span>
             </li>
             <div class="content-div"  v-if="item['KL Detail Type LIC']==='Trompil Batch Summary' ||
             item['KL Detail Type LIC']==='Lock Body Install Summary' ||
@@ -140,15 +140,15 @@
             item['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
             item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
             item['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
-            item['KL Detail Type LIC'] === 'Transfer Summary'" v-for="(itemTask, index) in upList(item['KL Installation Task'])" :key="index" @click.nataive.stop="taskClick(itemTask)">
+            item['KL Detail Type LIC'] === 'Transfer Summary'" v-for="(itemTask, index) in upList(item['KL Installation Task'])" :key="index" @click.stop="updateDoor(itemTask,item)">
               <div class="readonly">
-                <mt-field label="批次" :value="itemTask.Id"></mt-field>
-                <mt-field label="已完成/计划数量"  v-if="item['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
+                <mt-field label="批次" class="itemTaskId" :value="itemTask.Id"  @click.native.stop="taskClick(itemTask)"></mt-field>
+                <mt-field label="已完成/计划数量"  class="itemTask" v-if="item['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
           item['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
           item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
           item['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
           item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
-          item['KL Detail Type LIC'] === 'Transfer Summary'" :value="item['KL Completed Install Amount']+'/'+item['KL Install Amount Requested']"></mt-field>
+          item['KL Detail Type LIC'] === 'Transfer Summary'" :value="item['KL Completed Install Amount']+'/'+item['KL Install Amount Requested']"><span @click.stop="closeTask(itemTask)" class="batchClose"></span></mt-field>
                 <mt-field label="合格/计划数量" v-if="item['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
             item['KL Detail Type LIC'] === 'Check Before Trans Summary'" :value="item['KL Qualified Amount']+'/'+item['KL Spot Check Amount']"></mt-field>
                 <mt-field label="时间" :value="new Date(itemTask['Planned Completion']).format('yyyy-MM-dd')"></mt-field>
@@ -183,7 +183,7 @@
       content: '\E601';
       font-size: 1rem;
     }
-    .mint-content-div{
+    .mint-content-div {
       width: 98%;
       height: 30px;
       margin-top: 5px;
@@ -213,18 +213,39 @@
     .crm-zyList ul li {
       list-style: none;
     }
-    .crm-zyList ul .butLi{
+    .crm-zyList ul .butLi {
       position: absolute;
-      right: 10px;
+      right: 0px;
       top: 0px;
       line-height: 27px;
+      width: 60px;
       height: 27px;
     }
     .crm-zyList ul .butLi span {
       display: inline-block;
       text-align: center;
-      font-size: 14px!important;
-      color: #999!important;
+      width: 25px;
+      font-size: 14px !important;
+      color: #999 !important;
+    }
+    .batchClose::before {
+      font-family: "kinlong-icon" !important;
+      font-style: normal;
+      font-size: 1rem;
+      content: '\A152';
+      color: red;
+    }
+     .itemTask .batchClose {
+      position: relative;
+       width: 25px;
+      right: -9px;
+    }
+    .butLi .batchAdd::before{
+      font-family: "kinlong-icon" !important;
+      font-style: normal;
+      font-size: 1rem;
+      content: '\A153';
+      color: #356DFC;
     }
     .crm-zyList .content {
       position: relative;
@@ -239,7 +260,7 @@
       left: -20px;
       top: 0px;
     }
-    .crm-zyList .icon{
+    .crm-zyList .icon {
       border-radius: 26px;
       background: #8bc17c;
       color: #fff;
@@ -263,7 +284,7 @@
       color: #999;
       line-height: 27px;
     }
-    .content li :nth-of-type(2),.mt-switch {
+    .content li :nth-of-type(2), .mt-switch {
       position: absolute;
       top: 23px;
       right: 10px;
@@ -433,6 +454,10 @@
     .stage_li > .mui-scroll-wrapper a > div.grey {
       color: #cccccc;
     }
+    .itemTaskId .mint-cell-value input {
+      color: #0772c1;
+    }
+
   }
 </style>
 <script type="application/javascript">
@@ -631,7 +656,7 @@
       addTask(item) {
         console.dir('0');
         var self = this;
-        if (item['KL Detail Type LIC'] === 'Lock Installation Summary') {
+        if (item['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次新增
           if (self.detailData['KL Delivery Sales Type'] !== '工程') { // 真锁---工程
             // 跳转真锁安装批次新增页面
             this.$router.push({
@@ -670,7 +695,7 @@
           data: {
             'body': {
               'ProcessName': 'KL Install Task Close Action Workflow',
-              'RowId': item.id
+              'RowId': item.Id
             }
           },
           success: function(data) {
@@ -743,37 +768,10 @@
           * Transfer Summary 移交汇总
           * */
          // self.$router.push('batch');
-          // 跳转批次新曾
-          this.$router.push({
-            name: 'batch',
-            query: {
-              type: 'add',
-              item: item
-            }
-          });
-        } else if (index === 4) {
-          // 详情
-          if (index === 4) {
-            this.$router.push({
-              name: 'updateDoor',
-              query: {
-                item: item
-              }
-            });
-          } else { // 新曾
-            this.$router.push({
-              name: 'updateDoor',
-              query: {
-                type: 'read',
-                state: state,
-                item: item
-              }
-            });
-          }
         }
       },
       taskClick(item) { // 子任务数据集事件
-        // 跳转批次新曾
+        // 跳转批次详情、编辑
         this.$router.push({
           name: 'batch',
           query: {
@@ -781,8 +779,46 @@
             item: item
           }
         });
-       /* var self = this;
-        self.$router.push('sporadic');*/
+      },
+      updateDoor(item, fItem) {
+        var self = this;
+        // 根据状态跳转更新还是日志页面
+        if (item['Calculated Activity Status'] === 'Completed') { // 已完成
+          var type = '';
+          if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary' || fItem['KL Detail Type LIC'] === 'Check Before Trans Summary' || fItem['KL Detail Type LIC'] === 'Transfer Summary') {
+            type = 'updateDoorNext';
+          } else {
+            type = 'updateDoor';
+          }
+          self.$router.push({
+            name: 'journal',
+            query: {
+              id: item.Id,
+              type: type
+            }
+          });
+        } else { // 更新
+          // 详情
+          if (userInfo['Person UId'] === item['Primary Owner Id']) { // 当前登录人与批次负责人相等才能更新
+            if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary' || fItem['KL Detail Type LIC'] === 'Check Before Trans Summary' || fItem['KL Detail Type LIC'] === 'Transfer Summary') {
+              self.$router.push({
+                name: 'updateDoorNext',
+                query: {
+                  type: 'add',
+                  id: item.Id
+                }
+              });
+            } else {
+              self.$router.push({
+                name: 'updateDoor',
+                query: {
+                  type: 'add',
+                  id: item.Id
+                }
+              });
+            }
+          }
+        }
       }
     }
   };

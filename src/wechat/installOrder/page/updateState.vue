@@ -9,7 +9,7 @@
       </mt-cell>
       <mt-field label="" placeholder="请输入关闭原因" type="textarea" rows="8" v-model="value"></mt-field>
       <button-group>
-        <mt-button type="primary" class="single"
+        <mt-button class="single"
                    @click.native="handleClick">提交</mt-button>
       </button-group>
     </div>

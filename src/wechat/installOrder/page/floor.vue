@@ -10,7 +10,7 @@
       <mt-field label="房间1" v-for="(item, index) in roomList.roomList"  :key="index" v-model="item.val"></mt-field>
     </div>
     <button-group>
-      <mt-button type="primary" class="single"
+      <mt-button class="single"
                  @click.native="addFloor">新增房间</mt-button>
     </button-group>
   </div>
