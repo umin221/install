@@ -32,28 +32,24 @@ export default new Vuex.Store({
               PageSize: PAGESIZE
             },
             success: function(data) {
-              if (data.SiebelMessage['Order Entry - Orders']) {
-                commit('setList', data.SiebelMessage['Order Entry - Orders']);
+              let orderEntry = KND.Util.toArray(data.SiebelMessage['Order Entry - Orders']);
+              if (orderEntry) {
+                commit(more ? 'addList' : 'setList', orderEntry);
               }
               if (callback) {
                 callback(data);
               }
-            }
+            },
+            error
           });
         }
       },
       mutations: {
         setList(state, data) {
-          state.orderEntry = [];
-          if (KND.Util.isArray(data)) {
-            for (let i = 0; i < data.length;i++) {
-              state.orderEntry.push(data[i]);
-            }
-            state.sr_number = data['Order Total'];
-            state.total = data['Order Total'];
-          } else {
-            state.orderEntry.push(data);
-          }
+          state.orderEntry = data;
+        },
+        addList(state, data) {
+          state.orderEntry.push(...data);
         },
         setManager(state, isManager) {
           state.isManager = isManager;
@@ -107,30 +103,36 @@ export default new Vuex.Store({
         result: []
       },
       actions: {
-        getSearchList({commit}, orNumber) {
+        getSearchList({state, commit}, {orNumber, more, callback, error}) {
+          console.log(orNumber);
           api.get({
             key: 'getSearchList',
             data: {
               orNumber
             },
+            paging: {
+              StartRowNum: more ? state['result'].length : 0,
+              PageSize: PAGESIZE
+            },
             success: function(data) {
-              commit('setSearchList', data.SiebelMessage['Order Entry - Orders']);
-            }
+              let orderEntry = data.SiebelMessage['Order Entry - Orders'];
+              if (orderEntry) {
+                commit(more ? 'addSearchList' : 'setSearchList', orderEntry);
+                if (callback) {
+                  callback(orderEntry);
+                }
+              }
+            },
+            error
           });
         }
       },
       mutations: {
         setSearchList(state, data) {
-          state.result = [];
-          if (data) {
-            if (KND.Util.isArray(data)) {
-              for (let i = 0; i < data.length;i++) {
-                state.result.push(data[i]);
-              }
-            } else {
-              state.result.push(data);
-            }
-          }
+          state.result = data;
+        },
+        addSearchList(state, data) {
+          state.result.push(...data);
         }
       }
     }

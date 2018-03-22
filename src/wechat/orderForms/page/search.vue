@@ -4,7 +4,7 @@
                 placeholder="请输入订单号或者负责人">
 
         <cus-loadmore ref="result"
-                      :loadBottom="loadBottomFn"
+                      @loadBottom="loadBottomFn"
                       :topStatus="topStatus">
           <cus-cell class="multiple"
                     :key="item.id"
@@ -27,6 +27,17 @@
   import cusCell from 'public/components/cus-cell';
   //
   const NAMESPACE = 'searchList';
+  let loader = function(...args) {
+    let me = this;
+    let event = args.pop();
+    let list = args.pop();
+    let param = Object.extend(true, {
+      callback: (data) => {
+        me.$refs[list][event](data.length);
+      }
+    }, args.pop() || {});
+    me.getSearchList(param);
+  };
   export default {
     name: NAMESPACE,
     components: {cusLoadmore, cusSearch, cusCell},
@@ -44,7 +55,7 @@
       searchFn(val) {
         console.log(val);
         this.value = val;
-        this.getSearchList(val);
+        this.getSearchList({orNumber: val});
       },
       toDetail(orNumber) {
         this.$router.push({
@@ -54,7 +65,12 @@
           }
         });
       },
-      loadBottomFn() {
+      loadBottomFn(param) {
+        let me = this;
+        loader.call(this, {
+          orNumber: me.value,
+          more: true}, 'result',
+        'onBottomLoaded');
       }
     }
   };

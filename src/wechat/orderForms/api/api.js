@@ -3,7 +3,7 @@ let ApiList = {
     option.data.team = option.data.team ? '?ViewMode=Manager' : '';
     return {
       method: 'post',
-      url: 'service/EAI Siebel Adapter/Query' + option.data.team,
+      url: 'service/EAI Siebel Adapter/QueryPage' + option.data.team,
       data: {
         'body': {
           'OutputIntObjectName': 'Base Order Entry',
@@ -31,11 +31,13 @@ let ApiList = {
   getSearchList: option => {
     return {
       method: 'post',
-      url: 'service/EAI Siebel Adapter/Query',
+      url: 'service/EAI Siebel Adapter/QueryPage',
       data: {
         'body': {
           'OutputIntObjectName': 'Base Order Entry',
-          'SearchSpec': '[Order Entry - Orders.Order Number] ~LIKE "*' + option.data.orNumber + '*" OR [Order Entry - Orders.KL Primary Owner] ~LIKE "*' + option.data.orNumber + '*"'
+          'SearchSpec': '[Order Entry - Orders.Order Number] ~LIKE "*' + option.data.orNumber + '*" OR [Order Entry - Orders.KL Primary Owner] ~LIKE "*' + option.data.orNumber + '*"',
+          'StartRowNum': option.paging.StartRowNum,
+          'PageSize': option.paging.PageSize
         }
       }
     };

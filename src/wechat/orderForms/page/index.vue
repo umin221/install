@@ -20,17 +20,17 @@
       <loadmore ref="pending"
                 @loadTop="pendingLoadTop"
                 @loadBottom="pendingLoadBottom"
+                :param="isTeam"
                 :topStatus="topStatus"
                 :allLoaded="true">
-        <cusCell
+        <cus-cell
           v-for="(item,index) in orderEntry"
           :key="index"
            @click.native="toDateil(item['Order Number'])" is-link>
           <div class="mint-cell-sub-title" slot="title">维修订单号： {{item['Order Number']}}</div>
           <div class="mint-cell-sub-title" slot="title">订单总额： ￥{{item['Order Total']}}</div>
-        </cusCell>
+        </cus-cell>
       </loadmore>
-      <no-data v-if="!orderEntry.length"></no-data>
     </div>
   </div>
 </template>
@@ -39,8 +39,6 @@
   import loadmore from 'public/components/cus-loadmore';
   import cusHeader from 'public/components/cus-header';
   import cusCell from '../components/order-cell';
-  import buttonGroup from 'public/components/cus-button-group';
-  import noData from 'public/components/cus-empty';
   //
   let userName = '';
   let loader = function(...args) {
@@ -60,7 +58,6 @@
     created() {
       let me = this;
       KND.Native.getUserInfo((info) => {
-        console.log(info);
         userName = info;
         me.setManager(info['KL Primary Position Type LIC'] === 'Field Service Manager');
       });
@@ -92,20 +89,19 @@
           }
         });
       },
-      pendingLoadTop(team) {
-        team = team || this.isTeam;
+      pendingLoadTop(param) {
         loader.call(this, {
-          data: {team: team, Owner: userName['KL Employee Full Name']}}, 'pending',
+          data: {team: param, Owner: userName['KL Employee Full Name']}}, 'pending',
           'onTopLoaded');
       },
-      pendingLoadBottom(team) {
+      pendingLoadBottom(param) {
         loader.call(this, {
-          data: {team: team, Owner: userName['KL Employee Full Name']},
+          data: {team: param, Owner: userName['KL Employee Full Name']},
           more: true}, 'pending',
           'onBottomLoaded');
       }
     },
-    components: {loadmore, cusCell, buttonGroup, cusHeader, noData}
+    components: {loadmore, cusCell, cusHeader}
   };
 </script>
 <style lang="scss">
