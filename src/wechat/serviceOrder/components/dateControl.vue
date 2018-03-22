@@ -207,7 +207,6 @@
                   this.daysUL.push(this.days);
                   this.isMyDay = true;
                 } else {
-                  console.log('其他');
                 }
               }
             } else {
@@ -237,7 +236,8 @@
       },
       changeTime(value) {
         let x = '2010-09-28 ' + value;
-        let time = new Date(x.replace('-', '/'));
+        console.log(x.replace(/-/g, '/'));
+        let time = new Date(x.replace(/-/g, '/'));
         const b = 30;
         time.setMinutes(time.getMinutes() + b, time.getSeconds(), 0);
         time = time.toString().split(' ')[4].slice(0, 5);
@@ -273,7 +273,6 @@
             }
           }
         }
-        console.log(self.num);
         if (self.num === 1) {
           self.params.Time1.time = self.am[seleat].time[index - seleat * 8];
           self.params.Time1.key = (index1 + 1) * (index2 + 1);

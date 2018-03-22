@@ -25,7 +25,6 @@
       </mt-navbar>
       <mt-tab-container v-model="selected">
         <mt-tab-container-item id="pending">
-          <empty v-show="!pending.length"></empty>
           <loadmore ref="pending"
                     @loadTop="loadTopFn"
                     @loadBottom="loadBottomFn"
@@ -50,7 +49,6 @@
           </loadmore>
         </mt-tab-container-item>
         <mt-tab-container-item id="process">
-          <empty v-show="!process.length"></empty>
           <loadmore ref="process"
                     @loadTop="loadTopFn"
                     @loadBottom="loadBottomFn"
@@ -77,7 +75,6 @@
         </mt-tab-container-item>
 
         <mt-tab-container-item id="completed">
-          <empty v-show="!completed.length"></empty>
           <loadmore ref="completed"
                     @loadTop="loadTopFn"
                     @loadBottom="loadBottomFn"
@@ -105,7 +102,6 @@
       </mt-tab-container>
     </div>
     <div v-else-if="role === 'custom'" class="mint-content customService" >
-      <empty v-show="!cusService.length"></empty>
       <loadmore @loadTop="loadTopFn"
                 @loadBottom="loadBottomFn"
                 :param="{status:'all', list:'cusService'}"
@@ -130,6 +126,9 @@
           </mt-cell>
         </div>
       </loadmore>
+    </div>
+    <div v-else-if="role === 'other'" class="mint-content customService" >
+      <empty></empty>
     </div>
   </div>
 </template>

@@ -72,7 +72,7 @@
         </div>
       </div>
       <button-group v-if="role === 'custom'&& BtnStatu === 'status4'">
-        <mt-button type="primary" class="single" @click.native="toContact" >派单</mt-button>
+        <mt-button class="single" @click.native="toContact" >派单</mt-button>
       </button-group>
       <button-group v-if="role === 'install'">
         <div v-show="BtnStatu === 'status5'" class="callPlan">

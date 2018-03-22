@@ -382,8 +382,7 @@ let ApiList = {
         'body': {
           'Object Id': option.data['Object Id'], // 服务请求Id
           'inStatus': 'Complete', // 完成
-          'ProcessName': 'KL SR Status Change Process', // 服务请求状态改变逻辑WF
-          'KL Responsbility': option.data['responsiblity']
+          'ProcessName': 'KL SR Status Change Process' // 服务请求状态改变逻辑WF
         }
       }
     };

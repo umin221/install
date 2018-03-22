@@ -160,7 +160,7 @@
           'KL Product Model': me.ProductModel,
           'srNum': me.ServiceRequest['SR Number'],
           callBack: function(data) {
-            me.setPartner(data);
+//            me.setPartner(data);
             me.$router.go(-1);
           }
         };

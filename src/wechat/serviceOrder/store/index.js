@@ -112,7 +112,6 @@ export default new Vuex.Store({
               PageSize: PAGESIZE
             },
             success: data => {
-              console.log(data);
               let serviceOrders = KND.Util.toArray(data.SiebelMessage['Service Request']);
               if (serviceOrders) {
                 commit(more ? 'addOrders' : 'setOrders', {
@@ -606,20 +605,21 @@ export default new Vuex.Store({
               form
             },
             success: function(data) {
-              if (data) {
-                api.get({
-                  key: 'getDetail',
-                  data: {
-                    srNumber: form.srNum
-                  },
-                  success: function(data) {
-                    form.callBack(data.SiebelMessage['Service Request']);
-                  }
-                });
-              }
-              console.log(data);
+              // if (data) {
+              //   api.get({
+              //     key: 'getDetail',
+              //     data: {
+              //       srNumber: form.srNum
+              //     },
+              //     success: function(data) {
+              //     }
+              //   });
+              // }
+              // console.log(data);
+              form.callBack();
             },
             error: function(data) {
+              form.callBack();
               console.log('error');
             }
           });
@@ -812,8 +812,7 @@ export default new Vuex.Store({
                 api.get({
                   key: 'serviceDone',
                   data: {
-                    'Object Id': form.ServiceRequestId,
-                    'responsiblity': form.responsiblity
+                    'Object Id': form.ServiceRequestId
                   },
                   success: function(data) {
                     if (data) {

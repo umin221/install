@@ -34,7 +34,7 @@
       </cus-loadmore>
     </cus-search>
     <button-group v-if="type !== 'fault'">
-      <mt-button type="primary" class="single" @click.native="selectEnter">确认</mt-button>
+      <mt-button class="single" @click.native="selectEnter">确认</mt-button>
     </button-group>
   </div>
 </template>

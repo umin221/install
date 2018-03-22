@@ -37,7 +37,6 @@
         <mt-cell class="require" title="附件"></mt-cell>
         <div style="background-color: #ffffff">
           <div style="color: #777;font-size: 0.75rem;text-indent:0.75em;line-height: 40px">上传图片</div>
-          <div style="text-indent:0.75em"><i class="xs-icon icon-attach"></i></div>
         </div>
         <mt-popup v-if="showBox" v-model="showBox" position="bottom">
           <menu-box @my-enter="enter" @my-cancel="cancel" :slots="slots" :type="lovType"></menu-box>
@@ -89,7 +88,6 @@ export default {
         }
       }
       me.switchStatus = arr;
-      this.initSelect();
       return me.productData;
     }
   },
@@ -137,13 +135,12 @@ export default {
         contactId: me['ServiceRequest']['Contact Id'], // 联系人Id
         assetId: me['ServiceRequest']['Asset Id'], // 资产Id
         srNum: me['ServiceRequest']['SR Number'],
-        responsiblity: me['ServiceRequest']['KL Responsiblity'],
         callBack: function(data) {
           me.setPartner(data);
           me.$router.go(-1);
+          me.initSelect();
         }
       };
-      console.log(me['ServiceRequest']);
       me.addServiceOrder(obj);
     },
     toTranslated() {
