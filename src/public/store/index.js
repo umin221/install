@@ -24,6 +24,7 @@ export const app = {
     getLov({state}, option) {
       let data = option.data || {Type: option.type};
       ajax(Object.assign({
+        method: 'get',
         cache: true, // PickList Hierarchical
         url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND ' + KND.Util.condition(data) + '&PageSize=100&StartRowNum=0',
         success: data => {
@@ -37,6 +38,7 @@ export const app = {
      */
     getAuthority({state}, option) {
       ajax({
+        method: 'get',
         url: ('https://kas.kinlong.cn:8090/webchat/api/local/permission?url=' + encodeURIComponent(location.href.split('#')[0]) + '&appNO=CONTACT'),
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
