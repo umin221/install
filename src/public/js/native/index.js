@@ -11,6 +11,8 @@ import cache from '../lib/cache';
   let Util = context['Util'];
   // 用户ID
   let userID;
+  // 是否本地调试
+  let debug = !config.debug;
   // 缓存超时
   let exp = config.cacheExp;
   // 时间戳
@@ -88,6 +90,71 @@ import cache from '../lib/cache';
      */
     getUserID() {
       return session.get('userID') || 'IM02' || Util['getParam']('userID');
+    };
+
+    /**
+     * 图库选图 或 拍照
+     * @param {Number} option.count 选填 默认为1，数量
+     * @param {Array} option.sizeType 选填 ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+     * @param {Array} option.sourceType 可以指定来源是相册还是相机，默认二者都有
+     * @response {Array} res.localIds ["img:///storage/emulated/0/xxx/xxx/xxx.jpg"] 拍照结果
+     * @response {String} res.errMsg chooseImage:ok
+     */
+    chooseImage(option) {
+      wx.chooseImage(Object.assign({
+        count: 1, // 默认9
+        sizeType: ['compressed'],
+        sourceType: ['album', 'camera'],
+        success: function(res) {
+          var localIds = res.localIds; // 返回选定照片的本地ID列表，
+          // andriod中localId可以作为img标签的src属性显示图片；
+          // 而在IOS中需通过上面的接口getLocalImgData获取图片base64数据，从而用于img标签的显示
+          console.log(localIds);
+        }
+      }, option));
+      // 本地调试
+      if (debug) {
+        KND.Util.invoke(option.success, {
+          localIds: ['img:///storage/emulated/0/Tencent/WeixinWork/tempimagecache/1688852028455906/b4bc209fa2f44c64a57c159645330240.jpg'],
+          errMsg: 'chooseImage:ok'
+        });
+      }
+    };
+
+    /**
+     * 上传本地图片
+     * @param {Number} option.isShowProgressTips 选填 默认为1，显示进度提示
+     * @param {String} option.localId 必填 'img:///storage/emulated/0/xxx/xxx/xxx.jpg', 需要上传的图片localId
+     * @response {Array} res.serverId "1sb9A-V1qJt4tcfiKMM4UzpjMHuBHMMIIgYKl96OQ1_pBe8h0xte9G6aTPNjEQaYI" 上传结果
+     * @response {String} res.errMsg uploadImage:ok
+     */
+    uploadImage(option) {
+      wx.uploadImage(Object.assign({
+        localId: '', // 需要上传的图片的本地ID，由chooseImage接口获得
+        isShowProgressTips: 1, //
+        success: function(res) {
+          var serverId = res.serverId; // 返回图片的服务器端ID
+          console.log(serverId);
+        }
+      }, option));
+      // 本地调试
+      if (debug) {
+        KND.Util.invoke(option.success, {
+          serverId: '1sb9A-V1qJt4tcfiKMM4UzpjMHuBHMMIIgYKl96OQ1_pBe8h0xte9G6aTPNjEQaYI',
+          errMsg: 'uploadImage:ok'
+        });
+      }
+    };
+
+    /**
+     * 预览图片
+     * @param {String} option.current 必填 当前显示图片的http链接
+     * @param {Array} option.urls 必填 需要预览的图片http链接列表
+     */
+    previewImage(option) {
+      wx.previewImage(Object.assign({
+        urls: ['http://n.sinaimg.cn/translate/653/w400h253/20180322/0sp9-fyskeue4878551.jpg']
+      }, option));
     };
 
     /**

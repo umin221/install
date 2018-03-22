@@ -74,7 +74,7 @@
         position: absolute;
         bottom: 2px;
         left: 50%;
-        font-size: $font-size-default;
+        font-size: $font-size-small;
         -webkit-transform: translateX(-50%) rotate(180deg);
         transform: translateX(-50%) rotate(180deg);
         transition: transform .4s ease;

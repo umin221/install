@@ -11,12 +11,11 @@
         :placeholder="placeholder"
         class="mint-searchbar-core">
       </div>
-      <!--<a-->
-        <!--class="mint-searchbar-cancel"-->
-        <!--@click="visible = false, currentValue = ''"-->
-        <!--v-show="visible"-->
-        <!--v-text="cancelText">-->
-      <!--</a>-->
+      <a
+        class="mint-searchbar-cancel"
+        @click="$emit('search')"
+        v-text="searchText">
+      </a>
     </div>
     <div class="mint-search-list" v-show="show || currentValue">
       <div class="mint-search-list-warp">
@@ -70,8 +69,8 @@ export default {
     value: String,
     autofocus: Boolean,
     show: Boolean,
-    cancelText: {
-      default: '取消'
+    searchText: {
+      default: '搜索'
     },
     placeholder: {
       default: '搜索'
@@ -80,7 +79,9 @@ export default {
   },
 
   mounted() {
-    this.autofocus && this.$refs.input.focus();
+    setTimeout(() => {
+      this.autofocus && this.$refs.input.focus();
+    }, 260);
   }
 };
 </script>
