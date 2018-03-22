@@ -61,10 +61,17 @@ export default new Vuex.Store({
             key: 'getCurrData',
             data: time,
             success: data => {
-              commit('currentDayData', data.items);
+              commit('currentDayData', KND.Util.toArray(data.items));
               callback && callback(data.items);
             }
           });
+        },
+        /* 获取当天数据数据
+        * @param {Object} data 必填
+        * * @param {Function} callback 选填 回调函数
+        */
+        setCurrentDayData({state, commit, dispatch}, data) {
+          commit('currentDayData', data);
         },
         /* 删除计划
         * @param {String} id 必填 id
@@ -119,8 +126,10 @@ export default new Vuex.Store({
           Value: '请选择描述'
         },
         allDay: false, // 是否全天
-        startPickerValue: '', // 开始时间
-        endPickerValue: '',  // 结束时间
+        startPickerValue: '', // 计划开始时间
+        endPickerValue: '',  // 计划结束时间
+        ACstartPickerValue: '', // 实际开始时间
+        ACendPickerValue: '',  // 实际结束时间
         startHour: '00' // 结束时间最小选择范围
       },
       mutations: {
@@ -136,6 +145,12 @@ export default new Vuex.Store({
         },
         endPicker(state, time) {
           state.endPickerValue = time;
+        },
+        ACstartPicker(state, time) {
+          state.ACstartPickerValue = time;
+        },
+        ACendPicker(state, time) {
+          state.ACendPickerValue = time;
         },
         startHour(state, time) {
           state.startHour = time;
@@ -169,6 +184,20 @@ export default new Vuex.Store({
          */
         setEndPicker({state, commit, dispatch}, time) {
           commit('endPicker', time);
+        },
+        /**
+         * 选择实际开始时间
+         * @param {String} time 时间字符串
+         */
+        setACStartPicker({state, commit, dispatch}, time) {
+          commit('ACstartPicker', time);
+        },
+        /**
+         * 选择实际结束时间
+         * @param {String} time 时间字符串
+         */
+        setACEndPicker({state, commit, dispatch}, time) {
+          commit('ACendPicker', time);
         },
         /**
          * 限制结束时间的最小值
