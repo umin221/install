@@ -101,6 +101,9 @@ export default new Vuex.Store({
           state.form = form;
           state.form.User = KND.Util.toArray(form.User);
         },
+        setAttach(state, list) {
+          state.attach.list = KND.Util.toArray(list);
+        },
         clear(state) {
           state.form = {
             'Id': KND.Util.now(),
@@ -117,7 +120,7 @@ export default new Vuex.Store({
          * 通过id获取委外团队信息
          * @param {String} id 必填 id
          */
-        findPartnerById({commit}, id) {
+        findPartnerById({commit, dispatch}, id) {
           api.get({
             key: 'findPartnerById',
             data: {
@@ -125,6 +128,8 @@ export default new Vuex.Store({
             },
             success: data => {
               commit('setPartner', data.SiebelMessage['Channel Partner']);
+              // 查询附件
+              dispatch('queryMedias', id);
             }
           });
         },
@@ -178,7 +183,7 @@ export default new Vuex.Store({
         update({state}, setting) {
           delete state.form['Channel Partner_Position'];
           delete state.form['User'];
-          api.get(Object.extend({
+          api.get(Object.extend(true, {
             key: 'update',
             data: state.form,
             success: data => {
@@ -190,6 +195,56 @@ export default new Vuex.Store({
               }
             }
           }, setting));
+        },
+
+        /**
+         * 批量上传附件
+         * @param {Array} mediaId 必填 附件mediaId数组
+         */
+        pushMedia({state}, mediaId) {
+          console.log(mediaId);
+          // 提交 siebel
+          let push = (media) => {
+            api.get({
+              key: 'pushMedia',
+              data: {
+                id: state.form.Id,
+                mediaId: media.serverId
+              },
+              success: result => {
+                console.log(result);
+                run(mediaId.pop(), result);
+              }
+            });
+          };
+          // 上传附件
+          let run = (media, result) => {
+            if (media) {
+              push(media);
+            } else {
+              tools.success(result, {
+                back: true,
+                successTips: '提交成功'
+              });
+            };
+          };
+          run(mediaId.pop());
+        },
+
+        /**
+         * 查询附件列表
+         * @param {String} id 必填 委外厂商id
+         */
+        queryMedias({commit}, id) {
+          api.get({
+            key: 'queryMedias',
+            data: {
+              'Account Id': id
+            },
+            success: data => {
+              commit('setAttach', data['SiebelMessage']['KL Channel Partner Attachment']);
+            }
+          });
         }
       }
     },

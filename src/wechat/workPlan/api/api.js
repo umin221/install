@@ -5,7 +5,7 @@ let ApiList = {
   getList: option => {
     return {
       method: 'get',
-      url: `data/KL Daily Action Interface BO/KL Daily Action/?searchspec=Planned >= ${option.data.start} AND Planned <= ${option.data.end}`
+      url: `data/KL Daily Action Interface BO/KL Daily Action/?searchspec=Planned >= ${option.data.start} AND Planned <= ${option.data.end}&PageSize=100&StartRowNum=0`
     };
   },
   /**
@@ -14,7 +14,7 @@ let ApiList = {
   getCurrData: option => {
     return {
       method: 'get',
-      url: `data/KL Daily Action Interface BO/KL Daily Action/?searchspec=Planned = ${option.data}`
+      url: `data/KL Daily Action Interface BO/KL Daily Action/?searchspec=Planned = ${option.data}&PageSize=100&StartRowNum=0`
     };
   },
   /**
@@ -23,7 +23,7 @@ let ApiList = {
   add: option => {
     return {
       method: 'put',
-      url: 'data/KL Daily Action Interface BO/KL Daily Action'
+      url: 'data/KL Daily Action Interface BO/KL Daily Action/'
     };
   },
   /**
@@ -32,7 +32,7 @@ let ApiList = {
   delete: option => {
     return {
       method: 'DELETE',
-      url: 'data/KL Daily Action Interface BO/KL Daily Action/1-2BSEOL01'
+      url: `data/KL Daily Action Interface BO/KL Daily Action/${option.data.Id}`
     };
   }
 };

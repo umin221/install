@@ -17,8 +17,8 @@
         </mt-cell>
          <mt-cell title="计划开始时间" class="borderBottom"><span >{{initDateStart()}}</span></mt-cell>
          <mt-cell title="计划结束时间" class="borderBottom"><span >{{initDateEnd()}}</span></mt-cell>
-         <mt-cell title="实际开始时间" class="borderBottom"><span  @click='openStartTime'>{{initDate()}} {{startPickerValue}}</span></mt-cell>
-         <mt-cell title="实际结束时间" ><span @click='openEndTime'>{{initDate()}} {{endPickerValue}}</span></mt-cell>
+         <mt-cell title="实际开始时间" is-link class="borderBottom" @click.native='openStartTime'><span>{{initDate()}} {{ACstartPickerValue}}</span></mt-cell>
+         <mt-cell title="实际结束时间" is-link @click.native='openEndTime'><span>{{initDate()}} {{ACendPickerValue}}</span></mt-cell>
               <button-group class="singBtn">
         <mt-button class="submitBtn" type="primary" v-if='saveBtn'
                    @click.native="handleSave">更新</mt-button>
@@ -59,9 +59,22 @@
     },
     created() {
       // 判断是否显示更新按钮
-      if (this.currentDayData[this.$route.query.index]['Status INT'] === 'Not Started') {
+      var yaer = this.$route.query.year;
+      var month = this.$route.query.month;
+      var day = this.$route.query.day;
+      if (month < 10) month = `0${month}`;
+      if (day < 10) day = `0${day}`;
+      var time = new Date(yaer + '-' + month + '-' + day).getTime();
+      var date = new Date();
+      var nowTime = new Date(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()).getTime();
+      console.log(nowTime <= time);
+      if (this.currentDayData[this.$route.query.index]['Status INT'] === 'Not Started' && nowTime <= time) {
         this.saveBtn = true;
+        this.setACStartPicker('');
+        this.setACEndPicker('');
       } else {
+        this.setACStartPicker(this.currentDayData[this.$route.query.index]['Started'].replace(/\d+\/\d+\/\d+\s/, ''));
+        this.setACEndPicker(this.currentDayData[this.$route.query.index]['Done'].replace(/\d+\/\d+\/\d+\s/, ''));
         this.saveBtn = false;
         this.headTitle = '查看计划';
       }
@@ -70,8 +83,8 @@
       ...mapState(NAMESPACE, [
         'workDescDate',
         'allDay',
-        'startPickerValue',
-        'endPickerValue',
+        'ACstartPickerValue',
+        'ACendPickerValue',
         'startHour'
       ]),
       ...mapState('index', ['currentDayData'])
@@ -80,9 +93,9 @@
       ...mapActions(NAMESPACE, [
         'setWorkDesc',
         'setDayAll',
-        'setStartPicker',
-        'setEndPicker',
-        'setStartHour'
+        'setStartHour',
+        'setACStartPicker',
+        'setACEndPicker'
       ]),
       ...mapActions('app', ['getLov']),
       // 处理计划开始时间
@@ -105,33 +118,37 @@
       },
       // 点击选开始时间
       openStartTime() {
-        this.$refs.startPicker.open();
+        if (this.saveBtn) {
+          this.$refs.startPicker.open();
+        }
       },
       // 确定开始时间
       startPickerConfirm(date) {
-        this.setStartPicker(date);
+        this.setACStartPicker(date);
         // 限制结束时间只能是开始时间之后
         date.replace(/^\d{2}/, (val, index) => {
           this.setStartHour(val);
         });
         // 如果开始时间 > 结束时间，则清空结束时间
-        if (date >= this.endPickerValue) {
-          this.setEndPicker('');
+        if (date >= this.ACendPickerValue) {
+          this.setACEndPicker('');
         }
       },
       // 确定结束时间
       endPickerConfirm(date) {
-        if (this.startPickerValue < date) {
-          this.setEndPicker(date);
+        if (this.ACstartPickerValue < date) {
+          this.setACEndPicker(date);
         } else {
           Toast('结束时间必须大于开始时间');
         }
       },
       // 点击选结束时间
       openEndTime() {
-        this.$refs.endPicker.open();
+        if (this.saveBtn) {
+          this.$refs.endPicker.open();
+        }
       },
-      // 保存
+      // 更新状态
       handleSave() {
         var self = this;
         var year = this.$route.query.year;
@@ -139,19 +156,44 @@
         if (month < 10) month = `0${month}`;
         var day = this.$route.query.day;
         if (day < 10) day = `0${day}`;
+        var id = '';
+        id = this.currentDayData[this.$route.query.index]['Id'];
+        this.ACstartPickerValue = this.ACstartPickerValue.replace(/\d+:\d+:\d+/, (a, b) => {
+          this.setACStartPicker(this.ACstartPickerValue.substr(0, this.ACstartPickerValue.length - 3));
+        });
+        this.ACendPickerValue = this.ACendPickerValue.replace(/\d+:\d+:\d+/, (a, b) => {
+          this.setACEndPicker(this.ACendPickerValue.substr(0, this.ACendPickerValue.length - 3));
+        });
+        if (this.ACstartPickerValue === '') {
+          Toast('请选择实际开始时间');
+          return;
+        }
+        if (this.ACendPickerValue === '') {
+          Toast('请选择实际结束时间');
+          return;
+        }
+        var StartedTime = month + '/' + day + '/' + year + ' ' + this.ACstartPickerValue + ':00';
+        var DoneTime = month + '/' + day + '/' + year + ' ' + this.ACendPickerValue + ':00';
+        if (new Date(StartedTime).getTime() > new Date().getTime() || new Date(DoneTime) > new Date().getTime()) {
+          Toast('实际开始时间和实际结束时间都不能在当前时间之后');
+          return;
+        }
         api.get({
           key: 'add',
           data: {
-            'Id': new Date().getTime(), // 对应的id
+            'Id': id, // 对应的id
             'Type': '日常活动', // 工作类型
-            'KL Detail Type': this.workDescDate.value, // 工作描述
-            'Planned': month + '/' + day + '/' + year + ' ' + this.startPickerValue + ':00', // 计划开始时间
-            'Planned Completion': month + '/' + day + '/' + year + ' ' + this.endPickerValue + ':00' // 计划结束时间
+            'KL Detail Type': this.currentDayData[this.$route.query.index]['KL Detail Type'], // 工作描述
+            'Started': StartedTime, // 实际开始时间
+            'Done': DoneTime, // 实际结束时间
+            'Planned': this.currentDayData[this.$route.query.index]['Planned'], // 计划开始时间
+            'Planned Completion': this.currentDayData[this.$route.query.index]['Planned Completion'] // 计划结束时间
           },
           success: data => {
-            console.log(data);
             if (data.items.Id) {
-              MessageBox('提示', '新建计划成功').then(action => {
+              MessageBox('提示', '更新计划成功').then(action => {
+                this.setACStartPicker('');
+                this.setACEndPicker('');
                 self.$router.back();
               });
             }

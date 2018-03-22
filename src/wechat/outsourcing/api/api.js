@@ -144,9 +144,35 @@ let apiList = {
    * @param {Object} option.data 必填 联系人查询条件 键值对
    * @returns {{method: string, url: string}}
    */
-  findContact: (option) => {
+  findContact: option => {
     return {
       url: 'data/Base User/Base User/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=2&StartRowNum=0'
+    };
+  },
+
+  pushMedia: option => {
+    return {
+      url: 'service/Workflow Process Manager/RunProcess',
+      data: {
+        'body': {
+          'ProcessName': 'KL Attachment Upload Process',
+          'Type': 'Task',
+          'MediaId': option.data.mediaId,
+          'Object Id': option.data.id
+        }
+      }
+    };
+  },
+
+  queryMedias: option => {
+    return {
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'KL Channel Partner Attachments',
+          'SearchSpec': KND.Util.condition(option.data, 'KL Channel Partner Attachment')
+        }
+      }
     };
   }
 };
@@ -163,7 +189,7 @@ let ajax = api => {
 };
 
 const get = option => {
-  ajax(Object.extend(true, option, apiList[option.key](option)));
+  ajax(Object.assign(option, apiList[option.key](option)));
 };
 
 export default {

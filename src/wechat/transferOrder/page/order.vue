@@ -24,9 +24,9 @@
         </div>
 
         <div class="lock-line">
-          <lock-line title="锁体" @click="toLineFn(undefined, '锁体')">
+          <lock-line title="锁体" @click="toLineFn(undefined, 'Lock Body')">
             <mt-cell-swipe v-for="(line, index) in lines" class="lock-line-cell enable" ref="body"
-                     v-if="line['KL Product Type']==='锁体'"
+                     v-if="line['KL Product Type LIC']==='Lock Body'"
                      @click.native="toLineFn(line)"
                      :key="line['Id']"
                      :right="getSwipeBtn(line, index)"
@@ -38,9 +38,9 @@
               </div>
             </mt-cell-swipe>
           </lock-line>
-          <lock-line title="面板" @click="toLineFn(undefined, '面板')">
+          <lock-line title="面板" @click="toLineFn(undefined, 'Panel')">
             <mt-cell-swipe v-for="(line, index) in lines" class="lock-line-cell enable" ref="panel"
-                     v-if="line['KL Product Type'] === '面板'"
+                     v-if="line['KL Product Type LIC'] === 'Panel'"
                      @click.native="toLineFn(line)"
                      :key="line['Id']"
                      :right="getSwipeBtn(line, index)"
@@ -164,9 +164,9 @@
         let body = false;
         let type;
         return Array.prototype.some.call(this.lines, function(l) {
-          type = l['KL Product Type'];
-          if (type === '锁体') body = true;
-          if (type === '面板') panel = true;
+          type = l['KL Product Type LIC'];
+          if (type === 'Lock Body') body = true;
+          if (type === 'Panel') panel = true;
           return panel && body;
         });
       },
@@ -190,7 +190,7 @@
         let me = this;
         let order = me.order;
         // 是否面板
-        let isPanel = (line['KL Product Type'] || type) === '面板';
+        let isPanel = (line['KL Product Type LIC'] || type) === 'Panel';
         // 填充订单id，保存编辑行时需要
         line['Order Header Id'] = order.Id;
 

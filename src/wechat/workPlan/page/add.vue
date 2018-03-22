@@ -18,8 +18,8 @@
       <mt-cell title="全天活动" class="margin10 borderBottom">
           <mt-switch :value="allDay" @change.native="changeSwitch" :disabled="switchDisabled"></mt-switch>
         </mt-cell>
-         <mt-cell title="开始时间" class="borderBottom"><span @click='openStartTime'>{{initDate()}} {{startPickerValue}}</span></mt-cell>
-         <mt-cell title="结束时间" ><span @click='openEndTime'>{{initDate()}} {{endPickerValue}}</span></mt-cell>
+         <mt-cell title="开始时间" class="borderBottom" is-link  @click.native='openStartTime'><span>{{initDate()}} {{startPickerValue}}</span></mt-cell>
+         <mt-cell title="结束时间" is-link @click.native='openEndTime'><span>{{initDate()}} {{endPickerValue}}</span></mt-cell>
               <button-group class="singBtn" v-if='saveBtn'>
         <mt-button class="submitBtn" type="primary" 
                    @click.native="handleSave">保存</mt-button>
@@ -83,7 +83,10 @@
       }
       // 获取工作描述选项
       this.getLov({
-        type: 'TODO_TYPE',
+        data: {
+          Type: 'TODO_TYPE',
+          Parent: 'Daily Activities'
+        },
         success: data => {
           self.workDescript[0].values = data.items;
         }
@@ -110,10 +113,6 @@
       ...mapActions('app', ['getLov']),
       // 切换全天
       changeSwitch(val) {
-        if (this.$route.path === '/detail') {
-          this.switchDisabled = true;
-          return;
-        }
         if (event.target.checked) {
           this.setStartPicker('00:00');
           this.setEndPicker('23:59');
@@ -126,9 +125,6 @@
       },
       // 点击选开始时间
       openStartTime() {
-        if (this.$route.path === '/detail') {
-          return;
-        }
         if (this.allDay) {
           Toast('你选择了全天');
           return;
@@ -157,9 +153,6 @@
       },
       // 点击选结束时间
       openEndTime() {
-        if (this.$route.path === '/detail') {
-          return;
-        }
         if (this.allDay) {
           Toast('你选择了全天');
           return;
@@ -168,9 +161,6 @@
       },
       // 点击工作阶段
       tapWorkDescript() {
-        if (this.$route.path === '/detail') {
-          return;
-        }
         this.showWorkDescript = true;
       },
       // 点击确定 (工作描述弹窗)
@@ -206,12 +196,24 @@
         } else {
           id = new Date().getTime();
         }
+        if (this.workDescDate.Value === '') {
+          Toast('请选择工作描述');
+          return;
+        }
+        if (this.startPickerValue === '') {
+          Toast('请选择计划开始时间');
+          return;
+        }
+        if (this.endPickerValue === '') {
+          Toast('请选择计划结束时间');
+          return;
+        }
         api.get({
           key: 'add',
           data: {
             'Id': id, // 对应的id
             'Type': '日常活动', // 工作类型
-            'KL Detail Type': this.workDescDate.value, // 工作描述
+            'KL Detail Type': this.workDescDate.Value, // 工作描述
             'Planned': month + '/' + day + '/' + year + ' ' + this.startPickerValue + ':00', // 计划开始时间
             'Planned Completion': month + '/' + day + '/' + year + ' ' + this.endPickerValue + ':00' // 计划结束时间
           },
@@ -219,6 +221,8 @@
             console.log(data);
             if (data.items.Id) {
               MessageBox('提示', '新建计划成功').then(action => {
+                this.setStartPicker('');
+                this.setEndPicker('00');
                 self.$router.back();
               });
             }

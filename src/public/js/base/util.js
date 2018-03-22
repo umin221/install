@@ -247,6 +247,15 @@
         'background:transparent');
     };
 
+    /**
+     * 方法调用
+     * @param method
+     * @param args
+     */
+    invoke(method, ...args) {
+      if (method) method.apply(this, args);
+    };
+
   };
 
   /**

@@ -14,49 +14,38 @@
         <span class="xs-icon"
           :class="{'icon-delete': edit}"
           @click="deleteFn($index)"></span>
-        <img src="../assets/tt.png"/>
-      </div>
-      <div v-for="(item, $index) in localIds">
-        <span class="xs-icon"
-          :class="{'icon-delete': edit}"
-          @click="deleteFn($index)"></span>
-        <img src="../assets/tt.png"/>
+        <img :src="convertImgSrc(item)"
+          @click="previewImageFn(item)"/>
       </div>
     </div>
-
-    <mt-actionsheet
-      :actions="actions"
-      v-model="sheetVisible">
-    </mt-actionsheet>
   </div>
 </template>
 
 <script type="es6">
+  /**
+   * 附件组件
+   * 1.展示图片
+   *  －本地，手机拍照或图库图片
+   *  －在线，siebel 返回来的图片
+   * 2.编辑图片
+   *  －本地，调用拍照，上传企业微信，删除图片
+   *  －在线，删除在线图片
+   * 3.获取图片
+   *  －本地，返回企业微信的mediaIds列表
+   *  －在线，返回siebel图片列表
+   */
+  import {mapActions} from 'vuex';
   import titleGroup from '../../cus-title-group';
 
   export default {
     name: 'cus-attach',
     props: {
-      attach: Array,
+      attach: {
+        type: Array,
+        default: []
+      },
       edit: Boolean,
       title: String
-    },
-    data: () => {
-      return {
-        localIds: [],
-        actions: [{
-          name: '拍照',
-          method: () => {
-            console.log('调用拍照');
-          }
-        }, {
-          name: '选图',
-          method: () => {
-            console.log('调用选图');
-          }
-        }],
-        sheetVisible: false
-      };
     },
     computed: {
       empty() {
@@ -64,34 +53,58 @@
       }
     },
     methods: {
+      ...mapActions('app', ['getMediaById']),
       /**
        * 添加图片/拍照
+       * response res.localIds 选择图片的id集合
        */
       addFn() {
-        // this.sheetVisible = true;
-        wx.chooseImage({
-          count: 1, // 默认9
-          sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+        let me = this;
+        KND.Native.chooseImage({
           success: function(res) {
-            var localIds = res.localIds; // 返回选定照片的本地ID列表，
             // andriod中localId可以作为img标签的src属性显示图片；
             // 而在IOS中需通过上面的接口getLocalImgData获取图片base64数据，从而用于img标签的显示
-            console.log(localIds);
+            let localIds = res.localIds;
+            for (var i in localIds) {
+              me.uploadLocalIds(localIds[i]);
+            }
           }
         });
       },
       /**
        * 上传本地图片
+       * @param {String} localId 必填 图片localId
+       * @response {String} res.serverId 1sb9A-V1qJt4tcfiKMM4UzpjMHuBHMMIIgYKl96OQ1_pBe8h0xte9G6aTPNjEQaYI 返回图片的服务器端ID
        */
-      uploadLocalIds() {
-        wx.uploadImage({
-          localId: this.localIds, // 需要上传的图片的本地ID，由chooseImage接口获得
-          isShowProgressTips: 1, // 默认为1，显示进度提示
+      uploadLocalIds(localId) {
+        let me = this;
+        KND.Native.uploadImage({
+          localId: localId,
           success: function(res) {
-            var serverId = res.serverId; // 返回图片的服务器端ID
-            console.log(serverId);
+            me.attach.unshift({
+              localId: localId,
+              serverId: res.serverId
+            });
           }
+        });
+      },
+      getServerIds() {
+        let attach = this.attach;
+        return Array.prototype.filter.call(attach, (i) => {
+          return i.serverId;
+        });
+      },
+      convertImgSrc(item) {
+        return item.localId || item.Id;
+      },
+      /**
+       * 预览图片
+       */
+      previewImageFn(item) {
+        console.log(item);
+        KND.Native.previewImage({
+          // urls: ['http://192.168.166.8:8080/eai_anon_chs/start.swe?SWEExtSource=KLAttachment&SWEExtCmd=Execute&SWEExtData=123']
+          urls: ['http://n.sinaimg.cn/translate/653/w400h253/20180322/0sp9-fyskeue4878551.jpg']
         });
       },
       /**

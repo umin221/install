@@ -6,7 +6,7 @@
       <fallback slot="left"></fallback>
       <mt-button slot="right"
                  @click.native="$router.push('close')"
-                 v-show="!isTeam">关闭</mt-button>
+                 v-show="!isTeam && !isCompleted">关闭</mt-button>
     </mt-header>
 
     <!--detail-->
@@ -58,7 +58,7 @@
     </div>
 
     <!--buttons-->
-    <button-group v-show="!isTeam">
+    <button-group v-show="!isTeam && !isCompleted">
       <mt-button v-show="isPending" @click.native="$router.push('reject')">驳回</mt-button>
       <mt-button v-show="isPending" @click.native="assignFn">确认分配</mt-button>
       <mt-button v-show="!isPending" @click.native="toOrderFn">新增安装订单</mt-button>
@@ -94,7 +94,11 @@
       ...mapState(NAMESPACE, ['form', 'orders']),
       ...mapState('engineer', ['select']),
       isPending() {
-        return this.form['Status'] === '已提交';
+        return this.form['Status LIC'] === 'Pending Approval';
+      },
+      isCompleted() {
+        let statusLIC = this.form['Status LIC'];
+        return statusLIC === 'Closed' || statusLIC === 'Rejected';
       }
     },
     methods: {

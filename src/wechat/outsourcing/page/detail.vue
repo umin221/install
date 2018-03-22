@@ -33,7 +33,7 @@
         <!--<mt-field v-show="!read" class="require" :readonly="read" label="合同附件"></mt-field>-->
       </div>
 
-      <attach :attach="attach.list"
+      <attach :attach="attach.list" ref="attach"
               :edit="!read"
               :title="title">
       </attach>
@@ -156,7 +156,7 @@
     },
     methods: {
       ...mapMutations(NAMESPACE, ['clear']),
-      ...mapActions(NAMESPACE, ['findPartnerById', 'findPartner', 'addPartner', 'update']),
+      ...mapActions(NAMESPACE, ['findPartnerById', 'findPartner', 'addPartner', 'update', 'pushMedia']),
       toContact(contact) {
         this.$router.push({
           name: 'contact',
@@ -186,11 +186,13 @@
       submitFn() {
         // restart
         if (this.state === 'invalid') {
-          this.update({
-            data: {
-              'KL Partner Status': '待审批'
-            }
-          });
+          // this.update({
+          //  data: {
+          //    'KL Partner Status': '待审批'
+          //  }
+          // });
+          // 上传附件
+          this.pushMedia(this.$refs.attach.getServerIds());
         } else {
           // create
           this.addPartner();

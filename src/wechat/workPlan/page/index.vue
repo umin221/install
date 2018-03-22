@@ -29,8 +29,8 @@
       </ul>
       <!-- 日期 -->
       <div class="bodyDiv">
-        <ul class="days" v-for="(value,index1) in daysUL">
-          <li @click="pick(day,index+index1*7)" v-for="(day, index) in value" >
+        <ul class="days" v-for="(value,index1) in daysUL" :key="index1">
+          <li @click="pick(day,index+index1*7)" v-for="(day, index) in value" :key="index">
             <!--本月-->
             <div class="dateItem" :class="{'selected':(isSelected[(index+index1*7)] || (new Date(day).getFullYear() == new Date().getFullYear() && day.getMonth() == new Date().getMonth() && day.getDate() == new Date().getDate() && isSelected.length ==0))}">
               <span v-if="day==='spaces'"></span>
@@ -41,11 +41,11 @@
         </ul>
       </div>
       <div class="planList">
-        <mt-cell-swipe v-for="(item, index) in currentDayData"
+        <mt-cell-swipe v-for="(item, index) in currentDayData" :key="index"
           @click.native="toDetail(index)"
           class="planListItem"
           :title="item.Type"
-          :label="item.Description"
+          :label="item['KL Detail Type']"
           :right="operation(item, item.Id, index)">
           <div class="status">
             <p>{{formatDateTime(item.Planned)}} - {{formatDateTime(item['Planned Completion'])}}</p>
@@ -123,7 +123,7 @@
       ...mapState(NAMESPACE, ['currentYear', 'currentMonth', 'currentDay', 'firstWeek', 'listData', 'currentDayData'])
     },
     methods: {
-      ...mapActions(NAMESPACE, ['setYear', 'setMonth', 'setDay', 'setWeek', 'getListData', 'getCurrentDayData', 'deletePlan']),
+      ...mapActions(NAMESPACE, ['setYear', 'setMonth', 'setDay', 'setWeek', 'getListData', 'setCurrentDayData', 'getCurrentDayData', 'deletePlan']),
       // 去掉年月日
       formatDateTime(time) {
         return time.replace(/\d+\/\d+\/\d+\s/, '');
@@ -344,6 +344,7 @@
         } else {
           this.initData(this.formatDate(d.getFullYear(), curmnth, 1), true);
           this.isShowBtn = false;
+          this.setCurrentDayData([]); // 清空数据
         }
         this.startGetData(this.formatDate(d.getFullYear(), curmnth, 1));
       },
@@ -423,6 +424,7 @@
         if (m < 10) m = `0${m}`;
         let day = date.getDate();
         if (day < 10) day = `0${day}`;
+        this.setCurrentDayData([]); // 清空数据
         // 请求当天的数据
         this.getCurrentDayData(m + '/' + day + '/' + date.getFullYear());
       },

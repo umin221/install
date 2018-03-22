@@ -8,6 +8,7 @@
                :autofocus="true"
                :show="show"
                @keyup.enter.native="searchFn"
+               @search="searchFn"
                @input="handleInput">
       <slot>
         <mt-cell
