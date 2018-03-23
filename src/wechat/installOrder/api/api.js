@@ -156,6 +156,23 @@ let apiList = {
     return {
       url: 'data/KL Installation Detail/KL Installation Detail'
     };
+  },
+
+  /**
+   * 提交安装订单－门厂技术工程师
+   * @param option
+   * @returns {{url: string, data: {}}}
+   */
+  submit: option => {
+    return {
+      url: 'service/Workflow Process Manager/RunProcess',
+      data: {
+        'body': {
+          'ProcessName': 'KL Install Order Submit Process',
+          'Object Id': option.data.id
+        }
+      }
+    };
   }
 };
 

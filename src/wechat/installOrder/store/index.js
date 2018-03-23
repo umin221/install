@@ -92,6 +92,23 @@ export default new Vuex.Store({
     detail: {
       namespaced: true,
       state: {
+      },
+      actions: {
+        // 门厂技术提交订单
+        submit({state}, id) {
+          api.get({
+            key: 'submit',
+            data: {
+              id: id
+            },
+            success(data) {
+              tools.success(data, {
+                back: true,
+                successTips: '提交成功'
+              });
+            }
+          });
+        }
       }
     },
     /**
