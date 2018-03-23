@@ -1,7 +1,7 @@
 <!--委外团队列表-->
 <template>
   <div>
-    <cus-header fixed :title="isTeam ? '团队的安装订单' : '我的安装订单'" :menu="isManager ? [isTeam ? {title:'我的安装订单', key:'my'} : {title:'查看我的团队', key:'team'}] : undefined">
+    <cus-header fixed :title="isTeam || isDoorManager ? '团队的安装订单' : '我的安装订单'" :menu="isManager ? [isTeam ? {title:'我的安装订单', key:'my'} : {title:'查看我的团队', key:'team'}] : undefined">
       <fallback slot="left"></fallback>
       <mt-button @click.native="toSearchFn" slot="right">
         <i class="xs-icon icon-search"></i>
@@ -134,17 +134,18 @@
           self.selected = 'process';
 
         }
-      });
-      this.loadBottomFn({
-        status: self.tabStatus,
-        list: self.tabVal
+        // 获取安装订单数据
+        this.loadBottomFn({
+          status: self.tabStatus,
+          list: self.tabVal
+        });
       });
     },
     data: () => {
       return {
         tabVal: '',
         tabStatus: '',
-        isDoorManager: '', // 是否门厂技术主管 true===是
+//        isDoorManager: '', // 是否门厂技术主管 true===是
         // 活跃tab
         selected: 'pending',
         userInfo: '',
@@ -153,7 +154,11 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['pending', 'process', 'completed', 'isManager', 'isTeam'])
+      ...mapState(NAMESPACE, ['pending', 'process', 'completed', 'isManager', 'isTeam']),
+      isDoorManager() {
+        let code = this.userInfo['KL Primary Position Type LIC'];
+        return code === 'Door Factory Engineer'; // code === 'Door Factory Engineer' || code === 'Door Factory Manager';
+      }
     },
     methods: {
       ...mapActions(NAMESPACE, ['getList']),
