@@ -12,7 +12,7 @@
           <div v-if="role === 'install'" class="mt-Detail-title" >优先级：{{ServiceRequest['Priority']}}</div>
           <div class="mt-Detail-title">联系人：{{ServiceRequest['Contact Last Name']}}</div>
           <div v-if="role === 'custom'"   class="mt-Detail-title">服务类型：{{ServiceRequest['SR Type']}}</div>
-          <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call">{{ServiceRequest['Contact Business Phone']}}</a></div>
+          <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call i">{{ServiceRequest['Contact Business Phone']}}</a></div>
         </div>
         <div class="detail-content">
           <mt-navbar v-model="active">
@@ -92,8 +92,10 @@
           <dateControl @my-cancel="cancel" @my-enter="enter"></dateControl>
         </mt-popup>
       </div>
-
+      <!--关闭盒子-->
       <close :showBox1="showBox" @my-enter="boxEnter" @my-close="boxClose"></close>
+      <!--打电话-->
+      <cus-call :number="ServiceRequest['Contact Business Phone']" v-model="call"></cus-call>
       <!--工单操作-->
       <mt-popup v-model="popupVisible1" position="bottom" popup-transition="popup-fade" class="mint-popup-2">
         <mt-cell class="setOut" title="出发" :value="Action['KL Departure Location']" >
@@ -130,6 +132,7 @@
   import {mapState, mapActions} from 'vuex';
   import { MessageBox } from 'mint-ui';
   import close from '../components/close';
+  import cusCall from 'public/components/cus-call';
   import toggle from '../components/detail-toggle';
   import dateControl from '../components/dateControl';
   //
@@ -161,15 +164,16 @@
         starTime: '',
         endTime: '',
         callEnd: false,
-        AppointEnd: false
+        AppointEnd: false,
+        call: false
       };
     },
     computed: {
       ...mapState('index', ['loginMeg', 'role']),
-      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList'])
+      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact']),
+      ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress']),
       boxClose(msg) {               // 关闭取消事件
         this.showBox = false;
       },
@@ -193,6 +197,7 @@
       changeBtnStote() {            // 改变按钮状态
         let me = this;
         me.callEnd = true;
+        me.call = true;
       },
       clickShow() {                 // 点击显示日历
         let me = this;
@@ -248,8 +253,15 @@
         }
       },
       callSolve() {
+        let me = this;
         MessageBox.confirm('远程电话沟通客户已解决，确认提交？?', '').then(action => {
-          console.log(1111);
+          let obj = {
+            srId: me.ServiceRequest['Id'],
+            actionId: me.Action['Id'],
+            closeMsg: '工程师电话解决'
+          };
+          me.getCloseReason(obj);
+          me.$router.go(-1);
         });
       },
       clickPosition(value1) {
@@ -257,27 +269,42 @@
         let parms = {};
         let statu = me.Action['Status'];
         if (value1 === 'setOut') {
+          KND.Native.getLocation({
+            success(data) {
+              me.getMapAddress({data: data, type: 'starAddress'});
+            }
+          });
           parms = {
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
             'key': 'getDepart',
-            'KL Departure Location': '我是出发地址',
+            'KL Departure Location': me.starAddress,
             'type': 'setOut'
           };
         } else if (value1 === 'reach') {
+          KND.Native.getLocation({
+            success(data) {
+              me.getMapAddress({data: data, type: 'visitAddress'});
+            }
+          });
           parms = {
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
             'key': 'getDepart',
-            'MeetingLocation': '我是上门地址',
+            'MeetingLocation': me.visitAddress,
             'type': 'reach'
           };
         } else if (value1 === 'end') {
+          KND.Native.getLocation({
+            success(data) {
+              me.getMapAddress({data: data, type: 'endAddress'});
+            }
+          });
           parms = {
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
             'key': 'getDone',
-            'DoneLoc': '我是完成地址'
+            'DoneLoc': me.endAddress
           };
           me.popupVisible1 = !me.popupVisible1;
         }
@@ -329,7 +356,7 @@
         });
       }
     },
-    components: {close, dateControl, toggle}
+    components: {close, dateControl, toggle, cusCall}
   };
 </script>
 <style lang="scss">

@@ -7,7 +7,9 @@
 
     <div class="mint-content addService">
       <div class="addform">
-        <mt-field label="产品条形码" type="text" placeholder="输入或扫门锁条形码" @change="sarech" v-model="SerialNumber" class="textRight"></mt-field>
+        <mt-field label="产品条形码" type="text" placeholder="输入或扫门锁条形码" @change="sarech" v-model="SerialNumber" class="textRight">
+          <i class="xs-icon icon-scan" @click="scan"></i>
+        </mt-field>
         <mt-cell class="mint-field" title="所在省市区" placeholder="请选择" is-link>{{Personal}}</mt-cell>
         <mt-field class="block" label="详细地址" v-model="Address" placeholder="如设备过旧未贴条码,允许为空" type="textarea" rows="2"></mt-field>
         <div class="floor-box">
@@ -137,6 +139,20 @@
           name: 'searchTrans',
           query: {
             type: type
+          }
+        });
+      },
+      scan() {
+        let me = this;
+        KND.Native.scanQRCode({
+          success(data) {
+            me.AssetNumber = data['Asset Number'];
+            me.ProductId = data['Id'];  // 产品ID
+            me.Personal = data['KL Personal Province'] + data['Personal City'];    // 省市
+            me.Address = data['Personal Address'];// 详细地址
+            me.building = data['KL Personal Address Building'];
+            me.floor = data['KL Personal Address Floor'];
+            me.room = data['KL Personal Address Room'];
           }
         });
       },
