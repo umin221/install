@@ -1,7 +1,7 @@
 <!--委外团队列表-->
 <template>
   <div>
-    <cus-header fixed :title="isManager ? '我的安装订单' : '团队的安装订单'" :menu="isShowT ?[{title:'查看我的团队', key:'a'}]: [{title:'我的安装订单', key:'a'}]">
+    <cus-header fixed :title="isTeam ? '团队的安装订单' : '我的安装订单'" :menu="isManager ? [isTeam ? {title:'我的安装订单', key:'my'} : {title:'查看我的团队', key:'team'}] : undefined">
       <fallback slot="left"></fallback>
       <mt-button @click.native="toSearchFn" slot="right">
         <i class="xs-icon icon-search"></i>
@@ -123,6 +123,7 @@
         self.userInfo = info;
         self.setInfoUser(info);
         console.log(self.userInfo);
+        self.setManager(info['KL Primary Position Type LIC'] === 'Field Service Manager');
         if (self.userInfo['KL Primary Position Type LIC'] === 'Door Factory Engineer') {
           self.tabVal = 'pending';
           self.tabStatus = '待处理';
@@ -132,16 +133,6 @@
           self.tabStatus = '处理中';
           self.selected = 'process';
 
-        }
-        if (self.userInfo['KL Primary Position Type LIC'] === 'Door Factory Manager') { // 是否门厂技术主管
-          self.isManager = false;
-        } else {
-          self.isManager = true;
-        }
-        if (self.userInfo['KL Primary Position Type LIC'] === 'Field Service Manager') { // 安装主管
-          self.isShowT = true;
-        } else {
-          self.isShowT = false;
         }
       });
       this.loadBottomFn({
@@ -153,26 +144,25 @@
       return {
         tabVal: '',
         tabStatus: '',
+        isDoorManager: '', // 是否门厂技术主管 true===是
         // 活跃tab
         selected: 'pending',
-        isManager: true, // 是否门厂技术主管 true 不是
-        isShowT: false, // 是否显示我的团队 true 不显示
         userInfo: '',
         // 下拉状态
         topStatus: ''
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['pending', 'process', 'completed', 'isTeam'])
+      ...mapState(NAMESPACE, ['pending', 'process', 'completed', 'isManager', 'isTeam'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['getList']),
-      ...mapMutations(NAMESPACE, ['setInfoUser', 'setTeam']),
+      ...mapMutations(NAMESPACE, ['setInfoUser', 'setManager', 'setTeam']),
       // 标题栏菜单选择回调方法
       // 标题栏菜单选择回调方法
       menuFn(item) {
         var self = this;
-        self.setTeam();
+        this.setTeam(item.key === 'team');
         self.loadBottomFn({
           status: self.tabStatus,
           list: self.tabVal

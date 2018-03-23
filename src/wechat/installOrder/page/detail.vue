@@ -476,7 +476,8 @@
         method: 'POST',
         data: {
           'body': {
-            'OutputIntObjectName': 'Base Order Entry (Sales)',
+            // 'OutputIntObjectName': 'Base Order Entry (Sales)',
+            'OutputIntObjectName': 'KL Order Sales',
             'SearchSpec': '[Order Entry - Orders.Id]=' + '\'' + me.id + '\''
             // 'SearchSpec': '[Order Entry - Orders.Id]="1-2BSATYIN"'
           }

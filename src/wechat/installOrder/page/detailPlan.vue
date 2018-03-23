@@ -24,10 +24,11 @@
       <mt-datetime-picker
         ref="picker"
         v-model="pickerVisible"
-        type="date"
+        type="datetime"
         year-format="{value} 年"
         month-format="{value} 月"
         date-format="{value} 日"
+        hour-format="{value} 时"
         class="datetime"
         @confirm="handleChangePlan">
       </mt-datetime-picker>
@@ -150,7 +151,7 @@
       handleChangePlan(value) {
         let me = this;
         var key = me.timeKey;
-        me.planObj[key] = value.format('MM/dd/yyyy');
+        me.planObj[key] = value.format('MM/dd/yyyy hh:mm');
         console.dir(me.planObj);
         // me.startDate = value.format('MM/dd/yyyy'); // 后台存值格式
       },
@@ -178,10 +179,10 @@
           success: data => {
             console.dir(data);
             self.batchCode = data.Id; // 批次
-            self.start_Date = new Date(data.Planned).format('yyyy-MM-dd'); // 开始时间
-            self.end_Date = new Date(data['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
-            self.startDate = self.start_Date.format('MM/dd/yyyy'); // 后台存值格式
-            self.endDate = self.end_Date.format('MM/dd/yyyy');
+            self.start_Date = new Date(data.Planned).format('yyyy-MM-dd hh:mm'); // 开始时间
+            self.end_Date = new Date(data['Planned Completion']).format('yyyy-MM-dd hh:mm'); // 结束时间
+            self.startDate = self.start_Date.format('MM/dd/yyyy hh:mm'); // 后台存值格式
+            self.endDate = self.end_Date.format('MM/dd/yyyy hh:mm');
             self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
           }
         });

@@ -28,6 +28,9 @@ export default new Vuex.Store({
         // 搜索结果
         result: [],
         infoUser: '',
+        // 是否主管
+        isManager: false,
+        // 查看团队
         isTeam: false
       },
       mutations: {
@@ -40,8 +43,15 @@ export default new Vuex.Store({
         setInfoUser(state, infoUser) {
           state.infoUser = infoUser;
         },
-        setTeam(state) {
-          state.isTeam = true;
+        setManager(state, isManager) {
+          state.isManager = isManager;
+        },
+        setTeam(state, isTeam) {
+          state.isTeam = isTeam;
+          // 清空列表数据
+          state.pending = [];
+          state.process = [];
+          state.completed = [];
         }
       },
       actions: {
