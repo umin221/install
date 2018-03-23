@@ -200,7 +200,7 @@
       ...mapState(NameSpace, ['loginMeg', 'pending', 'process', 'completed', 'cusService', 'role'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getList', 'getLoginMeg']),
+      ...mapActions(NameSpace, ['getList', 'getLoginMeg', 'getMapAddress']),
       ...mapMutations(NameSpace, ['setManager', 'setLoginMeg']),
       toSearch() {
         this.$router.push({path: '/search'});

@@ -2,6 +2,7 @@ let ApiList = {
   getList: option => {
     let condition = Object.assign({}, option.data);
     let status = condition.Status;
+    let srNum = condition.srNum;
     let parmer = '';
     if (status) {
       condition['Status'] = status.split(',');
@@ -12,6 +13,8 @@ let ApiList = {
           parmer = parmer + 'OR [Service Request.Status] = LookupValue("SR_STATUS",' + '"' + condition['Status'][i] + '"' + ')';
         }
       }
+    } else if (srNum) {
+      parmer = '[Service Request.SR Number] ~LIKE ' + '"*' + srNum + '*"';
     }
     // let operator = option.data.Status ? ' = ' : ' ~LIKE ';
     return {
@@ -22,6 +25,7 @@ let ApiList = {
           'OutputIntObjectName': 'Base KL Service Request Interface BO',
           // 'SearchSpec': KND.Util.condition2D(condition, 'Service Request', ' OR ', operator),
           'SearchSpec': parmer,
+          'SortSpec': 'Created(DESCENDING)',
           'StartRowNum': option.paging.StartRowNum,
           'PageSize': option.paging.PageSize
         }
@@ -29,19 +33,19 @@ let ApiList = {
     };
     // 列表
   },
-  getSearchList: option => {
-    return {
-      method: 'post',
-      url: 'service/EAI Siebel Adapter/Query',
-      data: {
-        'body': {
-          'OutputIntObjectName': 'Base KL Service Request Interface BO',
-          'SearchSpec': '[Service Request.Owner]=' + option.data['Owner'] + ' AND [Service Request.SR Number] ~LIKE "*' + option.data.status + '*"'
-        }
-      }
-    };
-    // 列表搜索
-  },
+  // getSearchList: option => {
+  //   return {
+  //     method: 'post',
+  //     url: 'service/EAI Siebel Adapter/Query',
+  //     data: {
+  //       'body': {
+  //         'OutputIntObjectName': 'Base KL Service Request Interface BO',
+  //         'SearchSpec': '[Service Request.Owner]=' + option.data['Owner'] + ' AND [Service Request.SR Number] ~LIKE "*' + option.data.status + '*"'
+  //       }
+  //     }
+  //   };
+  //   // 列表搜索
+  // },
   getDetail: option => {
     return {
       method: 'post',
@@ -188,7 +192,7 @@ let ApiList = {
   getSearch: option => {
     return {
       method: 'get',
-      url: 'data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] ~LIKE "' + option.data.val + '*" &PageSize=10&StartRowNum=0'
+      url: 'data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] ~LIKE "' + option.data.val + '*" AND [User Type]=LookupValue("CONTACT_USER_TYPE", "Sales") &PageSize=10&StartRowNum=0'
     };
     // 搜索电话联系人
   },
@@ -387,6 +391,15 @@ let ApiList = {
       }
     };
     //  服务请求完成状态
+  },
+  getMapAddress: option => {
+    let lat = option.data.LngLat.latitude;
+    let lng = option.data.LngLat.longitude;
+    return {
+      method: 'get',
+      url: 'http://api.map.baidu.com/geocoder/v2/?callback=renderReverse&location=' + lat + ',' + lng + '&output=json&pois=1&ak=ggrtlGUIUfci06YK9TNZfxLAOQblo3du'
+    };
+    //  经纬度逆地理转换
   }
 };
 // 16113009 袁静

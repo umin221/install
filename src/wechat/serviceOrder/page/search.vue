@@ -4,7 +4,8 @@
                 placeholder="请输入服务单编号">
 
         <cus-loadmore ref="result"
-                      :loadBottom="loadBottomFn"
+                      @loadTop="loadTopFn"
+                      @loadBottom="loadBottomFn"
                       :topStatus="topStatus">
           <cus-cell class="multiple"
                     :key="item.id"
@@ -28,24 +29,35 @@
   import cusSearch from 'public/components/cus-search';
   import cusCell from 'public/components/cus-cell';
   //
+//  let loader = function(...args) {
+//    let me = this;
+//    let event = args.pop();
+//    let name = me.value;
+//    let param = {
+//      data: {
+//        'Owner': me.loginMeg['Emp #'],
+//        'SR Number': name
+//      },
+//      more: args.pop(),
+//      callback: (data) => {
+//        me.$refs.result[event](data.length);
+//      }
+//    };
+//    // 获取团队列表
+//    me.getList(param);
+//  };
   let loader = function(...args) {
     let me = this;
     let event = args.pop();
-    let name = me.value;
-    let param = {
-      data: {
-        'Owner': me.loginMeg['Emp #'],
-        'SR Number': name
-      },
-      more: args.pop(),
+    let list = args.pop();
+    let param = Object.extend(true, {
       callback: (data) => {
-        me.$refs.result[event](data.length);
+        me.$refs[list][event](data.length);
       }
-    };
+    }, args.pop() || {});
     // 获取团队列表
     me.getList(param);
   };
-
   const NAMESPACE = 'searchList';
   export default {
     name: 'search',
@@ -68,7 +80,12 @@
        */
       searchFn(val) {
         this.value = val;
-        loader.call(this, 'onBottomLoaded');
+        loader.call(this, {
+          data: {
+            'srNum': val
+          },
+          more: true
+        }, 'result', 'onTopLoaded');
       },
       /**
        * To detail
@@ -86,10 +103,21 @@
       /**
        * Load more
        */
+
+      loadTopFn() {
+        loader.call(this, {
+          data: {
+            'srNum': this.value
+          }
+        }, 'result', 'onTopLoaded');
+      },
       loadBottomFn() {
         loader.call(this, {
+          data: {
+            'srNum': this.value
+          },
           more: true
-        }, 'onBottomLoaded');
+        }, 'result', 'onBottomLoaded');
       }
     }
   };
