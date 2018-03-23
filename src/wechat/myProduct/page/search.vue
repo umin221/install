@@ -41,6 +41,7 @@
     },
     methods: {
       ...mapActions(NAMESPACE, ['getProduct']),
+      // 点击搜索
       searchFn(val) {
         this.value = val;
         this.getProduct(val);

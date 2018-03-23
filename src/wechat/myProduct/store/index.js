@@ -16,11 +16,19 @@ export default new Vuex.Store({
         value: ''
       },
       actions: {
+        getMyProduct({state, commit, dispatch}, {data, callback}) {
+          callback && callback();
+        }
       },
       mutations: {
       }
     },
     detail: {
+      namespaced: true,
+      state: {
+      }
+    },
+    searchTrans: {
       namespaced: true,
       state: {
       }

@@ -380,7 +380,6 @@
           if (nothave) {
             this.isBan.push(false);
           }
-
         }
         for (let n = 0; n < 42; n++) {   // 同上，来处理休息日
           let nothave = true;
