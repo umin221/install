@@ -677,6 +677,15 @@
               }
             });
           }
+        } else if (item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary') { // 替代锁批次
+          // 跳转真锁安装批次新增页面
+          this.$router.push({
+            name: 'zsBatch',
+            query: {
+              type: 'add',
+              item: item
+            }
+          });
         } else {
           // 跳转统一批次新增页面
           this.$router.push({
@@ -783,42 +792,85 @@
       },
       updateDoor(item, fItem) {
         var self = this;
+        var typePage = ''; // 区分跳转什么更新页面 updateDoor/updateDoorNext
         // 根据状态跳转更新还是日志页面
-        if (item['Calculated Activity Status'] === 'Completed') { // 已完成
-          var type = '';
-          if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary' || fItem['KL Detail Type LIC'] === 'Check Before Trans Summary' || fItem['KL Detail Type LIC'] === 'Transfer Summary') {
-            type = 'updateDoorNext';
-          } else {
-            type = 'updateDoor';
-          }
-          self.$router.push({
-            name: 'journal',
-            query: {
-              id: item.Id,
-              type: type
-            }
-          });
-        } else { // 更新
-          // 详情
-          if (userInfo['Person UId'] === item['Primary Owner Id']) { // 当前登录人与批次负责人相等才能更新
-            if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary' || fItem['KL Detail Type LIC'] === 'Check Before Trans Summary' || fItem['KL Detail Type LIC'] === 'Transfer Summary') {
-              self.$router.push({
-                name: 'updateDoorNext',
-                query: {
-                  type: 'add',
-                  id: item.Id
-                }
-              });
+        if (item['Calculated Activity Status'] === 'Completed') { // 已完成 跳转日志
+          if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次 完成状态先跳转日志   日志页面与其他日志页面不共用
+            self.$router.push({
+              name: 'journalLIS',
+              query: {
+                id: item.Id,
+                fItem: fItem,
+                type: false // 是否可以更新
+              }
+            });
+          } else { // 其他批次都是跳转 更新页面
+            if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary' || fItem['KL Detail Type LIC'] === 'Check Before Trans Summary') {
+              typePage = 'updateDoorNext';
             } else {
+              typePage = 'updateDoor';
+            }
+            self.$router.push({
+              name: 'journal',
+              query: {
+                id: item.Id,
+                fItem: fItem,
+                type: typePage
+              }
+            });
+          }
+        } else { // 更新 只有状态进行中 是责任人才能更新
+          // 详情
+          if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次 编辑跳转日志  判断日志页面有没有权限更新
+            var is_deit = false;
+            if (userInfo['Person UId'] === item['Primary Owner Id'] && item['Calculated Activity Status'] === 'In Progress') {
+              is_deit = true;
+            }
+            self.$router.push({
+              name: 'journalLIS',
+              query: {
+                id: item.Id,
+                fItem: fItem,
+                type: is_deit // 是否可以更新
+              }
+            });
+          } else { // 其他批次的更新 统一
+            if (userInfo['Person UId'] === item['Primary Owner Id'] && item['Calculated Activity Status'] === 'In Progress') { // 当前登录人与批次负责人相等并且状态是进行中才能更新
+              if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary' || fItem['KL Detail Type LIC'] === 'Check Before Trans Summary') {
+                self.$router.push({
+                  name: 'updateDoorNext',
+                  query: {
+                    type: 'add',
+                    id: item.Id
+                  }
+                });
+              } else {
+                self.$router.push({
+                  name: 'updateDoor',
+                  query: {
+                    type: 'add',
+                    fItem: fItem,
+                    id: item.Id
+                  }
+                });
+              }
+            } else { // 没有权限更新和不是负责人只能看日志
+              if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary' || fItem['KL Detail Type LIC'] === 'Check Before Trans Summary') {
+                typePage = 'updateDoorNext';
+              } else {
+                typePage = 'updateDoor';
+              }
               self.$router.push({
-                name: 'updateDoor',
+                name: 'journal',
                 query: {
-                  type: 'add',
-                  id: item.Id
+                  id: item.Id,
+                  fItem: fItem,
+                  type: typePage
                 }
               });
             }
           }
+
         }
       }
     }

@@ -7,10 +7,13 @@
     </mt-header>
     <div class="mint-content zsBatch">
       <div :class="{'readonly':read}">
-        <cus-field label="开孔数量"
+        <cus-field label="完成数量"
                    type="number"
                    :class="heartVisible"
                    v-model="line['Completed Install Amount']"></cus-field>
+        <cus-field label="抽查数量"
+                   type="number"
+                   v-model="line['Spot Check Amount']"></cus-field>
         <cus-field label="合格数量"
                    type="number"
                    v-model="line['Qualified Amoun']"></cus-field>
@@ -55,13 +58,12 @@
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
   import api from '../api/api';
-
+  import {mapState} from 'vuex';
   export default {
     name: 'updateDoor',
     created() {
       let param = this.$route.query;
       this.id = param.id;
-      console.dir('=====' + this.id);
     },
     data: () => {
       return {
@@ -80,6 +82,7 @@
       });
     },
     computed: {
+      ...mapState('index', ['infoUser']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -113,7 +116,7 @@
         var self = this;
         var lineObj = self.line;
         if (!lineObj['Completed Install Amount']) {
-          Toast('开孔数量不能为空！');
+          Toast('完成数量不能为空！');
           return;
         }
         api.get({ // 提交详细计划数据
@@ -123,6 +126,7 @@
             'Id': '0001', // 默认ID
             'Activity Id': self.id,
             'Completed Install Amount': lineObj['Completed Install Amount'], // 新增批次返回的ID
+            'Spot Check Amount': lineObj['Spot Check Amount'], // 新增批次返回的ID
             'Qualified Amoun': lineObj['Qualified Amoun'], // 新增批次返回的ID
             'Unqualified Amount': lineObj['Unqualified Amount'], // 新增批次返回的ID
             'Unqualified Solve Amount': lineObj['Unqualified Solve Amount'], // 新增批次返回的ID
@@ -133,6 +137,7 @@
             if (!data.ERROR) {
               Toast('提交成功');
               lineObj['Completed Install Amount'] = '';
+              lineObj['Spot Check Amount'] = '';
               lineObj['Qualified Amoun'] = '';
               lineObj['Unqualified Amount'] = '';
               lineObj['Unqualified Solve Amount'] = '';
