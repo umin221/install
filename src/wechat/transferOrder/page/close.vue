@@ -19,7 +19,7 @@
 <script type="es6">
   import {mapActions} from 'vuex';
 
-  let NAMESPACE = 'close';
+  const NAMESPACE = 'close';
   export default {
     name: NAMESPACE,
     data() {

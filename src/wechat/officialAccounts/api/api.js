@@ -1,4 +1,11 @@
 let ApiList = {
+  getLov: option => {
+    option.data.parent = option.data.parent ? 'Parent Value = "' + option.data.parent + '"' : 'Parent is null';
+    return {
+      method: 'get',
+      url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type= "' + option.data.type + '" AND ' + option.data.parent + ' &PageSize=100&StartRowNum=0'
+    };
+  }
 };
 // 16113009 袁静
 // 14080088 张沙沙

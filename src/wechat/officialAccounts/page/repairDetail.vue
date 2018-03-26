@@ -42,7 +42,9 @@
         </mt-tab-container>
       </div>
     </div>
-    <!--工单操作-->
+    <button-group>
+      <mt-button class="single" @click.native="toComment">点评</mt-button>
+    </button-group>
   </div>
 </template>
 <script>
@@ -64,7 +66,10 @@
       ...mapState(NameSpace, ['tabList'])
     },
     methods: {
-      ...mapActions(NameSpace, [''])
+      ...mapActions(NameSpace, ['']),
+      toComment() {
+        this.$router.push('commentOn');
+      }
     },
     components: {toggle}
   };

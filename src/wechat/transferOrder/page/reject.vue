@@ -19,7 +19,7 @@
 <script type="es6">
   import {mapActions} from 'vuex';
 
-  let NAMESPACE = 'reject';
+  const NAMESPACE = 'reject';
   export default {
     name: NAMESPACE,
     data() {

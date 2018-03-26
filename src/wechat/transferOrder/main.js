@@ -15,7 +15,6 @@ import empty from 'public/components/cus-empty';
 import buttonGroup from 'public/components/cus-button-group';
 import App from '../../App';
 import store from './store';
-import './filters'; // Vue Filter
 
 // For back
 Vue.component('fallback', fallback);

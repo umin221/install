@@ -7,8 +7,8 @@
 import 'public/config'; // Loader Config
 import './util'; // Global Util
 import '../native'; // Register Native API
-import './filters'; // Global Vue Filter
-import './mixin'; // Global Mixin
+// import './filters'; // Global Vue Filter
+// import './mixin'; // Global Mixin
 import './tools'; // Global Tools
 import './vc'; // VConsole
 

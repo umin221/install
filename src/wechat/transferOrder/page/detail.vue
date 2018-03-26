@@ -73,7 +73,6 @@
   import toggle from 'public/components/cus-toggle';
 
   const NAMESPACE = 'detail';
-
   export default {
     name: NAMESPACE,
     components: {cusField, titleGroup, toggle},

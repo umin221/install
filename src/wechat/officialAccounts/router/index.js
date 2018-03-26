@@ -17,22 +17,58 @@ export default new Router({
       require(['../page/index'], resolve);
     }
   }, {
-    path: '/address', // 首页列表
+    path: '/address', // 地址管理
     name: 'address',
     component(resolve) {
       require(['../page/address'], resolve);
     }
   }, {
-    path: '/myRepair', // 首页列表
+    path: '/myRepair', // 报修列表
     name: 'myRepair',
     component(resolve) {
       require(['../page/myRepair'], resolve);
     }
   }, {
-    path: '/repairDetail', // 首页列表
+    path: '/repairDetail', // 报修详情
     name: 'repairDetail',
     component(resolve) {
       require(['../page/repairDetail'], resolve);
+    }
+  }, {
+    path: '/addAddress', // 新建地址
+    name: 'addAddress',
+    component(resolve) {
+      require(['../page/addAddress'], resolve);
+    }
+  }, {
+    path: '/commentOn', // 点评
+    name: 'commentOn',
+    component(resolve) {
+      require(['../page/commentOn'], resolve);
+    }
+  }, {
+    path: '/personal', // 个人中心
+    name: 'personal',
+    component(resolve) {
+      require(['../page/personal'], resolve);
+    }
+  }, {
+    path: '/myDevice', // 我的设备
+    name: 'myDevice',
+    component(resolve) {
+      require(['../page/myDevice'], resolve);
+    }
+  }, {
+    path: '/deviceDetail', // 我的设备
+    name: 'deviceDetail',
+    component(resolve) {
+      require(['../page/deviceDetail'], resolve);
+    }
+  }, {
+    path: '/addDevice', // 我的设备
+    name: 'addDevice',
+    component(resolve) {
+      require(['../page/addDevice'], resolve);
     }
   }]
 });
