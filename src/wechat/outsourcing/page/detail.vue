@@ -86,7 +86,7 @@
   import titleGroup from 'public/components/cus-title-group';
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
-
+  // use plugin
   Vue.use(vp);
 
   // Swiper button

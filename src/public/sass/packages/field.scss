@@ -59,3 +59,13 @@
     }
   }
 }
+
+.readonly, .disable {
+  .mint-cell-wrapper {
+    div.mint-cell-title {
+      &:before {
+        content: "";
+      }
+    }
+  }
+}

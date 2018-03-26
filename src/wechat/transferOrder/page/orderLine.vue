@@ -7,13 +7,15 @@
 
       <!--detail-->
       <div class="mint-content line" :data-date="date" :class="{disable: !editable}">
-        <cus-field label="产品名称"
+        <cus-field label="产品名称" tag="产品名称"
                    @click.native="showLovFn('agreementItem')"
                    :value="productName || line['KL Product Model No']"
+                   v-valid.require
                    is-link></cus-field>
-        <cus-field label="开向"
+        <cus-field label="开向" tag="开向"
                    @click.native="showLovFn('KL Hole Direction')"
                    v-model="line['KL Hole Direction']"
+                   v-valid.require
                    is-link></cus-field>
         <mt-cell title="是否带天地" v-show="!isPanel">
           <mt-switch v-model="flag"></mt-switch>
@@ -22,8 +24,9 @@
                    <!--@click.native="openPicker"-->
                    <!--:value="line['Scheduled Ship Date']"-->
                    <!--is-link></cus-field>-->
-        <cus-field label="数量"
+        <cus-field label="数量" tag="数量"
                    type="number"
+                   v-valid.require.number
                    v-model="line['Quantity Requested']"></cus-field>
         <cus-field label="门材质"
                    @click.native="showLovFn('KL Door Material Quality')"
@@ -73,14 +76,17 @@
 
 <script type="es6">
   import {mapState, mapActions} from 'vuex';
+  import Vue from 'vue';
+  import vp from 'public/plugin/validator';
   import menuBox from 'public/components/cus-menu.vue';
   import cusField from 'public/components/cus-field';
-
-  let NAMESPACE = 'orderLine';
+  // use plugin
+  Vue.use(vp);
   // mapp
   let mapp = config.mapp;
   let today = new Date();
 
+  const NAMESPACE = 'orderLine';
   export default {
     name: NAMESPACE,
     components: {menuBox, cusField},
@@ -189,7 +195,9 @@
       ...mapActions('app', ['getLov']),
       // 保存订单行
       saveFn() {
-        this.saveOrderLine(this.line);
+        tools.valid.call(this, () => {
+          this.saveOrderLine(this.line);
+        });
       },
       // 选择对话框
       showLovFn(type) {
