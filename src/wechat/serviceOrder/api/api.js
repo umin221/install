@@ -392,7 +392,21 @@ let ApiList = {
     };
     //  服务请求完成状态
   },
+  getMoreOrder: option => {
+    return {
+      method: 'put',
+      url: 'data/KL Service Request Interface BO/Service Request',
+      data: {
+        'Id': '1',
+        'Contact Id': option.data.ContactId,
+        'Contact Last Name': option.data.ContactName,
+        'Personal Location Id': option.data.LocationId
+      }
+    };
+    //  经纬度逆地理转换
+  },
   getMapAddress: option => {
+    console.log(option);
     let lat = option.data.LngLat.latitude;
     let lng = option.data.LngLat.longitude;
     return {

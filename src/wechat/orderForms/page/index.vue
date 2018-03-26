@@ -1,13 +1,5 @@
 <template>
   <div style="background-color: #ebebeb;">
-    <!--<mt-header fixed title="我的服务订单">-->
-      <!--<fallback slot="left"></fallback>-->
-      <!--<router-link to="search" slot="right">-->
-        <!--<mt-button >-->
-          <!--<i class="xs-icon icon-search"></i>-->
-        <!--</mt-button>-->
-      <!--</router-link>-->
-    <!--</mt-header>-->
     <cus-header fixed :title="isTeam ? '团队的服务订单' : '我的服务订单'" :menu="isManager ? [isTeam ? {title:'我的服务订单', key:'my'} : {title:'查看我的团队', key:'team'}] : undefined">
       <fallback slot="left"></fallback>
       <router-link to="search" slot="right">

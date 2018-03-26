@@ -37,20 +37,35 @@
               </div>
             </mt-tab-container-item>
             <mt-tab-container-item id="tab-container2">
-              <toggle v-if="ServiceRequest['Action']" label="单据编号">
+              <toggle v-if="ServiceRequest['Action']" :title="true" label="单据编号">
                 <div>
-                  <div class="record-title">故障记录</div>
-                  <ul class="failure-record">
-                    <li>产品序列号：{{ServiceRequest['KL SN']}}</li>
-                    <li>详细地址：{{ServiceRequest['Personal Street Address']}}</li>
-                    <li>产品类型：{{ServiceRequest['KL Product Model']}}</li>
-                    <li>故障描述：{{ServiceRequest['Sub-Area']}}</li>
-                    <li>故障现象：{{ServiceRequest['Area']}}</li>
-                    <li>照片附件</li>
-                  </ul>
-                  <div class="record-title">完工确认单</div>
-                  <ul class="finish-enter">
-                  </ul>
+                  <toggle :title="false" label="故障记录">
+                    <ul class="failure-record">
+                      <li>产品序列号：{{ServiceRequest['KL SN']}}</li>
+                      <li>详细地址：{{ServiceRequest['Personal Street Address']}}</li>
+                      <li>产品类型：{{ServiceRequest['KL Product Model']}}</li>
+                      <li>故障描述：{{ServiceRequest['Sub-Area']}}</li>
+                      <li>故障现象：{{ServiceRequest['Area']}}</li>
+                      <li>照片附件</li>
+                    </ul>
+                  </toggle>
+                  <toggle :title="false" label="完工确认单">
+                    <div v-if="ServiceRequest['Order Entry - Orders']">
+                      <div class="enter-order">
+                        <div>保修期</div>
+                        <div>配件名称</div>
+                        <div>数量</div>
+                      </div>
+                      <div class="enter-order">
+                        <div>{{ServiceRequest['Order Entry - Orders']['Order Entry - Line Items']['KL Warranty Flag']}}</div>
+                        <div>{{ServiceRequest['Order Entry - Orders']['Order Entry - Line Items']['KL Product Name Join']}}</div>
+                        <div>{{ServiceRequest['Order Entry - Orders']['Order Entry - Line Items']['Quantity Requested']}}</div>
+                      </div>
+                    </div>
+                    <div v-else>
+                      暂无数据
+                    </div>
+                  </toggle>
                 </div>
               </toggle>
               <div v-else style="line-height: 5rem;text-align: center">暂无数据</div>
@@ -114,9 +129,9 @@
         </mt-cell>
         <mt-cell title="完工确认">
           <mt-button v-if="Action['Status']==='已上门'&& ServiceRequest['SR Rootcause'] && ServiceRequest['Status'] !== '已完成'"
-                     @click="clickPosition('failureRecord')">填写</mt-button>
+                     @click.native="clickPosition('failureRecord')">填写</mt-button>
           <mt-button v-else-if="ServiceRequest['Status'] === '已完成'"
-                     @click="clickPosition('failureRecord')">再记一单</mt-button>
+                     @click.native="moreOrder">再记一单</mt-button>
           <mt-button v-else style="background: gainsboro">填写</mt-button>
         </mt-cell>
         <mt-cell class="completeEnd" title="结束">
@@ -173,7 +188,7 @@
       ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress']),
+      ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress', 'getMoreOrder']),
       boxClose(msg) {               // 关闭取消事件
         this.showBox = false;
       },
@@ -269,42 +284,42 @@
         let parms = {};
         let statu = me.Action['Status'];
         if (value1 === 'setOut') {
-          KND.Native.getLocation({
-            success(data) {
-              me.getMapAddress({data: data, type: 'starAddress'});
-            }
-          });
+//          KND.Native.getLocation({
+//            success(data) {
+//              me.getMapAddress({data: data, type: 'starAddress'});
+//            }
+//          });
           parms = {
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
             'key': 'getDepart',
-            'KL Departure Location': me.starAddress,
+            'KL Departure Location': '出发地址',
             'type': 'setOut'
           };
         } else if (value1 === 'reach') {
-          KND.Native.getLocation({
-            success(data) {
-              me.getMapAddress({data: data, type: 'visitAddress'});
-            }
-          });
+//          KND.Native.getLocation({
+//            success(data) {
+//              me.getMapAddress({data: data, type: 'visitAddress'});
+//            }
+//          });
           parms = {
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
             'key': 'getDepart',
-            'MeetingLocation': me.visitAddress,
+            'MeetingLocation': '上门地址',
             'type': 'reach'
           };
         } else if (value1 === 'end') {
-          KND.Native.getLocation({
-            success(data) {
-              me.getMapAddress({data: data, type: 'endAddress'});
-            }
-          });
+//          KND.Native.getLocation({
+//            success(data) {
+//              me.getMapAddress({data: data, type: 'endAddress'});
+//            }
+//          });
           parms = {
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
             'key': 'getDone',
-            'DoneLoc': me.endAddress
+            'DoneLoc': '完成地址'
           };
           me.popupVisible1 = !me.popupVisible1;
         }
@@ -327,6 +342,15 @@
             }
           });
         }
+      },
+      moreOrder() {
+        let me = this;
+        let params = {
+          ContactId: me.ServiceRequest['Contact Id'],
+          ContactName: me.ServiceRequest['Contact Last Name'],
+          LocationId: me.ServiceRequest['Personal Location Id']
+        };
+        me.getMoreOrder(params);
       },
       changeMy() {              // 主管接单
         let me = this;
@@ -517,5 +541,13 @@
     li{
       line-height: 1.5rem;
     };
+  }
+  .enter-order {
+    display: flex;
+
+    div{
+     width: 25%;
+      text-align: center;
+    }
   }
 </style>
