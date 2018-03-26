@@ -1,5 +1,9 @@
 .mint-field {
 
+  &.error {
+    border-bottom: 1px solid red;
+  }
+
   &.require {
     .mint-cell-title:before {
       content: "*";
@@ -19,6 +23,12 @@
     input {
       text-align: right;
     }
+  }
+}
+
+.mint-cell {
+  &.error {
+    border-bottom: 1px solid red;
   }
 }
 

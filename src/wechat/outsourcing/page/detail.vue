@@ -13,24 +13,23 @@
     <!--create detail edit-->
     <div class="mint-content wide-form">
       <div :class="{'readonly':read}">
-        <cus-field label="合作伙伴名称" placeholder="请输入名称"
-          :class="heartVisible"
-          :edit=!read
-          @change="checkNameExistFn"
-          v-model="form['Name']"></cus-field>
-        <cus-field label="合作伙伴负责人" placeholder="请输入负责人"
-          :class="heartVisible"
-          :edit=!read
-          v-model="form['KL Partner Owner Name']"></cus-field>
-        <cus-field label="联系电话" placeholder="请输入电话" type="tel"
-          :class="heartVisible"
-          :edit=!read
-          v-model="form['Main Phone Number']"></cus-field>
-        <cus-field label="详细地址" placeholder="请输入地址"
-          :class="heartVisible"
-          :edit=!read
-          v-model="form['Primary Address Street']"></cus-field>
-        <!--<mt-field v-show="!read" class="require" :readonly="read" label="合同附件"></mt-field>-->
+        <cus-field label="合作伙伴名称" placeholder="请输入名称" tag="名称"
+                   @change="checkNameExistFn"
+                   :edit=!read
+                   v-valid.require
+                   v-model="form['Name']"></cus-field>
+        <cus-field label="合作伙伴负责人" placeholder="请输入负责人" tag="负责人"
+                   :edit=!read
+                   v-valid.require
+                   v-model="form['KL Partner Owner Name']"></cus-field>
+        <cus-field label="联系电话" placeholder="请输入电话" type="tel" tag="电话"
+                   :edit=!read
+                   v-valid.require.phone
+                   v-model="form['Main Phone Number1']"></cus-field>
+        <cus-field label="详细地址" placeholder="请输入地址" tag="地址"
+                   :edit=!read
+                   v-valid.require
+                   v-model="form['Primary Address Street']"></cus-field>
       </div>
 
       <attach :attach="attach.list" ref="attach"
@@ -82,9 +81,13 @@
 
 <script type="es6">
   import {mapState, mapActions, mapMutations} from 'vuex';
+  import Vue from 'vue';
+  import vp from 'public/plugin/validator';
   import titleGroup from 'public/components/cus-title-group';
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
+
+  Vue.use(vp);
 
   // Swiper button
   let swiperBtn = [{
@@ -140,10 +143,6 @@
       swiperBtn() {
         return this.state === 'valid' ? swiperBtn : [];
       },
-      // * 是否显示
-      heartVisible() {
-        return this.type === 'read' ? '' : 'require';
-      },
       /**
        * 根据当前状态和类型判断标题展示
        * 新建&重新启用界面复用 仅标题不一样
@@ -184,23 +183,27 @@
       },
       // Partner create & restart
       submitFn() {
-        // restart
-        if (this.state === 'invalid') {
-          // this.update({
-          //  data: {
-          //    'KL Partner Status': '待审批'
-          //  }
-          // });
-          // 上传附件
-          this.pushMedia(this.$refs.attach.getServerIds());
-        } else {
-          // create
-          this.addPartner();
-        }
+        tools.valid.call(this, () => {
+          // restart
+          if (this.state === 'invalid') {
+            // this.update({
+            //  data: {
+            //    'KL Partner Status': '待审批'
+            //  }
+            // });
+            // 上传附件
+            this.pushMedia(this.$refs.attach.getServerIds());
+          } else {
+            // create
+            this.addPartner();
+          }
+        });
       },
       // Partner update
       updateFn() {
-        this.update();
+        tools.valid.call(this, () => {
+          this.update();
+        });
       },
       // To contact or fail out partner
       multipleFn() {
