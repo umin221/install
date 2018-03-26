@@ -136,7 +136,7 @@ let apiList = {
   getPlan: option => { // 获取批次详情计划数据
     return {
       method: 'get',
-      url: 'data/KL Installation Task Detail Plan/KL Installation Task Detail Plan/?searchspec=[Parent Activity Id] = ' + option.data.id,
+      url: 'data/KL Installation Task Detail Plan/KL Installation Task Detail Plan/?searchspec=[Parent Activity Id] =' + "'" + option.data.id + "'",
       data: {}
     };
   },

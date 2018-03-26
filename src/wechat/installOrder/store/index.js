@@ -280,15 +280,19 @@ export default new Vuex.Store({
       mutations: {
       },
       actions: {
-        getPlanList({state}, obj) {
+        getPlanList({state}, id) {
           api.get({ // 提交数据
             key: 'getPlan',
             method: 'GET',
             data: {
-              id: obj['Parent Activity Id']
+              id: id
             },
             success: function(data) {
-              state.planList = data;
+              if (data.items.length > 0) {
+                state.planList = data.items;
+              } else {
+                state.planList = KND.Util.toArray(data);
+              }
             }
           });
         },

@@ -72,7 +72,10 @@
               }
             },
             success: function(data) {
-              history.go(-1);
+              if (!data.ERROR) {
+                Toast('提交成功');
+                self.$router.back();
+              }
             }
           });
         } else {

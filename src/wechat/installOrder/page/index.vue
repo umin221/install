@@ -157,7 +157,7 @@
       ...mapState(NAMESPACE, ['pending', 'process', 'completed', 'isManager', 'isTeam']),
       isDoorManager() {
         let code = this.userInfo['KL Primary Position Type LIC'];
-        return code === 'Door Factory Engineer'; // code === 'Door Factory Engineer' || code === 'Door Factory Manager';
+        return code === 'Door Factory Manager'; // code === 'Door Factory Engineer' || code === 'Door Factory Manager';
       }
     },
     methods: {

@@ -3,26 +3,28 @@
   <div>
     <mt-header fixed :title="title">
       <fallback slot="left"></fallback>
-      <mt-button v-show="read" slot="right"
-                 @click="type = 'edit'">编辑</mt-button>
+      <mt-button v-if="form['KL Signed Amount'] && is_edit" slot="right"
+                 @click="type = 'edit';is_edit = false">编辑</mt-button>
     </mt-header>
 
     <div class="mint-content wide-form">
       <div :class="{'readonly':read}">
         <mt-cell title="是否涉及签收" v-if="item['KL Detail Type LIC'] === 'Trompil Lock Sign' ||
-          item['KL Detail Type LIC'] === 'Working Drawing Sign'">
-          <mt-switch v-model="box1"></mt-switch>
+          item['KL Detail Type LIC'] === 'Working Drawing Sign'" :class="{disable: !editable}">
+          <mt-switch v-if="form['KL Signed Amount']" v-model="box1"></mt-switch>
         </mt-cell>
-        <div v-show="box1">
+        <div v-show="box1" :class="{disable: !editable}">
           <mt-field label="签收数量" placeholder="请输入签收数量"
                     :class="heartVisible" v-model="form['KL Signed Amount']"></mt-field>
-          <mt-field label="备注说明" type="textarea" rows="4" v-model="form['Description']"></mt-field>
         </div>
       </div>
       <attach :attach="attach.list"
               :edit="!read"
               :title="title" v-show="box1">
       </attach>
+      <div :class="{'readonly':read}">
+        <mt-field label="备注说明" type="textarea" v-model="form['Description']"></mt-field>
+      </div>
     </div>
 
     <button-group>
@@ -52,13 +54,20 @@
       let param = this.$route.query;
       this.state = param.state;
       this.type = param.type;
+      this.is_edit = param.is_edit;
       this.id = param.item.Id;
       this.item = param.item;
       console.dir('=====' + this.id);
       // 获取详情
       if (this.type === 'read') {
         this.getSign(this.item);
+        /* if (this.form['KL Signed Amount']) {
+          this.box1 = true;
+        } else {
+          this.box1 = false;
+        }*/
       } else {
+        this.editable = true;
         this.clear();
       }
     },
@@ -66,10 +75,10 @@
       return {
         id: '',
         item: '',
+        is_edit: false,
+        editable: false,
         box1: true,
-        switch_show: true,
         type: 'add', // add 新增 / edit 编辑 / read 只读
-        state: 'pending', // pending 待审批 / valid 已生效 / invalid 未生效
         button: {
           list: [{
             text: '提交'
@@ -87,6 +96,9 @@
     computed: {
       ...mapState(NameSpace, ['form', 'attach']),
       // 表单只读
+      eidt() {
+        return this.type === 'edit';
+      },
       read() {
         return this.type === 'read';
       },

@@ -5,28 +5,60 @@
     </mt-header>
     <div class="mint-content zsBatch">
       <div :class="{'readonly':read}">
-        <mt-field label="批次" placeholder="是"
-                  :class="heartVisible"></mt-field>
-        <mt-field is-link label="计划开始日期" placeholder="请输入签收数量"
-                  :class="heartVisible"></mt-field>
-        <mt-field is-link label="计划完成日期" placeholder="请输入签收数量"
-                  :class="heartVisible"></mt-field>
-        <mt-field label="是否委外" placeholder="请输入签收数量"
-                  :class="heartVisible"></mt-field>
-        <mt-field is-link label="委外安装员" placeholder="请输入签收数量"
-                  :class="heartVisible"></mt-field>
-        <mt-field is-link label="真锁交接日期" placeholder="请输入签收数量"
-                  :class="heartVisible"></mt-field>
-
+        <mt-field label="批次"></mt-field>
+        <mt-cell title="计划开始日期" :class="heartVisible" @click.native="open('picker','Planned')" :value="planObj.Planned" is-link></mt-cell>
+        <mt-cell title="计划完成日期" :class="heartVisible" @click.native="open('picker', 'Planned Completion')" :value="planObj['Planned Completion']" is-link></mt-cell>
+        <cus-field label="完成数量"
+                   type="number"
+                   :class="heartVisible"
+                   v-model="planObj['Completed Install Amount']"></cus-field>
+        <mt-cell title="是否委外" :class="heartVisible">
+          <mt-switch v-model="box1"></mt-switch>
+        </mt-cell>
+        <div v-show="box1">
+          <mt-field is-link label="委外安装员"
+                    :class="heartVisible" :value="planObj.isPrimaryMVGPosition"></mt-field>
+          <mt-field is-link label="合作伙伴名称"></mt-field>
+          <mt-cell title="真锁交接日期" @click.native="open('picker', 'Planned Completion')" :value="planObj['Planned Completion']" is-link></mt-cell>
+        </div>
       </div>
-      <attach :attach="attach.list"
-              :edit="!read"
-              :title="title">
-      </attach>
+      <div v-show="box1">
+        <attach :attach="attach.list"
+                :edit="!read"
+                :title="title">
+        </attach>
+      </div>
+      <div class="lock-line">
+        <lock-line title="详细计划" @click="addPlanList('add')">
+          <mt-cell-swipe v-for="(line, index) in planList" class="lock-line-cell enable" ref="body"
+                         @click.native="addPlanList('read')"
+                         :key=index
+                         is-link>
+            <div class="co-flex co-jc" slot="title">
+              <span class="co-f1">{{line.Description}}</span>
+              <span class="co-f1">{{line.TODO_TYPE}}</span>
+            </div>
+            <div class="co-flex co-jc" slot="title">
+              <span class="co-f1">{{line.Planned}}</span>
+              <span class="co-f1">{{line['Planned Completion']}}</span>
+            </div>
+          </mt-cell-swipe>
+        </lock-line>
+      </div>
       <button-group>
         <mt-button class="single"
                    @click.native="nextClick">下一步</mt-button>
       </button-group>
+      <mt-datetime-picker
+        ref="picker"
+        v-model="pickerVisible"
+        type="date"
+        year-format="{value} 年"
+        month-format="{value} 月"
+        date-format="{value} 日"
+        class="datetime"
+        @confirm="handleChangePlan">
+      </mt-datetime-picker>
     </div>
   </div>
 </template>
@@ -49,6 +81,7 @@
 </style>
 <script type="application/javascript">
   import buttonGroup from 'public/components/cus-button-group';
+  import cusField from 'public/components/cus-field';
   import {mapState} from 'vuex';
 
   let right = [{
@@ -60,14 +93,21 @@
 
   export default {
     name: 'zsBatch',
-    created: () => {
+    created() {
       let param = this.$route.query;
       this.item = param.item;
       console.dir(1);
+      if (this.select.Id) { // 选择团队选回来的负责人
+        this.isPrimaryMVGName = this.select['Last Name']; // 主要负责人名字
+        this.isPrimaryMVGPosition = this.select['KL Primary Position Type'];  // 主要负责人职位
+      }
     },
     data: () => {
       return {
         value: '',
+        pickerVisible: true,
+        planObj: {},
+        box1: true,
         type: 'add', // add 新增 / edit 编辑 / read 只读
         titleVal: '新建安装批次',
         item: '',
@@ -105,6 +145,17 @@
       }
     },
     methods: {
+      open(picker, key) {
+        this.timeKey = key;
+        this.$refs[picker].open();
+      },
+      handleChangePlan(value) {
+        let me = this;
+        var key = me.timeKey;
+        me.planObj[key] = value.format('MM/dd/yyyy');
+        console.dir(me.planObj);
+        // me.startDate = value.format('MM/dd/yyyy'); // 后台存值格式
+      },
       nextClick() {
         var self = this;
         this.$router.push({
@@ -116,6 +167,6 @@
         });
       }
     },
-    components: {buttonGroup}
+    components: {buttonGroup, cusField}
   };
 </script>
