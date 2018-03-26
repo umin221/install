@@ -10,19 +10,40 @@ let apiList = {
       'StartRowNum': option.paging.StartRowNum,
       'PageSize': option.paging.PageSize
     };
-    var bing = ''; // 安装工程师跟安装主管需要参数Primary Postion Id
+    var isDoorFactory = false;
+    var searchSpec = [];
+    // 状态条件
+    var status = option.data.Status || '';
+    // 搜索条件
+    var search = option.data.search || '';
+    // 所有人都不看草稿
+    searchSpec.push('[Order Entry - Orders.Status]<>"Draft"');
     if (option.data.infoUser['KL Primary Position Type LIC'] === 'Door Factory Engineer') { // 门厂技术安装员
       boby.ViewMode = 'Sales Rep';
+      isDoorFactory = true;
     } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Manager' && !option.data.isTeam) { // 安装主管(我的安装订单)
-      bing = '[Order Entry - Orders.Primary Position Id]="' + option.data.infoUser['Primary Position Id'] + '" AND ';
+      searchSpec.push('[Order Entry - Orders.Primary Position Id]="' + option.data.infoUser['Primary Position Id'] + '"');
     } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Engineer') { // 安装工程师(我的安装订单)
-      bing = '[Order Entry - Orders.Primary Position Id]="' + option.data.infoUser['Primary Position Id'] + '" AND ';
+      searchSpec.push('[Order Entry - Orders.Primary Position Id]="' + option.data.infoUser['Primary Position Id'] + '"');
     } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Manager' && option.data.isTeam) { // option.data.isTeam 等于true 是我的团队 安装主管我的团队
       boby.ViewMode = 'Manager';
     } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Door Factory Manager') { // 门厂技术主管
       boby.ViewMode = 'Manager';
+      isDoorFactory = true;
     }
-    boby.SearchSpec = bing + '(' + KND.Util.condition2D({Status: option.data.Status.split(',')}, 'Order Entry - Orders', ' OR ', '=') + ')';
+    // 非门厂不看待门厂确认
+    if (!isDoorFactory) {
+      searchSpec.push('[Order Entry - Orders.Status]<>"In Confirming"');
+    }
+    // 订单状态过滤
+    if (status) {
+      searchSpec.push('(' + KND.Util.condition2D({Status: option.data.Status.split(',')}, 'Order Entry - Orders', ' OR ', '=') + ')');
+    }
+    // 订单搜索条件过滤
+    if (search) {
+      searchSpec.push('(' + KND.Util.condition2D(search, 'Order Entry - Orders', ' OR ', ' LIKE ') + ')');
+    }
+    boby.SearchSpec = searchSpec.join(' AND ');
     return {
       url: 'service/EAI Siebel Adapter/QueryPage',
       data: {
@@ -134,6 +155,23 @@ let apiList = {
   setJourna: option => {
     return {
       url: 'data/KL Installation Detail/KL Installation Detail'
+    };
+  },
+
+  /**
+   * 提交安装订单－门厂技术工程师
+   * @param option
+   * @returns {{url: string, data: {}}}
+   */
+  submit: option => {
+    return {
+      url: 'service/Workflow Process Manager/RunProcess',
+      data: {
+        'body': {
+          'ProcessName': 'KL Install Order Submit Process',
+          'Object Id': option.data.id
+        }
+      }
     };
   }
 };

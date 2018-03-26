@@ -2,23 +2,34 @@
   <div>
     <mt-header fixed :title="titleVal">
       <fallback slot="left"></fallback>
-      <mt-button slot="right"
-                 @click="journalFn()">日志</mt-button>
     </mt-header>
     <div class="mint-content zsBatch">
-      <div :class="{'readonly':read}">
+      <div class="read">
+        <cus-field label="安装人员"
+                   v-model="XXX"></cus-field>
         <cus-field label="完成数量"
-                   type="number"
-                   :class="heartVisible"
                    v-model="line['Completed Install Amount']"></cus-field>
-        <cus-field label="备注说明"
-                   type="textarea"
-                   v-model="line['Description']"></cus-field>
       </div>
-      <attach :attach="attach.list"
-              :edit="!read"
-              :title="title">
-      </attach>
+      <div :class="{'readonly':read}">
+        <cus-field label="抽查数量"
+                   type="number"
+                   v-model="line['Spot Check Amount']"></cus-field>
+        <cus-field label="合格数量"
+                   type="number"
+                   v-model="line['Qualified Amoun']"></cus-field>
+        <cus-field label="异常数量"
+                   type="number"
+                   v-model="line['Unqualified Amount']"></cus-field>
+        <cus-field label="异常处理数量"
+                   type="number"
+                   v-model="line['Unqualified Solve Amount']"></cus-field>
+        <cus-field label="异常描述"
+                   type="textarea"
+                   v-model="line['Unqualified Desc']"></cus-field>
+        <cus-field label="异常处理描述"
+                   type="textarea"
+                   v-model="line['Unqualified Solve Desc']"></cus-field>
+      </div>
       <button-group>
         <mt-button class="single"
                    @click="submitFn">提交</mt-button>
@@ -44,28 +55,21 @@
   }
 </style>
 <script type="application/javascript">
-  import {mapState} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
   import api from '../api/api';
-  let right = [{
-    content: '删除',
-    style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
-    handler: () => this.$messagebox('delete')
-  }];
-  const NameSpace = 'updateDoorNext';
+  import {mapState} from 'vuex';
   export default {
-    name: 'updateDoorNext',
+    name: 'updateLIS',
     created() {
       let param = this.$route.query;
       this.id = param.id;
-      console.dir('=====' + this.id);
     },
     data: () => {
       return {
         id: '',
         type: 'add', // add 新增 / edit 编辑 / read 只读
-        titleVal: '挂门进度更新',
+        titleVal: '真锁安装抽样',
         line: {},
         active: 'tab-container'
       };
@@ -78,13 +82,10 @@
       });
     },
     computed: {
-      ...mapState(NameSpace, ['form', 'attach']),
+      ...mapState('index', ['infoUser']),
       // 表单只读
       read() {
         return this.type === 'read';
-      },
-      right() {
-        return this.state === 'valid' ? right : [];
       },
       // * 是否显示
       heartVisible() {
@@ -99,36 +100,34 @@
       }
     },
     methods: {
-      journalFn() {
-        var self = this;
-        self.$router.push({
-          name: 'journal',
-          query: {
-            id: self.id,
-            type: 'updateDoorNext'
-          }
-        });
-      },
       submitFn() {
         var self = this;
         var lineObj = self.line;
-        if (!lineObj['Completed Install Amount']) {
-          Toast('完成数量不能为空！');
-          return;
-        }
         api.get({ // 提交详细计划数据
           key: 'setJourna',
           method: 'PUT',
           data: {
-            'Id': '0002', // 默认ID
+            'Id': '0001', // 默认ID
             'Activity Id': self.id,
-            'Completed Install Amount': lineObj['Completed Install Amount']
+            'Completed Install Amount': lineObj['Completed Install Amount'], // 新增批次返回的ID
+            'Spot Check Amount': lineObj['Spot Check Amount'], // 新增批次返回的ID
+            'Qualified Amoun': lineObj['Qualified Amoun'], // 新增批次返回的ID
+            'Unqualified Amount': lineObj['Unqualified Amount'], // 新增批次返回的ID
+            'Unqualified Solve Amount': lineObj['Unqualified Solve Amount'], // 新增批次返回的ID
+            'Unqualified Desc': lineObj['Unqualified Desc'], // 新增批次返回的ID
+            'Unqualified Solve Desc': lineObj['Unqualified Solve Desc'] // 新增批次返回的ID
           },
           success: function(data) {
             if (!data.ERROR) {
               Toast('提交成功');
               lineObj['Completed Install Amount'] = '';
-              lineObj.Description = '';
+              lineObj['Spot Check Amount'] = '';
+              lineObj['Qualified Amoun'] = '';
+              lineObj['Unqualified Amount'] = '';
+              lineObj['Unqualified Solve Amount'] = '';
+              lineObj['Unqualified Desc'] = '';
+              lineObj['Unqualified Solve Desc'] = '';
+              KND.Util.back();
             }
           }
         });

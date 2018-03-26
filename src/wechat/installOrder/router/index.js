@@ -71,22 +71,34 @@ export default new Router({
       require(['../page/detailPlan'], resolve);
     }
   }, {
-    path: '/updateDoor', // 验收1
+    path: '/updateDoor', // 验收更新1
     name: 'updateDoor',
     component(resolve) {
       require(['../page/updateDoor'], resolve);
     }
   }, {
-    path: '/updateDoorNext', // 验收2
+    path: '/updateDoorNext', // 验收更新2
     name: 'updateDoorNext',
     component(resolve) {
       require(['../page/updateDoorNext'], resolve);
     }
   }, {
-    path: '/journal', // 日志页面
+    path: '/updateLIS', // 真锁更新验收2
+    name: 'updateLIS',
+    component(resolve) {
+      require(['../page/updateLIS'], resolve);
+    }
+  }, {
+    path: '/journal', // 日志页面 -——————统一页面
     name: 'journal',
     component(resolve) {
       require(['../page/journal'], resolve);
+    }
+  }, {
+    path: '/journalLIS', // 日志页面 ——————真锁专用
+    name: 'journalLIS',
+    component(resolve) {
+      require(['../page/journalLIS'], resolve);
     }
   }, {
     path: '/updateDoor', // 挂门更新

@@ -35,91 +35,92 @@
         </div>
       </toggle>
       <div style="height: 0.5rem;background: #eaeaea;"></div>
-      <div class="content-lc" style="margin-top: 15px">
-        <div class="stage_li">
-          <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 72px;">
-            <div class="mui-scroll" style="height: 65px;overflow: -webkit-paged-x;">
-              <a v-for="(item, index) in taskData"  :key="index">
-                <div class="icon" @click="updateState(item.Status, item.Id, index)">
-                  <span v-show="index!=0"  class="left line l_grey"></span>
-                  <span class="point mui-icon"><span></span></span>
-                  <span  class="right line l_grey"></span>
-<!--
-                  <span v-if="item.length!= index" class="right mui-icon l_grey"></span>
--->
+      <div v-show="!isConfirming">
+        <div class="content-lc" style="margin-top: 15px">
+          <div class="stage_li">
+            <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 72px;">
+              <div class="mui-scroll" style="height: 65px;overflow: -webkit-paged-x;">
+                <a v-for="(item, index) in taskData"  :key="index">
+                  <div class="icon" @click="updateState(item.Status, item.Id, index)">
+                    <span v-show="index!=0"  class="left line l_grey"></span>
+                    <span class="point mui-icon"><span></span></span>
+                    <span  class="right line l_grey"></span>
+                    <!--
+                                      <span v-if="item.length!= index" class="right mui-icon l_grey"></span>
+                    -->
+                  </div>
+                  <div class="name present" @click="updateTask(index)">{{item['KL Detail Type']}}</div>
+                </a>
+                <a>
+                  <div class="icon" @click="getClose()">
+                    <span class="left line l_grey"></span>
+                    <span class="point mui-icon p_grey"><span></span></span>
+
+                  </div>
+                  <div class="name grey">关闭</div>
+                </a>
+                <!--<a>
+                  <div class="icon">
+
+                    <span class="point mui-icon"><span></span></span>
+                    <span class="right line l_grey"></span>
+                  </div>
+                  <div class="name present">2222
+                  </div>
+                </a><a>
+                <div class="icon">
+                  <span class="left line l_grey"></span>
+                  <span class="point mui-icon p_grey"><span></span></span>
+                  <span class="right line l_grey"></span>
                 </div>
-                <div class="name present" @click="updateTask(index)">{{item['KL Detail Type']}}</div>
+                <div class="name grey">
+                  投标阶段
+                </div>
               </a>
-              <a>
-                <div class="icon" @click="getClose()">
+                <a>
+                <div class="icon">
+                  <span class="left line l_grey"></span>
+                  <span class="point mui-icon close"><span></span></span>
+                  <span class="right line l_grey"></span>
+                </div>
+                <div class="name grey">
+                  投标阶段
+                </div>
+              </a>
+                <a>
+                <div class="icon">
                   <span class="left line l_grey"></span>
                   <span class="point mui-icon p_grey"><span></span></span>
 
                 </div>
-                <div class="name grey">关闭</div>
-              </a>
-              <!--<a>
-                <div class="icon">
-
-                  <span class="point mui-icon"><span></span></span>
-                  <span class="right line l_grey"></span>
+                <div class="name grey">
+                  商务谈判
                 </div>
-                <div class="name present">2222
-                </div>
-              </a><a>
-              <div class="icon">
-                <span class="left line l_grey"></span>
-                <span class="point mui-icon p_grey"><span></span></span>
-                <span class="right line l_grey"></span>
+              </a>-->
               </div>
-              <div class="name grey">
-                投标阶段
-              </div>
-            </a>
-              <a>
-              <div class="icon">
-                <span class="left line l_grey"></span>
-                <span class="point mui-icon close"><span></span></span>
-                <span class="right line l_grey"></span>
-              </div>
-              <div class="name grey">
-                投标阶段
-              </div>
-            </a>
-              <a>
-              <div class="icon">
-                <span class="left line l_grey"></span>
-                <span class="point mui-icon p_grey"><span></span></span>
-
-              </div>
-              <div class="name grey">
-                商务谈判
-              </div>
-            </a>-->
             </div>
           </div>
         </div>
-      </div>
-      <div class="mint-content-info">
-        <empty v-show="!taskDataList.length"></empty>
-        <div class="crm-zyList" v-for="(item, index) in taskDataList" :key="index">
-          <ul class="content" @click="routerPage(index, item, '')">
-            <li class="bd-radius">
-              <span class="icon"></span>
-            </li>
-            <li style="margin-right: 8px">{{item['KL Detail Type']}}</li>
-            <li style="margin-right: 8px"
-                v-if="item['KL Detail Type LIC'] === 'Trompil Lock Sign' ||
+        <div class="mint-content-info">
+          <empty v-show="!taskDataList.length"></empty>
+          <div class="crm-zyList" v-for="(item, index) in taskDataList" :key="index">
+            <ul class="content" @click="routerPage(index, item, '')">
+              <li class="bd-radius">
+                <span class="icon"></span>
+              </li>
+              <li style="margin-right: 8px">{{item['KL Detail Type']}}</li>
+              <li style="margin-right: 8px"
+                  v-if="item['KL Detail Type LIC'] === 'Trompil Lock Sign' ||
                  item['KL Detail Type LIC'] === 'Working Drawing Sign' ||
                  (item['KL Detail Type LIC'] === 'Ship From Door Factory' && item['Calculated Activity Status'] != 'Not Started') ||
                  item['KL Detail Type LIC'] === 'Lock Body Sign' ||
                  item['KL Detail Type LIC'] === 'Substitution Lock Sign' ||
                 item['KL Detail Type LIC'] === 'Lock Sign' ||
                 item['KL Detail Type LIC'] === 'Substitution Lock Trans Return'">
-              <span>{{item['Planned Completion']}}</span>
-              <span>{{item.Status}}</span>
-            </li>
-            <div class="butLi" v-if="item['KL Detail Type LIC']==='Trompil Batch Summary' ||
+                <span>{{item['Planned Completion']}}</span>
+                <span>{{item.Status}}</span>
+              </li>
+              <div class="butLi" v-if="item['KL Detail Type LIC']==='Trompil Batch Summary' ||
             item['KL Detail Type LIC']==='Lock Body Install Summary' ||
             item['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
             item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
@@ -127,13 +128,13 @@
             item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
             item['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
             item['KL Detail Type LIC'] === 'Transfer Summary'" >
-              <span @click.stop="closeTask(item)" class="batchClose"></span>
-              <span @click.stop="addTask(item)" class="batchAdd"></span>
-            </div>
-            <li style="margin-right: 8px" v-if="item['KL Detail Type LIC'] === 'Ship From Door Factory' && item['Calculated Activity Status'] === 'Not Started'">
-              <span class="mt-switch"><mt-switch v-model="shipmentVal"  @click.native.stop="shipment(item)"></mt-switch></span>
-            </li>
-            <div class="content-div"  v-if="item['KL Detail Type LIC']==='Trompil Batch Summary' ||
+                <span @click.stop="closeTask(item)" class="batchClose"></span>
+                <span @click.stop="addTask(item)" class="batchAdd"></span>
+              </div>
+              <li style="margin-right: 8px" v-if="item['KL Detail Type LIC'] === 'Ship From Door Factory' && item['Calculated Activity Status'] === 'Not Started'">
+                <span class="mt-switch"><mt-switch v-model="shipmentVal"  @click.native.stop="shipment(item)"></mt-switch></span>
+              </li>
+              <div class="content-div"  v-if="item['KL Detail Type LIC']==='Trompil Batch Summary' ||
             item['KL Detail Type LIC']==='Lock Body Install Summary' ||
             item['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
             item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
@@ -141,23 +142,28 @@
             item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
             item['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
             item['KL Detail Type LIC'] === 'Transfer Summary'" v-for="(itemTask, index) in upList(item['KL Installation Task'])" :key="index" @click.stop="updateDoor(itemTask,item)">
-              <div class="readonly">
-                <mt-field label="批次" class="itemTaskId" :value="itemTask.Id"  @click.native.stop="taskClick(itemTask)"></mt-field>
-                <mt-field label="已完成/计划数量"  class="itemTask" v-if="item['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
+                <div class="readonly">
+                  <mt-field label="批次" class="itemTaskId" :value="itemTask.Id"  @click.native.stop="taskClick(itemTask)"></mt-field>
+                  <mt-field label="已完成/计划数量"  class="itemTask" v-if="item['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
           item['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
           item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
           item['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
           item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
           item['KL Detail Type LIC'] === 'Transfer Summary'" :value="item['KL Completed Install Amount']+'/'+item['KL Install Amount Requested']"><span @click.stop="closeTask(itemTask)" class="batchClose"></span></mt-field>
-                <mt-field label="合格/计划数量" v-if="item['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
+                  <mt-field label="合格/计划数量" v-if="item['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
             item['KL Detail Type LIC'] === 'Check Before Trans Summary'" :value="item['KL Qualified Amount']+'/'+item['KL Spot Check Amount']"></mt-field>
-                <mt-field label="时间" :value="new Date(itemTask['Planned Completion']).format('yyyy-MM-dd')"></mt-field>
-                <mt-field label="状态" :value="itemTask.Status"></mt-field>
-               </div>
-            </div>
-          </ul>
+                  <mt-field label="时间" :value="new Date(itemTask['Planned Completion']).format('yyyy-MM-dd')"></mt-field>
+                  <mt-field label="状态" :value="itemTask.Status"></mt-field>
+                </div>
+              </div>
+            </ul>
+          </div>
         </div>
       </div>
+
+      <button-group v-show="isConfirming">
+        <mt-button @click.native="submitFn">确认提交</mt-button>
+      </button-group>
     </div>
   </div>
 </template>
@@ -476,7 +482,8 @@
         method: 'POST',
         data: {
           'body': {
-            'OutputIntObjectName': 'Base Order Entry (Sales)',
+            // 'OutputIntObjectName': 'Base Order Entry (Sales)',
+            'OutputIntObjectName': 'KL Order Sales',
             'SearchSpec': '[Order Entry - Orders.Id]=' + '\'' + me.id + '\''
             // 'SearchSpec': '[Order Entry - Orders.Id]="1-2BSATYIN"'
           }
@@ -484,11 +491,14 @@
         success: function(data) {
           console.dir(data.SiebelMessage);
           me.detailData = data.SiebelMessage['Order Entry - Orders'];
-          me.taskData = KND.Util.toArray(me.detailData['KL Installation Task']);
-          console.dir(me.taskData);
-          me.pStatus = me.taskData[0]['Calculated Activity Status'];
-          if (me.pStatus !== 'Not Started') { // 未开始时不获取子任务数据
-            me.taskDataList = KND.Util.toArray(me.taskData[0]['KL Installation Task']);
+          var taskData = me.detailData['KL Installation Task'];
+          if (taskData) {
+            me.taskData = KND.Util.toArray(taskData);
+            console.dir(me.taskData);
+            me.pStatus = me.taskData[0]['Calculated Activity Status'];
+            if (me.pStatus !== 'Not Started') { // 未开始时不获取子任务数据
+              me.taskDataList = KND.Util.toArray(me.taskData[0]['KL Installation Task']);
+            }
           }
           me.taskDataST = KND.Util.toArray(me.detailData['Order Entry - Line Items']);
           console.dir(me.taskDataST);
@@ -503,7 +513,7 @@
       return {
         type: 'read', // add 新增 / edit 编辑 / read 只读
         id: '',
-        detailData: '', // 详情整体数据
+        detailData: {}, // 详情整体数据
         taskData: '', // 任务集
         taskDataList: '', // 任务集子任务
         taskDataST: '', // 面板锁体
@@ -512,6 +522,11 @@
         shipmentVal: false, // 发运开关，判断值
         active: 'tab-container'
       };
+    },
+    computed: {
+      isConfirming() {
+        return this.detailData.Status === '门厂工程师确认中';
+      }
     },
     beforeRouteEnter(to, from, next) {
       console.dir(2);
@@ -676,6 +691,15 @@
               }
             });
           }
+        } else if (item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary') { // 替代锁批次
+          // 跳转真锁安装批次新增页面
+          this.$router.push({
+            name: 'zsBatch',
+            query: {
+              type: 'add',
+              item: item
+            }
+          });
         } else {
           // 跳转统一批次新增页面
           this.$router.push({
@@ -782,43 +806,101 @@
       },
       updateDoor(item, fItem) {
         var self = this;
+        var typePage = ''; // 区分跳转什么更新页面 updateDoor/updateDoorNext
         // 根据状态跳转更新还是日志页面
-        if (item['Calculated Activity Status'] === 'Completed') { // 已完成
-          var type = '';
-          if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary' || fItem['KL Detail Type LIC'] === 'Check Before Trans Summary' || fItem['KL Detail Type LIC'] === 'Transfer Summary') {
-            type = 'updateDoorNext';
-          } else {
-            type = 'updateDoor';
-          }
-          self.$router.push({
-            name: 'journal',
-            query: {
-              id: item.Id,
-              type: type
-            }
-          });
-        } else { // 更新
-          // 详情
-          if (userInfo['Person UId'] === item['Primary Owner Id']) { // 当前登录人与批次负责人相等才能更新
-            if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary' || fItem['KL Detail Type LIC'] === 'Check Before Trans Summary' || fItem['KL Detail Type LIC'] === 'Transfer Summary') {
-              self.$router.push({
-                name: 'updateDoorNext',
-                query: {
-                  type: 'add',
-                  id: item.Id
-                }
-              });
+        if (item['Calculated Activity Status'] === 'Completed') { // 已完成 跳转日志
+          if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次 完成状态先跳转日志   日志页面与其他日志页面不共用
+            self.$router.push({
+              name: 'journalLIS',
+              query: {
+                id: item.Id,
+                fItem: fItem,
+                type: false // 是否可以更新
+              }
+            });
+          } else { // 其他批次都是跳转 更新页面
+            if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary' || fItem['KL Detail Type LIC'] === 'Check Before Trans Summary') {
+              typePage = 'updateDoorNext';
             } else {
+              typePage = 'updateDoor';
+            }
+            self.$router.push({
+              name: 'journal',
+              query: {
+                id: item.Id,
+                fItem: fItem,
+                type: typePage
+              }
+            });
+          }
+        } else { // 更新 只有状态进行中 是责任人才能更新
+          // 详情
+          if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次 编辑跳转日志  判断日志页面有没有权限更新
+            var is_deit = false;
+            if (userInfo['Person UId'] === item['Primary Owner Id'] && item['Calculated Activity Status'] === 'In Progress') {
+              is_deit = true;
+            }
+            self.$router.push({
+              name: 'journalLIS',
+              query: {
+                id: item.Id,
+                fItem: fItem,
+                type: is_deit // 是否可以更新
+              }
+            });
+          } else { // 其他批次的更新 统一
+            if (userInfo['Person UId'] === item['Primary Owner Id'] && item['Calculated Activity Status'] === 'In Progress') { // 当前登录人与批次负责人相等并且状态是进行中才能更新
+              if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary' || fItem['KL Detail Type LIC'] === 'Check Before Trans Summary') {
+                self.$router.push({
+                  name: 'updateDoorNext',
+                  query: {
+                    type: 'add',
+                    id: item.Id
+                  }
+                });
+              } else {
+                self.$router.push({
+                  name: 'updateDoor',
+                  query: {
+                    type: 'add',
+                    fItem: fItem,
+                    id: item.Id
+                  }
+                });
+              }
+            } else { // 没有权限更新和不是负责人只能看日志
+              if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary' || fItem['KL Detail Type LIC'] === 'Check Before Trans Summary') {
+                typePage = 'updateDoorNext';
+              } else {
+                typePage = 'updateDoor';
+              }
               self.$router.push({
-                name: 'updateDoor',
+                name: 'journal',
                 query: {
-                  type: 'add',
-                  id: item.Id
+                  id: item.Id,
+                  fItem: fItem,
+                  type: typePage
                 }
               });
             }
           }
+
         }
+      },
+      // 提交安装订单
+      submitFn() {
+        api.get({
+          key: 'submit',
+          data: {
+            id: this.detailData.Id
+          },
+          success(data) {
+            tools.success(data, {
+              back: true,
+              successTips: '提交成功'
+            });
+          }
+        });
       }
     }
   };
