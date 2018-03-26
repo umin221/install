@@ -32,11 +32,17 @@
           <mt-badge class="xs-icon icon-edit" type="success">编辑</mt-badge>
         </div>
       </div>
+      <button-group>
+        <mt-button class="single" @click.native="toAddAddress" >
+          <i class="xs-icon icon-add"></i>
+          新建地址
+        </mt-button>
+      </button-group>
     </div>
   </div>
 </template>
 <script>
-  import {mapState, mapActions, mapMutations} from 'vuex';
+//  import {mapState, mapActions, mapMutations} from 'vuex';
   import menuBox from '../../../public/components/cus-menu.vue';
   import cusCell from 'public/components/cus-cell';
   const NameSpace = 'address';
@@ -49,11 +55,14 @@
       };
     },
     computed: {
-      ...mapState(NameSpace, [''])
+//      ...mapState(NameSpace, [''])
     },
     methods: {
-      ...mapActions(NameSpace, ['']),
-      ...mapMutations(NameSpace, [''])
+//      ...mapActions(NameSpace, ['']),
+//      ...mapMutations(NameSpace, [''])
+      toAddAddress() {
+        this.$router.push('addAddress');
+      }
     },
     components: {menuBox, cusCell}
   };

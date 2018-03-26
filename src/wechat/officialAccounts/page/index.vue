@@ -10,9 +10,8 @@
         <mt-cell title="预约时间" placeholder="请选择" is-link></mt-cell>
         <mt-cell title="故障现象" placeholder="请选择" is-link></mt-cell>
         <mt-field label="问题说明"  placeholder="请详细说明..."></mt-field>
-        <mt-cell>
-          <div class="photo">相关照片</div>
-        </mt-cell>
+        <mt-cell title="相关照片"></mt-cell>
+        <div class="photo"></div>
       </div>
       <!--<mt-popup v-if="showBox" v-model="showBox" position="bottom">-->
       <!--</mt-popup>-->
@@ -67,4 +66,7 @@
   };
 </script>
 <style lang="scss">
+  .addform{
+    background-color: #ffffff;
+  }
 </style>

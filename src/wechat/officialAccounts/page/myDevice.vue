@@ -1,20 +1,16 @@
 <template>
   <div style="background-color: #ebebeb;">
-      <!--<div class="addform">-->
-        <!--<mt-cell>-->
-          <!--<div class="mint-cell-sub-title" slot="title">姓名：张三</div>-->
-          <!--<div class="mint-cell-sub-title" slot="title">电话：18688889999</div>-->
-          <!--<div class="mint-cell-sub-title" slot="title">地址：xxxxxxxxxxxxxxxxxx小区xxx号</div>-->
-        <!--</mt-cell>-->
-      <!--</div>-->
     <div class="mint-content">
-      <div class="myRepair">
-        <cus-cell class="myRepairList" @click.native="toDetail" is-link>
-          <div class="mint-cell-sub-title" slot="title">服务单编号：WX201706010001001</div>
-          <div class="mint-cell-sub-title" slot="title">申请日期：2017-12-15 14:00</div>
+      <div class="myDevice">
+        <cus-cell class="myDeviceList" @click.native="toDetail" is-link>
+          <div class="mint-cell-sub-title" slot="title">产品序列号：WX201706010001001</div>
           <div class="mint-cell-sub-title" slot="title">产品类型：智能锁</div>
+          <div class="mint-cell-sub-title" slot="title">产品型号：s1000</div>
         </cus-cell>
       </div>
+      <button-group>
+        <mt-button class="single" @click.native="addDevice">添加</mt-button>
+      </button-group>
     </div>
   </div>
 </template>
@@ -22,7 +18,7 @@
 //  import {mapState, mapActions, mapMutations} from 'vuex';
   import menuBox from '../../../public/components/cus-menu.vue';
   import cusCell from 'public/components/cus-cell';
-  const NameSpace = 'myRepair';
+  const NameSpace = 'myDevice';
   export default {
     name: NameSpace,
     created() {
@@ -38,14 +34,17 @@
 //      ...mapActions(NameSpace, ['']),
 //      ...mapMutations(NameSpace, [''])
       toDetail() {
-        this.$router.push('repairDetail');
+        this.$router.push('deviceDetail');
+      },
+      addDevice() {
+        this.$router.push('addDevice');
       }
     },
     components: {menuBox, cusCell}
   };
 </script>
 <style lang="scss">
-  .myRepairList{
+  .myDeviceList{
     div{
       line-height: 1.5rem;
     }
