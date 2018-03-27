@@ -114,8 +114,8 @@
     created() {
       let me = this;
       KND.Native.getUserInfo((info) => {
-        // 是否主管
-        me.setManager(info['KL Primary Position Type LIC'] === 'Field Service Manager');
+        // 是否主管 非安装工程师，都是主管权限
+        me.setManager(info['KL Primary Position Type LIC'] !== 'Field Service Engineer');
         // 获取数据
         me.loadBottomFn({
           status: '待审批',
