@@ -34,17 +34,23 @@ class ValidatorPlug {
         if (!tag) console.error(el + 'not tag!');
         let modifiers = this.binding.modifiers;
         for (var m in modifiers) {
-          let flag = regexs[m].test(value);
-          if (flag) {
-            KND.Util.removeClass(el, 'error');
-          } else {
-            KND.Util.addClass(el, 'error');
-            // this.Vue.$emit('error', {
-            //  msg: getErrMsg(tag, m),
-            //  tag: tag
-            // });
-            return getErrMsg(tag, m);
+          let ms = m.split('|');
+          let msg;
+          for (var i in ms) {
+            let flag = regexs[ms[i]].test(value);
+            if (flag) {
+              KND.Util.removeClass(el, 'error');
+              break;
+            } else {
+              KND.Util.addClass(el, 'error');
+              // this.Vue.$emit('error', {
+              //  msg: getErrMsg(tag, m),
+              //  tag: tag
+              // });
+            };
+            msg = getErrMsg(tag, ms[i]);
           };
+          return msg;
         };
       };
     };
