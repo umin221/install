@@ -32,9 +32,10 @@
                      :right="getSwipeBtn(line, index)"
                      is-link>
               <div class="co-flex co-jc" slot="title">
-                <span class="co-f1">{{line['KL Product Model No']}}</span>
-                <span class="co-f1">开向:{{line['KL Hole Direction']}}</span>
-                <span class="co-f1">数量:{{line['Quantity Requested']}}</span>
+                <span class="co-f1 icon-copy" @click.stop="copyFn(line)"></span>
+                <span class="co-f2">{{line['KL Product Model No']}}</span>
+                <span class="co-f2">开向:{{line['KL Hole Direction']}}</span>
+                <span class="co-f2">数量:{{line['Quantity Requested']}}</span>
               </div>
             </mt-cell-swipe>
           </lock-line>
@@ -46,9 +47,10 @@
                      :right="getSwipeBtn(line, index)"
                      is-link>
               <div class="co-flex co-jc" slot="title">
-                <span class="co-f1">{{line['KL Product Model No']}}</span>
-                <span class="co-f1">开向:{{line['KL Hole Direction']}}</span>
-                <span class="co-f1">数量:{{line['Quantity Requested']}}</span>
+                <span class="co-f1 icon-copy" @click.stop="copyFn(line)"></span>
+                <span class="co-f2">{{line['KL Product Model No']}}</span>
+                <span class="co-f2">开向:{{line['KL Hole Direction']}}</span>
+                <span class="co-f2">数量:{{line['Quantity Requested']}}</span>
               </div>
             </mt-cell-swipe>
           </lock-line>
@@ -285,6 +287,21 @@
           id: line.Id,
           index: index
         });
+      },
+      // Copy line
+      copyFn(line) {
+        MessageBox.confirm('复制此订单行记录？', '请确认').then(action => {
+          let isPanel = line['KL Product Type LIC'] === 'Panel';
+          delete line.Id;
+          this.$router.push({
+            path: 'orderLine',
+            query: {
+              line: JSON.stringify(line),
+              isPanel: isPanel,
+              editable: this.editable
+            }
+          });
+        });
       }
     }
   };
@@ -294,6 +311,7 @@
   .order {
     .mint-cell {
       .mint-cell-title {
+        line-height: 30px;
         color: $gray-minor;
       }
 
