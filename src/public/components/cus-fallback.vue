@@ -1,6 +1,6 @@
 <template>
-  <div class="cus-fallback">
-    <mt-button @click="bind(callback)"><i class="xs-icon icon-back"><slot></slot></i></mt-button>
+  <div class="cus-fallback" @click="bind(callback)">
+    <mt-button><i class="xs-icon icon-back"><slot></slot></i></mt-button>
 	</div>
 
 </template>
@@ -21,3 +21,11 @@
     }
   };
 </script>
+
+<style lang="scss">
+  .cus-fallback {
+    button.mint-button {
+      min-width: 1.2rem;
+    }
+  }
+</style>
