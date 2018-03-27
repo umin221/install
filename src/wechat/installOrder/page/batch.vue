@@ -32,6 +32,7 @@
       </div>
       <button-group>
         <mt-button class="single"
+                   v-show="isSubmit"
                    @click.native="submitFn">提交</mt-button>
       </button-group>
       <mt-datetime-picker
@@ -99,7 +100,6 @@
       this.state = param.state;
       this.type = param.type;
       this.id = param.item.Id;
-      this.item = param.item;
       console.dir('=====' + this.id);
       // 获取详情
       if (this.type === 'add') {
@@ -110,8 +110,8 @@
         this.batchCode = '10001'; // 随机默认
       } else {
         self.titleVal = '开孔批次详情';
-        this.getBatch(this.item);
-        this.getPlanList(this.item);
+        this.getBatch(this.id);
+        this.getPlanList(this.id);
       }
     },
     data: () => {
@@ -144,6 +144,11 @@
       read() {
         return this.type === 'read';
       },
+      // 提交按钮
+      isSubmit() {
+        let type = this.type;
+        return type === 'add';
+      },
       // * 是否显示
       heartVisible() {
         return this.type === 'read' ? '' : 'require';
@@ -156,7 +161,9 @@
         return KND.Util.toArray(obj);
       },
       open(picker) {
-        this.$refs[picker].open();
+        if (this.type === 'add') {
+          this.$refs[picker].open();
+        }
       },
       handleChange(value) {
         let me = this;
@@ -181,20 +188,20 @@
           }
         });
       },
-      getBatch(obj) {
+      getBatch(id) {
         var self = this;
         api.get({ // 批次详情
           key: 'findBatchById', // 'findBatchById',
           data: {
-            id: obj.Id
+            id: id
           },
           success: data => {
             console.dir(data);
             self.batchCode = data.Id; // 批次
             self.start_Date = new Date(data.Planned).format('yyyy-MM-dd'); // 开始时间
             self.end_Date = new Date(data['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
-            self.startDate = self.start_Date.format('MM/dd/yyyy'); // 后台存值格式
-            self.endDate = self.end_Date.format('MM/dd/yyyy');
+            self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
+            self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
             self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
           }
         });

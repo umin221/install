@@ -278,7 +278,6 @@ export default new Vuex.Store({
           });
         },
         submitService({commit}, form) {
-          console.log(this);
           api.get({
             key: form.key,
             data: {
@@ -448,6 +447,20 @@ export default new Vuex.Store({
             },
             success: function(data) {
               commit('setAddress', {data: data['formatted_address'], type: type});
+              // console.log(data);
+            }
+          });
+        },
+        getMoreOrder({commit}, {ContactId, ContactName, LocationId}) {
+          api.get({
+            key: 'getMoreOrder',
+            data: {
+              ContactId,
+              ContactName,
+              LocationId
+            },
+            success: function(data) {
+              // commit('setAddress', {data: data['formatted_address'], type: type});
               // console.log(data);
             }
           });
@@ -800,17 +813,7 @@ export default new Vuex.Store({
                     'Object Id': form.ServiceRequestId
                   },
                   success: function(data) {
-                    if (data) {
-                      api.get({
-                        key: 'getDetail',
-                        data: {
-                          srNumber: form.srNum
-                        },
-                        success: function(data) {
-                          form.callBack(data.SiebelMessage['Service Request']);
-                        }
-                      });
-                    }
+                    console.log(data);
                   }
                 });
               }

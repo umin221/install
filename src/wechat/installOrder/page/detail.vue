@@ -18,7 +18,7 @@
             <div slot="title" class="list-text"><span class="list-text-span">面板部分</span></div>
           </mt-cell>
           <div class="mint-sx-div">
-            <mt-cell   @click.native="getLock(item.Id, item['KL Product Type'], item)" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='面板'"  :title="item['KL Product Series Code']">
+            <mt-cell @click.native="getLock(item.Id, item['KL Product Type'], item)" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='面板'"  :title="item['KL Product Series Code']">
               <span style="width: 120px">开向：{{item['KL Hole Direction']}}</span>
               <span>数量：{{item['Quantity Requested']}}</span>
             </mt-cell>
@@ -672,7 +672,7 @@
         console.dir('0');
         var self = this;
         if (item['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次新增
-          if (self.detailData['KL Delivery Sales Type'] !== '工程') { // 真锁---工程
+          if (self.detailData['KL Delivery Sales Type'] === '工程') { // 真锁---工程
             // 跳转真锁安装批次新增页面
             this.$router.push({
               name: 'zsBatch',
@@ -713,6 +713,16 @@
       },
       closeTask(item) { // 关闭当前批次
         console.dir(item);
+        var self = this;
+        self.$router.push('updateState');
+        // 跳转关闭页面更新状态
+        this.$router.push({
+          name: 'updateState',
+          query: {
+            id: item.Id
+          }
+        });
+        /*
         api.get({ // 更改状态
           key: 'getUPStatus',
           method: 'POST',
@@ -724,7 +734,7 @@
           },
           success: function(data) {
           }
-        });
+        });*/
       },
       routerPage(index, item, state) { // 子任务事件
         var self = this;
@@ -744,35 +754,48 @@
           item['KL Detail Type LIC'] === 'Substitution Lock Sign' ||
           item['KL Detail Type LIC'] === 'Lock Sign' ||
           item['KL Detail Type LIC'] === 'Substitution Lock Trans Return') {  // 签收页面
-          if (item['Calculated Activity Status'] === 'Completed' || item['Calculated Activity Status'] === 'Ignore' || userInfo['Person UId'] !== item['Primary Owner Id'] || self.pStatus !== 'In Progress') { // Completed = 完成 ，Ignore = 忽略
-            /* if (userInfo['Person UId'] === item['Primary Owner Id']) { // 判断是否有权限编辑   登陆者信息与任务负责人匹配则可以编辑
-              this.$router.push({ // 编辑
-                name: 'sign',
-                query: {
-                  type: 'edit',
-                  item: item
-                }
-              });
-            } else {*/
-            this.$router.push({ // 只读
-              name: 'sign',
-              query: {
-                type: 'read',
-                state: state,
-                item: item
-              }
-            });
-            // }
-          } else {
+          if (userInfo['Person UId'] === item['Primary Owner Id'] && item['Calculated Activity Status'] === 'Not Started') { // 有权限新增
             this.$router.push({ // 新增
               name: 'sign',
               query: {
                 type: 'add',
                 state: state,
+                is_edit: false,
                 item: item
               }
             });
+          } else if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Completed' || self.pStatus === 'In Progress')) { // 判断是否有权限编辑   登陆者信息与任务负责人匹配 并且状态在进行中已完成则可以编辑
+            if ((item['KL Detail Type LIC'] === 'Trompil Lock Sign' || item['KL Detail Type LIC'] === 'Working Drawing Sign') && !item['KL Signed Amount']) { // 开孔签收与图纸签证 不涉及签收不需要查看详情
+              console.dir('===');
+            } else {
+              this.$router.push({ // 编辑
+                name: 'sign',
+                query: {
+                  type: 'read',
+                  state: state,
+                  is_edit: true,
+                  item: item
+                }
+              });
+            }
+          } else if (item['Calculated Activity Status'] !== 'Not Started') {
+            if ((item['KL Detail Type LIC'] === 'Trompil Lock Sign' || item['KL Detail Type LIC'] === 'Working Drawing Sign') && !item['KL Signed Amount']) { // 开孔签收与图纸签证 不涉及签收不需要查看详情
+              console.dir('===');
+            } else {
+              this.$router.push({ // 只读
+                name: 'sign',
+                query: {
+                  type: 'read',
+                  state: state,
+                  is_edit: false,
+                  item: item
+                }
+              });
+            }
           }
+          /* if (item['Calculated Activity Status'] === 'Completed' || item['Calculated Activity Status'] === 'Ignore' || userInfo['Person UId'] !== item['Primary Owner Id'] || self.pStatus !== 'In Progress') { // Completed = 完成 ，Ignore = 忽略
+          } else {
+          }*/
         } else if (item['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
           item['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
           item['KL Detail Type LIC'] === 'Door Hanging Acc Batch' ||
@@ -799,7 +822,7 @@
         this.$router.push({
           name: 'batch',
           query: {
-            type: 'edit',
+            type: 'read',
             item: item
           }
         });

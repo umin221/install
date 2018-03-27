@@ -61,5 +61,21 @@
 .icon-time:before {
   content: '\A136';
 }
+.icon-call:before {
+  content: '\A142';
+}
+.icon-starY:before {
+  content: '\A138';
+  color: #f4ea2a;
+  font-size: 1.5rem;
+}
+.icon-starN:before {
+  content: '\A139';
+  color: #E6E6E6;
+  font-size: 1.5rem;
+}
+.icon-device:before {
+  content: '\A172';
+}
 
 

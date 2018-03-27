@@ -93,8 +93,6 @@
   import cusHeader from 'public/components/cus-header';
   import cusLoadmore from 'public/components/cus-loadmore';
   import cusCell from 'public/components/cus-cell';
-
-  const NAMESPACE = 'index';
   //
   let loader = function(...args) {
     let me = this;
@@ -109,6 +107,7 @@
     me.getTransferOrder(param);
   };
 
+  const NAMESPACE = 'index';
   export default {
     name: NAMESPACE,
     components: {cusHeader, cusLoadmore, cusCell},

@@ -53,6 +53,11 @@
 
 <style lang="scss">
   .cus-field {
+
+    &.error {
+      border-bottom: 1px solid red;
+    }
+
     &.require {
       .mint-cell-title:before {
         content: "*";
