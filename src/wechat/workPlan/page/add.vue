@@ -196,7 +196,7 @@
         } else {
           id = new Date().getTime();
         }
-        if (this.workDescDate.Value === '') {
+        if (this.workDescDate.Value === '请选择描述') {
           Toast('请选择工作描述');
           return;
         }
