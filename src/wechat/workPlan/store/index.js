@@ -47,8 +47,8 @@ export default new Vuex.Store({
               end: end
             },
             success: data => {
-              commit('listData', data.items);
-              callback && callback(data.items);
+              commit('listData', data.SiebelMessage['KL Daily Action']);
+              callback && callback(data.SiebelMessage['KL Daily Action']);
             }
           });
         },
@@ -61,8 +61,8 @@ export default new Vuex.Store({
             key: 'getCurrData',
             data: time,
             success: data => {
-              commit('currentDayData', KND.Util.toArray(data.items));
-              callback && callback(data.items);
+              commit('currentDayData', KND.Util.toArray(data.SiebelMessage['KL Daily Action']));
+              callback && callback(data.SiebelMessage['KL Daily Action']);
             }
           });
         },

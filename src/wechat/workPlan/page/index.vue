@@ -41,7 +41,7 @@
         </ul>
       </div>
       <div class="planList">
-        <mt-cell-swipe v-for="(item, index) in currentDayData" :key="index"
+        <mt-cell-swipe  v-for="(item, index) in currentDayData" :key="index"
           @click.native="toDetail(index)"
           class="planListItem"
           :title="item.Type"
@@ -70,7 +70,7 @@
 </template>
 <script>
   import {mapState, mapActions} from 'vuex';
-  import { DatetimePicker, CellSwipe } from 'mint-ui';
+  import { DatetimePicker, CellSwipe, MessageBox } from 'mint-ui';
 
   const NAMESPACE = 'index';
 
@@ -108,10 +108,16 @@
     },
     created() {
       var self = this;
-      var date = new Date();
+      var date = '';
+      if (this.$route.query.year) {
+        date = new Date(this.formatDate(this.$route.query.year, this.$route.query.month, this.$route.query.day));
+        self.initData(this.formatDate(this.$route.query.year, this.$route.query.month, 1), true);
+      } else {
+        date = new Date();
+        self.initData(self.formatDate(date.getFullYear(), date.getMonth() + 1, 1), true);
+      }
       // 给定DatetimePicker组件默认值
       self.pickerValue = date.getFullYear() + '-' + date.getMonth() + 1 + '-' + 1;
-      self.initData(self.formatDate(date.getFullYear(), date.getMonth() + 1, 1), true);
       let m = date.getMonth() + 1;
       if (m < 10) m = `0${m}`;
       let d = date.getDate();
@@ -162,9 +168,6 @@
         });
       },
       operation(item, id, index) {
-        if (item['Status INT'] !== 'Not Started') {
-          return [];
-        }
         var params = Object.assign({}, {
           'id': id,
           'index': index,
@@ -172,28 +175,39 @@
             console.log(data);
           }
         });
-        return [
-          {
-            content: '编辑',
-            style: { background: '#00599f', color: '#fff' },
-            handler: () => {
-              this.$router.push({
-                path: './edit',
-                query: {
-                  index: index,
-                  year: this.currentYear,
-                  month: this.currentMonth,
-                  day: this.selectIndex - (this.beforeSpaces.length - 1)
-                }
-              });
+        if (item['Status INT'] === 'Not Started') {
+          return [
+            {
+              content: '编辑',
+              style: { background: '#00599f', color: '#fff' },
+              handler: () => {
+                this.$router.push({
+                  path: './edit',
+                  query: {
+                    index: index,
+                    year: this.currentYear,
+                    month: this.currentMonth,
+                    day: this.selectIndex - (this.beforeSpaces.length - 1)
+                  }
+                });
+              }
+            },
+            {
+              content: '删除',
+              style: { background: 'red', color: '#fff' },
+              handler: () => this.deletePlanBox(params)
             }
-          },
-          {
-            content: '删除',
-            style: { background: 'red', color: '#fff' },
-            handler: () => this.deletePlan(params)
-          }
-        ];
+          ];
+        } else {
+          return [];
+        }
+      },
+      // 删除计划
+      deletePlanBox(params) {
+        var self = this;
+        MessageBox.confirm('你确定删除吗?').then(action => {
+          self.deletePlan(params);
+        });
       },
       // 跳转详情
       toDetail(index) {
@@ -233,7 +247,10 @@
         for (let i = 1; i <= curMonthDays; i += 1) {
           if (data) {
             for (var j = 0; j < data.length; j++) {
-              if (new Date(data[j].Planned).getDate() === i) {
+              // if (new Date(data[j].Planned).getDate() === i) {
+              //   this.alldayData[i - 1] += '/' + data[j]['Status INT'];
+              // }
+              if (new Date(data[j].Planned) <= new Date(this.formatDate(this.currentYear, this.currentMonth, i) + ' ' + '23:59:59') && new Date(data[j]['Planned Completion']) >= new Date(this.formatDate(this.currentYear, this.currentMonth, i) + ' ' + '00:00:00')) {
                 this.alldayData[i - 1] += '/' + data[j]['Status INT'];
               }
             }
@@ -283,6 +300,10 @@
           var initDay = init ? new Date().getDate() : this.currentDay;
           if (i === initDay && this.isToDay(this.currentYear, this.currentMonth, initDay)) {
             this.selectIndex = this.firstWeek + i - 2;
+          } else if (this.$route.query.day) {
+            this.selectIndex = this.$route.query.day * 1 + (this.beforeSpaces.length - 1);
+            this.isSelected = new Array(42).fill(false, 0, 42);
+            this.isSelected[this.$route.query.day * 1 + (this.beforeSpaces.length - 1)] = true;
           }
         }
       },
@@ -321,6 +342,9 @@
       },
       // 上一個月&下一个月   传入当前年份和月份
       pickPreNext(year, month, num) {
+        this.$route.query.year = '';
+        this.$route.query.month = '';
+        this.$route.query.day = '';
         this.daysUL = [];
         this.isSelected = [];
         this.selectIndex = '';

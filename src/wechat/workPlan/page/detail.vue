@@ -6,7 +6,9 @@
 <template>
   <div id="add-plan">
       <mt-header fixed :title="headTitle">
-      <fallback slot="left"></fallback>
+        <div class="cus-fallback" slot="left">
+           <mt-button @click="back"><i class="xs-icon icon-back"></i></mt-button>
+	      </div>
     </mt-header>
       <div class="mint-content add-plan">
         <mt-cell title="工作类型" class="borderBottom">
@@ -44,12 +46,12 @@
   import {mapState, mapActions} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
   import menuBox from 'public/components/cus-menu.vue';
-  import { Cell, DatetimePicker, Toast } from 'mint-ui';
+  import { Cell, Button, DatetimePicker, Toast } from 'mint-ui';
 
   const NAMESPACE = 'detail';
 
   export default {
-    components: {Cell, buttonGroup, DatetimePicker, menuBox},
+    components: {Cell, buttonGroup, DatetimePicker, menuBox, Button},
     name: 'add',
     data() {
       return {
@@ -95,9 +97,22 @@
         'setDayAll',
         'setStartHour',
         'setACStartPicker',
-        'setACEndPicker'
+        'setACEndPicker',
+        'setCurrentDayData'
       ]),
       ...mapActions('app', ['getLov']),
+      // 返回
+      back() {
+        console.log('');
+        this.$router.push({
+          path: '/',
+          query: {
+            year: this.$route.query.year,
+            month: this.$route.query.month,
+            day: this.$route.query.day
+          }
+        });
+      },
       // 处理计划开始时间
       initDateStart() {
         var time = this.currentDayData[this.$route.query.index]['Planned'].replace(/\d+\/\d+\/\d+\s/, '');

@@ -4,8 +4,16 @@ let ApiList = {
    */
   getList: option => {
     return {
-      method: 'get',
-      url: `data/KL Daily Action Interface BO/KL Daily Action/?searchspec=Planned >= ${option.data.start} AND Planned <= ${option.data.end}&PageSize=100&StartRowNum=0`
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base KL Daily Action Interface BO',
+          'SearchSpec': `[KL Daily Action.Planned Completion]>= ${option.data.start} AND [KL Daily Action.Planned] <= ${option.data.end}`,
+          'ViewMode': 'Personal'
+        }
+      }
+      // url: `?searchspec=Planned >= ${option.data.start} AND Planned <= ${option.data.end} AND Planned Completion <= ${option.data.end}`
     };
   },
   /**
@@ -13,8 +21,16 @@ let ApiList = {
    */
   getCurrData: option => {
     return {
-      method: 'get',
-      url: `data/KL Daily Action Interface BO/KL Daily Action/?searchspec=Planned = ${option.data}&PageSize=100&StartRowNum=0`
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base KL Daily Action Interface BO',
+          'SearchSpec': `[KL Daily Action.Planned Completion]>= ${option.data} AND [KL Daily Action.Planned] <= ${option.data}`,
+          'ViewMode': 'Personal'
+        }
+      }
+      // url: `?searchspec=Planned >= ${option.data.start} AND Planned <= ${option.data.end} AND Planned Completion <= ${option.data.end}`
     };
   },
   /**
