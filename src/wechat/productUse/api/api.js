@@ -1,6 +1,15 @@
 let ApiList = {
-  getList: {
-    url: 'http://192.168.166.8:9001/siebel-rest/v1.0/data/Service Request/Service Request/1-2BSAQ63P'
+  /**
+   * 获取配件数据
+   */
+  getPartList: {
+    url: 'data/Service Request/Service Request/1-2BSAQ63P'
+  },
+  /**
+   * 获取项目数据
+   */
+  getProjectList: {
+    url: 'data/Service Request/Service Request/1-2BSAQ63P'
   }
 };
 
