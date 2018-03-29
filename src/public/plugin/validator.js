@@ -31,11 +31,11 @@ class ValidatorPlug {
         let target = e.target || el.querySelector('input') || el.querySelector('.mint-cell-value');
         let value = target.value || target.innerText;
         let tag = el.getAttribute('tag');
+        let msg;
         if (!tag) console.error(el + 'not tag!');
         let modifiers = this.binding.modifiers;
         for (var m in modifiers) {
           let ms = m.split('|');
-          let msg;
           for (var i in ms) {
             let flag = regexs[ms[i]].test(value);
             if (flag) {
@@ -50,8 +50,8 @@ class ValidatorPlug {
             };
             msg = getErrMsg(tag, ms[i]);
           };
-          return msg;
         };
+        return msg;
       };
     };
 

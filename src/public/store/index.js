@@ -2,6 +2,8 @@ let ajax = api => {
   KND.Native.ajax(api);
 };
 
+let proxy = config.proxy;
+
 export const app = {
   namespaced: true,
   state: {
@@ -34,12 +36,13 @@ export const app = {
     },
 
     /**
-     * 获取企业微信 js sdk 权限
+     * 获取企业微信&微信公众号 js sdk 权限
      */
     getAuthority({state}, option) {
+      let appNO = 'CONTACT'; // 公众号：KINLONG2013  企业号：CONTACT
       ajax({
         method: 'get',
-        url: ('https://kas.kinlong.cn:8090/webchat/api/local/permission?url=' + encodeURIComponent(location.href.split('#')[0]) + '&appNO=CONTACT'),
+        url: (proxy + '/webchat/api/local/permission?url=' + encodeURIComponent(location.href.split('#')[0]) + '&appNO=' + appNO),
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
@@ -54,23 +57,60 @@ export const app = {
     },
 
     /**
-     * 获取附件
+     * 查询附件列表
+     * @param {String} option['IOName'] 必填 上传io 安装任务：KL Action Attachment 委外管理：KL Channel Partner Attachments
+     * @param {Array} option['sepc'] 必填 查询条件
+     * @returns
      */
-    getMediaById({state}, option) {
+    queryMedias({state}, option) {
+      let data = option.data;
+      option.success = option.success || (data => console.log(data));
       ajax({
-        method: 'post',
-        url: 'service/Workflow Process Manager/RunProcess',
+        url: 'service/EAI Siebel Adapter/Query',
         data: {
           'body': {
-            'ProcessName': 'KL Attachment Base64 Query Process',
-            'Type': option.type, // 'Partner',
-            'Object Id': option.id // '1-2BSEPVGX'
+            'OutputIntObjectName': data.IOName, // 'KL Action Attachment',
+            'SearchSpec': KND.Util.condition(data.SearchSpec) // '[Action Attachment.Activity Id]="1-2BSE8H3R"'
           }
         },
-        success: data => {
-          console.log(123);
-        }
+        success: option.success
       });
+    },
+
+    /**
+     * 上传附件
+     * @param {String} option['IOName'] 必填 上传io 安装任务：KL Action Attachment 委外管理：KL Channel Partner Attachments
+     * @param {String} option['Id'] 必填 业务id
+     * @param {Array} option['MediaId'] 必填 腾讯mediaId
+     * @param {Function} option['success'] 必填 成功回调
+     * @param {Function} option['error'] 选填 失败回调
+     */
+    upload({state}, option) {
+      let data = option.data;
+      let MediaId = data.MediaId;
+      option.success = option.success || (data => console.log(data));
+      option.error = option.error || (data => console.log(data));
+      // 提交 siebel
+      let push = (media) => {
+        ajax({
+          method: 'get',
+          url: (proxy + '/webchat/api/external/uploadattachment?url=http://192.168.166.8:9001/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess&IOName=' + data.IOName + '&Object Id=' + data.Id + '&ProcessName=KL Attachment Upload Process&appNO=CONTACT&mediaID=' + media),
+          success: result => {
+            console.log(result);
+            run(MediaId.pop(), result);
+          },
+          error: option.error
+        });
+      };
+      // 上传附件
+      let run = (media, result) => {
+        if (media) {
+          push(media.serverId);
+        } else {
+          option.success(result);
+        };
+      };
+      run(MediaId.pop());
     }
   }
 };

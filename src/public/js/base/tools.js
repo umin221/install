@@ -14,7 +14,7 @@
     /**
      * 标准成功返回处理回调
      */
-    success(data, option = {}) {
+    success(data = {}, option = {}) {
       let opt = Object.assign({
         successTips: '操作成功!', // 成功提示
         errorTips: '', // 错误提示
