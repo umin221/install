@@ -17,10 +17,28 @@ export default new Router({
       require(['../page/index'], resolve);
     }
   }, {
-    path: '/', // 首页列表
+    path: '/detail', // 详情
     name: 'detail',
     component(resolve) {
       require(['../page/detail'], resolve);
+    }
+  }, {
+    path: '/add', // 新增
+    name: 'add',
+    component(resolve) {
+      require(['../page/add'], resolve);
+    }
+  }, {
+    path: '/selectParts', // 选择配件
+    name: 'selectParts',
+    component(resolve) {
+      require(['../page/selectParts'], resolve);
+    }
+  }, {
+    path: '/selectProject', // 选择项目
+    name: 'selectProject',
+    component(resolve) {
+      require(['../page/selectProject'], resolve);
     }
   }]
 });

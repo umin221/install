@@ -2,7 +2,7 @@
   <div style="background-color: #ebebeb;">
     <mt-header fixed title="配件领用">
       <fallback slot="left"></fallback>
-      <router-link to="search" slot="right">
+      <router-link to="add" slot="right">
         <mt-button >
           <i class="xs-icon icon-add"></i>
         </mt-button>
@@ -18,7 +18,7 @@
         <mt-tab-container-item id="pending">
           <loadmore ref="pending" :loadTop="pendingLoadTop" :loadBottom="pendingLoadBottom" :topStatus="topStatus" :allLoaded="true">
             <cus-cell
-              class="multiple"
+              class="multiple border-bottom"
               :title="'领用编号'+ item.No"
               v-for="(item,index) in isSelect"
               :key="index"
@@ -113,5 +113,8 @@
 <style lang="scss">
   .productForm{
     line-height: 1.5rem;
+  }
+  .border-bottom{
+    border-bottom: 1px solid #dcdcdc;
   }
 </style>

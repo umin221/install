@@ -11,7 +11,7 @@ import Page from '../page/page';
 Vue.use(Router);
 
 export default new Router({
-  routes: [{
+  routes: [{ path: '/', redirect: '/page' }, {
     path: '/page',
     name: 'page',
     component: Page
