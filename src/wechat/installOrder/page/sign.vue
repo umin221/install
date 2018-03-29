@@ -96,9 +96,6 @@
     computed: {
       ...mapState(NameSpace, ['form', 'attach']),
       // 表单只读
-      eidt() {
-        return this.type === 'edit';
-      },
       read() {
         return this.type === 'read';
       },

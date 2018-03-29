@@ -59,10 +59,16 @@ export default new Router({
       require(['../page/sign'], resolve);
     }
   }, {
-    path: '/batch', // 批次页面
+    path: '/batch', // 批次新增页面
     name: 'batch',
     component(resolve) {
       require(['../page/batch'], resolve);
+    }
+  }, {
+    path: '/batchDetail', // 批次详情页面
+    name: 'batchDetail',
+    component(resolve) {
+      require(['../page/batchDetail'], resolve);
     }
   }, {
     path: '/detailPlan', // 批次详细计划页面

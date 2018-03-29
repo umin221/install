@@ -4,10 +4,10 @@
       <fallback slot="left"></fallback>
     </mt-header>
     <div class="mint-content batch">
-      <div :class="{'readonly':read}">
+      <div :class="{disable: !editable}">
         <cus-field label="计划类型"
-                   @click.native="showLovFn('TODO_TYPE')"
-                   v-model="planObj['TODO_TYPE']"
+                   @click.native="showLovFn('KL Detail Type')"
+                   v-model="planObj['KL Detail Type']"
                    is-link></cus-field>
         <mt-cell title="计划开始日期" @click.native="open('picker','Planned')" :value="planObj.Planned" is-link></mt-cell>
         <mt-cell title="计划完成日期" @click.native="open('picker', 'Planned Completion')" :value="planObj['Planned Completion']" is-link></mt-cell>
@@ -19,6 +19,7 @@
       </div>
       <button-group>
         <mt-button class="single"
+                   v-show="editable"
                    @click.native="submitFn">保存</mt-button>
       </button-group>
       <mt-datetime-picker
@@ -83,7 +84,7 @@
       console.dir(1);
       var self = this;
       let param = this.$route.query;
-      self.id = param.Id;
+      self.id = param.id;
       self.planType = param.planType;
       self.type = param.type;
       self.planItem = param.item;
@@ -97,21 +98,32 @@
             'Parent Value': self.planType
           },
           success: data => {
-            mapp.option['TODO_TYPE'] = KND.Util.toArray(data.items);
+            mapp.option['KL Detail Type'] = KND.Util.toArray(data.items);
           }
         });
       } else {
-        self.getBatch(self.planItem);
+        self.titleVal = '详细计划详情';
+        self.editable = false;
+      }
+      self.planObj['Id'] = '00001';
+      if (self.planItem) { // planItem有值的时候显示
+        self.planObj['Id'] = self.planItem['Id'];
+        self.planObj['KL Detail Type'] = self.planItem['KL Detail Type'];
+        self.planObj['Planned'] = self.planItem['Planned'];
+        self.planObj['Planned Completion'] = self.planItem['Planned Completion'];
+        self.planObj['Description'] = self.planItem['Description'];
       }
     },
     data: () => {
       return {
         value: '',
         pickerVisible: true,
+        index: '',
         id: '',
         timeKey: '', // 标记什么时间
         planItem: '',
         planType: '',
+        editable: true,
         type: 'add', // add 新增 / edit 编辑 / read 只读
         titleVal: '新建详细计划',
         vk: 'Value',
@@ -151,7 +163,7 @@
       handleChangePlan(value) {
         let me = this;
         var key = me.timeKey;
-        me.planObj[key] = value.format('MM/dd/yyyy hh:mm');
+        me.planObj[key] = value.format('MM/dd/yyyy hh:mm:ss');
         console.dir(me.planObj);
         // me.startDate = value.format('MM/dd/yyyy'); // 后台存值格式
       },
@@ -179,20 +191,34 @@
           success: data => {
             console.dir(data);
             self.batchCode = data.Id; // 批次
-            self.start_Date = new Date(data.Planned).format('yyyy-MM-dd hh:mm'); // 开始时间
-            self.end_Date = new Date(data['Planned Completion']).format('yyyy-MM-dd hh:mm'); // 结束时间
-            self.startDate = self.start_Date.format('MM/dd/yyyy hh:mm'); // 后台存值格式
-            self.endDate = self.end_Date.format('MM/dd/yyyy hh:mm');
+            self.start_Date = new Date(data.Planned + ':00').format('yyyy-MM-dd hh:mm:ss'); // 开始时间
+            self.end_Date = new Date(data['Planned Completion'] + ':00').format('yyyy-MM-dd hh:mm:ss'); // 结束时间
+            self.startDate = self.start_Date.format('MM/dd/yyyy hh:mm:ss'); // 后台存值格式
+            self.endDate = self.end_Date.format('MM/dd/yyyy hh:mm:ss');
             self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
           }
         });
       },
       submitFn() {
         var self = this;
-        self.setPlanList(self.planObj); // 把值添加到数组中 并清空
-        self.planObj = {};
-        Toast('保存成功');
-        history.go(-1);
+        api.get({ // 提交详细计划数据
+          key: 'setPlan',
+          method: 'PUT',
+          data: {
+            'Id': self.planObj['Id'], // 新增批次返回的ID
+            'Parent Activity Id': self.id,
+            'Planned': self.planObj.Planned,
+            'KL Detail Type': self.planObj['KL Detail Type'],
+            'Planned Completion': self.planObj['Planned Completion'],
+            'Started': '',
+            'Done': '',
+            'Description': self.planObj.Description
+          },
+          success: function(data) {
+            Toast('保存成功');
+            KND.Util.back();
+          }
+        });
       }
     },
     components: {buttonGroup, cusField, menuBox, lockLine}

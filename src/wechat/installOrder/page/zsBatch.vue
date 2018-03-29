@@ -82,6 +82,7 @@
 <script type="application/javascript">
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
+  import lockLine from '../components/cusLockLine';
   import {mapState} from 'vuex';
 
   let right = [{
@@ -96,11 +97,6 @@
     created() {
       let param = this.$route.query;
       this.item = param.item;
-      console.dir(1);
-      if (this.select.Id) { // 选择团队选回来的负责人
-        this.isPrimaryMVGName = this.select['Last Name']; // 主要负责人名字
-        this.isPrimaryMVGPosition = this.select['KL Primary Position Type'];  // 主要负责人职位
-      }
     },
     data: () => {
       return {
@@ -122,6 +118,7 @@
       });
     },
     computed: {
+      ...mapState('batch', ['planList']),
       ...mapState(NameSpace, ['form', 'attach']),
       // 表单只读
       read() {
@@ -167,6 +164,6 @@
         });
       }
     },
-    components: {buttonGroup, cusField}
+    components: {buttonGroup, cusField, lockLine}
   };
 </script>

@@ -13,6 +13,6 @@ config.mapp = {
     'Closed,Cancelled': 'completed'
   },
   'option': {
-    'TODO_TYPE': 'Value'
+    'KL Detail Type': 'Value'
   }
 };

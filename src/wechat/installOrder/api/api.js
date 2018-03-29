@@ -6,21 +6,19 @@ let apiList = {
   getList: option => {
 
     var boby = {
-      'OutputIntObjectName': 'KL Install Order',
+      'OutputIntObjectName': 'KL Install Order Header',
+      // 'OutputIntObjectName': 'KL Install Order',
       'StartRowNum': option.paging.StartRowNum,
       'PageSize': option.paging.PageSize
     };
-    var isDoorFactory = false;
     var searchSpec = [];
     // 状态条件
     var status = option.data.Status || '';
     // 搜索条件
     var search = option.data.search || '';
     // 所有人都不看草稿
-    searchSpec.push('[Order Entry - Orders.Status]<>"Draft"');
     if (option.data.infoUser['KL Primary Position Type LIC'] === 'Door Factory Engineer') { // 门厂技术安装员
       boby.ViewMode = 'Sales Rep';
-      isDoorFactory = true;
     } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Manager' && !option.data.isTeam) { // 安装主管(我的安装订单)
       searchSpec.push('[Order Entry - Orders.Primary Position Id]="' + option.data.infoUser['Primary Position Id'] + '"');
     } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Engineer') { // 安装工程师(我的安装订单)
@@ -29,11 +27,6 @@ let apiList = {
       boby.ViewMode = 'Manager';
     } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Door Factory Manager') { // 门厂技术主管
       boby.ViewMode = 'Manager';
-      isDoorFactory = true;
-    }
-    // 非门厂不看待门厂确认
-    if (!isDoorFactory) {
-      searchSpec.push('[Order Entry - Orders.Status]<>"In Confirming"');
     }
     // 订单状态过滤
     if (status) {
@@ -142,7 +135,8 @@ let apiList = {
   },
   setPlan: option => { // 批次详细计划提交
     return {
-      url: 'data/KL Installation Task Detail Plan/KL Installation Task Detail Plan/'
+      url: 'data/KL Installation Task/KL Installation Task/' + option.data['Parent Activity Id'] + '/KL Installation Task Detail Plan'
+      // url: 'data/KL Installation Task Detail Plan/KL Installation Task Detail Plan/'
     };
   },
   getJournalData: option => {

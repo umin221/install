@@ -2,9 +2,10 @@
   <div>
     <mt-header fixed :title="titleVal">
       <fallback slot="left"></fallback>
+      <mt-button @click.native="toSaveFn(2)" slot="right" v-text="">保存</mt-button>
     </mt-header>
-    <div class="mint-content batch">
-      <div :class="{'readonly':read}">
+    <div class="mint-content batch" :class="{'disable': !editable}">
+      <div>
         <mt-cell title="批次">
           <span>{{batchCode}}</span>
         </mt-cell>
@@ -14,9 +15,9 @@
                   :class="heartVisible" v-model="batchNum"></mt-field>
       </div>
       <div class="lock-line">
-        <lock-line title="详细计划" @click="addPlanList('add')">
+        <lock-line title="详细计划" @click="addPlanFn('')">
           <mt-cell-swipe v-for="(line, index) in planList" class="lock-line-cell enable" ref="body"
-                         @click.native="addPlanList('read')"
+                         @click.native="addPlanFn(line)"
                          :key=index
                          is-link>
             <div class="co-flex co-jc" slot="title">
@@ -32,7 +33,6 @@
       </div>
       <button-group>
         <mt-button class="single"
-                   v-show="isSubmit"
                    @click.native="submitFn">提交</mt-button>
       </button-group>
       <mt-datetime-picker
@@ -84,6 +84,9 @@
       }
     }
   }
+  .disable .cus-lock.icon-add-circle:before {
+    color: white!important;
+  }
 </style>
 <script type="application/javascript">
   import {mapState, mapActions} from 'vuex';
@@ -94,40 +97,46 @@
   export default {
     name: 'batch',
     created() {
-      console.dir(1);
       var self = this;
       let param = this.$route.query;
-      this.state = param.state;
-      this.type = param.type;
-      this.id = param.item.Id;
-      console.dir('=====' + this.id);
-      // 获取详情
-      if (this.type === 'add') {
-        self.titleVal = '新建开孔批次';
-        this.start_Date = ''; // 开始时间
-        this.end_Date = ''; // 开始时间
-        this.batchNum = 0; // 数量
-        this.batchCode = '10001'; // 随机默认
-      } else {
-        self.titleVal = '开孔批次详情';
-        this.getBatch(this.id);
-        this.getPlanList(this.id);
+      self.state = param.state;
+      self.type = param.type;
+      self.item = param.item;
+      if (self.type === 'add') {
+        self.batchCode = '10001'; // 随机默认
+        if (self.pcObj.Id) { // 批次页面新增保存有数据
+          self.id = self.pcObj.Id;
+          self.batchCode = self.pcObj.Id; // 新增保存的ID
+          self.start_Date = new Date(self.pcObj.Planned).format('yyyy-MM-dd'); // 开始时间
+          self.end_Date = new Date(self.pcObj['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
+          self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
+          self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
+          self.batchNum = self.pcObj['KL Install Amount Requested'] || 0; // 数量
+          self.getPlanList(self.batchCode);
+        }
+      } else if (self.type === 'edit') {
+        self.getBatch(self.item.Id);
+        self.id = self.item.Id;
+        self.batchCode = self.item.Id; // 详情的ID
+        self.getPlanList(self.item.Id);
       }
     },
     data: () => {
       return {
         value: '',
         batchCode: '', // 批次
-        start_Date: new Date(),        // 开始时间
-        startDate: null,
-        end_Date: new Date(),        // 结束时间
-        endDate: null,
+        start_Date: '',        // 开始时间
+        startDate: '',
+        end_Date: '',        // 结束时间
+        endDate: '',
         batchNum: 0, // 数量
         pickerVisible: true,
-        id: '',
+        planList: [],
         item: '',
-        type: 'add', // add 新增 / edit 编辑 / read 只读
-        titleVal: '新建开孔批次',
+        id: '', // 记录新增后的批次ID
+        type: 'edit', // add 新增 / edit 编辑 / read 只读
+        editable: true,
+        titleVal: '新建批次',
         active: 'tab-container'
       };
     },
@@ -139,15 +148,11 @@
       });
     },
     computed: {
-      ...mapState(NameSpace, ['planList']),
+      ...mapState('detail', ['itemTask']),
+      ...mapState(NameSpace, ['pcObj']),
       // 表单只读
       read() {
         return this.type === 'read';
-      },
-      // 提交按钮
-      isSubmit() {
-        let type = this.type;
-        return type === 'add';
       },
       // * 是否显示
       heartVisible() {
@@ -155,15 +160,10 @@
       }
     },
     methods: {
-      ...mapActions(NameSpace, ['getPlanList', 'setPlan']),
       ...mapActions('app', ['getLov']),
-      upList(obj) {
-        return KND.Util.toArray(obj);
-      },
+      ...mapActions(NameSpace, ['getPcObj']),
       open(picker) {
-        if (this.type === 'add') {
-          this.$refs[picker].open();
-        }
+        this.$refs[picker].open();
       },
       handleChange(value) {
         let me = this;
@@ -175,16 +175,21 @@
         me.end_Date = value.format('yyyy/MM/dd');
         me.endDate = value.format('MM/dd/yyyy');
       },
-      addPlanList(type) {
-        let me = this;
-        let planType = KND.Util.toArray(me.item['KL Installation Task'])[0]['KL Detail Type']; // 取统一批次
-        this.$router.push({
-          name: 'detailPlan',
-          query: {
-            type: type,
-            planType: planType,
-            id: me.id,
-            item: me.item
+      getPlanList(id) {
+        var self = this;
+        self.planList = [];
+        api.get({ // 提交数据
+          key: 'getPlan',
+          method: 'GET',
+          data: {
+            id: id
+          },
+          success: function(data) {
+            if (data.items) {
+              self.planList = data.items;
+            } else {
+              self.planList = KND.Util.toArray(data);
+            }
           }
         });
       },
@@ -206,59 +211,92 @@
           }
         });
       },
-      submitFn() {
+      addPlanFn(obj) {
         var self = this;
-        if (self.planList.length > 0) { // 详细计划不能为空   先提交批次再提交详细计划
-          var parma = {
-            'Planned': self.startDate,
-            'Planned Completion': self.endDate,
-            'KL Install Amount Requested': self.batchNum,
-            'Id': self.batchCode,
-            'KL Detail Type': self.item['KL Detail Type'],
-            'Parent Activity Id': self.item.Id
-          };
-          if (self.type === 'add') {
-            // Type:EVENT_STATUS code:Planning
-            // 取 lov Status '设定计划'
-            var Status = '';
-            self.getLov({ // 取类型值
-              data: {
-                'Type': 'EVENT_STATUS',
-                'Name': 'Planning'
-              },
-              success: data => {
-                Status = KND.Util.toArray(data.items)[0].Value;
-                parma.Status = Status;
-                parma['KL Detail Type'] = KND.Util.toArray(self.item['KL Installation Task'])[0]['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
-                parma['Template Id'] = KND.Util.toArray(self.item['KL Installation Task'])[0]['Template Id'];
-                parma['Order Id'] = KND.Util.toArray(self.item['KL Installation Task'])[0]['Order Id'];
-                api.get({ // 提交数据
-                  key: 'getUPData',
-                  method: 'PUT',
-                  data: parma,
-                  success: function(data) {
-                    var obj = {};
-                    obj.itemId = self.id;
-                    obj.pcId = data.items.Id; // 新增批次返回的ID
-                    self.setPlan(obj);
-                  }
-                });
-              }
-            });
-          } else {
+        if (self.id) { // 有批次直接跳转
+          let planType = self.itemTask['KL Detail Type']; // 取统一批次
+          this.$router.push({
+            name: 'detailPlan',
+            query: {
+              type: 'add',
+              planType: planType,
+              id: self.id,
+              item: obj
+            }
+          });
+        } else {  // 先保存批次
+          this.toSaveFn('1');
+        }
+      },
+      toSaveFn(num) { // num=1 保存并跳转详细计划  num = 2 只是保存 不跳转
+        var self = this;
+        var parma = {
+          'Planned': self.startDate,
+          'Planned Completion': self.endDate,
+          'KL Install Amount Requested': self.batchNum,
+          'Id': self.batchCode,
+          'KL Detail Type': self.item['KL Detail Type'],
+          'Parent Activity Id': self.item.Id
+        };
+        var Status = '';
+        self.getLov({ // 取类型值
+          data: {
+            'Type': 'EVENT_STATUS',
+            'Name': 'Planning'
+          },
+          success: data => {
+            Status = KND.Util.toArray(data.items)[0].Value;
+            parma.Status = Status;
+            parma['KL Detail Type'] = self.itemTask['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
+            parma['Template Id'] = self.itemTask['Template Id'];
+            parma['Order Id'] = self.itemTask['Order Id'];
             api.get({ // 提交数据
               key: 'getUPData',
               method: 'PUT',
               data: parma,
               success: function(data) {
-                var obj = {};
-                obj.itemId = self.id;
-                obj.pcId = data.items.Id; // 新增批次返回的ID
-                self.setPlan(obj);
+                if (!data.ERROR) {
+                  self.id = data.items.Id; // 新增批次返回的ID
+                  self.batchCode = data.items.Id; // 新增批次返回的ID
+                  self.getPcObj(data.items); // 保存store
+                  if (num === '1') {
+                    let planType = self.itemTask['KL Detail Type']; // 取统一批次
+                    self.$router.push({
+                      name: 'detailPlan',
+                      query: {
+                        type: 'add',
+                        planType: planType,
+                        id: self.batchCode,
+                        item: ''
+                      }
+                    });
+                  } else {
+                    Toast('保存成功');
+                  }
+                }
               }
             });
           }
-        }
+        });
+      },
+      submitFn() {
+        var self = this;
+        api.get({ // 更改按钮状态
+          key: 'getUPStatus',
+          method: 'POST',
+          data: {
+            'body': {
+              'ProcessName': 'KL Install Task Submit For Approval Workflow',
+              'RowId': self.id
+            }
+          },
+          success: function(data) {
+            if (!data.ERROR) {
+              Toast('提交成功');
+              KND.Util.back();
+            }
+          }
+        });
       }
     },
     components: {buttonGroup, lockLine}

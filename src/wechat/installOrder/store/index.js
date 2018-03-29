@@ -6,7 +6,7 @@ import { app } from 'public/store';
 Vue.use(Vuex);
 
 // 缓存页面
-app.state.alive = ['index', 'batch'];
+app.state.alive = ['index'];
 
 // 每页加载条数
 const PAGESIZE = config.pageSize;
@@ -92,8 +92,14 @@ export default new Vuex.Store({
     detail: {
       namespaced: true,
       state: {
+        itemTask: []
+      },
+      mutations: {
       },
       actions: {
+        getTaskType({state}, itemTask) {
+          state.itemTask = itemTask;
+        },
         // 门厂技术提交订单
         submit({state}, id) {
           api.get({
@@ -275,63 +281,27 @@ export default new Vuex.Store({
     batch: {
       namespaced: true,
       state: {
+        pcObj: {} // 批次保存时 存store
+      },
+      mutations: {
+        clear(state) {
+          state.pcObj = {};
+        }
+      },
+      actions: {
+        getPcObj({state}, obj) {
+          state.pcObj = obj;
+        }
+      }
+    },
+    batchDetail: {
+      namespaced: true,
+      state: {
         planList: []
       },
       mutations: {
       },
       actions: {
-        getPlanList({state}, id) {
-          api.get({ // 提交数据
-            key: 'getPlan',
-            method: 'GET',
-            data: {
-              id: id
-            },
-            success: function(data) {
-              if (data.items.length > 0) {
-                state.planList = data.items;
-              } else {
-                state.planList = KND.Util.toArray(data);
-              }
-            }
-          });
-        },
-        setPlan({state}, obj) {
-          var self = this;
-          api.get({ // 提交详细计划数据
-            key: 'setPlan',
-            method: 'PUT',
-            data: {
-              'Id': obj.pcId, // 新增批次返回的ID
-              'Planned': state.planList[0].Planned,
-              'Planned Completion': state.planList[0]['Planned Completion'],
-              'Started': '',
-              'Done': '',
-              'Description': state.planList[0].Description
-            },
-            success: function(data) {
-              api.get({ // 更改按钮状态
-                key: 'getUPStatus',
-                method: 'POST',
-                data: {
-                  'body': {
-                    'ProcessName': 'KL Install Task Submit For Approval Workflow',
-                    'RowId': obj.itemId
-                  }
-                },
-                success: function(data) {
-                  if (!data.ERROR) {
-                    Toast('提交成功');
-                    self.$route().back();
-                  }
-                }
-              });
-            }
-          });
-        },
-        setPlanList({state}, obj) {
-          state.planList.push(obj);
-        }
       }
     },
     updateDoor: {
