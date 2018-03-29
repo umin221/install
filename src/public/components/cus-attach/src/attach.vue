@@ -15,7 +15,7 @@
           :class="{'icon-delete': edit}"
           @click="deleteFn($index)"></span>
         <img :src="convertImgSrc(item)"
-          @click="previewImageFn(item)"/>
+             @click="previewImageFn($index)"/>
       </div>
     </div>
   </div>
@@ -34,8 +34,9 @@
    *  －本地，返回企业微信的mediaIds列表
    *  －在线，返回siebel图片列表
    */
-  import {mapActions} from 'vuex';
   import titleGroup from '../../cus-title-group';
+
+  let downloadUrl = (config.proxy + '/webchat/api/external/downloadattachment?url=http://192.168.166.8:9001/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess');
 
   export default {
     name: 'cus-attach',
@@ -45,7 +46,8 @@
         default: []
       },
       edit: Boolean,
-      title: String
+      title: String,
+      ioName: String
     },
     computed: {
       empty() {
@@ -53,7 +55,6 @@
       }
     },
     methods: {
-      ...mapActions('app', ['getMediaById']),
       /**
        * 添加图片/拍照
        * response res.localIds 选择图片的id集合
@@ -66,6 +67,7 @@
             // 而在IOS中需通过上面的接口getLocalImgData获取图片base64数据，从而用于img标签的显示
             let localIds = res.localIds;
             for (var i in localIds) {
+              console.log(localIds[i]);
               me.uploadLocalIds(localIds[i]);
             }
           }
@@ -81,6 +83,7 @@
         KND.Native.uploadImage({
           localId: localId,
           success: function(res) {
+            console.log(res);
             me.attach.unshift({
               localId: localId,
               serverId: res.serverId
@@ -95,16 +98,20 @@
         });
       },
       convertImgSrc(item) {
-        return item.localId || item.Id;
+        item.src = encodeURI(item.localId ? item.localId : downloadUrl + '&IOName=' + this.ioName + '&Object Id=' + item.Id + '&ProcessName=KL Attachment Query Process');
+        return item.src;
       },
       /**
        * 预览图片
        */
-      previewImageFn(item) {
-        console.log(item);
+      previewImageFn(index) {
+        let arr = Array.prototype.map.call(this.attach, item => {
+          return item.src;
+        });
+        console.log(arr);
         KND.Native.previewImage({
-          // urls: ['http://192.168.166.8:8080/eai_anon_chs/start.swe?SWEExtSource=KLAttachment&SWEExtCmd=Execute&SWEExtData=123']
-          urls: ['http://n.sinaimg.cn/translate/653/w400h253/20180322/0sp9-fyskeue4878551.jpg']
+          current: arr[index],
+          urls: arr
         });
       },
       /**
@@ -142,6 +149,8 @@
         img {
           width: 2.5rem;
           height: 2.5rem;
+          border-radius: 8px;
+          border: 1px solid #eaeaea;
         }
 
       }

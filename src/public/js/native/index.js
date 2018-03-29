@@ -12,23 +12,23 @@ import cache from '../lib/cache';
   // 用户ID
   let userID;
   // 是否本地调试
-  let debug = !config.debug;
+  let debug = config.debug;
   // 缓存超时
   let exp = config.cacheExp;
   // 时间戳
-  const lock = 1521174072972;
+  const LOCK = 1521174072972;
   // 会话缓存
   let session = {
     set: (key, val) => {
-      key += lock;
+      key += LOCK;
       sessionStorage.setItem(key, val);
     },
     get: (key) => {
-      key += lock;
+      key += LOCK;
       return sessionStorage.getItem(key);
     },
     remove: (key) => {
-      key += lock;
+      key += LOCK;
       return sessionStorage.removeItem(key);
     }
   };
