@@ -4,17 +4,23 @@
       <fallback slot="left"></fallback>
       <mt-button @click.native="approvalFn" slot="right" v-text="">审批记录</mt-button>
     </mt-header>
-    <div class="mint-content batchDetail" :class="{'disable': !editable}">
-      <div>
-        <mt-cell title="批次">
-          <span>{{batchCode}}</span>
-        </mt-cell>
-        <mt-cell title="计划开始日期"  :value="start_Date"></mt-cell>
-        <mt-cell title="计划完成日期" :value="end_Date"></mt-cell>
-        <mt-field label="计划开孔数量"
-                  :class="heartVisible" v-model="batchNum"></mt-field>
+    <div class="mint-content batchDetail">
+      <div v-show="is_option" class="readonly">
+        <mt-field label="申请人" :value="appData['Order Number']"></mt-field>
+        <mt-field label="类型" :value="appData['KL Agreement Opportunity Name']"></mt-field>
+        <mt-field label="提交日期" :value="appData['KL Delivery Sales Type']"></mt-field>
+        <mt-field label="项目详情" :value="appData['KL Delivery Sales Type']" @click.native="toDetailFn">XXXXX</mt-field>
       </div>
-      <div class="lock-line" v-show="is_plan">
+      <div class="readonly" style="margin-top: 10px">
+        <mt-field label="批次">
+          <span>{{batchCode}}</span>
+        </mt-field>
+        <mt-field label="计划开始日期"  :value="start_Date"></mt-field>
+        <mt-field label="计划完成日期" :value="end_Date"></mt-field>
+        <mt-field label="计划开孔数量"
+                   :value="batchNum"></mt-field>
+      </div>
+      <div class="lock-line" v-show="is_plan"  :class="{'disable': !editable}">
         <lock-line title="详细计划">
           <mt-cell-swipe v-for="(line, index) in planList" class="lock-line-cell enable" ref="body"
                          @click.native="addPlanList(line)"
@@ -31,6 +37,12 @@
           </mt-cell-swipe>
         </lock-line>
       </div>
+      <button-group v-show="is_option">
+        <mt-button class="single"
+                   @click.native="submitFn">驳回</mt-button>
+        <mt-button class="single"
+                   @click.native="submitFn">确认</mt-button>
+      </button-group>
     </div>
   </div>
 </template>
@@ -79,6 +91,7 @@
       this.option = param.option; // 区分从哪跳转到详情页
       if (this.option === 'approval') {
         this.is_option = true; // 是否审批
+        this.getAppData(this.id);
       }
       self.titleVal = '批次详情';
       this.getBatch(this.id);
@@ -98,6 +111,7 @@
         end_Date: '',        // 结束时间
         batchNum: 0, // 数量
         planList: [],
+        appData: {}, // 审批信息头
         id: '',
         item: '',
         editable: false,
@@ -176,6 +190,45 @@
             } else {
               self.planList = KND.Util.toArray(data);
             }
+          }
+        });
+      },
+      toDetailFn() {
+        // var self =this;
+        this.$router.push({
+          name: 'detail',
+          query: {
+            id: '1-2BSEB2W4'
+          }
+        });
+      },
+      getAppData(id) {
+        var me = this;
+        api.get({
+          key: 'getDetail',
+          method: 'POST',
+          data: {
+            'body': {
+              'OutputIntObjectName': 'Base UInbox Item History',
+              // 'OutputIntObjectName': 'KL Order Sales',
+              'SearchSpec': '[Order Entry - Orders.Id]=' + '\'' + id + '\''
+              // 'SearchSpec': '[Order Entry - Orders.Id]="1-2BSATYIN"'
+            }
+          },
+          success: function(data) {
+            console.dir(data.SiebelMessage);
+            me.detailData = data.SiebelMessage['Order Entry - Orders'];
+            var taskData = me.detailData['KL Installation Task'];
+            if (taskData) {
+              me.taskData = KND.Util.toArray(taskData);
+              console.dir(me.taskData);
+              me.pStatus = me.taskData[0]['Calculated Activity Status'];
+              if (me.pStatus !== 'Not Started') { // 未开始时不获取子任务数据
+                me.taskDataList = KND.Util.toArray(me.taskData[0]['KL Installation Task']);
+              }
+            }
+            me.taskDataST = KND.Util.toArray(me.detailData['Order Entry - Line Items']);
+            console.dir(me.taskDataST);
           }
         });
       }

@@ -33,9 +33,9 @@
       <div class="buildingInfo-zy">注意：非标准楼层选择楼数量后手工编辑</div>
     </div>
     <button-group>
-      <mt-button type="primary" class="single"
-                 @click.native="previewFn">编辑预览</mt-button>
-      <mt-button type="primary" class="single"
+      <!--<mt-button type="primary" class="single"
+                 @click.native="previewFn">编辑预览</mt-button>-->
+      <mt-button class="single"
                  @click.native="submitFn">保存提交</mt-button>
     </button-group>
   </div>

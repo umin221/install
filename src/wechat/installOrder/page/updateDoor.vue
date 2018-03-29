@@ -58,7 +58,7 @@
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
   import api from '../api/api';
-  import {mapState} from 'vuex';
+  import {mapState, mapActions} from 'vuex';
   export default {
     name: 'updateDoor',
     created() {
@@ -102,6 +102,7 @@
       }
     },
     methods: {
+      ...mapActions('app', ['getLov']),
       journalFn() {
         var self = this;
         self.$router.push({
@@ -135,7 +136,6 @@
           },
           success: function(data) {
             if (!data.ERROR) {
-              Toast('提交成功');
               lineObj['Completed Install Amount'] = '';
               lineObj['Spot Check Amount'] = '';
               lineObj['Qualified Amoun'] = '';
@@ -143,6 +143,30 @@
               lineObj['Unqualified Solve Amount'] = '';
               lineObj['Unqualified Desc'] = '';
               lineObj['Unqualified Solve Desc'] = '';
+              // 更新状态
+              var Status = '';
+              self.getLov({ // 取类型值
+                data: {
+                  'Type': 'EVENT_STATUS',
+                  'Name': 'In Progress'
+                },
+                success: data => {
+                  Status = KND.Util.toArray(data.items)[0].Value;
+                  var parma = {};
+                  parma.Status = Status;
+                  parma.Id = self.id;
+                  api.get({ // 提交数据
+                    key: 'getUPData',
+                    method: 'PUT',
+                    data: parma,
+                    success: function(data) {
+                      if (!data.ERROR) {
+                        Toast('提交成功');
+                      }
+                    }
+                  });
+                }
+              });
             }
           }
         });
