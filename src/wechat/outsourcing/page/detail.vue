@@ -25,14 +25,15 @@
         <cus-field label="联系电话" placeholder="请输入电话" type="tel" tag="电话"
                    :edit=!read
                    v-valid.require.phone
-                   v-model="form['Main Phone Number1']"></cus-field>
+                   v-model="form['Main Phone Number']"></cus-field>
         <cus-field label="详细地址" placeholder="请输入地址" tag="地址"
                    :edit=!read
                    v-valid.require
                    v-model="form['Primary Address Street']"></cus-field>
       </div>
 
-      <attach :attach="attach.list" ref="attach"
+      <attach ioName="KL Channel Partner Attachments" ref="attach"
+              :attach="attach.list"
               :edit="!read"
               :title="title">
       </attach>
@@ -90,11 +91,35 @@
   Vue.use(vp);
 
   // Swiper button
-  let swiperBtn = [{
+  let _swiperBtn = [{
     content: '删除',
     style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
     handler: () => this.$messagebox('delete')
   }];
+
+  /**
+   * 附件上传
+   * @param {Array} serverIds 企业微信临时素材id => mediaId
+   * @param {String} id 业务id
+   */
+  let _upload = function(serverIds, id) {
+    // 成功回调
+    let callback = data => {
+      tools.success(data, {
+        back: true,
+        successTips: '提交成功'
+      });
+    };
+    // 上传附件
+    serverIds ? this.upload({
+      data: {
+        MediaId: serverIds,
+        Id: id,
+        IOName: 'KL Channel Partner Attachments'
+      },
+      success: callback
+    }) : callback(id);
+  };
 
   const NAMESPACE = 'detail';
   export default {
@@ -109,6 +134,17 @@
       // 获取详情
       if (param.id) {
         me.findPartnerById(param.id);
+        me.queryMedias({
+          data: {
+            'IOName': 'KL Channel Partner Attachments',
+            'SearchSpec': {
+              'KL Channel Partner Attachment.Account Id': param.id
+            }
+          },
+          success: data => {
+            this.attach.list = KND.Util.toArray(data['SiebelMessage']['KL Channel Partner Attachment']);
+          }
+        });
       } else {
         me.clear();
       }
@@ -121,12 +157,17 @@
           list: [{
             text: '提交'
           }]
+        },
+        attach: { // 附件
+          list: [],
+          edit: false,
+          title: '合同附件'
         }
       };
     },
     computed: {
       ...mapState('index', ['isManager']),
-      ...mapState(NAMESPACE, ['form', 'attach', 'record']),
+      ...mapState(NAMESPACE, ['form', 'record']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -141,7 +182,7 @@
         return type === 'add' || (type === 'edit' && this.state === 'invalid');
       },
       swiperBtn() {
-        return this.state === 'valid' ? swiperBtn : [];
+        return this.state === 'valid' ? _swiperBtn : [];
       },
       /**
        * 根据当前状态和类型判断标题展示
@@ -155,6 +196,7 @@
     },
     methods: {
       ...mapMutations(NAMESPACE, ['clear']),
+      ...mapActions('app', ['upload', 'queryMedias']),
       ...mapActions(NAMESPACE, ['findPartnerById', 'findPartner', 'addPartner', 'update', 'pushMedia']),
       toContact(contact) {
         this.$router.push({
@@ -183,26 +225,39 @@
       },
       // Partner create & restart
       submitFn() {
-        tools.valid.call(this, () => {
-          // restart
-          if (this.state === 'invalid') {
-            // this.update({
-            //  data: {
-            //    'KL Partner Status': '待审批'
-            //  }
-            // });
-            // 上传附件
-            this.pushMedia(this.$refs.attach.getServerIds());
+        let me = this;
+        tools.valid.call(me, () => {
+          // 提交图片
+          let uploadAttach = id => {
+            _upload.call(me, me.$refs.attach.getServerIds(), id);
+          };
+          // 重新启用委外团队
+          if (me.state === 'invalid') {
+            me.update({
+              data: {
+                'KL Partner Status': '待审批'
+              },
+              success: data => {
+                uploadAttach(data.items.Id);
+              }
+            });
           } else {
-            // create
-            this.addPartner();
+            // 创建委外团队
+            me.addPartner(data => {
+              uploadAttach(data.PrimaryRowId);
+            });
           }
         });
       },
       // Partner update
       updateFn() {
-        tools.valid.call(this, () => {
-          this.update();
+        let me = this;
+        tools.valid.call(me, () => {
+          me.update({
+            success: data => {
+              _upload.call(me, me.$refs.attach.getServerIds(), data.items.Id);
+            }
+          });
         });
       },
       // To contact or fail out partner

@@ -88,11 +88,6 @@ export default new Vuex.Store({
       namespaced: true,
       state: {
         form: '',
-        attach: { // 附件
-          list: [], // [{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}],
-          edit: false,
-          title: '合同附件'
-        },
         record: [{state: '已提交', time: '2017-02-01 18:00'},
           {state: '总部安装主管xx审批中', time: '2017-02-01 19:00'}]
       },
@@ -100,9 +95,6 @@ export default new Vuex.Store({
         setPartner(state, form) {
           state.form = form;
           state.form.User = KND.Util.toArray(form.User);
-        },
-        setAttach(state, list) {
-          state.attach.list = KND.Util.toArray(list);
         },
         clear(state) {
           state.form = {
@@ -128,8 +120,6 @@ export default new Vuex.Store({
             },
             success: data => {
               commit('setPartner', data.SiebelMessage['Channel Partner']);
-              // 查询附件
-              dispatch('queryMedias', id);
             }
           });
         },
@@ -149,7 +139,8 @@ export default new Vuex.Store({
          * 创建委外团队
          * 绑定当前表单数据
          */
-        addPartner({state}) {
+        addPartner({state}, success) {
+          success = success || (data => console.log(data));
           let partner = state.form;
           // Alias 为必填，默认填入 Name
           partner.Alias = partner.Alias || partner.Name;
@@ -162,18 +153,7 @@ export default new Vuex.Store({
             data: {
               partner: partner
             },
-            success: data => {
-              if (data.PrimaryRowId) {
-                Toast({
-                  message: '提交成功'
-                });
-                KND.Util.back();
-              } else {
-                Toast({
-                  message: '提交失败'
-                });
-              }
-            }
+            success: success
           });
         },
         /**
@@ -187,12 +167,10 @@ export default new Vuex.Store({
             key: 'update',
             data: state.form,
             success: data => {
-              if (data['KL Partner Status'] !== status) {
-                Toast('更新成功');
-                KND.Util.back();
-              } else {
-                Toast('更新失败');
-              }
+              tools.success(data, {
+                back: true,
+                successTips: '更新成功'
+              });
             }
           }, setting));
         },
@@ -229,22 +207,6 @@ export default new Vuex.Store({
             };
           };
           run(mediaId.pop());
-        },
-
-        /**
-         * 查询附件列表
-         * @param {String} id 必填 委外厂商id
-         */
-        queryMedias({commit}, id) {
-          api.get({
-            key: 'queryMedias',
-            data: {
-              'Account Id': id
-            },
-            success: data => {
-              commit('setAttach', data['SiebelMessage']['KL Channel Partner Attachment']);
-            }
-          });
         }
       }
     },

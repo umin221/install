@@ -156,21 +156,9 @@ let apiList = {
       data: {
         'body': {
           'ProcessName': 'KL Attachment Upload Process',
-          'Type': 'Task',
+          'Type': 'Partner',
           'MediaId': option.data.mediaId,
           'Object Id': option.data.id
-        }
-      }
-    };
-  },
-
-  queryMedias: option => {
-    return {
-      url: 'service/EAI Siebel Adapter/Query',
-      data: {
-        'body': {
-          'OutputIntObjectName': 'KL Channel Partner Attachments',
-          'SearchSpec': KND.Util.condition(option.data, 'KL Channel Partner Attachment')
         }
       }
     };
