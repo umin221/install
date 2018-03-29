@@ -1,77 +1,77 @@
 <template>
-    <div>
-      <!--header-->
-      <mt-header fixed :title="isPanel?'面板':'锁体'">
-        <fallback slot="left"></fallback>
-      </mt-header>
+  <div>
+    <!--header-->
+    <mt-header fixed :title="isPanel?'面板':'锁体'">
+      <fallback slot="left"></fallback>
+    </mt-header>
 
-      <!--detail-->
-      <div class="mint-content line" :data-date="date" :class="{disable: !editable}">
-        <cus-field label="产品名称" tag="产品名称"
-                   @click.native="showLovFn('agreementItem')"
-                   :value="productName || line['KL Product Model No']"
-                   v-valid.require
-                   is-link></cus-field>
-        <cus-field label="开向" tag="开向"
-                   @click.native="showLovFn('KL Hole Direction')"
-                   v-model="line['KL Hole Direction']"
-                   v-valid.require
-                   is-link></cus-field>
-        <mt-cell title="是否带天地" v-show="!isPanel">
-          <mt-switch v-model="flag"></mt-switch>
-        </mt-cell>
-        <!--<cus-field label="交货日期"-->
-                   <!--@click.native="openPicker"-->
-                   <!--:value="line['Scheduled Ship Date']"-->
-                   <!--is-link></cus-field>-->
-        <cus-field label="数量" tag="数量"
-                   type="number"
-                   v-valid.require.number
-                   v-model="line['Quantity Requested']"></cus-field>
-        <cus-field label="门材质"
-                   @click.native="showLovFn('KL Door Material Quality')"
-                   v-model="line['KL Door Material Quality']"
-                   is-link></cus-field>
-        <cus-field label="门厚" v-show="!isPanel"
-                   v-model="line['KL Door Thickness']"></cus-field>
-        <cus-field label="锁舌导向板规格" v-show="!isPanel"
-                   v-model="line['KL Guide Plate Specification']"></cus-field>
-        <cus-field label="门扣板规格" v-show="!isPanel"
-                   v-model="line['KL Gate Plate Specification']"></cus-field>
-        <cus-field label="滑盖丝印" v-show="isPanel"
-                   v-model="line['KL Slippery Screen Printing']"></cus-field>
-        <cus-field label="彩卡丝印" v-show="isPanel"
-                   v-model="line['KL Color Card Screen Printing']"></cus-field>
-        <cus-field label="配件要求"
-                   v-model="line['KL Parts Requirement']"></cus-field>
-        <cus-field label="备注"
-                   type="textarea"
-                   v-model="line['Description']"></cus-field>
+    <!--detail-->
+    <div class="mint-content line" :data-date="date" :class="{disable: !editable}">
+      <cus-field label="产品名称" tag="产品名称"
+                 @click.native="showLovFn('agreementItem')"
+                 :value="productName || line['KL Product Model No']"
+                 v-valid.require
+                 is-link></cus-field>
+      <cus-field label="开向" tag="开向"
+                 @click.native="showLovFn('KL Hole Direction')"
+                 v-model="line['KL Hole Direction']"
+                 v-valid.require
+                 is-link></cus-field>
+      <mt-cell title="是否带天地" v-show="!isPanel">
+        <mt-switch v-model="flag"></mt-switch>
+      </mt-cell>
+      <!--<cus-field label="交货日期"-->
+      <!--@click.native="openPicker"-->
+      <!--:value="line['Scheduled Ship Date']"-->
+      <!--is-link></cus-field>-->
+      <cus-field label="数量" tag="数量"
+                 type="number"
+                 v-valid.require.number
+                 v-model="line['Quantity Requested']"></cus-field>
+      <cus-field label="门材质"
+                 @click.native="showLovFn('KL Door Material Quality')"
+                 v-model="line['KL Door Material Quality']"
+                 is-link></cus-field>
+      <cus-field label="门厚" v-show="!isPanel"
+                 v-model="line['KL Door Thickness']"></cus-field>
+      <cus-field label="锁舌导向板规格" v-show="!isPanel"
+                 v-model="line['KL Guide Plate Specification']"></cus-field>
+      <cus-field label="门扣板规格" v-show="!isPanel"
+                 v-model="line['KL Gate Plate Specification']"></cus-field>
+      <cus-field label="滑盖丝印" v-show="isPanel"
+                 v-model="line['KL Slippery Screen Printing']"></cus-field>
+      <cus-field label="彩卡丝印" v-show="isPanel"
+                 v-model="line['KL Color Card Screen Printing']"></cus-field>
+      <cus-field label="配件要求"
+                 v-model="line['KL Parts Requirement']"></cus-field>
+      <cus-field label="备注"
+                 type="textarea"
+                 v-model="line['Description']"></cus-field>
 
-        <!--buttons-->
-        <button-group>
-          <mt-button @click.native="saveFn">保存</mt-button>
-        </button-group>
-      </div>
-
-      <!--popup-->
-      <mt-popup v-model="showBox" position="bottom">
-        <menu-box @my-enter="enter"
-                  @my-cancel="showBox=false"
-                  :vk="vk"
-                  :type="lovType"
-                  :slots="slots"></menu-box>
-      </mt-popup>
-
-      <!--<mt-datetime-picker-->
-        <!--ref="picker" type="date"-->
-        <!--:startDate="startDate"-->
-        <!--year-format="{value} 年"-->
-        <!--month-format="{value} 月"-->
-        <!--date-format="{value} 日"-->
-        <!--v-model="pickerValue">-->
-      <!--</mt-datetime-picker>-->
+      <!--buttons-->
+      <button-group>
+        <mt-button @click.native="saveFn">保存</mt-button>
+      </button-group>
     </div>
+
+    <!--popup-->
+    <mt-popup v-model="showBox" position="bottom">
+      <menu-box @my-enter="enter"
+                @my-cancel="showBox=false"
+                :vk="vk"
+                :type="lovType"
+                :slots="slots"></menu-box>
+    </mt-popup>
+
+    <!--<mt-datetime-picker-->
+    <!--ref="picker" type="date"-->
+    <!--:startDate="startDate"-->
+    <!--year-format="{value} 年"-->
+    <!--month-format="{value} 月"-->
+    <!--date-format="{value} 日"-->
+    <!--v-model="pickerValue">-->
+    <!--</mt-datetime-picker>-->
+  </div>
 </template>
 
 <script type="es6">
@@ -106,6 +106,7 @@
       me.editable = param.editable;
       if (!me.editable) return;
 
+      /**
       // 合同行
       let agreementItems = me.form['MACD FS Agreement Item'];
       // 合同下所有 海贝思 的行项目，作为产品选择
@@ -127,10 +128,11 @@
         });
         return;
       };
+       */
 
       // 填充产品名称
       if (!line['KL Product Model No']) {
-        this.agreementItem = mapp.option['agreementItem'][0] || {};
+        // this.agreementItem = mapp.option['agreementItem'][0] || {};
       };
 
       // 取 lov 开向
@@ -199,7 +201,7 @@
     methods: {
       ...mapActions(NAMESPACE, ['saveOrderLine']),
       ...mapActions('app', ['getLov']),
-      // 保存订单行
+        // 保存订单行
       saveFn() {
         tools.valid.call(this, () => {
           this.saveOrderLine(this.line);
@@ -234,8 +236,8 @@
 
 <style lang="scss">
   .line {
-    .mint-cell-title {
-      color: $gray-minor;
-    }
+  .mint-cell-title {
+    color: $gray-minor;
+  }
   }
 </style>

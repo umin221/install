@@ -92,9 +92,16 @@ export default new Vuex.Store({
     detail: {
       namespaced: true,
       state: {
-        itemTask: []
+        itemTask: [],
+        taskDataST: '' // 面板锁体
       },
       mutations: {
+        removeTaskDataST(state, index) {
+          state.taskDataST.splice(index, 1);
+        },
+        setTaskDataST(state, data) {
+          state.taskDataST = data;
+        }
       },
       actions: {
         getTaskType({state}, itemTask) {
@@ -112,6 +119,21 @@ export default new Vuex.Store({
                 back: true,
                 successTips: '提交成功'
               });
+            }
+          });
+        },
+        /**
+         * 删除订单行
+         */
+        deleteOrderLine({commit}, setting) {
+          api.get({
+            key: 'deleteOrderLine',
+            data: {
+              id: setting.id
+            },
+            success: data => {
+              commit('removeTaskDataST', setting.index);
+              tools.success(data);
             }
           });
         }
@@ -514,6 +536,28 @@ export default new Vuex.Store({
           console.dir('=============');
           console.dir(state.buildingList);
 
+        }
+      }
+    },
+
+    /**
+     * 创建&更新订单行
+     */
+    orderLine: {
+      namespaced: true,
+      state: {},
+      mutations: {},
+      actions: {
+        saveOrderLine({state}, data) {
+          api.get({
+            key: 'saveOrderLine',
+            data: Object.assign({}, data),
+            success: data => {
+              tools.success(data, {
+                back: true
+              });
+            }
+          });
         }
       }
     }

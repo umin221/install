@@ -167,6 +167,41 @@ let apiList = {
         }
       }
     };
+  },
+
+  /**
+   * 新增或修改订单行项目(在订单下新建或修改）
+   * @param {String} option.data['KL Hole Direction'] 选填 开向 左开
+   * @param {String} option.data['KL World Flag'] 选填 Y
+   * @param {String} option.data['Scheduled Ship Date'] 选填 03/01/2018
+   * @param {String} option.data['KL Door Thickness'] 选填 锁舌导向板规格
+   * @param {String} option.data['KL Parts Requirement'] 选填 配件要求
+   * @param {String} option.data['Quantity Requested'] 选填 125
+   * @param {String} option.data['KL Agreement Item Id'] 选填 1-DGFJM0
+   * @param {String} option.data['KL Door Material Quality'] 选填 木门
+   * @param {String} option.data['KL Gate Plate Specification'] 选填 门扣板规格
+   * @param {String} option.data['Description'] 选填 备注
+   * @param {String} option.data['Id'] 选填 1-111
+   * @returns {{method: string, url: string}}
+   */
+  saveOrderLine: option => {
+    return {
+      method: 'put',
+      url: 'data/Order Entry (Sales)/Order Entry - Orders/' + option.data['Order Header Id'] + '/Order Entry - Line Items'
+      // url: 'data/Order Entry (Sales)/Order Entry - Orders/1-2BSAS9OT/Order Entry - Line Items/1-2BSB7L33xxx'
+    };
+  },
+
+  /**
+   * 删除订单行
+   * @param {String} option.data.id 必填 订单行id
+   * @returns {{method: string, url: string}}
+   */
+  deleteOrderLine: option => {
+    return {
+      method: 'delete',
+      url: 'data/Order Entry - Line Items/Order Entry - Line Items/' + option.data.id
+    };
   }
 };
 

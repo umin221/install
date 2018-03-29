@@ -13,25 +13,41 @@
       </div>
       <toggle>
         <div style="height: 0.5rem;background: #eaeaea;"></div>
-        <div class="mint-content-info">
-          <mt-cell>
-            <div slot="title" class="list-text"><span class="list-text-span">面板部分</span></div>
-          </mt-cell>
-          <div class="mint-sx-div">
-            <mt-cell @click.native="getLock(item.Id, item['KL Product Type'], item)" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='面板'"  :title="item['KL Product Series Code']">
-              <span style="width: 120px">开向：{{item['KL Hole Direction']}}</span>
-              <span>数量：{{item['Quantity Requested']}}</span>
-            </mt-cell>
+        <div class="mint-content-info" style="padding-bottom: 50px;">
+
+          <div class="lock-line">
+            <lock-line title="锁体" @click="toLineFn(undefined, 'Lock Body')">
+              <mt-cell-swipe v-for="(line, index) in taskDataST" class="lock-line-cell enable" ref="body"
+                             v-if="line['KL Product Type LIC']==='Lock Body'"
+                             @click.native="toLineFn(line)"
+                             :key="line['Id']"
+                             :right="getSwipeBtn(line, index)"
+                             is-link>
+                <div class="co-flex co-jc" slot="title">
+                  <span v-show="isConfirming" class="co-f1 icon-copy" @click.stop="copyFn(line)"></span>
+                  <span class="co-f2">{{line['KL Product Series Code']}}</span>
+                  <span class="co-f2">开向:{{line['KL Hole Direction']}}</span>
+                  <span class="co-f2">数量:{{line['Quantity Requested']}}</span>
+                </div>
+              </mt-cell-swipe>
+            </lock-line>
+            <lock-line title="面板" @click="toLineFn(undefined, 'Panel')">
+              <mt-cell-swipe v-for="(line, index) in taskDataST" class="lock-line-cell enable" ref="panel"
+                             v-if="line['KL Product Type LIC'] === 'Panel'"
+                             @click.native="toLineFn(line)"
+                             :key="line['Id']"
+                             :right="getSwipeBtn(line, index)"
+                             is-link>
+                <div class="co-flex co-jc" slot="title">
+                  <span v-show="isConfirming" class="co-f1 icon-copy" @click.stop="copyFn(line)"></span>
+                  <span class="co-f2">{{line['KL Product Series Code']}}</span>
+                  <span class="co-f2">开向:{{line['KL Hole Direction']}}</span>
+                  <span class="co-f2">数量:{{line['Quantity Requested']}}</span>
+                </div>
+              </mt-cell-swipe>
+            </lock-line>
           </div>
-          <mt-cell>
-            <div slot="title" class="list-text"><span class="list-text-span">锁体部分* 真锁</span></div>
-          </mt-cell>
-          <div class="mint-sx-div">
-            <mt-cell  @click.native="getLock(item.Id, item['KL Product Type'], item)" is-link v-for="item in taskDataST" :key="item.id" v-if="item['KL Product Type']=='锁体'"  :title="item['KL Product Series Code']">
-              <span style="width: 120px">开向：{{item['KL Hole Direction']}}</span>
-              <span>数量：{{item['Quantity Requested']}}</span>
-            </mt-cell>
-          </div>
+
         </div>
       </toggle>
       <div style="height: 0.5rem;background: #eaeaea;"></div>
@@ -445,15 +461,16 @@
   }
 </style>
 <script type="application/javascript">
-  import {mapActions, mapMutations} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import api from '../api/api';
   import { MessageBox, Toast } from 'mint-ui';
   import toggle from 'public/components/cus-toggle';
+  import lockLine from '../../transferOrder/components/cusLockLine';
   let userInfo = {};
   const NameSpace = 'detail';
   export default {
     name: 'detail',
-    components: {toggle},
+    components: {toggle, lockLine},
     created() {
       let me = this;
       me.id = me.$route.query.id;
@@ -480,7 +497,7 @@
               me.taskDataList = KND.Util.toArray(me.taskData[0]['KL Installation Task']);
             }
           }
-          me.taskDataST = KND.Util.toArray(me.detailData['Order Entry - Line Items']);
+          me.setTaskDataST(KND.Util.toArray(me.detailData['Order Entry - Line Items']));
           console.dir(me.taskDataST);
         }
       });
@@ -496,7 +513,6 @@
         detailData: {}, // 详情整体数据
         taskData: '', // 任务集
         taskDataList: '', // 任务集子任务
-        taskDataST: '', // 面板锁体
         pStatus: '', // 父状态
         // is_show_sx: false, // 是否显示面板锁体
         shipmentVal: false, // 发运开关，判断值
@@ -504,6 +520,7 @@
       };
     },
     computed: {
+      ...mapState(NameSpace, ['taskDataST']),
       isConfirming() {
         return this.detailData.Status === '门厂工程师确认中';
       }
@@ -517,7 +534,8 @@
     },
     methods: {
       ...mapMutations('batch', ['clear']),
-      ...mapActions(NameSpace, ['getTaskType']),
+      ...mapMutations(NameSpace, ['setTaskDataST']),
+      ...mapActions(NameSpace, ['getTaskType', 'deleteOrderLine']),
       colorClass(cla) {
         var colorCla = '';
         if (cla === 'Not Started') { // 未开始
@@ -569,17 +587,6 @@
           self.is_show_sx = true;
         }
       },*/
-      getLock(id, type, item) { // 面板锁体详情事件
-        // 跳转面板锁体详情
-        this.$router.push({
-          name: 'lock',
-          query: {
-            id: id,
-            type: type,
-            item: item
-          }
-        });
-      },
       butXttd() { // 跳转协同团队
         let me = this;
         this.$router.push({
@@ -942,6 +949,55 @@
               successTips: '提交成功'
             });
           }
+        });
+      },
+
+      // 右滑删除
+      getSwipeBtn(line, index) {
+        return true ? [{
+          content: '删除',
+          style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
+          handler: () => this.deleteFn(line, index)
+        }] : [];
+      },
+      // 订单行
+      toLineFn(line = {}, type) {
+        let me = this;
+        let order = me.detailData;
+        console.log(order);
+        // 是否面板
+        let isPanel = (line['KL Product Type LIC'] || type) === 'Panel';
+        // 填充订单id，保存编辑行时需要
+        line['Order Header Id'] = order.Id;
+        me.$router.push({
+          path: 'orderLine',
+          query: {
+            line: JSON.stringify(line),
+            isPanel: isPanel,
+            editable: me.isConfirming // this.editable
+          }
+        });
+      },
+      // Delete Install Order Line
+      deleteFn(line, index) {
+        this.deleteOrderLine({
+          id: line.Id,
+          index: index
+        });
+      },
+      // Copy line
+      copyFn(line) {
+        MessageBox.confirm('复制此订单行记录？', '请确认').then(action => {
+          let isPanel = line['KL Product Type LIC'] === 'Panel';
+          delete line.Id;
+          this.$router.push({
+            path: 'orderLine',
+            query: {
+              line: JSON.stringify(line),
+              isPanel: isPanel,
+              editable: true
+            }
+          });
         });
       }
     }

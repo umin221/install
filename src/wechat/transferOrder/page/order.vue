@@ -32,7 +32,7 @@
                      :right="getSwipeBtn(line, index)"
                      is-link>
               <div class="co-flex co-jc" slot="title">
-                <span class="co-f1 icon-copy" @click.stop="copyFn(line)"></span>
+                <span v-show="editable" class="co-f1 icon-copy" @click.stop="copyFn(line)"></span>
                 <span class="co-f2">{{line['KL Product Model No']}}</span>
                 <span class="co-f2">开向:{{line['KL Hole Direction']}}</span>
                 <span class="co-f2">数量:{{line['Quantity Requested']}}</span>
@@ -47,7 +47,7 @@
                      :right="getSwipeBtn(line, index)"
                      is-link>
               <div class="co-flex co-jc" slot="title">
-                <span class="co-f1 icon-copy" @click.stop="copyFn(line)"></span>
+                <span v-show="editable" class="co-f1 icon-copy" @click.stop="copyFn(line)"></span>
                 <span class="co-f2">{{line['KL Product Model No']}}</span>
                 <span class="co-f2">开向:{{line['KL Hole Direction']}}</span>
                 <span class="co-f2">数量:{{line['Quantity Requested']}}</span>

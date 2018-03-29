@@ -131,10 +131,10 @@ export default new Router({
       require(['../page/zsBatch'], resolve);
     }
   }, {
-    path: '/lock', // 锁芯页面
-    name: 'lock',
+    path: '/orderLine', // 锁体&面板
+    name: 'orderLine',
     component(resolve) {
-      require(['../page/lock'], resolve);
+      require(['../page/orderLine'], resolve);
     }
   }, { // 项目楼层信息采集
     path: '/buildingInfo',
