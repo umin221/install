@@ -2,10 +2,15 @@
   <div style="background-color: #ebebeb;">
     <div class="mint-content">
       <div class="myDevice">
-        <cus-cell class="myDeviceList" @click.native="toDetail" is-link>
-          <div class="mint-cell-sub-title" slot="title">产品序列号：WX201706010001001</div>
-          <div class="mint-cell-sub-title" slot="title">产品类型：智能锁</div>
-          <div class="mint-cell-sub-title" slot="title">产品型号：s1000</div>
+        <empty v-show="!ContactAsset.length"></empty>
+        <cus-cell class="myDeviceList"
+                  v-for="(item, index) in ContactAsset"
+                  @click.native="toDetail(item['KL Asset Id'])"
+                  :key="index"
+                  is-link>
+          <div class="mint-cell-sub-title" slot="title">产品序列号：{{item['KL Asset SN']}}</div>
+          <div class="mint-cell-sub-title" slot="title">产品名称：{{item['KL Asset Product Name']}}</div>
+          <div class="mint-cell-sub-title" slot="title">产品型号：{{item['KL Asset Product Model']}}</div>
         </cus-cell>
       </div>
       <button-group>
@@ -15,29 +20,44 @@
   </div>
 </template>
 <script>
-//  import {mapState, mapActions, mapMutations} from 'vuex';
+  import {mapState, mapActions} from 'vuex';
   import menuBox from '../../../public/components/cus-menu.vue';
   import cusCell from 'public/components/cus-cell';
   const NameSpace = 'myDevice';
   export default {
     name: NameSpace,
     created() {
+      let me = this;
+      me.getContact();
     },
     data: () => {
       return {
       };
     },
     computed: {
-//      ...mapState(NameSpace, [''])
+      ...mapState(NameSpace, ['ContactAsset', 'Contact'])
     },
     methods: {
-//      ...mapActions(NameSpace, ['']),
+      ...mapActions(NameSpace, ['getContact']),
 //      ...mapMutations(NameSpace, [''])
-      toDetail() {
-        this.$router.push('deviceDetail');
+      toDetail(Id) {
+        console.log(Id);
+        let me = this;
+        me.$router.push({
+          name: 'deviceDetail',
+          query: {
+            id: Id
+          }
+        });
       },
       addDevice() {
-        this.$router.push('addDevice');
+        let me = this;
+        me.$router.push({
+          name: 'addDevice',
+          query: {
+            id: me.Contact.Id
+          }
+        });
       }
     },
     components: {menuBox, cusCell}

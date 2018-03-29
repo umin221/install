@@ -2,9 +2,12 @@
   <div class="service-continer">
     <div class="mint-content service-detail">
       <div class="detail-title">
-        <div class="mt-Detail-title">服务单编号：ST201706060001<span class="user-state">已接单</span></div>
-        <div class="mt-Detail-title">维修工程师：刘伟江</div>
-        <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call">13999998888</a></div>
+        <div class="mt-Detail-title">服务单编号：{{serviceDetail['SR Number']}}
+          <span class="user-state" v-if="serviceDetail.Action">{{action.Status}}</span>
+          <span class="user-state" v-else>暂未派工</span>
+        </div>
+        <div class="mt-Detail-title">维修工程师：{{serviceDetail['KL Owner Full Name']}}</div>
+        <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call">{{serviceDetail['Owner Phone']}}</a></div>
       </div>
       <div class="detail-content">
         <mt-navbar v-model="active">
@@ -13,28 +16,32 @@
         <mt-tab-container v-model="active">
           <mt-tab-container-item id="tab-container1">
             <div class="mt-Detail-info">
-              <div>产品条形码：<a href="javascript:void(0);" class="detail-call"></a></div>
-              <div>产品型号：</div>
-              <div>申请时间：</div>
-              <div>客户预约时间：</div>
-              <div>实际预约时间：</div>
-              <div>地址：</div>
-              <div>用户故障说明：</div>
+              <div>产品条形码：{{serviceDetail['KL SN']}} <a href="javascript:void(0);" class="detail-call"></a></div>
+              <div>产品型号：{{serviceDetail['KL Product Model']}}</div>
+              <div>申请时间：{{serviceDetail['Created']}}</div>
+              <div>预约时间：{{serviceDetail['CEM Planned Start Date']}}</div>
+              <div>
+                <div>地址：</div>
+                <p style="color: #C9CDD2;font-size: 14px;line-height: 0">
+                  {{serviceDetail['KL Personal Province']}},{{serviceDetail['Personal City']}},
+                  {{serviceDetail['KL Personal Town']}},{{serviceDetail['Personal Street Address']}}
+                </p>
+              </div>
               <div>问题说明：
-                <div></div>
+                <p style="color: #C9CDD2;font-size: 14px;line-height: 0"></p>
               </div>
               <div>相关照片：</div>
             </div>
           </mt-tab-container-item>
           <mt-tab-container-item id="tab-container2">
-            <div class="crm-zyList" >
+            <div class="crm-zyList"  v-for="(item, index) in note" :key="index">
               <ul class="content">
                 <li class="bd-radius">
                   <span class="icon"></span>
                 </li>
-                <li style="margin-right: 8px"></li>
+                <li style="margin-right: 8px">{{item.Note}}</li>
                 <div class="content-div">
-                  <div>暂无数据</div>
+                  <div>{{item.Created}}</div>
                 </div>
               </ul>
             </div>
@@ -42,8 +49,10 @@
         </mt-tab-container>
       </div>
     </div>
-    <button-group>
-      <mt-button class="single" @click.native="toComment">点评</mt-button>
+    <button-group v-if="serviceDetail.Action">
+      <mt-button class="single"
+                 @click.native="toComment"
+                  v-if="action['Status'] === '已完成'">点评</mt-button>
     </button-group>
   </div>
 </template>
@@ -56,6 +65,9 @@
   export default {
     name: NameSpace,
     created() {
+      let me = this;
+      me.srNumber = me.$route.query.srNumber;
+      me.getServiceDetail({search: 'SR Number', value: me.srNumber});
     },
     data: () => {
       return {
@@ -63,10 +75,10 @@
       };
     },
     computed: {
-      ...mapState(NameSpace, ['tabList'])
+      ...mapState(NameSpace, ['tabList', 'serviceDetail', 'action', 'note'])
     },
     methods: {
-      ...mapActions(NameSpace, ['']),
+      ...mapActions(NameSpace, ['getServiceDetail']),
       toComment() {
         this.$router.push('commentOn');
       }

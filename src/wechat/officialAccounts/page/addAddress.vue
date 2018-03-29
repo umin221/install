@@ -7,9 +7,13 @@
                  placeholder="请选择"
                  is-link
                  v-model="provinces"></mt-cell>
-        <cus-field class="block" label="详细地址" type="textarea" placeholder="请输入详细地址"></cus-field>
-        <cus-field label="联系人" type="text" placeholder="请输入联系人姓名"></cus-field>
-        <cus-field label="联系电话" type="number" placeholder="请输入联系人电话"></cus-field>
+        <cus-field class="block"
+                   label="详细地址"
+                   v-model= 'street_Address'
+                   type="textarea"
+                   placeholder="请输入详细地址"></cus-field>
+        <!--<cus-field label="联系人" type="text" placeholder="请输入联系人姓名"></cus-field>-->
+        <!--<cus-field label="联系电话" type="number" placeholder="请输入联系人电话"></cus-field>-->
       </div>
     </div>
     <!--下拉菜单-->
@@ -24,7 +28,7 @@
     </mt-popup>
 
     <button-group>
-      <mt-button class="single">保存</mt-button>
+      <mt-button class="single" @click.native="saveAddress">保存</mt-button>
     </button-group>
   </div>
 </template>
@@ -50,6 +54,26 @@
   export default {
     name: NameSpace,
     created() {
+      let me = this;
+      me.type = me.$route.query.type;
+      if (me.type === 'edit') {
+        me.addrId = me.$route.query.Id;
+        me.ContactId = me.$route.query.ContactId;
+        me.searchAddrId({
+          addrId: me.addrId,
+          callback: function(data) {
+            if (data) {
+              me.KL_PROVINCE = data['Province'];
+              me.KL_CITY = data['City'];
+              me.KL_TOWN = data['County'];
+              me.street_Address = data['Street Address'];
+              me.provinces = data['Province'] + data['City'] + data['County'];
+            }
+          }
+        });
+      } else {
+        me.ContactId = me.$route.query.ContactId;
+      }
     },
     data: () => {
       return {
@@ -57,15 +81,22 @@
         slots1: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
         slots2: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
         showBox: false,
-        provinces: ''
+        provinces: '',
+        KL_PROVINCE: '',
+        KL_CITY: '',
+        KL_TOWN: '',
+        street_Address: '',
+        addrId: '',
+        ContactId: ''
       };
     },
     computed: {
-      ...mapState(NameSpace, ['addAddress', 'Municipality'])
+      ...mapState(NameSpace, ['Municipality'])
     },
     methods: {
+      ...mapActions(NameSpace, ['addressManage', 'searchAddrId', 'upDateAddress']),
       ...mapActions('index', ['getLov']),
-      ...mapMutations(NameSpace, []),
+      ...mapMutations('address', ['setaddAddress']),
 //      submit() {
 //        this.$router.push('myRepair');
 //      },
@@ -89,8 +120,9 @@
         let me = this;
         let isMun = isMunicipality.call(this, values['KL_PROVINCE']);
         me.showBox = false;
-        console.log(values['KL_PROVINCE']);
-        console.log(isMun);
+        me.KL_PROVINCE = values['KL_PROVINCE'];
+        me.KL_CITY = values['KL_CITY'];
+        me.KL_TOWN = values['KL_TOWN'];
         if (isMun) {
           me.provinces = values['KL_PROVINCE'] + values['KL_CITY'] + values['KL_TOWN'];
         } else {
@@ -127,6 +159,40 @@
               }
             }
           });
+        }
+      },
+      saveAddress() {
+        let me = this;
+        let form = {};
+        if (me.type === 'add') {
+          form = {
+            'Province': me.KL_PROVINCE,
+            'City': me.KL_CITY,
+            'County': me.KL_TOWN,
+            'Street Address': me.street_Address,
+            'contactId': me.ContactId,
+            success: function(data) {
+              if (data) {
+                me.$router.back();
+              }
+            }
+          };
+          me.addressManage(form);
+        } else {
+          form = {
+            'Province': me.KL_PROVINCE,
+            'City': me.KL_CITY,
+            'County': me.KL_TOWN,
+            'Street Address': me.street_Address,
+            'contactId': me.ContactId,
+            'addressId': me.addrId,
+            callback: function(data) {
+              if (data) {
+                me.$router.back();
+              }
+            }
+          };
+          me.upDateAddress(form);
         }
       }
     },

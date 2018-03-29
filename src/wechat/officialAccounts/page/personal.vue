@@ -5,17 +5,17 @@
           微信名称
       </div>
       <div class="my-personal">
-        <div class="personal" @click="toMyDevice">
-          <i class="xs-icon icon-device" style="font-size: 1.5rem"></i>
-          我的设备
+        <div class="co-flex co-ver co-jsa" @click="toMyDevice">
+          <span class="xs-icon icon-device" style="font-size: 1.5rem"></span>
+          <span>我的工单</span>
         </div>
-        <div class="personal">
-          <i class="xs-icon icon-addr" style="font-size: 1.5rem"></i>
-          我的地址
+        <div class="co-flex co-ver co-jsa" @click="toAddress">
+          <span class="xs-icon icon-addr" style="font-size: 1.5rem"></span>
+          <span>我的工单</span>
         </div>
-        <div class="personal">
-          <i class="xs-icon icon-call" style="font-size: 1.5rem"></i>
-          热线服务
+        <div class="co-flex co-ver co-jsa" @click="callService">
+          <span class="xs-icon icon-call" style="font-size: 1.5rem"></span>
+          <span>我的工单</span>
         </div>
       </div>
     </div>
@@ -44,6 +44,12 @@
       },
       toMyDevice() {
         this.$router.push('myDevice');
+      },
+      toAddress() {
+        this.$router.push('address');
+      },
+      callService() {
+        this.$router.push('hotTelephone');
       }
     },
     components: {menuBox}
@@ -53,15 +59,16 @@
   .my-personal{
     margin-top: 1.5rem;
     background-color: #ffffff;
-    .personal{
-      width: 50%;
-      float: left;
+    div{
+      display: inline-flex;
+      width: 49%;
+      height: 6rem;
+      font-size: $font-size-default;
       text-align: center;
-      line-height: 7.5rem;
-      border: 1px solid #000000;
+      padding: 10px 0;
+      border-bottom: 1px solid #eaeaea;
+      border-right: 1px solid #eaeaea;
       box-sizing: border-box;
-      font-size: 0.9rem;
-      background-color: #ffffff;
     }
   }
 </style>

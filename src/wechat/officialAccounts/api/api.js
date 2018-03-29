@@ -5,6 +5,209 @@ let ApiList = {
       method: 'get',
       url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type= "' + option.data.type + '" AND ' + option.data.parent + ' &PageSize=100&StartRowNum=0'
     };
+  },
+  submitService: option => {           // 公众号提交服务请求
+    return {
+      method: 'POST',
+      url: 'service/Workflow Process Manager/RunProcess',
+      data: {
+        'body': {
+          'Address Id': option.data.form['Address Id'], // 如果是用户自己新建了地址，传新建的地址Id,如果只是简单定位，不用传
+          'Appoint Time': option.data.form['Appoint Time'], // 用户的预约上门时间
+          'Asset Id': option.data.form['Asset Id'], // 如果是用户扫码了，并带出了资产，传资产Id，扫不出来，不用传
+          'Brand': '海贝斯', // 品牌
+          'Country': '中国', // 国家
+          'Province': option.data.form['Province'], // 省
+          'City': option.data.form['City'], // 城市
+          'Town': option.data.form['Town'], // 区
+          'Detail Address': option.data.form['Detail Address'], // 详细地址
+          'Contact Name': option.data.form['Contact Name'], // 名字
+          'Contact Phone': option.data.form['Contact Phone'], // 电话
+          'Area': option.data.form['Area'], // 故障分类
+          'Sub-Area': option.data.form['Sub-Area'], // 故障描述
+          'Complaint Description': option.data.form['Complaint Description'], // 故障详情描述
+          'Open Id': option.data.form['Open Id'], // 微信端的OpenId
+          'ProcessName': 'KL WeChat Public Account CreateSR Process'
+        }
+      }
+    };
+  },
+  addressManage: option => {           // 新增地址
+    return {
+      method: 'put',
+      url: 'data/CUT Address/CUT Address',
+      data: {
+        'Id': '1',
+        'Country': '中国',
+        'Province': option.data.form.Province,
+        'City': option.data.form.City,
+        'County': option.data.form.County,
+        'Street Address': option.data.form['Street Address']
+      }
+    };
+  },
+  deleteAddress: option => {           // 删除地址
+    return {
+      method: 'DELETE',
+      url: 'data/CUT Address/CUT Address/' + option.data.Id,
+      data: {
+        body: {}
+      }
+    };
+  },
+  setContactAddress: option => {           // 关联地址到联系人
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Upsert',
+      data: {
+        'body': {
+          'SiebelMessage': {
+            'MessageId': '',
+            'MessageType': 'Integration Object',
+            'IntObjectName': 'Base KL Contact Interface BO',
+            'IntObjectFormat': 'Siebel Hierarchical',
+            'ListOfBase KL Contact Interface BO': {
+              'Contact': {
+                'Id': option.data.contactId,
+                'ListOfCutAddress': {
+                  'CUT Address': [
+                    {
+                      'Id': option.data.addressId
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+  },
+  getContact: option => {           // 获取联系人信息
+    return {
+      method: 'POST',
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base KL Contact Interface BO',
+          'SearchSpec': '[Contact.Work Phone #]="134567876544"'
+        }
+      }
+    };
+  },
+  searchAddrId: option => {           // 获取地址信息
+    return {
+      method: 'get',
+      url: 'data/CUT Address/CUT Address/' + option.data.addrId
+    };
+  },
+  setDefaultAddress: option => {           // 设置默认地址
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Upsert',
+      data: {
+        'body': {
+          'SiebelMessage': {
+            'MessageId': '',
+            'MessageType': 'Integration Object',
+            'IntObjectName': 'Base KL Contact Interface BO',
+            'IntObjectFormat': 'Siebel Hierarchical',
+            'ListOfBase KL Contact Interface BO': {
+              'Contact': {
+                'Id': option.data.contactId,
+                'ListOfCutAddress': {
+                  'CUT Address': [
+                    {
+                      'Id': option.data.addressId,
+                      'SSA Primary Field': 'Y'
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+  },
+  upDateAddress: option => {           // 编辑更新地址
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Upsert',
+      data: {
+        'body': {
+          'SiebelMessage': {
+            'MessageId': '',
+            'MessageType': 'Integration Object',
+            'IntObjectName': 'Base KL Contact Interface BO',
+            'IntObjectFormat': 'Siebel Hierarchical',
+            'ListOfBase KL Contact Interface BO': {
+              'Contact': {
+                'Id': option.data.form.contactId,
+                'ListOfCutAddress': {
+                  'CUT Address': [
+                    {
+                      'Id': option.data.form.addressId,
+                      'Country': option.data.form.Country,
+                      'Province': option.data.form.Province,
+                      'City': option.data.form.City,
+                      'County': option.data.form.County,
+                      'Street Address': option.data.form['Street Address']
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+  },
+  getServiceList: option => {           // 服务工单列表请求
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base KL Service Request Interface BO',
+          'SearchSpec': '[Service Request.' + option.data.search + ']= ' + '"' + option.data.value + '"'
+        }
+      }
+    };
+  },
+  getAssetdetail: option => {           // 查询资产
+    return {
+      method: 'get',
+      url: 'data/KL Asset Interface BO/Asset Mgmt - Asset/?searchspec=[' + option.data.search + '] = "' + option.data.value + '"  &PageSize=100&StartRowNum=0'
+    };
+  },
+  setContactAsset: option => {           // 联系人关联资产
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Upsert',
+      data: {
+        'body': {
+          'SiebelMessage': {
+            'MessageId': '',
+            'MessageType': 'Integration Object',
+            'IntObjectName': 'Base KL Contact Interface BO',
+            'IntObjectFormat': 'Siebel Hierarchical',
+            'ListOfBase KL Contact Interface BO': {
+              'Contact': {
+                'Id': option.data.ContactId,
+                'ListOfContact_Asset': {
+                  'Contact_Asset': [
+                    {
+                      'KL Asset Id': option.data.AssetId
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    };
   }
 };
 // 16113009 袁静

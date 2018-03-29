@@ -70,5 +70,11 @@ export default new Router({
     component(resolve) {
       require(['../page/addDevice'], resolve);
     }
+  }, {
+    path: '/hotTelephone', // 热线电话
+    name: 'hotTelephone',
+    component(resolve) {
+      require(['../page/hotTelephone'], resolve);
+    }
   }]
 });

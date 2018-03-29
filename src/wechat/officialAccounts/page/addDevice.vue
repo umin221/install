@@ -2,11 +2,14 @@
   <div>
     <div class="mint-content">
       <div class="addDevice">
-        <mt-field label="产品条形码" placeholder="请输入条形码" >
+        <mt-field label="产品条形码"
+                  v-model="klsn"
+                  @change.native="search"
+                  placeholder="请输入条形码" >
             <i class="xs-icon icon-scan"></i>
         </mt-field>
-        <mt-cell title="产品品牌"></mt-cell>
-        <mt-cell title="产品型号"></mt-cell>
+        <mt-cell title="产品品牌" value="坚朗海贝斯"></mt-cell>
+        <mt-cell title="产品型号" :value="productModel"></mt-cell>
         <mt-cell title="保修开始时间"></mt-cell>
         <mt-cell title="保修结束时间"></mt-cell>
         <button-group>
@@ -17,26 +20,50 @@
   </div>
 </template>
 <script>
-//  import {mapState, mapActions, mapMutations} from 'vuex';
+  import {mapState, mapActions} from 'vuex';
   import menuBox from 'public/components/cus-menu';
 //  import { MessageBox } from 'mint-ui';
   const NameSpace = 'addDevice';
   export default {
     name: NameSpace,
     created() {
+      let me = this;
+      me.ContactId = me.$route.query.id;
+      console.log(me.ContactId);
     },
     data: () => {
       return {
+        ContactId: '',
+        klsn: '',
+        productModel: ''
       };
     },
     computed: {
-//      ...mapState(NameSpace, [''])
+      ...mapState(NameSpace, ['assetDetail'])
     },
     methods: {
-//      ...mapActions(NameSpace, ['']),
-//      ...mapMutations(NameSpace, []),
+      ...mapActions(NameSpace, ['getAssetSn', 'setContactAsset']),
       submit() {
-        this.$router.push('myRepair');
+        let me = this;
+//        console.log(me.assetDetail);
+        me.setContactAsset({
+          ContactId: me.ContactId,
+          AssetId: me.assetDetail.Id,
+          callback: function(data) {
+            if (data) {
+              me.$router.back();
+            }
+          }
+        });
+      },
+      search() {
+        let me = this;
+        me.getAssetSn({
+          klsn: me.klsn,
+          callback: function(data) {
+            me.productModel = data['KL Product Model'];
+          }
+        });
       }
     },
     components: {menuBox}
