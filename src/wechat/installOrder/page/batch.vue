@@ -22,11 +22,11 @@
                          is-link>
             <div class="co-flex co-jc" slot="title">
             <span class="co-f1">{{line.Description}}</span>
-            <span class="co-f1">{{line.TODO_TYPE}}</span>
+            <span class="co-f1">{{line['KL Detail Type']}}</span>
           </div>
             <div class="co-flex co-jc" slot="title">
-              <span class="co-f1">{{line.Planned}}</span>
-              <span class="co-f1">{{line['Planned Completion']}}</span>
+              <span class="co-f1" >{{new Date(line.Planned).format('yyyy-MM-dd hh:mm:ss')}}</span>
+              <span class="co-f1">{{new Date(line['Planned Completion']).format('yyyy-MM-dd hh:mm:ss')}}</span>
             </div>
           </mt-cell-swipe>
         </lock-line>
@@ -115,10 +115,21 @@
           self.getPlanList(self.batchCode);
         }
       } else if (self.type === 'edit') {
-        self.getBatch(self.item.Id);
-        self.id = self.item.Id;
-        self.batchCode = self.item.Id; // 详情的ID
-        self.getPlanList(self.item.Id);
+        if (self.pcObj.Id) { // 批次页面新增保存有数据
+          self.id = self.pcObj.Id;
+          self.batchCode = self.pcObj.Id; // 新增保存的ID
+          self.start_Date = new Date(self.pcObj.Planned).format('yyyy-MM-dd'); // 开始时间
+          self.end_Date = new Date(self.pcObj['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
+          self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
+          self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
+          self.batchNum = self.pcObj['KL Install Amount Requested'] || 0; // 数量
+          self.getPlanList(self.batchCode);
+        } else {
+          self.getBatch(self.item.Id);
+          self.id = self.item.Id;
+          self.batchCode = self.item.Id; // 详情的ID
+          self.getPlanList(self.item.Id);
+        }
       }
     },
     data: () => {
@@ -201,13 +212,16 @@
             id: id
           },
           success: data => {
-            console.dir(data);
-            self.batchCode = data.Id; // 批次
-            self.start_Date = new Date(data.Planned).format('yyyy-MM-dd'); // 开始时间
-            self.end_Date = new Date(data['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
-            self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
-            self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
-            self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
+            if (!data.ERROR) {
+              console.dir(data);
+              self.batchCode = data.Id; // 批次
+              self.start_Date = new Date(data.Planned).format('yyyy-MM-dd'); // 开始时间
+              self.end_Date = new Date(data['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
+              self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
+              self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
+              self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
+              self.getPcObj(data); // 保存store
+            }
           }
         });
       },
@@ -230,13 +244,19 @@
       },
       toSaveFn(num) { // num=1 保存并跳转详细计划  num = 2 只是保存 不跳转
         var self = this;
+        var aId = '';
+        if (self.type === 'add') {
+          aId = self.item.Id;
+        } else if (self.type === 'edit') {
+          aId = self.item['Parent Activity Id'];
+        }
         var parma = {
           'Planned': self.startDate,
           'Planned Completion': self.endDate,
           'KL Install Amount Requested': self.batchNum,
           'Id': self.batchCode,
           'KL Detail Type': self.item['KL Detail Type'],
-          'Parent Activity Id': self.item.Id
+          'Parent Activity Id': aId
         };
         var Status = '';
         self.getLov({ // 取类型值

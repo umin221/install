@@ -102,7 +102,7 @@
             taskData['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
             taskData['KL Detail Type LIC'] === 'Transfer Summary'" v-for="(itemTask, index) in upList(taskData['KL Installation Task'])" :key="index" @click.stop="updateDoor(itemTask,taskData)">
                 <div class="readonly">
-                  <mt-field label="批次" class="itemTaskId" :value="itemTask.Id"  @click.native.stop="taskClick(itemTask)"></mt-field>
+                  <mt-field label="批次" class="itemTaskId" :value="itemTask.Id"  @click.native.stop="taskClick(itemTask,taskData)"></mt-field>
                   <mt-field label="已完成/计划数量"  class="itemTask" v-if="taskData['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
           taskData['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
           taskData['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
@@ -183,13 +183,13 @@
       right: 0px;
       top: 0px;
       line-height: 27px;
-      width: 60px;
+      width: 100px;
       height: 27px;
     }
     .crm-zyList ul .butLi span {
       display: inline-block;
       text-align: center;
-      width: 25px;
+      width: 45px;
       font-size: 14px !important;
       color: #999 !important;
     }
@@ -201,9 +201,11 @@
       color: red;
     }
      .itemTask .batchClose {
-      position: relative;
-       width: 25px;
-      right: -9px;
+       position: absolute;
+       width: 45px;
+       right: -15px;
+       top: -22px;
+       text-align: center;
     }
     .butLi .batchAdd::before{
       font-family: "kinlong-icon" !important;
@@ -820,11 +822,13 @@
           });
         }
       },
-      taskClick(item) { // 子任务数据集事件
+      taskClick(item, fItem) { // 子任务数据集事件
         // 跳转批次详情、编辑
         //  && (item['Calculated Activity Status'] === 'Draft' || item['Calculated Activity Status'] === 'Rejected')
-        if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Draft' || item['Calculated Activity Status'] === 'Rejected')) { // 草稿、驳回状态 要编辑提交 并且有权限的人才可做此操作
+        if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'Rejected')) { // 草稿=Planning(设定计划)、驳回状态=Rejected 要编辑提交 并且有权限的人才可做此操作
           this.clear();
+          var itemTask = KND.Util.toArray(fItem['KL Installation Task'])[0];
+          this.getTaskType(itemTask);
           this.$router.push({ // 编辑
             name: 'batch',
             query: {

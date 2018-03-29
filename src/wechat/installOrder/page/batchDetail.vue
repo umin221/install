@@ -2,6 +2,7 @@
   <div>
     <mt-header fixed :title="titleVal">
       <fallback slot="left"></fallback>
+      <mt-button @click.native="approvalFn" slot="right" v-text="">审批记录</mt-button>
     </mt-header>
     <div class="mint-content batchDetail" :class="{'disable': !editable}">
       <div>
@@ -21,11 +22,11 @@
                          is-link>
             <div class="co-flex co-jc" slot="title">
             <span class="co-f1">{{line.Description}}</span>
-            <span class="co-f1">{{line.TODO_TYPE}}</span>
+            <span class="co-f1">{{line['KL Detail Type']}}</span>
           </div>
             <div class="co-flex co-jc" slot="title">
-              <span class="co-f1">{{line.Planned}}</span>
-              <span class="co-f1">{{line['Planned Completion']}}</span>
+              <span class="co-f1" >{{new Date(line.Planned).format('yyyy-MM-dd hh:mm:ss')}}</span>
+              <span class="co-f1">{{new Date(line['Planned Completion']).format('yyyy-MM-dd hh:mm:ss')}}</span>
             </div>
           </mt-cell-swipe>
         </lock-line>

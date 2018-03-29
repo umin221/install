@@ -9,10 +9,10 @@
                    @click.native="showLovFn('KL Detail Type')"
                    v-model="planObj['KL Detail Type']"
                    is-link></cus-field>
-        <mt-cell title="计划开始日期" @click.native="open('picker','Planned')" :value="planObj.Planned" is-link></mt-cell>
-        <mt-cell title="计划完成日期" @click.native="open('picker', 'Planned Completion')" :value="planObj['Planned Completion']" is-link></mt-cell>
-        <mt-cell v-show="type==='edit'" title="实际开始日期" @click.native="open('picker')" :value="planObj.Planned" is-link></mt-cell>
-        <mt-cell v-show="type==='edit'" title="实际结束日期" @click.native="open('pickerEnd')" :value="planObj['Planned Completion']" is-link></mt-cell>
+        <mt-cell title="计划开始日期" @click.native="open('picker','Planned')" :value="Planned" is-link></mt-cell>
+        <mt-cell title="计划完成日期" @click.native="open('picker', 'PlannedCompletion')" :value="PlannedCompletion" is-link></mt-cell>
+        <mt-cell v-show="type==='edit'" title="实际开始日期" @click.native="open('picker', 'Started')" :value="Started" is-link></mt-cell>
+        <mt-cell v-show="type==='edit'" title="实际结束日期" @click.native="open('pickerEnd', 'Done')" :value="Done" is-link></mt-cell>
         <cus-field label="备注"
                    type="textarea"
                    v-model="planObj['Description']"></cus-field>
@@ -111,7 +111,13 @@
         self.planObj['KL Detail Type'] = self.planItem['KL Detail Type'];
         self.planObj['Planned'] = self.planItem['Planned'];
         self.planObj['Planned Completion'] = self.planItem['Planned Completion'];
+        self.planObj['Started'] = self.planItem['Started'];
+        self.planObj['Done'] = self.planItem['Done'];
         self.planObj['Description'] = self.planItem['Description'];
+        self.Planned = new Date(self.planItem['Planned']).format('yyyy-MM-dd hh:mm:ss');
+        self.PlannedCompletion = new Date(self.planItem['Planned Completion']).format('yyyy-MM-dd hh:mm:ss');
+        self.Started = new Date(self.planItem['Started']).format('yyyy-MM-dd hh:mm:ss');
+        self.Done = new Date(self.planItem['Done']).format('yyyy-MM-dd hh:mm:ss');
       }
     },
     data: () => {
@@ -128,6 +134,10 @@
         titleVal: '新建详细计划',
         vk: 'Value',
         planObj: {},
+        Planned: '',
+        PlannedCompletion: '',
+        Started: '',
+        Done: '',
         slots: [
           {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
         ],
@@ -161,11 +171,21 @@
         this.$refs[picker].open();
       },
       handleChangePlan(value) {
-        let me = this;
-        var key = me.timeKey;
-        me.planObj[key] = value.format('MM/dd/yyyy hh:mm:ss');
-        console.dir(me.planObj);
-        // me.startDate = value.format('MM/dd/yyyy'); // 后台存值格式
+        let self = this;
+        var key = self.timeKey;
+        if (key === 'Planned') {
+          self.Planned = value.format('yyyy-MM-dd hh:mm:ss');
+          self.planObj['Planned'] = value.format('MM/dd/yyyy hh:mm:ss');
+        } else if (key === 'PlannedCompletion') {
+          self.PlannedCompletion = value.format('yyyy-MM-dd hh:mm:ss');
+          self.planObj['Planned Completion'] = value.format('MM/dd/yyyy hh:mm:ss');
+        } else if (key === 'Started') {
+          self.Started = value.format('yyyy-MM-dd hh:mm:ss');
+          self.planObj['Started'] = value.format('MM/dd/yyyy hh:mm:ss');
+        } else if (key === 'Done') {
+          self.Done = value.format('yyyy-MM-dd hh:mm:ss');
+          self.planObj['Done'] = value.format('MM/dd/yyyy hh:mm:ss');
+        }
       },
       // 选择对话框
       showLovFn(type) {
