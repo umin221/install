@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import { app } from 'public/store';
+import api from '../api/api';
 
 Vue.use(Vuex);
 
@@ -13,14 +14,26 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
-        value: ''
+        dataList: [] // 列表数据
       },
       actions: {
-        getMyProduct({state, commit, dispatch}, {data, callback}) {
-          callback && callback();
+        getData({state, commit, dispatch}, {data, callback}) {
+          api.get({
+            key: 'getList',
+            data: {
+              Id: data
+            },
+            success: data => {
+              commit('setData', data);
+              callback && callback(data);
+            }
+          });
         }
       },
       mutations: {
+        setData(state, data) {
+          state.dataList = data;
+        }
       }
     },
     detail: {
@@ -31,6 +44,19 @@ export default new Vuex.Store({
     searchTrans: {
       namespaced: true,
       state: {
+      },
+      actions: {
+        getData({state, commit, dispatch}, {data, callback}) {
+          api.get({
+            key: 'getList',
+            data: {
+              Id: data
+            },
+            success: data => {
+              callback && callback(data);
+            }
+          });
+        }
       }
     }
   }

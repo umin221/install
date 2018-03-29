@@ -14,6 +14,7 @@
             <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: </div>
             <div class="mint-cell-sub-title" slot="title">联系电话: </div>
           </cus-cell>
+          <empty v-show="!result"></empty>
         </cus-loadmore>
 
     </cus-search>
@@ -40,11 +41,11 @@
       ...mapState(NAMESPACE, ['result'])
     },
     methods: {
-      ...mapActions(NAMESPACE, ['getProduct']),
+      ...mapActions(NAMESPACE, ['getData']),
       // 点击搜索
       searchFn(val) {
         this.value = val;
-        this.getProduct(val);
+        this.getData(val);
       },
       loadBottomFn() {
       }

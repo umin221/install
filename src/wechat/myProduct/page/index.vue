@@ -1,6 +1,6 @@
 <template>
   <div style="background-color: #ebebeb;">
-    <cus-header fixed title="我的配件" :menu="[{title:'查看我的团队', key:'a'}]">
+    <cus-header fixed :title="dataType.title" :menu="[{title:'我的配件', key:'b'},{title:'查看我的团队', key:'a'}]">
       <fallback slot="left"></fallback>
       <router-link to="search" slot="right">
         <mt-button >
@@ -23,14 +23,14 @@
           :allLoaded="true">
             <!-- <cus-cell
               :title="'配件型号'+item.No"
-              v-for="(item,index) in isSelect"
+              v-for="(item,index) in dataList"
               :value="item.type"
               :key="index">
               <div class="productForm" slot="title">配件名称： {{item.name}}</div>
               <div class="productForm" slot="title">库存量： {{item.num}}</div>
             </cus-cell> -->
             <div class="item-list cus-cell" 
-              v-for="(item,index) in isSelect"
+              v-for="(item,index) in dataList"
               :key="index">
                <mt-cell class="border-bottom" :title="'配件型号：'+item.No"><span style="color:#00519B">{{item.type}}</span></mt-cell>
                <mt-cell class="gray" :title="'配件名称：'+item.name"></mt-cell>
@@ -38,12 +38,13 @@
             </div>
          <!-- <div class="productForm" slot="title">配件名称： {{item.name}}</div>
               <div class="productForm" slot="title">库存量： {{item.num}}</div> -->
+              <empty v-show="!dataList.length"></empty>
           </loadmore>
         </mt-tab-container-item>
         <mt-tab-container-item id="valid">
           <loadmore ref="valid" :loadTop="validLoadTop" :loadBottom="validLoadBottom" :topStatus="topStatus" :allLoaded="true">
             <div class="item-list cus-cell" 
-              v-for="(item,index) in isSelect"
+              v-for="(item,index) in dataList"
               :key="index">
                 <mt-cell class="border-bottom" :title="'配件型号：'+item.No"><span style="color:#00519B">{{item.type}}</span></mt-cell>
                <mt-cell class="gray" :title="'配件名称：'+item.name"></mt-cell>
@@ -73,7 +74,7 @@
       }
     }, args.pop() || {});
     // 数据列表
-    me.getMyProduct(param);
+    me.getData(param);
   };
 
   export default {
@@ -81,24 +82,24 @@
     created() {
       for (let i = 0; i < 3; i++) {
         let obj = {name: 'SRR0201712160002', num: '110', type: '维修配件', No: '1-SDSADAA2'};
-        this.isSelect.push(obj);
+        this.dataList.push(obj);
       }
     },
     data: () => {
       return {
         selected: 'pending',
         topStatus: '',
-        isSelect: []
+        dataType: {title: '我的配件', key: 'b'}
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['currentYear'])
+      ...mapState(NAMESPACE, ['dataList'])
     },
     methods: {
-      ...mapActions(NAMESPACE, ['getMyProduct']),
+      ...mapActions(NAMESPACE, ['getData']),
       // 切换头部菜单
       menuFn(item) {
-        console.log(item);
+        this.dataType = item;
       },
       // 顶部下拉加载
       pendingLoadTop(param) {
