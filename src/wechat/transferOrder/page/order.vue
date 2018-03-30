@@ -57,10 +57,10 @@
         </div>
 
         <!--buttons-->
-        <button-group v-show="isDraft">
-          <mt-button v-show="showTransfer" :class="{'disable': !lineComplete}"
+        <button-group v-show="editable">
+          <mt-button v-show="!showSubmit" :class="{'disable': !lineComplete}"
                      @click.native="transferFn">转门厂技术</mt-button>
-          <mt-button v-show="showSubmit" type="primary"
+          <mt-button v-show="showSubmit"
                      :class="{'disable': !lineComplete}"
                      @click.native="submitFn">发起安装</mt-button>
         </button-group>
@@ -124,23 +124,15 @@
     computed: {
       ...mapState('index', ['isTeam']),
       ...mapState(NAMESPACE, ['order', 'lines']),
-      // 是否草稿状态
-      isDraft() {
-        let status = this.order['Status'];
-        return !status || status === '草稿';
-      },
       // 是否可编辑
       editable() {
-        return this.isDraft && !this.isTeam;
+        let status = this.order['Status'];
+        return (!status || status === '草稿') && !this.isTeam;
       },
       // 是否显示 发起提交 按钮
       showSubmit() {
-        return this.isDraft && !this.showTransfer;
-      },
-      // 是否显示 转发门厂技术 按钮
-      showTransfer() {
         let me = this;
-        return (me.order['KL Hole Type'] === '门厂开孔') || (me.order['KL Delivery Setter Full Name'] !== me.$route.query.DFEngineer);
+        return (me.order['KL Hole Type'] !== '门厂开孔') || (me.order['KL Delivery Setter Full Name'] === me.$route.query.DFEngineer);
       },
       // 是否安装锁体 switch
       box1: {
@@ -250,35 +242,40 @@
       },
       // 转发门厂技术
       transferFn() {
-        this.runProcess({
-          data: {
-            body: {
-              'ProcessName': 'KL Install Order Transfer Process',
-              'Object Id': this.order.Id
+        MessageBox.confirm('是否转发门厂确认？', '请确认').then(action => {
+          this.runProcess({
+            data: {
+              body: {
+                'ProcessName': 'KL Install Order Transfer Process',
+                'Object Id': this.order.Id
+              }
+            },
+            success: data => {
+              tools.success(data, {
+                back: true,
+                successTips: '转发成功'
+              });
             }
-          },
-          success: data => {
-            if (!data.ERROR) {
-              Toast('转发成功');
-              this.order['Status'] = '门厂工程师确认中';
-            }
-          }
+          });
         });
       },
       // 提交安装订单
       submitFn() {
-        this.runProcess({
-          data: {
-            body: {
-              'ProcessName': 'KL Product Model No',
-              'Object Id': this.order.Id
+        MessageBox.confirm('是否确认提交审批？', '请确认').then(action => {
+          this.runProcess({
+            data: {
+              body: {
+                'ProcessName': 'KL Install Order Submit Process',
+                'Object Id': this.order.Id
+              }
+            },
+            success: data => {
+              tools.success(data, {
+                back: true,
+                successTips: '提交成功'
+              });
             }
-          },
-          success: data => {
-            if (!data.ERROR) {
-              Toast('提交成功');
-            }
-          }
+          });
         });
       },
       // Delete Install Order Line

@@ -13,8 +13,16 @@
     name: 'cus-toggle',
     data() {
       return {
-        visible: false
+        visible: this.show
       };
+    },
+    props: {
+      show: Boolean
+    },
+    watch: {
+      show(val) {
+        this.visible = val;
+      }
     },
     computed: {
       label() {

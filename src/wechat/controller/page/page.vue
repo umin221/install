@@ -20,7 +20,7 @@
         MessageBox('提示', '跳转模块为空');
         return;
       };
-      location.replace(location.href.replace('#/page', '#/' + page).replace('/controller/', '/' + module + '/'));
+      location.replace((location.href.replace('#/page', '#/' + page).replace('/controller/', '/' + module + '/') + '&option=approval'));
     }
   };
 </script>

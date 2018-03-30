@@ -11,13 +11,13 @@
           <mt-field label="安装数量" :value="detailData['KL Install Amount'] || 0"></mt-field>
           <div slot="title" class="mint-content-div"><div class="mint-content-xt" @click="butXttd">协同团队</div></div>
       </div>
-      <toggle>
+      <toggle :show="isConfirming">
         <div style="height: 0.5rem;background: #eaeaea;"></div>
         <div class="mint-content-info" style="padding-bottom: 50px;">
 
           <div class="lock-line">
             <lock-line title="锁体" @click="toLineFn(undefined, 'Lock Body')">
-              <mt-cell-swipe v-for="(line, index) in taskDataST" class="lock-line-cell enable" ref="body"
+              <mt-cell-swipe v-for="(line, index) in taskDataST" class="lock-line-cell enable"
                              v-if="line['KL Product Type LIC']==='Lock Body'"
                              @click.native="toLineFn(line)"
                              :key="line['Id']"
@@ -32,8 +32,8 @@
               </mt-cell-swipe>
             </lock-line>
             <lock-line title="面板" @click="toLineFn(undefined, 'Panel')">
-              <mt-cell-swipe v-for="(line, index) in taskDataST" class="lock-line-cell enable" ref="panel"
                              v-if="line['KL Product Type LIC'] === 'Panel'"
+              <mt-cell-swipe v-for="(line, index) in taskDataST" class="lock-line-cell enable"
                              @click.native="toLineFn(line)"
                              :key="line['Id']"
                              :right="getSwipeBtn(line, index)"
@@ -954,7 +954,7 @@
 
       // 右滑删除
       getSwipeBtn(line, index) {
-        return true ? [{
+        return this.isConfirming ? [{
           content: '删除',
           style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
           handler: () => this.deleteFn(line, index)
