@@ -6,10 +6,10 @@
     </mt-header>
     <div class="mint-content batchDetail">
       <div v-show="is_option" class="readonly">
-        <mt-field label="申请人" :value="appData['Order Number']"></mt-field>
-        <mt-field label="类型" :value="appData['KL Agreement Opportunity Name']"></mt-field>
-        <mt-field label="提交日期" :value="appData['KL Delivery Sales Type']"></mt-field>
-        <mt-field label="项目详情" :value="appData['KL Delivery Sales Type']" @click.native="toDetailFn">XXXXX</mt-field>
+        <mt-field label="申请人" :value="appData['Party Name']"></mt-field>
+        <mt-field label="类型" :value="appData['Item Type Display Name']"></mt-field>
+        <mt-field label="提交日期" :value="appData['UInbox Item Task']['Start Time']"></mt-field>
+        <mt-field label="订单详情" @click.native="toDetailFn" :value="orderId"></mt-field>
       </div>
       <div class="readonly" style="margin-top: 10px">
         <mt-field label="批次">
@@ -39,9 +39,9 @@
       </div>
       <button-group v-show="is_option">
         <mt-button class="single"
-                   @click.native="submitFn">驳回</mt-button>
+                   @click.native="submitFn('Rejected')">驳回</mt-button>
         <mt-button class="single"
-                   @click.native="submitFn">确认</mt-button>
+                   @click.native="submitFn('Approved')">确认</mt-button>
       </button-group>
     </div>
   </div>
@@ -91,6 +91,9 @@
       this.option = param.option; // 区分从哪跳转到详情页
       if (this.option === 'approval') {
         this.is_option = true; // 是否审批
+        this.orderId = param.OrderId;
+        this.InboxItemId = param.InboxItemId;
+        this.InboxTaskId = param.InboxTaskId;
         this.getAppData(this.id);
       }
       self.titleVal = '批次详情';
@@ -103,6 +106,9 @@
       return {
         value: '',
         batchCode: '', // 批次
+        orderId: '', // 订单详情ID
+        InboxItemId: '', // 审批id
+        InboxTaskId: '', // 审批id
         option: '', // 区分从哪跳转到详情页
         is_plan: true, // 是否显示详细计划
         is_option: false, // 是否审批
@@ -194,41 +200,54 @@
         });
       },
       toDetailFn() {
-        // var self =this;
+        var self = this;
         this.$router.push({
           name: 'detail',
           query: {
-            id: '1-2BSEB2W4'
+            id: self.orderId
           }
         });
       },
       getAppData(id) {
-        var me = this;
+        var self = this;
         api.get({
-          key: 'getDetail',
+          key: 'getAppData',
           method: 'POST',
           data: {
             'body': {
               'OutputIntObjectName': 'Base UInbox Item History',
-              // 'OutputIntObjectName': 'KL Order Sales',
-              'SearchSpec': '[Order Entry - Orders.Id]=' + '\'' + id + '\''
-              // 'SearchSpec': '[Order Entry - Orders.Id]="1-2BSATYIN"'
+              'SearchSpec': '[UInbox Item.Id]=' + "'" + self.InboxItemId + "'" + ' AND [UInbox Item Task.Id]=' + "'" + self.InboxTaskId + "'"
             }
           },
           success: function(data) {
             console.dir(data.SiebelMessage);
-            me.detailData = data.SiebelMessage['Order Entry - Orders'];
-            var taskData = me.detailData['KL Installation Task'];
-            if (taskData) {
-              me.taskData = KND.Util.toArray(taskData);
-              console.dir(me.taskData);
-              me.pStatus = me.taskData[0]['Calculated Activity Status'];
-              if (me.pStatus !== 'Not Started') { // 未开始时不获取子任务数据
-                me.taskDataList = KND.Util.toArray(me.taskData[0]['KL Installation Task']);
-              }
+            self.appData = data.SiebelMessage['UInbox Item'];
+            console.dir(self.appData);
+          }
+        });
+      },
+      submitFn(type) {
+        var self = this;
+        if (type === 'Approved') {
+        } else {
+        }
+        api.get({
+          key: 'setApproval',
+          method: 'POST',
+          data: {
+            'body': {
+              'Object Id': self.id,
+              'InboxItemId': self.InboxItemId,
+              'InboxTaskId': self.InboxTaskId,
+              'ActionLIC': type,
+              'KL Request Description': '测试',
+              'ProcessName': 'KL Install Task Approval Action Main Workflow'
             }
-            me.taskDataST = KND.Util.toArray(me.detailData['Order Entry - Line Items']);
-            console.dir(me.taskDataST);
+          },
+          success: function(data) {
+            console.dir(data.SiebelMessage);
+            self.appData = data.SiebelMessage['UInbox Item'];
+            console.dir(self.appData);
           }
         });
       }

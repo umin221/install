@@ -139,6 +139,11 @@ let apiList = {
       // url: 'data/KL Installation Task Detail Plan/KL Installation Task Detail Plan/'
     };
   },
+  getAppData: option => { // 审批详情头
+    return {
+      url: 'service/EAI Siebel Adapter/Query'
+    };
+  },
   getJournalData: option => {
     return {
       method: 'get',
