@@ -32,8 +32,8 @@
               </mt-cell-swipe>
             </lock-line>
             <lock-line title="面板" @click="toLineFn(undefined, 'Panel')">
-                             v-if="line['KL Product Type LIC'] === 'Panel'"
               <mt-cell-swipe v-for="(line, index) in taskDataST" class="lock-line-cell enable"
+                             v-if="line['KL Product Type LIC'] === 'Panel'"
                              @click.native="toLineFn(line)"
                              :key="line['Id']"
                              :right="getSwipeBtn(line, index)"
