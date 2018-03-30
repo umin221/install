@@ -107,7 +107,7 @@
       },
       // Confirm allocation assign order
       assignFn() {
-        let positionId = this.select.Id;
+        let positionId = this.select['Primary Position Id'];
         if (positionId) {
           this.assign(positionId);
         } else {
