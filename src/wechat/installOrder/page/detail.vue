@@ -13,7 +13,7 @@
       </div>
       <toggle :show="isConfirming">
         <div style="height: 0.5rem;background: #eaeaea;"></div>
-        <div class="mint-content-info" style="padding-bottom: 50px;">
+        <div class="mint-content-info" style="padding-bottom: 50px;background-color: #eaeaea;">
 
           <div class="lock-line">
             <lock-line title="锁体" @click="toLineFn(undefined, 'Lock Body')">
@@ -522,7 +522,8 @@
     computed: {
       ...mapState(NameSpace, ['taskDataST']),
       isConfirming() {
-        return this.detailData.Status === '门厂工程师确认中';
+        let status = this.detailData.Status;
+        return !status || status === '门厂工程师确认中';
       }
     },
     beforeRouteEnter(to, from, next) {

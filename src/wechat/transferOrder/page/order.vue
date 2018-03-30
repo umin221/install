@@ -132,7 +132,8 @@
       // 是否显示 发起提交 按钮
       showSubmit() {
         let me = this;
-        return (me.order['KL Hole Type'] !== '门厂开孔') || (me.order['KL Delivery Setter Full Name'] === me.$route.query.DFEngineer);
+        let info = config.userInfo || {};
+        return (me.order['KL Hole Type'] !== '门厂开孔') || (me.order['KL Delivery Partner Owner Id'] === info.Id);
       },
       // 是否安装锁体 switch
       box1: {

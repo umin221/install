@@ -21,12 +21,14 @@ button {
   }
 
   &.disable {
+    display: none;
     @include disable;
   }
 }
 
 .disable {
   button {
+    display: none;
     @include disable;
   }
 }

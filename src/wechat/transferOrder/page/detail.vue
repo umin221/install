@@ -135,8 +135,7 @@
           me.$router.push({
             path: 'order',
             query: {
-              order: JSON.stringify(item),
-              DFEngineer: me.form['Door Factory Engineer']
+              order: JSON.stringify(item)
             }
           });
         } else {
