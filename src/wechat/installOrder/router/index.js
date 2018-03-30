@@ -77,6 +77,12 @@ export default new Router({
       require(['../page/detailPlan'], resolve);
     }
   }, {
+    path: '/installer', // 委外安装员
+    name: 'installer',
+    component(resolve) {
+      require(['../page/installer'], resolve);
+    }
+  }, {
     path: '/updateDoor', // 验收更新1
     name: 'updateDoor',
     component(resolve) {

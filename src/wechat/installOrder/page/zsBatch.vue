@@ -17,17 +17,21 @@
           <mt-switch v-model="box1"></mt-switch>
         </mt-cell>
         <div v-show="box1">
-          <mt-field is-link label="委外安装员"
-                    :class="heartVisible" :value="isPrimaryMVGPosition"></mt-field>
-          <mt-field is-link label="合作伙伴名称"></mt-field>
-          <mt-cell title="真锁交接日期" @click.native="open('picker', 'Planned Completion')" is-link></mt-cell>
+          <mt-cell v-show="show_zs" title="真锁交接日期" @click.native="open('picker', 'Planned Completion')" is-link></mt-cell>
         </div>
       </div>
-      <div v-show="box1">
-        <attach :attach="attach.list"
-                :edit="!read"
-                :title="title">
-        </attach>
+      <div class="lock-line" v-show="box1">
+        <lock-line title="委外安装员" @click="addInstaller('')">
+          <mt-cell-swipe v-for="(installer, index) in installerList" class="lock-line-cell enable" ref="body" :key=index>
+            <div class="co-flex co-jc" slot="title">
+              <span class="co-f1">{{installer.Description}}</span>
+              <span class="co-f1">{{installer['KL Detail Type']}}</span>
+            </div>
+            <div class="co-flex co-jc" slot="title">
+              <span class="co-f1" >{{installer['KL Detail Type']}}</span>
+            </div>
+          </mt-cell-swipe>
+        </lock-line>
       </div>
       <div class="lock-line">
         <lock-line title="详细计划" @click="addPlanFn('')">
@@ -46,10 +50,18 @@
           </mt-cell-swipe>
         </lock-line>
       </div>
+      <div v-show="box1">
+        <attach :attach="attach.list"
+                :edit="!read"
+                :title="title">
+        </attach>
+      </div>
       <button-group>
         <mt-button class="single"
+                   v-show="show_zs"
                    @click.native="nextPageFn">下一步</mt-button>
         <mt-button class="single"
+                   v-show="!show_zs"
                    @click.native="submitFn">提交</mt-button>
       </button-group>
       <mt-datetime-picker
@@ -120,6 +132,11 @@
       self.state = param.state;
       self.type = param.type;
       self.item = param.item;
+      if (self.item['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次
+        self.show_zs = true;
+      } else { // 替代锁
+        self.show_zs = false;
+      }
       if (self.type === 'add') {
         self.batchCode = '10001'; // 随机默认
         if (self.pcObj.Id) { // 批次页面新增保存有数据
@@ -153,6 +170,7 @@
     data: () => {
       return {
         value: '',
+        show_zs: true, // 真锁显示
         batchCode: '', // 批次
         start_Date: '',        // 开始时间
         startDate: '',
@@ -163,6 +181,7 @@
         pickerVisible: true,
         box1: true,
         planList: [],
+        installerList: [],
         item: '',
         id: '', // 记录新增后的批次ID
         type: 'edit', // add 新增 / edit 编辑 / read 只读
@@ -256,6 +275,21 @@
           }
         });
       },
+      addInstaller() { // 选择委外安装员
+        var self = this;
+        if (self.id) { // 有批次直接跳转
+          this.$router.push({
+            name: 'installer',
+            query: {
+              type: 'add',
+              id: self.id,
+              item: ''
+            }
+          });
+        } else {
+          this.toSaveFn('3');
+        }
+      },
       addPlanFn(obj) {
         var self = this;
         if (self.id) { // 有批次直接跳转
@@ -273,7 +307,7 @@
           this.toSaveFn('1');
         }
       },
-      toSaveFn(num) { // num=1 保存并跳转详细计划  num = 2 只是保存 不跳转
+      toSaveFn(num) { // num=1 保存并跳转详细计划  num = 2 只是保存 不跳转 num=3 保存跳转选择委外安装员
         var self = this;
         var aId = '';
         if (self.type === 'add') {
@@ -318,6 +352,15 @@
                         type: 'add',
                         planType: planType,
                         id: self.batchCode,
+                        item: ''
+                      }
+                    });
+                  } else if (num === '3') {
+                    this.$router.push({
+                      name: 'installer',
+                      query: {
+                        type: 'add',
+                        id: self.id,
                         item: ''
                       }
                     });

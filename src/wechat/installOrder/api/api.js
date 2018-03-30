@@ -77,11 +77,41 @@ let apiList = {
     };
     // 名字过滤
     if (name) {
-      specName += '[Last Name] ~LIKE "' + name + '*" AND ';
+      specName += '[Last Name] ~LIKE "' + name + '*" OR ([KL Parent Service Region Name] ~LIKE "' + name + '*" OR [Service Region] ~LIKE "' + name + '*") AND';
     };
     return {
+      method: 'get',
       url: 'data/KL Employee Interface BO/Employee/?searchspec=' + specName + '(' + specPosi.join(' OR ') + ')&' + KND.Util.param(option.paging)
     };
+  },
+  /**
+   * 查找所有产品安装工程师&主管 搜索&获取列表
+   * @param {String} option.data.position 必填 职位
+   * @param {String} option.data['Last Name'] 选填 用户名字 模糊查询
+   * @param {Object} option.paging 必填 翻页参数
+   * @returns {{url: string}}
+   */
+  findInstaller: option => {
+    let position = option.data.position.split('||');
+    let name = option.data['Last Name'];
+    let specPosi = [];
+    let specName = '';
+    // 职位过滤
+    for (let i in position) {
+      specPosi.push('[KL Primary Position Type]="' + position[i] + '"');
+    };
+    // 名字过滤
+    if (name) {
+      specName += '[Last Name] ~LIKE "' + name + '*" OR ([KL Parent Service Region Name] ~LIKE "' + name + '*" OR [Service Region] ~LIKE "' + name + '*") AND';
+    };
+    return {
+      method: 'get',
+      url: 'data/KL Employee Interface BO/Employee/?searchspec=' + specName + '(' + specPosi.join(' OR ') + ')&' + KND.Util.param(option.paging)
+    };
+    /* return {
+      method: 'PUT',
+      url: 'data/KL User/User/?searchspec=' + specName + '(' + specPosi.join(' OR ') + ')&' + KND.Util.param(option.paging)
+    };*/
   },
   /*
   * 协同团队修改负责人
@@ -142,6 +172,11 @@ let apiList = {
   getAppData: option => { // 审批详情头
     return {
       url: 'service/EAI Siebel Adapter/Query'
+    };
+  },
+  setApproval: option => { // 审批操作
+    return {
+      url: 'service/Workflow Process Manager/RunProcess'
     };
   },
   getJournalData: option => {

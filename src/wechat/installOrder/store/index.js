@@ -191,6 +191,73 @@ export default new Vuex.Store({
         }
       }
     },
+    /**
+     * 委外安装员
+     * */
+    installer: {
+      namespaced: true,
+      state: {
+        result: [],
+        select: {
+          'Last Name': '请选择'
+        }
+      },
+      mutations: {
+        setEngineer(state, engineer) {
+          state.result = engineer;
+        },
+        addEngineer(state, engineer) {
+          state.result.push(...engineer);
+        },
+        selEngineer(state, engineer) {
+          state.select = engineer;
+        }
+      },
+      actions: {
+        // 修改是否选中
+        setResult({state}, index) {
+          if (state.result[index].isBut) {
+            state.result[index].isBut = false;
+          } else {
+            state.result[index].isBut = true;
+          }
+        },
+        /**
+         * 查找安装工程师
+         * @param {Object} data 必填 查询条件 键值对
+         */
+        findInstaller({state, commit}, {data, more, callback}) {
+          api.get({
+            key: 'findInstaller',
+            data: data,
+            paging: {
+              StartRowNum: more ? state.result.length : 0,
+              PageSize: PAGESIZE
+            },
+            success: data => {
+              let engineer = KND.Util.toArray(data.items);
+              if (engineer.length > 0) {
+                for (var i = 0; i < engineer.length; i++) {
+                  engineer[i].isBut = false;
+                }
+                commit(more ? 'addEngineer' : 'setEngineer', engineer);
+                if (callback) {
+                  console.dir('=============');
+                  console.dir(engineer);
+                  callback(engineer);
+                }
+              }
+            },
+            error: error => {
+              if (callback) {
+                callback();
+              };
+              console.log(error);
+            }
+          });
+        }
+      }
+    },
     sign: {
       namespaced: true,
       state: {

@@ -15,7 +15,7 @@
       </mt-cell>
     </div>
     <button-group v-show="isUpPrimary">
-      <mt-button type="primary" class="single"
+      <mt-button class="single"
                  @click.native="submitFn">确认分配</mt-button>
     </button-group>
   </div>
@@ -27,35 +27,36 @@
   import {mapState} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
   const NAMESPACE = 'engineer';
+  let userInfo = {};
   export default {
     name: NAMESPACE,
     created() {
       let me = this;
       me.userInfo = me.$route.query.userInfo;
-      if (me.userInfo['KL Primary Position Type LIC'] === 'Field Service Manager') {
+      KND.Native.getUserInfo((info) => {
+        userInfo = info;
+        console.log(userInfo);
+      });
+      if (userInfo['KL Primary Position Type LIC'] === 'Field Service Manager') {
         me.isUpPrimary = true;
       }
-      if (this.select.Id) { // 选择团队选回来的负责人
-        this.isPrimaryMVGName = this.select['Last Name']; // 主要负责人名字
-        this.isPrimaryMVGPosition = this.select['KL Primary Position Type'];  // 主要负责人职位
-      } else {  // 接口数据回来的负责人
-        me.id = me.$route.query.id;
-        api.get({
-          key: 'getXttd',
-          method: 'POST',
-          data: {
-            'body': {
-              'OutputIntObjectName': 'KL Install Order Sales Team',
-              'SearchSpec': '[Order Entry - Orders.Id]=' + '\'' + me.id + '\''
-            }
-          },
-          success: function(data) {
-            console.dir(data);
-            console.dir(data.SiebelMessage);
-            me.xttdDetail = data.SiebelMessage['Order Entry - Orders'];
-            me.xttdDetailData = KND.Util.toArray(me.xttdDetail['Position']);
-            console.dir('=====');
-            console.dir(me.taskData);
+      me.id = me.$route.query.id;
+      api.get({
+        key: 'getXttd',
+        method: 'POST',
+        data: {
+          'body': {
+            'OutputIntObjectName': 'KL Install Order Sales Team',
+            'SearchSpec': '[Order Entry - Orders.Id]=' + '\'' + me.id + '\''
+          }
+        },
+        success: function(data) {
+          me.xttdDetail = data.SiebelMessage['Order Entry - Orders'];
+          me.xttdDetailData = KND.Util.toArray(me.xttdDetail['Position']);
+          if (me.select.Id) { // 选择团队选回来的负责人
+            me.isPrimaryMVGName = me.select['Last Name']; // 主要负责人名字
+            me.isPrimaryMVGPosition = me.select['KL Primary Position Type'];  // 主要负责人职位
+          } else {  // 接口数据回来的负责人
             if (me.xttdDetailData.length > 0) {
               for (var i = 0; i < me.xttdDetailData.length; i++) {
                 if (me.xttdDetailData[i]['SSA Primary Field'] === 'Y') { // ['SSA Primary Field']==Y 表示责任人
@@ -65,8 +66,8 @@
               }
             }
           }
-        });
-      }
+        }
+      });
     },
     data: () => {
       return {
@@ -74,7 +75,7 @@
         value: '',
         userInfo: '',
         isUpPrimary: false, // 是否有权限修改安装工程师 false==没有
-        isPrimaryMVGName: 'XXX', // 主要负责人名字
+        isPrimaryMVGName: '', // 主要负责人名字
         isPrimaryMVGPosition: '安装工程师',  // 主要负责人职位
         xttdDetail: '',
         xttdDetailData: '',
@@ -119,6 +120,10 @@
               'personList': list
             },
             success: function(data) {
+              if (!data.ERROR) {
+                Toast('分配成功！');
+                KND.Util.back();
+              }
             }
           });
         }

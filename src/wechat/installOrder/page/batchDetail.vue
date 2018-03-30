@@ -8,7 +8,7 @@
       <div v-show="is_option" class="readonly">
         <mt-field label="申请人" :value="appData['Party Name']"></mt-field>
         <mt-field label="类型" :value="appData['Item Type Display Name']"></mt-field>
-        <mt-field label="提交日期" :value="appDataTask['Start Time']"></mt-field>
+        <mt-field label="提交日期" :value="new Date(appDataTask['Start Time']).format('yyyy-MM-dd')"></mt-field>
         <mt-field label="订单详情" @click.native="toDetailFn" :value="orderId"></mt-field>
       </div>
       <div class="readonly" style="margin-top: 10px">

@@ -62,7 +62,8 @@
                     <span class="point mui-icon" :class="colorClass(item['Calculated Activity Status'])"><span></span></span>
                     <span  class="right line" :class="colorClass(item['Calculated Activity Status'])"></span>
                   </div>
-                  <div class="name" :class="colorClass(item['Calculated Activity Status'])" @click="updateTask(index)">{{item['KL Detail Type']}}</div>
+                  <div class="name" :class="colorClass(item['Calculated Activity Status'])" @click="updateTask(index, item['KL Detail Type'])">{{item['KL Detail Type']}}</div>
+                  <div v-show="showSelect(item)" style="height: 1px;background: #0772c1;margin-top: 10px;"></div>
                 </a>
                 <!--<a>
                   <div class="icon" @click="getClose()">
@@ -172,7 +173,7 @@
     }
     .mint-content-xt {
       border: 1px solid #cccccc;
-      padding: 0.45rem 0.5rem;
+      padding: 0.35rem 0.5rem;
       width: 3rem;
       display: initial;
       text-align: center;
@@ -490,6 +491,7 @@
           me.detailData = data.SiebelMessage['Order Entry - Orders'];
           var taskData = me.detailData['KL Installation Task'];
           if (taskData) {
+            me.selectName = taskData[0]['KL Detail Type'];
             me.taskData = KND.Util.toArray(taskData);
             console.dir(me.taskData);
             me.pStatus = me.taskData[0]['Calculated Activity Status'];
@@ -512,6 +514,7 @@
         id: '',
         detailData: {}, // 详情整体数据
         taskData: '', // 任务集
+        selectName: '',
         taskDataList: '', // 任务集子任务
         pStatus: '', // 父状态
         // is_show_sx: false, // 是否显示面板锁体
@@ -537,6 +540,14 @@
       ...mapMutations('batch', ['clear']),
       ...mapMutations(NameSpace, ['setTaskDataST']),
       ...mapActions(NameSpace, ['getTaskType', 'deleteOrderLine']),
+      showSelect(item) {
+        var self = this;
+        if (item['KL Detail Type'] === self.selectName) {
+          return true;
+        } else {
+          return false;
+        }
+      },
       colorClass(cla) {
         var colorCla = '';
         if (cla === 'Not Started') { // 未开始
@@ -553,8 +564,9 @@
       upList(obj) {
         return KND.Util.toArray(obj);
       },
-      updateTask(index) { // 点击任务切换子任务
+      updateTask(index, selName) { // 点击任务切换子任务
         let me = this;
+        me.selectName = selName;
         me.taskDataList = [];
         me.pStatus = me.taskData[index]['Calculated Activity Status'];
         if (me.pStatus !== 'Not Started') { // 未开始时不获取子任务数据
@@ -679,6 +691,7 @@
         if (item['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次新增
           if (self.detailData['KL Delivery Sales Type'] === '工程') { // 真锁---工程
             // 跳转真锁安装批次新增页面
+            self.clear();
             this.$router.push({
               name: 'zsBatch',
               query: {
@@ -698,6 +711,7 @@
           }
         } else if (item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary') { // 替代锁批次
           // 跳转真锁安装批次新增页面
+          self.clear();
           this.$router.push({
             name: 'zsBatch',
             query: {
