@@ -8,7 +8,7 @@
       <div v-show="is_option" class="readonly">
         <mt-field label="申请人" :value="appData['Party Name']"></mt-field>
         <mt-field label="类型" :value="appData['Item Type Display Name']"></mt-field>
-        <mt-field label="提交日期" :value="appData['UInbox Item Task']['Start Time']"></mt-field>
+        <mt-field label="提交日期" :value="appDataTask['Start Time']"></mt-field>
         <mt-field label="订单详情" @click.native="toDetailFn" :value="orderId"></mt-field>
       </div>
       <div class="readonly" style="margin-top: 10px">
@@ -37,7 +37,7 @@
           </mt-cell-swipe>
         </lock-line>
       </div>
-      <button-group v-show="is_option">
+      <button-group v-show="is_option && is_but">
         <mt-button class="single"
                    @click.native="submitFn('Rejected')">驳回</mt-button>
         <mt-button class="single"
@@ -94,7 +94,7 @@
         this.orderId = param.OrderId;
         this.InboxItemId = param.InboxItemId;
         this.InboxTaskId = param.InboxTaskId;
-        this.getAppData(this.id);
+        this.getAppData();
       }
       self.titleVal = '批次详情';
       this.getBatch(this.id);
@@ -112,12 +112,14 @@
         option: '', // 区分从哪跳转到详情页
         is_plan: true, // 是否显示详细计划
         is_option: false, // 是否审批
+        is_but: true, // 判断是否显示按钮   1.审批时 2.没有审批过
         is_show: false, // 是否显示委外、附件    只有替代锁 真锁 才会显示
         start_Date: '',        // 开始时间
         end_Date: '',        // 结束时间
         batchNum: 0, // 数量
         planList: [],
         appData: {}, // 审批信息头
+        appDataTask: {}, // 审批信息子任务信息
         id: '',
         item: '',
         editable: false,
@@ -208,7 +210,7 @@
           }
         });
       },
-      getAppData(id) {
+      getAppData() {
         var self = this;
         api.get({
           key: 'getAppData',
@@ -222,6 +224,30 @@
           success: function(data) {
             console.dir(data.SiebelMessage);
             self.appData = data.SiebelMessage['UInbox Item'];
+            self.appDataTask = self.appData['UInbox Item Task'];
+            var lov = [];
+            self.getLov({ // 取类型值
+              data: {
+                'Type': 'UINBOX_ITEM_STATUS_TYPE'
+              },
+              success: data => {
+                lov = KND.Util.toArray(data.items);
+                var lov_date = [];
+                for (var i = 0; i < lov.length; i++) {
+                  if (lov[i].Value !== 'Approving') {
+                    lov_date.push(lov[i]);
+                  }
+                }
+                if (lov_date) {
+                  var Status = self.appData.Action; // 取状态判断是否已审批
+                  for (var j = 0; j < lov_date.length; j++) {
+                    if (lov_date[j].Value === Status) {
+                      self.is_but = false;
+                    }
+                  }
+                }
+              }
+            });
             console.dir(self.appData);
           }
         });
@@ -245,9 +271,10 @@
             }
           },
           success: function(data) {
-            console.dir(data.SiebelMessage);
-            self.appData = data.SiebelMessage['UInbox Item'];
-            console.dir(self.appData);
+            if (!data.ERROR) {
+              Toast('提交成功');
+              KND.Util.back();
+            }
           }
         });
       }
