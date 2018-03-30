@@ -98,7 +98,7 @@
         });
       },
       convertImgSrc(item) {
-        item.src = encodeURI(item.localId ? item.localId : downloadUrl + '&IOName=' + this.ioName + '&Object Id=' + item.Id + '&ProcessName=KL Attachment Query Process');
+        item.src = item.localId ? item.localId : encodeURI(downloadUrl + '&IOName=' + this.ioName + '&Object Id=' + item.Id + '&ProcessName=KL Attachment Query Process');
         return item.src;
       },
       /**

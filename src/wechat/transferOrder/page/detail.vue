@@ -116,9 +116,9 @@
       },
       // Add Install Order
       toOrderFn(item) {
-        let status = item.Status;
+        let status = item['Calculated Order Status'];
         // 无状态 或者 状态 为 草稿，已驳回时
-        if (!status || status === '已驳回' || status === '草稿') {
+        if (!status || status === 'Rejected' || status === 'Draft' || status === 'In Confirming') {
           // 安装订单编辑
           let me = this;
           delete item['Link'];

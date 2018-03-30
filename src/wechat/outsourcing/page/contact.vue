@@ -6,13 +6,15 @@
 
     <div class="mint-content">
       <div>
-        <mt-field label="联系电话" placeholder="请输入电话"
-          v-model="contact['Cellular Phone #']"
-          @change="findContactFn"></mt-field>
-        <mt-field label="姓名" placeholder="请输入姓名"
-          v-model="contact['Last Name']"></mt-field>
-        <mt-field label="登陆账号" placeholder="请输入账号"
-          :value="contact['Cellular Phone #']"></mt-field>
+        <mt-field label="联系电话" placeholder="请输入电话" tag="电话"
+                  v-model="contact['Cellular Phone #']"
+                  v-valid.require.phone
+                  @change="findContactFn"></mt-field>
+        <mt-field label="姓名" placeholder="请输入姓名" tag="姓名"
+                  v-valid.require
+                  v-model="contact['Last Name']"></mt-field>
+        <mt-field label="登陆账号" class="readonly"
+                  :value="contact['Cellular Phone #']"></mt-field>
         <!--<mt-field label="登陆密码" placeholder="请输入密码"-->
           <!--v-model="contact['KL Outsource Password']"></mt-field>-->
       </div>
@@ -63,10 +65,12 @@
       },
       // 创建&编辑联系人
       saveFn() {
-        let c = this.contact;
-        c['Login Name'] = c['Cellular Phone #'];
-        // 保存联系人
-        this.upsertContact(this.contact);
+        tools.valid.call(this, () => {
+          let c = this.contact;
+          c['Login Name'] = c['Cellular Phone #'];
+          // 保存联系人
+          this.upsertContact(this.contact);
+        });
       }
     }
   };

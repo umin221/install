@@ -47,7 +47,8 @@
           {'id': 1, 'vul': '我的配件'},
           {'id': 1, 'vul': '配件领用'},
           {'id': 1, 'vul': '配件退入'},*/
-          {'id': 'outsourcing', 'vul': '委外人员管理', 'icon': 'out'}
+          {'id': 'outsourcing', 'vul': '委外人员管理', 'icon': 'out'},
+          {'id': 'officialAccounts', 'vul': '公众号', 'icon': 'out'}
         ]
       };
     },

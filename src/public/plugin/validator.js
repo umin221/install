@@ -127,7 +127,7 @@ class ValidatorPlug {
     };
     // Global Directive
     Vue.directive('valid', {
-      bind: (el, binding) => {
+      inserted: (el, binding) => {
         //
         let v = new V({
           el: el,
