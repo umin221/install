@@ -1,7 +1,7 @@
 <template>
   <div style="background-color: #ebebeb;">
     <div class="mint-content">
-      <empty v-show="!cutAddress.length"></empty>
+      <empty v-show="!cutAddress.length && !localAddress.length"></empty>
       <div class="addressC" v-for="(item, index) in cutAddress" :key="index">
         <cus-cell class="addressT" @click.native="select(item)">
           <div class="mint-cell-sub-title" slot="title">
@@ -23,7 +23,29 @@
                     @click.native="deleteAddr(item.Id)">删除</mt-badge>
           <mt-badge class="xs-icon icon-edit"
                     type="success"
-                    @click.native="editAddr(item.Id, 'edit')">编辑</mt-badge>
+                    @click.native="editAddr(item.Id)">编辑</mt-badge>
+        </div>
+      </div>
+      <div class="addressC"
+           v-if="!cutAddress.length"
+           v-for="(item, index) in localAddress"
+           :key="index">
+        <cus-cell class="addressT" @click.native="select(item)">
+          <div class="mint-cell-sub-title" slot="title">
+            省市区：{{item['Province']}}{{item['City']}}{{item['County']}}
+          </div>
+          <div class="mint-cell-sub-title" slot="title">
+            地址：{{item['Street Address']}}{{item['Street Address 2']}}{{item['Street Address 3']}}{{item['Street Address 4']}}
+          </div>
+        </cus-cell>
+        <div class="editDetail">
+          <mt-badge class="xs-icon icon-delete"
+                    style="color: #ffffff;"
+                    type="error"
+                    @click.native="deleteAddr(item.Id, 'local')">删除</mt-badge>
+          <mt-badge class="xs-icon icon-edit"
+                    type="success"
+                    @click.native="editAddr(item.Id, index+1)">编辑</mt-badge>
         </div>
       </div>
       <!--新增保存在本地-->
@@ -53,10 +75,11 @@
       };
     },
     computed: {
-      ...mapState(NameSpace, ['cutAddress', 'Contact'])
+      ...mapState(NameSpace, ['cutAddress', 'Contact', 'localAddress'])
     },
     methods: {
       ...mapActions(NameSpace, ['getContact', 'deleteAddress', 'setDefaultAddress']),
+      ...mapMutations(NameSpace, ['deleteAddress']),
       ...mapMutations('index', ['addressBack']),
       toAddAddress() {
         let me = this;
@@ -74,14 +97,14 @@
         me.addressBack(item);
         me.$router.back();
       },
-      editAddr(Id) {
+      editAddr(Id, index) {
         let me = this;
         me.$router.push({
           name: 'addAddress',
           query: {
             Id: Id,
             type: 'edit',
-            ContactId: me.Contact.Id
+            index: index
           }
         });
       },

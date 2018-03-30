@@ -7,15 +7,15 @@
       <div class="my-personal">
         <div class="co-flex co-ver co-jsa" @click="toMyDevice">
           <span class="xs-icon icon-device" style="font-size: 1.5rem"></span>
-          <span>我的工单</span>
+          <span>我的设备</span>
         </div>
         <div class="co-flex co-ver co-jsa" @click="toAddress">
           <span class="xs-icon icon-addr" style="font-size: 1.5rem"></span>
-          <span>我的工单</span>
+          <span>我的地址</span>
         </div>
         <div class="co-flex co-ver co-jsa" @click="callService">
           <span class="xs-icon icon-call" style="font-size: 1.5rem"></span>
-          <span>我的工单</span>
+          <span>热线服务</span>
         </div>
       </div>
     </div>

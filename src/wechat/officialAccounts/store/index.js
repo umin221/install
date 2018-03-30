@@ -45,12 +45,13 @@ export default new Vuex.Store({
               form
             },
             success: data => {
-              console.log(data);
               if (form.callback) {
+                Toast('提交成功');
                 form.callback(data);
               }
             },
             error: data => {
+              Toast('提交失败');
               console.log(data);
             }
           });
@@ -62,18 +63,23 @@ export default new Vuex.Store({
       namespaced: true,
       state: {
         Contact: [],
-        cutAddress: []
+        cutAddress: [],
+        localAddress: []
       },
       mutations: {
         setContact(state, data) {
           state.Contact = data;
           state.cutAddress = KND.Util.toArray(data['CUT Address']);
         },
-        setaddAddress(state, data) {
-          state.addAddress.push(data);
+        setLocalAddress(state, {data, index}) {
+          if (index) {
+            state.localAddress.splice(index - 1, 1, data);
+          } else {
+            state.localAddress.push(data);
+          }
         },
         deleteAddress(state, data) {
-          state.addAddress = [];
+          state.localAddress = [];
         }
       },
       actions: {
@@ -101,7 +107,7 @@ export default new Vuex.Store({
               Id
             },
             success: data => {
-              if (type === 'add') {
+              if (type === 'local') {
                 commit('deleteAddress');
               } else {
                 dispatch('getContact');
@@ -150,11 +156,15 @@ export default new Vuex.Store({
             },
             success: data => {
               console.log(data);
-              dispatch('setContactAddress', {
-                contactId: form.contactId,
-                addressId: data.items.Id,
-                callback: form.success
-              });
+              if (form.contactId) {
+                dispatch('setContactAddress', {
+                  contactId: form.contactId,
+                  addressId: data.items.Id,
+                  callback: form.success
+                });
+              } else {
+                form.success(data);
+              }
             },
             error: data => {
               console.log(data);
@@ -259,7 +269,8 @@ export default new Vuex.Store({
         setServiceDetail(state, data) {
           state.serviceDetail = data;
           if (state.serviceDetail.Action) {
-            state.action = state.serviceDetail.Action;
+            let action = state.serviceDetail.Action;
+            state.action = KND.Util.isArray(action) ? action[0] : action;
           }
           if (state.serviceDetail['FIN Service Request Notes']) {
             state.note = KND.Util.toArray(state.serviceDetail['FIN Service Request Notes']);
@@ -392,6 +403,42 @@ export default new Vuex.Store({
             },
             error: data => {
               Toast('添加失败');
+              console.log(data);
+            }
+          });
+        }
+      }
+    },
+    commentOn: {
+      namespaced: true,
+      state: {
+      },
+      mutations: {
+      },
+      actions: {
+        customerSurvey({commit}, form) {
+          api.get({
+            key: 'customerSurvey',
+            data: {
+              form
+            },
+            success: data => {
+              Toast('回访成功');
+              form.callback(data);
+            },
+            error: data => {
+              Toast('回访失败，请联系管理员');
+            }
+          });
+        },
+        commentLov({commit}, {type, callback}) {
+          api.get({
+            key: 'commentLov',
+            type: type,
+            success: data => {
+              callback(data);
+            },
+            error: data => {
               console.log(data);
             }
           });

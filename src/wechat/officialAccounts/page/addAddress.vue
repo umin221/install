@@ -56,9 +56,9 @@
     created() {
       let me = this;
       me.type = me.$route.query.type;
+      me.ContactId = me.$route.query.ContactId;
       if (me.type === 'edit') {
         me.addrId = me.$route.query.Id;
-        me.ContactId = me.$route.query.ContactId;
         me.searchAddrId({
           addrId: me.addrId,
           callback: function(data) {
@@ -71,8 +71,6 @@
             }
           }
         });
-      } else {
-        me.ContactId = me.$route.query.ContactId;
       }
     },
     data: () => {
@@ -96,7 +94,7 @@
     methods: {
       ...mapActions(NameSpace, ['addressManage', 'searchAddrId', 'upDateAddress']),
       ...mapActions('index', ['getLov']),
-      ...mapMutations('address', ['setaddAddress']),
+      ...mapMutations('address', ['setLocalAddress']),
 //      submit() {
 //        this.$router.push('myRepair');
 //      },
@@ -172,9 +170,10 @@
             'Street Address': me.street_Address,
             'contactId': me.ContactId,
             success: function(data) {
-              if (data) {
-                me.$router.back();
+              if (!me.contactId && data) {
+                me.setLocalAddress({data: data.items});
               }
+              me.$router.back();
             }
           };
           me.addressManage(form);
@@ -185,9 +184,13 @@
             'County': me.KL_TOWN,
             'Street Address': me.street_Address,
             'contactId': me.ContactId,
-            'addressId': me.addrId,
+            'addrId': me.addrId,
             callback: function(data) {
-              if (data) {
+              if (me.$route.query.index) {
+                me.setLocalAddress({
+                  data: data.items,
+                  index: me.$route.query.index
+                });
                 me.$router.back();
               }
             }

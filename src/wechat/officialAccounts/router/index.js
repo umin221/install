@@ -59,13 +59,13 @@ export default new Router({
       require(['../page/myDevice'], resolve);
     }
   }, {
-    path: '/deviceDetail', // 我的设备
+    path: '/deviceDetail', // 设备详情
     name: 'deviceDetail',
     component(resolve) {
       require(['../page/deviceDetail'], resolve);
     }
   }, {
-    path: '/addDevice', // 我的设备
+    path: '/addDevice', // 添加设备
     name: 'addDevice',
     component(resolve) {
       require(['../page/addDevice'], resolve);

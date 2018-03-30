@@ -26,7 +26,8 @@ let ApiList = {
           'Area': option.data.form['Area'], // 故障分类
           'Sub-Area': option.data.form['Sub-Area'], // 故障描述
           'Complaint Description': option.data.form['Complaint Description'], // 故障详情描述
-          'Open Id': option.data.form['Open Id'], // 微信端的OpenId
+          // 'Open Id': option.data.form['Open Id'], // 微信端的OpenId
+          'Open Id': 'openId2', // 微信端的OpenId
           'ProcessName': 'KL WeChat Public Account CreateSR Process'
         }
       }
@@ -52,6 +53,20 @@ let ApiList = {
       url: 'data/CUT Address/CUT Address/' + option.data.Id,
       data: {
         body: {}
+      }
+    };
+  },
+  upDateAddress: option => {           // 更新地址
+    return {
+      method: 'put',
+      url: 'data/CUT Address/CUT Address',
+      data: {
+        'Id': option.data.form.addrId,
+        'Country': '中国',
+        'Province': option.data.form.Province,
+        'City': option.data.form.City,
+        'County': option.data.form.County,
+        'Street Address': option.data.form['Street Address']
       }
     };
   },
@@ -90,7 +105,7 @@ let ApiList = {
       data: {
         'body': {
           'OutputIntObjectName': 'Base KL Contact Interface BO',
-          'SearchSpec': '[Contact.Work Phone #]="134567876544"'
+          'SearchSpec': '[Contact.KL Open Id]="openId2"'
         }
       }
     };
@@ -130,39 +145,39 @@ let ApiList = {
       }
     };
   },
-  upDateAddress: option => {           // 编辑更新地址
-    return {
-      method: 'post',
-      url: 'service/EAI Siebel Adapter/Upsert',
-      data: {
-        'body': {
-          'SiebelMessage': {
-            'MessageId': '',
-            'MessageType': 'Integration Object',
-            'IntObjectName': 'Base KL Contact Interface BO',
-            'IntObjectFormat': 'Siebel Hierarchical',
-            'ListOfBase KL Contact Interface BO': {
-              'Contact': {
-                'Id': option.data.form.contactId,
-                'ListOfCutAddress': {
-                  'CUT Address': [
-                    {
-                      'Id': option.data.form.addressId,
-                      'Country': option.data.form.Country,
-                      'Province': option.data.form.Province,
-                      'City': option.data.form.City,
-                      'County': option.data.form.County,
-                      'Street Address': option.data.form['Street Address']
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        }
-      }
-    };
-  },
+  // upDateAddress: option => {           // 编辑更新地址
+  //   return {
+  //     method: 'post',
+  //     url: 'service/EAI Siebel Adapter/Upsert',
+  //     data: {
+  //       'body': {
+  //         'SiebelMessage': {
+  //           'MessageId': '',
+  //           'MessageType': 'Integration Object',
+  //           'IntObjectName': 'Base KL Contact Interface BO',
+  //           'IntObjectFormat': 'Siebel Hierarchical',
+  //           'ListOfBase KL Contact Interface BO': {
+  //             'Contact': {
+  //               'Id': option.data.form.contactId,
+  //               'ListOfCutAddress': {
+  //                 'CUT Address': [
+  //                   {
+  //                     'Id': option.data.form.addressId,
+  //                     'Country': option.data.form.Country,
+  //                     'Province': option.data.form.Province,
+  //                     'City': option.data.form.City,
+  //                     'County': option.data.form.County,
+  //                     'Street Address': option.data.form['Street Address']
+  //                   }
+  //                 ]
+  //               }
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   };
+  // },
   getServiceList: option => {           // 服务工单列表请求
     return {
       method: 'post',
@@ -205,6 +220,52 @@ let ApiList = {
               }
             }
           }
+        }
+      }
+    };
+  },
+  customerSurvey: option => {           // 维修服务完成后回访
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Upsert',
+      data: {
+        'body': {
+          'SiebelMessage': {
+            'MessageId': '',
+            'MessageType': 'Integration Object',
+            'IntObjectName': 'Base KL Service Request Interface BO',
+            'IntObjectFormat': 'Siebel Hierarchical',
+            'ListOfBase KL Service Request Interface BO': {
+              'Service Request': {
+                'Id': option.data.form.Id,
+                'Status': '已回访',
+                'SR Status Date': option.data.form.statusDate,
+                'ListOfCustomer Survey': {
+                  'Customer Survey': {
+                    'Id': '1',
+                    'Accessible': option.data.form.Accessible,     // 是否有预约？
+                    'Knowledgable': option.data.form.Knowledgable,   // 维修服务技术？
+                    'Overall': option.data.form.Overall,          // 维修服务态度？
+                    'Resolved': option.data.form.Resolved,        // 是否维修完成？
+                    'Comments': option.data.form.Comments,        // 建议与反馈
+                    'KL Status': '完成'
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+  },
+  commentLov: option => {           // 五星评价lov
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base List Of Values',
+          'SearchSpec': '[List Of Values.Active]="Y" AND [List Of Values.Language]="CHS" AND [List Of Values.Type] = "' + option.type + '"'
         }
       }
     };

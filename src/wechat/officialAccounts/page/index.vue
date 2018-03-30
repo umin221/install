@@ -39,9 +39,11 @@
         <mt-field label="问题说明"
                   v-model="ComplaintDescription"
                   placeholder="请详细说明..."></mt-field>
-        <mt-cell title="相关照片">
-        </mt-cell>
-        <div class="photo"></div>
+        <attach ioName="KL Service Request Attachment IO" ref="attach"
+                :attach="attach.list"
+                :edit="attach.edit"
+                :title="attach.title">
+        </attach>
       </div>
       <mt-datetime-picker
         ref="picker1"
@@ -100,7 +102,12 @@
         ComplaintDescription: '', // 故障详情描述
         AddressId: '',        // 如果是用户自己新建了地址，传新建的地址Id,如果只是简单定位，不用传
         AppointTime: '',      // 用户的预约上门时间
-        AssetId: ''           // 如果是用户扫码了，并带出了资产，传资产Id，扫不出来，不用传
+        AssetId: '',           // 如果是用户扫码了，并带出了资产，传资产Id，扫不出来，不用传
+        attach: { // 附件
+          list: [],
+          edit: true,
+          title: '相关照片'
+        }
       };
     },
     computed: {

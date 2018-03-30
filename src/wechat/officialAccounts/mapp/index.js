@@ -2,7 +2,6 @@
  * Local Config
  */
 config.mapp = {
-  'option': {
-    'KL_PROVINCE': [] // 开孔方式
-  }
+  'CS_KNOWLEDGABLE': [], // 开孔方式
+  'CS_OVERALL': []
 };

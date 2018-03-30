@@ -3,7 +3,7 @@
     <div class="mint-content service-detail">
       <div class="detail-title">
         <div class="mt-Detail-title">服务单编号：{{serviceDetail['SR Number']}}
-          <span class="user-state" v-if="serviceDetail.Action">{{action.Status}}</span>
+          <span class="user-state" v-if="serviceDetail.Action">{{serviceDetail.Status}}</span>
           <span class="user-state" v-else>暂未派工</span>
         </div>
         <div class="mt-Detail-title">维修工程师：{{serviceDetail['KL Owner Full Name']}}</div>
@@ -22,18 +22,20 @@
               <div>预约时间：{{serviceDetail['CEM Planned Start Date']}}</div>
               <div>
                 <div>地址：</div>
-                <p style="color: #C9CDD2;font-size: 14px;line-height: 0">
+                <p style="color: grey;font-size: 14px;line-height: 0">
                   {{serviceDetail['KL Personal Province']}},{{serviceDetail['Personal City']}},
                   {{serviceDetail['KL Personal Town']}},{{serviceDetail['Personal Street Address']}}
                 </p>
               </div>
               <div>问题说明：
-                <p style="color: #C9CDD2;font-size: 14px;line-height: 0"></p>
+                <p style="color: grey;font-size: 14px;line-height: 0">
+                  {{serviceDetail['Complaint Description']}}
+                </p>
               </div>
               <div>相关照片：</div>
             </div>
           </mt-tab-container-item>
-          <mt-tab-container-item id="tab-container2">
+          <mt-tab-container-item id="tab-container2" style="margin-bottom: 2rem;">
             <div class="crm-zyList"  v-for="(item, index) in note" :key="index">
               <ul class="content">
                 <li class="bd-radius">
@@ -52,7 +54,7 @@
     <button-group v-if="serviceDetail.Action">
       <mt-button class="single"
                  @click.native="toComment"
-                  v-if="action['Status'] === '已完成'">点评</mt-button>
+                  v-if="action['Status'] === '完成'">点评</mt-button>
     </button-group>
   </div>
 </template>
@@ -80,7 +82,13 @@
     methods: {
       ...mapActions(NameSpace, ['getServiceDetail']),
       toComment() {
-        this.$router.push('commentOn');
+        let me = this;
+        me.$router.push({
+          name: 'commentOn',
+          query: {
+            id: me.serviceDetail.Id
+          }
+        });
       }
     },
     components: {toggle}
