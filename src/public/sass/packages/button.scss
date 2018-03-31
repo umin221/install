@@ -26,7 +26,7 @@ button {
   }
 }
 
-.disable {
+.disable, .readonly {
   button {
     display: none;
     @include disable;

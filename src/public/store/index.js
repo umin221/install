@@ -47,7 +47,7 @@ export const app = {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
         success: data => {
-          data.debug = true;
+          // data.debug = true;
           wx.config(data);
           wx.ready(() => {
             console.log('WeChatAPI success');

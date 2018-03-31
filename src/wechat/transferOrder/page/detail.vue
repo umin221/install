@@ -4,9 +4,9 @@
     <!--header-->
     <mt-header fixed title="安装交接单详情">
       <fallback slot="left"></fallback>
-      <mt-button slot="right"
-                 @click.native="$router.push('close')"
-                 v-show="!isTeam && !isCompleted">关闭</mt-button>
+      <!--<mt-button slot="right"-->
+                 <!--@click.native="$router.push('close')"-->
+                 <!--v-show="!isTeam && !isCompleted">关闭</mt-button>-->
     </mt-header>
 
     <!--detail-->
