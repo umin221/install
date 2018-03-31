@@ -50,8 +50,7 @@
         if (id === 'repairPolicy' || id === 'engineer') {
           Toast('别看啦！还没开发完呢');
         } else {
-          let href = 'officialAccounts#/' + id + location.search;
-          document.location.href = href;
+          this.$router.push(id);
         }
       }
     }
