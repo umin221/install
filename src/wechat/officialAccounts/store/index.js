@@ -84,8 +84,13 @@ export default new Vuex.Store({
       },
       actions: {
         getContact({commit}, callback) {
+          let openId = KND.Util.getParam('openid');
+          console.log(openId);
           api.get({
             key: 'getContact',
+            data: {
+              openId
+            },
             success: function(data) {
               let Contact = data.SiebelMessage.Contact;
               if (Contact) {
@@ -315,8 +320,13 @@ export default new Vuex.Store({
       },
       actions: {
         getContact({commit}, callback) {
+          let openId = KND.Util.getParam('openid');
+          console.log(openId);
           api.get({
             key: 'getContact',
+            data: {
+              openId
+            },
             success: data => {
               console.log(data);
               let Contact = data.SiebelMessage.Contact;

@@ -27,7 +27,7 @@ let ApiList = {
           'Sub-Area': option.data.form['Sub-Area'], // 故障描述
           'Complaint Description': option.data.form['Complaint Description'], // 故障详情描述
           // 'Open Id': option.data.form['Open Id'], // 微信端的OpenId
-          'Open Id': 'openId2', // 微信端的OpenId
+          'Open Id': option.data.form['Open Id'], // 微信端的OpenId
           'ProcessName': 'KL WeChat Public Account CreateSR Process'
         }
       }
@@ -105,7 +105,7 @@ let ApiList = {
       data: {
         'body': {
           'OutputIntObjectName': 'Base KL Contact Interface BO',
-          'SearchSpec': '[Contact.KL Open Id]="openId2"'
+          'SearchSpec': '[Contact.KL Open Id]="' + option.data.openId + '"'
         }
       }
     };

@@ -17,6 +17,12 @@ export default new Router({
       require(['../page/index'], resolve);
     }
   }, {
+    path: '/submitService', // 首页列表
+    name: 'submitService',
+    component(resolve) {
+      require(['../page/submitService'], resolve);
+    }
+  }, {
     path: '/address', // 地址管理
     name: 'address',
     component(resolve) {
