@@ -9,21 +9,21 @@
                   type="number"
                   placeholder="请输入联系电话"
                   v-model.trim="Contact_Phone"
-                  class="textRight"></mt-field>
+                  class="textRight require"></mt-field>
         <mt-field label="报修联系人"
                   type="text"
                   id="contactText"
                   :attr="isCall"
                   placeholder="请输入联系人"
                   v-model="Contact_Name"
-                  class="textRight"></mt-field>
+                  class="textRight require"></mt-field>
         <mt-cell class="mint-field"
                  @click.native="getLov('CONTACT_TYPE')"
-                 title="联系人类型"
+                 title="联系人类型 require"
                  :value="CONTACT_TYPE"
                  placeholder="请选择" is-link></mt-cell>
         <mt-cell title="省市区"
-                 class="mint-field"
+                 class="mint-field require"
                  @click.native="showLovFn('KL_PROVINCE')"
                  placeholder="请选择"
                  is-link
@@ -37,7 +37,7 @@
                   type="textarea" rows="2">
           <i class="xs-icon icon-edit" @click="editAddress" style="position: absolute;bottom: 1.8rem;right: 0.8rem;"></i>
         </mt-field>
-        <mt-cell class="mint-field"  title="服务类型" :value="SR_TYPE" @click.native="getLov('SR_TYPE','')"  placeholder="请选择" is-link></mt-cell>
+        <mt-cell class="mint-field require"  title="服务类型" :value="SR_TYPE" @click.native="getLov('SR_TYPE','')"  placeholder="请选择" is-link></mt-cell>
         <mt-cell class="mint-field"  title="故障现象" :value="SR_AREA" @click.native="getLov('SR_AREA','')"  placeholder="请选择" is-link></mt-cell>
         <mt-cell class="mint-field margin-right" title="故障分级" :value="Priority"></mt-cell>
         <mt-field class="block" label="客服说明" v-model="ProductFlag" placeholder="详细描述或附加需求..." type="textarea" rows="2"></mt-field>
