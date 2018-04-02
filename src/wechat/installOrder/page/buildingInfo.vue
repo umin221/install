@@ -4,8 +4,16 @@
       <fallback slot="left"></fallback>
     </mt-header>
     <div class="mint-content buildingInfo">
-      <mt-field label="安装地址" placeholder="请输入安装地址"
-                @change="addAddress"></mt-field>
+      <mt-cell title="省市区"
+               @click.native="showLovFn('KL_PROVINCE')"
+               placeholder="请选择"
+               is-link
+               v-model="provinces"></mt-cell>
+      <cus-field class="block"
+                 label="详细地址"
+                 v-model= 'detailAddress'
+                 type="textarea"
+                 placeholder="请输入详细地址"></cus-field>
       <div style="height: 5px"></div>
       <div style="background: white;padding-bottom: 10px;">
         <mt-cell>
@@ -32,9 +40,17 @@
       </div>
       <div class="buildingInfo-zy">注意：非标准楼层选择楼数量后手工编辑</div>
     </div>
+    <!--下拉菜单-->
+    <mt-popup v-model="showBox" position="bottom">
+      <menu-box @my-enter="enter"
+                @my-cancel="showBox = false"
+                @my-change="onValuesChange"
+                @my-change1="onValuesChange1"
+                :slots="slots"
+                :slots1="slots1"
+                :slots2="slots2"></menu-box>
+    </mt-popup>
     <button-group>
-      <!--<mt-button type="primary" class="single"
-                 @click.native="previewFn">编辑预览</mt-button>-->
       <mt-button class="single"
                  @click.native="submitFn">保存提交</mt-button>
     </button-group>
@@ -95,20 +111,44 @@
 </style>
 <script type="application/javascript">
   import {mapState, mapActions} from 'vuex';
+  import cusField from 'public/components/cus-field';
+  import menuBox from '../components/cus-menu';
+  import api from '../api/api';
 
   import buttonGroup from 'public/components/cus-button-group';
+  let isMunicipality = function(...args) {
+    let me = this;
+    let city = args.pop();
+    let isMun = true;
+    for (let i = 0;i < me.Municipality.length; i++) {
+      if (city === me.Municipality[i]) {
+        isMun = false;
+      }
+    }
+    return isMun;
+  };
   const NameSpace = 'buildingInfo';
   export default {
     name: 'buildingInfo',
-    created: () => {
+    created() {
       console.dir(1);
       let param = this.$route.query;
-      this.item = param.item;
+      this.id = param.id;
+      this.orderID = param.orderID;
     },
     data: () => {
       return {
         value: '',
-        item: '',
+        id: '',
+        slots: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
+        slots1: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
+        slots2: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
+        showBox: false,
+        provinces: '',
+        KL_PROVINCE: '',
+        KL_CITY: '',
+        KL_TOWN: '',
+        detailAddress: '',
         active: 'tab-container'
       };
     },
@@ -120,13 +160,66 @@
       });
     },
     methods: {
-      ...mapActions(NameSpace, ['reduceValFn', 'plusValFn']),
-      previewFn: function() { // 楼层预览
-        var self = this;
-        self.$router.push('building');
+      ...mapActions(NameSpace, ['reduceValFn', 'plusValFn', 'getLov']),
+      showLovFn(type) {
+        let me = this;
+        me.slots[0].values = [];
+        me.showBox = true;
+        me.getLov({
+          type: 'KL_PROVINCE',
+          parent: '中国',
+          success: data => {
+            let datas = KND.Util.toArray(data.items) ;
+            for (let i = 0;i < datas.length; i++) {
+              me.slots[0].values.push(datas[i].Value);
+            }
+          }
+        });
       },
-      addAddress: function() {
-        console.dir('获取地址');
+      enter(values) {
+        let me = this;
+        let isMun = isMunicipality.call(this, values['KL_PROVINCE']);
+        me.showBox = false;
+        me.KL_PROVINCE = values['KL_PROVINCE'];
+        me.KL_CITY = values['KL_CITY'];
+        me.KL_TOWN = values['KL_TOWN'];
+        if (isMun) {
+          me.provinces = values['KL_PROVINCE'] + values['KL_CITY'] + values['KL_TOWN'];
+        } else {
+          me.provinces = values['KL_CITY'] + values['KL_TOWN'];
+        }
+      },
+      onValuesChange(value) {
+        let me = this;
+        me.slots1[0].values = [];
+        if (value[0]) {
+          me.getLov({
+            type: 'KL_CITY',
+            parent: value[0],
+            success: data => {
+              let datas = KND.Util.toArray(data.items) ;
+              for (let i = 0;i < datas.length; i++) {
+                me.slots1[0].values.push(datas[i].Value);
+              }
+            }
+          });
+        }
+      },
+      onValuesChange1(value) {
+        let me = this;
+        me.slots2[0].values = [];
+        if (value[0]) {
+          me.getLov({
+            type: 'KL_TOWN',
+            parent: value[0],
+            success: data => {
+              let datas = KND.Util.toArray(data.items) ;
+              for (let i = 0;i < datas.length; i++) {
+                me.slots2[0].values.push(datas[i].Value);
+              }
+            }
+          });
+        }
       },
       reduceVal: function(type) {
         this.reduceValFn({
@@ -141,10 +234,56 @@
           success: data => {
           }
         });
+      },
+      submitFn: function() {
+        var self = this;
+        api.get({
+          key: 'setBuild',
+          method: 'POST',
+          data: {
+            'body': {
+              'OrderId': self.orderID, // 详情ID
+              'TaskId': self.id, // 批次ID
+              'Type': 'Initial',
+              'ProcessName': 'KL Install Order Asset Create Process',
+              'BuilingName': '栋',
+              'BuildingNum': self.buildingNum,
+              'FloorName': 'F',
+              'FloorNum': self.layerNum,
+              'RoomNum': self.roomNum,
+              'Country': '中国',
+              'Province': self.KL_PROVINCE,
+              'City': self.KL_CITY,
+              'County': self.KL_TOWN,
+              'Street Address': self.detailAddress
+            }
+          },
+          success: function(data) {
+            if (!data.ERROR) {
+              api.get({ // 更改按钮状态
+                key: 'getUPStatus',
+                method: 'POST',
+                data: {
+                  'body': {
+                    'ProcessName': 'KL Install Task Submit For Approval Workflow',
+                    'RowId': self.id
+                  }
+                },
+                success: function(dataObj) {
+                  if (!dataObj.ERROR) {
+                    Toast('提交成功');
+                    KND.Util.back(-2);
+                  }
+                }
+              });
+            }
+          }
+        });
       }
     },
-    components: {buttonGroup},
+    components: {buttonGroup, menuBox, cusField},
     computed: {
+      ...mapState(NameSpace, ['Municipality']),
       ...mapState(NameSpace, ['buildingNum', 'layerNum', 'roomNum'])
     }
 

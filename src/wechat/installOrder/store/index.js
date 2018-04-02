@@ -214,14 +214,6 @@ export default new Vuex.Store({
         }
       },
       actions: {
-        // 修改是否选中
-        setResult({state}, index) {
-          if (state.result[index].isBut) {
-            state.result[index].isBut = false;
-          } else {
-            state.result[index].isBut = true;
-          }
-        },
         /**
          * 查找安装工程师
          * @param {Object} data 必填 查询条件 键值对
@@ -235,17 +227,72 @@ export default new Vuex.Store({
               PageSize: PAGESIZE
             },
             success: data => {
-              let engineer = KND.Util.toArray(data.items);
+              let engineer = KND.Util.toArray(data.SiebelMessage['Channel Partner'].User);
+              var comName = data.SiebelMessage['Channel Partner'].Name;
               if (engineer.length > 0) {
                 for (var i = 0; i < engineer.length; i++) {
-                  engineer[i].isBut = false;
+                  engineer[i].companyName = comName;
                 }
-                commit(more ? 'addEngineer' : 'setEngineer', engineer);
-                if (callback) {
-                  console.dir('=============');
-                  console.dir(engineer);
-                  callback(engineer);
-                }
+              }
+              commit(more ? 'addEngineer' : 'setEngineer', engineer);
+              if (callback) {
+                console.dir('=============');
+                console.dir(engineer);
+                callback(engineer);
+              }
+            },
+            error: error => {
+              if (callback) {
+                callback();
+              };
+              console.log(error);
+            }
+          });
+        }
+      }
+    },
+    /*
+    * 合作伙伴
+    * */
+    company: {
+      namespaced: true,
+      state: {
+        result: [],
+        select: {
+          'Last Name': '请选择'
+        }
+      },
+      mutations: {
+        setEngineer(state, engineer) {
+          state.result = engineer;
+        },
+        addEngineer(state, engineer) {
+          state.result.push(...engineer);
+        },
+        selEngineer(state, engineer) {
+          state.select = engineer;
+        }
+      },
+      actions: {
+        /**
+         * 查找安装工程师
+         * @param {Object} data 必填 查询条件 键值对
+         */
+        findCompany({state, commit}, {data, more, callback}) {
+          api.get({
+            key: 'findCompany',
+            data: data,
+            paging: {
+              StartRowNum: more ? state.result.length : 0,
+              PageSize: PAGESIZE
+            },
+            success: data => {
+              let engineer = KND.Util.toArray(data.SiebelMessage['Channel Partner']);
+              commit(more ? 'addEngineer' : 'setEngineer', engineer);
+              if (callback) {
+                console.dir('=============');
+                console.dir(engineer);
+                callback(engineer);
               }
             },
             error: error => {
@@ -379,7 +426,12 @@ export default new Vuex.Store({
       },
       actions: {
         getPcObj({state}, obj) {
-          state.pcObj = obj;
+          if (obj.is_company) {
+            state.pcObj['KL Partner Id'] = obj.Id;
+            state.pcObj['KL Partner Name'] = obj.Name;
+          } else {
+            state.pcObj = obj;
+          }
         }
       }
     },
@@ -537,9 +589,23 @@ export default new Vuex.Store({
           }
         ],
         layerList: [],
-        roomList: []
+        roomList: [],
+        Municipality: ['上海', '天津', '澳门', '重庆', '香港', '北京']
       },
       actions: {
+        getLov({commit}, {type, parent, success, error}) {
+          api.get({
+            key: 'getLov',
+            data: {
+              type,
+              parent
+            },
+            success,
+            error: data => {
+              console.log(data);
+            }
+          });
+        },
         // 数量加减
         plusValFn({state}, obj) {
           console.dir(state.buildingNum);

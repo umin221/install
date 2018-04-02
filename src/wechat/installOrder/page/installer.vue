@@ -15,8 +15,8 @@
           <div class="mint-cell-title co-flex" slot="title">
             <span class="co-f1">姓名: {{item['Last Name']}}</span> <span class="co-f1">{{item['KL Primary Position Type']}}</span>
           </div>
-          <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Emp #']}}</div>
-          <div class="mint-cell-sub-title" slot="title">合作伙伴名称: {{item['KL Primary Division Name']}}</div>
+          <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Cellular Phone #']}}</div>
+          <div class="mint-cell-sub-title" slot="title">合作伙伴名称: {{item.companyName}}</div>
           <div v-show="showSelect(item)" class="selectIcon" slot="title">
             <i class="xs-icon icon-select"></i>
           </div>
@@ -44,7 +44,7 @@
   import cusSearch from 'public/components/cus-search';
   import cusCell from 'public/components/cus-cell';
   import buttonGroup from 'public/components/cus-button-group';
-
+  import api from '../api/api';
   //
   let loader = function(...args) {
     let me = this;
@@ -53,7 +53,7 @@
     let param = {
       more: args.pop(),
       data: {
-        'position': '产品安装工程师||产品安装主管',
+        'companyId': me.companyId,
         'Last Name': name
       },
       callback: (data) => {
@@ -69,12 +69,18 @@
     name: NAMESPACE,
     // 获取默认数据
     created() {
+      var self = this;
+      let param = this.$route.query;
+      self.id = param.id;
+      self.companyId = param.companyId;
       loader.call(this, 'onBottomLoaded');
     },
     components: {cusLoadmore, cusSearch, cusCell, buttonGroup},
     data: () => {
       return {
         value: '',
+        id: '',
+        companyId: '', // 合作伙伴公司
         selectName: {},
         topStatus: ''
       };
@@ -93,7 +99,6 @@
         loader.call(this, 'onBottomLoaded');
       },
       showSelect(item) {
-        console.log(this.selectName[item['Last Name']]);
         return this.selectName[item['Last Name']];
       },
       /**
@@ -107,9 +112,6 @@
           this.$set(this.selectName, item['Last Name'], null);
           delete this.selectName[item['Last Name']];
         }
-//        this.$set(this.selectName, item['Last Name'], flag ? item : undefined);
-//        this.selectName[index] = true;
-        // this.setResult(index);
       },
       /**
        * Load more
@@ -120,7 +122,41 @@
         }, 'onBottomLoaded');
       },
       submitFn() {
-        console.log(this.selectName);
+        var self = this;
+        let select = this.selectName;
+        var objList = [];
+        for (let i in select) {
+          var obj = {};
+          obj.Id = select[i].Id;
+          objList.push(obj);
+        }
+        console.dir(objList);
+        api.get({
+          key: 'selIntaller',
+          method: 'POST',
+          data: {
+            'body': {
+              'SiebelMessage': {
+                'MessageId': '',
+                'MessageType': 'Integration Object',
+                'IntObjectName': 'Base KL Installation Task',
+                'IntObjectFormat': 'Siebel Hierarchical',
+                'ListOfBase KL Installation Task': {
+                  'KL Installation Task': {
+                    'Id': self.id,
+                    'ListOfContact': objList
+                  }
+                }
+              }
+            }
+          },
+          success: function(data) {
+            if (!data.ERROR) {
+              Toast('授权成功');
+              KND.Util.back();
+            }
+          }
+        });
       }
     }
   };

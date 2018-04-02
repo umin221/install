@@ -96,38 +96,50 @@
                 <span>{{taskData['Planned Completion']}}</span>
                 <span>{{taskData.Status}}</span>
               </li>
-              <div class="butLi" v-if="taskData['KL Detail Type LIC']==='Trompil Batch Summary' ||
-            taskData['KL Detail Type LIC']==='Lock Body Install Summary' ||
-            taskData['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
-            taskData['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
-            taskData['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
-            taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
-            taskData['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
-            taskData['KL Detail Type LIC'] === 'Transfer Summary'" >
-                <span @click.stop="closeTask(taskData)" class="batchClose"></span>
-                <span @click.stop="addTask(taskData)" class="batchAdd"></span>
-              </div>
               <li style="margin-right: 8px" v-if="taskData['KL Detail Type LIC'] === 'Ship From Door Factory' && taskData['Calculated Activity Status'] === 'Not Started'">
                 <span class="mt-switch"><mt-switch v-model="shipmentVal"  @click.native.stop="shipment(taskData)"></mt-switch></span>
               </li>
-              <div class="content-div"  v-if="taskData['KL Detail Type LIC']==='Trompil Batch Summary' ||
-            taskData['KL Detail Type LIC']==='Lock Body Install Summary' ||
-            taskData['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
-            taskData['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
-            taskData['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
-            taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
-            taskData['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
-            taskData['KL Detail Type LIC'] === 'Transfer Summary'" v-for="(itemTask, index) in upList(taskData['KL Installation Task'])" :key="index" @click.stop="updateDoor(itemTask,taskData)">
+              <div class="butLi"
+                   v-if="taskData['KL Detail Type LIC']==='Trompil Batch Summary' ||
+                  taskData['KL Detail Type LIC']==='Lock Body Install Summary' ||
+                  taskData['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
+                  taskData['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
+                  taskData['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
+                  taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
+                  taskData['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
+                  taskData['KL Detail Type LIC'] === 'Transfer Summary'" >
+                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(taskData)" class="batchClose"></span>
+                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" @click.stop="addTask(taskData)" class="batchAdd"></span>
+                  <span>{{taskData.Status}}</span>
+              </div>
+              <div class="content-div"
+                v-if="taskData['KL Detail Type LIC']==='Trompil Batch Summary' ||
+                taskData['KL Detail Type LIC']==='Lock Body Install Summary' ||
+                taskData['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
+                taskData['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
+                taskData['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
+                taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
+                taskData['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
+                taskData['KL Detail Type LIC'] === 'Transfer Summary'"
+                 v-for="(itemTask, index) in upList(taskData['KL Installation Task'])" :key="index"
+                 @click.stop="updateDoor(itemTask,taskData)">
                 <div class="readonly">
                   <mt-field label="批次" class="itemTaskId" :value="itemTask.Id"  @click.native.stop="taskClick(itemTask,taskData)"></mt-field>
-                  <mt-field label="已完成/计划数量"  class="itemTask" v-if="taskData['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
-          taskData['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
-          taskData['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
-          taskData['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
-          taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
-          taskData['KL Detail Type LIC'] === 'Transfer Summary'" :value="taskData['KL Completed Install Amount']+'/'+taskData['KL Install Amount Requested']"><span @click.stop="closeTask(itemTask)" class="batchClose"></span></mt-field>
-                  <mt-field label="合格/计划数量" v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
-            taskData['KL Detail Type LIC'] === 'Check Before Trans Summary'" :value="taskData['KL Qualified Amount']+'/'+taskData['KL Spot Check Amount']"></mt-field>
+                  <mt-field label="已完成/计划数量"  class="itemTask"
+                    v-if="taskData['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
+                    taskData['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
+                    taskData['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
+                    taskData['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
+                    taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
+                    taskData['KL Detail Type LIC'] === 'Transfer Summary'"
+                    :value="taskData['KL Completed Install Amount']+'/'+taskData['KL Install Amount Requested']">
+                    <span @click.stop="closeTask(itemTask)" class="batchClose"></span>
+                  </mt-field>
+                  <mt-field label="合格/计划数量"
+                    v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
+                    taskData['KL Detail Type LIC'] === 'Check Before Trans Summary'"
+                    :value="taskData['KL Qualified Amount']+'/'+taskData['KL Spot Check Amount']">
+                  </mt-field>
                   <mt-field label="时间" :value="new Date(itemTask['Planned Completion']).format('yyyy-MM-dd')"></mt-field>
                   <mt-field label="状态" :value="itemTask.Status"></mt-field>
                 </div>
@@ -200,8 +212,9 @@
       right: 0px;
       top: 0px;
       line-height: 27px;
-      width: 100px;
+      width: 150px;
       height: 27px;
+      text-align: right;
     }
     .crm-zyList ul .butLi span {
       display: inline-block;
@@ -271,7 +284,7 @@
     .content li :nth-of-type(2), .mt-switch {
       position: absolute;
       top: 23px;
-      right: 10px;
+      right: 0px;
     }
     .content-div {
       border: 1px solid #81B92C;
@@ -475,34 +488,7 @@
     created() {
       let me = this;
       me.id = me.$route.query.id;
-      api.get({
-        key: 'getDetail',
-        method: 'POST',
-        data: {
-          'body': {
-            'OutputIntObjectName': 'Base Order Entry (Sales)',
-            // 'OutputIntObjectName': 'KL Order Sales',
-            'SearchSpec': '[Order Entry - Orders.Id]=' + '\'' + me.id + '\''
-            // 'SearchSpec': '[Order Entry - Orders.Id]="1-2BSATYIN"'
-          }
-        },
-        success: function(data) {
-          console.dir(data.SiebelMessage);
-          me.detailData = data.SiebelMessage['Order Entry - Orders'];
-          var taskData = me.detailData['KL Installation Task'];
-          if (taskData) {
-            me.selectName = taskData[0]['KL Detail Type'];
-            me.taskData = KND.Util.toArray(taskData);
-            console.dir(me.taskData);
-            me.pStatus = me.taskData[0]['Calculated Activity Status'];
-            if (me.pStatus !== 'Not Started') { // 未开始时不获取子任务数据
-              me.taskDataList = KND.Util.toArray(me.taskData[0]['KL Installation Task']);
-            }
-          }
-          me.setTaskDataST(KND.Util.toArray(me.detailData['Order Entry - Line Items']));
-          console.dir(me.taskDataST);
-        }
-      });
+      this.detail();
       KND.Native.getUserInfo((info) => {
         userInfo = info;
         console.log(userInfo);
@@ -540,6 +526,37 @@
       ...mapMutations('batch', ['clear']),
       ...mapMutations(NameSpace, ['setTaskDataST']),
       ...mapActions(NameSpace, ['getTaskType', 'deleteOrderLine']),
+      detail() {
+        var self = this;
+        api.get({
+          key: 'getDetail',
+          method: 'POST',
+          data: {
+            'body': {
+              'OutputIntObjectName': 'Base Order Entry (Sales)',
+              // 'OutputIntObjectName': 'KL Order Sales',
+              'SearchSpec': '[Order Entry - Orders.Id]=' + '\'' + self.id + '\''
+              // 'SearchSpec': '[Order Entry - Orders.Id]="1-2BSATYIN"'
+            }
+          },
+          success: function(data) {
+            console.dir(data.SiebelMessage);
+            self.detailData = data.SiebelMessage['Order Entry - Orders'];
+            var taskData = self.detailData['KL Installation Task'];
+            if (taskData) {
+              self.selectName = taskData[0]['KL Detail Type'];
+              self.taskData = KND.Util.toArray(taskData);
+              console.dir(self.taskData);
+              self.pStatus = self.taskData[0]['Calculated Activity Status'];
+              if (self.pStatus !== 'Not Started') { // 未开始时不获取子任务数据
+                self.taskDataList = KND.Util.toArray(self.taskData[0]['KL Installation Task']);
+              }
+            }
+            self.setTaskDataST(KND.Util.toArray(self.detailData['Order Entry - Line Items']));
+            console.dir(self.taskDataST);
+          }
+        });
+      },
       showSelect(item) {
         var self = this;
         if (item['KL Detail Type'] === self.selectName) {
@@ -633,6 +650,7 @@
 
                 },
                 success: function(data) {
+                  self.detail();
                   Toast({
                     message: '已发起安装替代锁申请，销售审批通过后进行安装。',
                     duration: 5000
@@ -676,6 +694,7 @@
                 }
               },
               success: function(data) {
+                self.detail();
               }
             });
           } else {
@@ -696,7 +715,8 @@
               name: 'zsBatch',
               query: {
                 type: 'add',
-                item: item
+                item: item,
+                orderID: self.id
               }
             });
           } else { // 真锁---零星
@@ -716,7 +736,8 @@
             name: 'zsBatch',
             query: {
               type: 'add',
-              item: item
+              item: item,
+              orderID: self.id
             }
           });
         } else {
@@ -835,29 +856,74 @@
           * Transfer Summary 移交汇总
           * */
          // self.$router.push('batch');
-          this.$router.push({
-            name: 'batchDetail',
-            query: {
-              type: 'read',
-              Id: item.Id
-            }
-          });
+          if (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Rejected') { // 汇总节点未开始、已驳回的时候 开启节点
+            /*
+            * 批次汇总开启节点
+            * */
+            MessageBox({
+              title: '提示',
+              message: ' 是否开启节点?',
+              showCancelButton: true
+            }).then(action => {
+              if (action === 'confirm') {
+                console.log('abc');
+                api.get({
+                  key: 'getTaskAdd',
+                  method: 'POST',
+                  data: {
+                    'body': {
+                      'ProcessName': 'KL Install Task Start Action Workflow',
+                      'RowId': item.Id
+                    }
+
+                  },
+                  success: function(data) {
+                    self.detail();
+                    Toast({
+                      message: '开启成功',
+                      duration: 5000
+                    });
+                  }
+                });
+              }
+            });
+          } else {
+            this.$router.push({
+              name: 'batchDetail',
+              query: {
+                type: 'read',
+                Id: item.Id
+              }
+            });
+          }
         }
       },
       taskClick(item, fItem) { // 子任务数据集事件
+        var self = this;
         // 跳转批次详情、编辑
         //  && (item['Calculated Activity Status'] === 'Draft' || item['Calculated Activity Status'] === 'Rejected')
         if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'Rejected')) { // 草稿=Planning(设定计划)、驳回状态=Rejected 要编辑提交 并且有权限的人才可做此操作
           this.clear();
           var itemTask = KND.Util.toArray(fItem['KL Installation Task'])[0];
           this.getTaskType(itemTask);
-          this.$router.push({ // 编辑
-            name: 'batch',
-            query: {
-              type: 'edit',
-              item: item
-            }
-          });
+          if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary' || fItem['KL Detail Type LIC'] === 'Substitution Lock Inst Summary') { // 替代锁、真锁 编辑页面不通
+            this.$router.push({
+              name: 'zsBatch',
+              query: {
+                type: 'edit',
+                item: item,
+                orderID: self.id
+              }
+            });
+          } else {
+            this.$router.push({ // 编辑
+              name: 'batch',
+              query: {
+                type: 'edit',
+                item: item
+              }
+            });
+          }
         } else {
           this.$router.push({
             name: 'batchDetail',

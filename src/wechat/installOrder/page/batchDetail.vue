@@ -18,7 +18,19 @@
         <mt-field label="计划开始日期"  :value="start_Date"></mt-field>
         <mt-field label="计划完成日期" :value="end_Date"></mt-field>
         <mt-field label="计划开孔数量"
-                   :value="batchNum"></mt-field>
+                   :value="batchNum" is-link></mt-field>
+        <mt-field v-show="is_installer" label="合作伙伴"  :value="companyName"></mt-field>
+        <mt-field v-show="is_zs" label="真锁交接日期"  :value="deliveryTime"></mt-field>
+      </div>
+      <div class="lock-line" v-show="is_installer" :class="{'disable': !editable}">
+        <lock-line title="委外安装员">
+          <mt-cell-swipe v-for="(installer, index) in installerList" class="lock-line-cell enable" ref="body" :key=index>
+            <div class="co-flex co-jc" slot="title">
+              <span class="co-f1">{{installer['Last Name']}}</span>
+              <span class="co-f1">{{installer['Work Phone #']}}</span>
+            </div>
+          </mt-cell-swipe>
+        </lock-line>
       </div>
       <div class="lock-line" v-show="is_plan"  :class="{'disable': !editable}">
         <lock-line title="详细计划">
@@ -116,6 +128,10 @@
         is_show: false, // 是否显示委外、附件    只有替代锁 真锁 才会显示
         start_Date: '',        // 开始时间
         end_Date: '',        // 结束时间
+        is_installer: false, // 是否替代锁、真锁批次 显示委外联系人
+        companyName: '', // 合作伙伴名称
+        is_zs: false, // 是否真锁批次 显示交接日期
+        deliveryTime: '', // 交接日期
         batchNum: 0, // 数量
         planList: [],
         appData: {}, // 审批信息头
@@ -141,6 +157,15 @@
     },
     methods: {
       ...mapActions('app', ['getLov']),
+      approvalFn() {
+        var self = this;
+        this.$router.push({
+          name: 'approval',
+          query: {
+            id: self.id
+          }
+        });
+      },
       addPlanList(item) {
         this.$router.push({
           name: 'detailPlan',
@@ -171,6 +196,18 @@
               self.titleVal = '汇总详情';
             } else {
               self.getPlanList(id);
+              if (data['KL Detail Type LIC'] === 'Substitution Lock Inst Batch' ||
+                data['KL Detail Type LIC'] === 'Lock Installation Batch') { // 替代锁批次=Substitution Lock Inst Batch、真锁=Lock Installation Batch获取为外人员 显示合作伙伴
+                self.is_installer = true;
+                self.getInstallerList(id);
+                self.companyName = data['KL Partner Name'];
+                if (data['KL Detail Type LIC'] === 'Lock Installation Batch') { // 真锁
+                  self.is_zs = true;
+                  if (data['KL Delivery Time']) {
+                    self.deliveryTime = new Date(data['KL Delivery Time']).format('yyyy-MM-dd') || ''; // 结束时间
+                  }
+                }
+              }
             }
             self.batchCode = data.Id; // 批次
             if (data.Planned) {
@@ -197,6 +234,24 @@
               self.planList = data.items;
             } else {
               self.planList = KND.Util.toArray(data);
+            }
+          }
+        });
+      },
+      getInstallerList(id) { // 联系人
+        var self = this;
+        self.installerList = [];
+        api.get({ // 提交数据
+          key: 'getInstaller',
+          method: 'GET',
+          data: {
+            id: id
+          },
+          success: function(data) {
+            if (data.items) {
+              self.installerList = data.items;
+            } else {
+              self.installerList = KND.Util.toArray(data);
             }
           }
         });

@@ -1,4 +1,11 @@
 let apiList = {
+  getLov: option => {
+    option.data.parent = option.data.parent ? 'Parent Value = "' + option.data.parent + '"' : 'Parent is null';
+    return {
+      method: 'get',
+      url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type= "' + option.data.type + '" AND ' + option.data.parent + ' &PageSize=100&StartRowNum=0'
+    };
+  },
   /* getList: {
     url: 'service/EAI Siebel Adapter/QueryPage'
     // 列表
@@ -60,6 +67,30 @@ let apiList = {
     };
   },
   /**
+   * 合作伙伴
+   * */
+  findCompany: option => {
+    let name = option.data['Last Name'];
+    let specName = '';
+    // 名字过滤
+    if (name) {
+      specName += '[Channel Partner.Name] ~LIKE ' + "'" + name + '*' + "'" + ' AND ';
+    };
+    return {
+      method: 'POST',
+      url: 'service/EAI Siebel Adapter/QueryPage',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'KL Channel Partner',
+          'SearchSpec': specName + '[Channel Partner.KL Partner Status]=LookupValue(\'ORG_STATUS\',\'Active\') AND [Channel Partner.KL Partner Type]=LookupValue(\'KL_PARTNER_TYPE\',\'Outsourcing Manufacturer\')',
+          'ViewMode': 'All',
+          'StartRowNum': option.paging.StartRowNum,
+          'PageSize': option.paging.PageSize
+        }
+      }
+    };
+  },
+  /**
    * 查找所有产品安装工程师&主管 搜索&获取列表
    * @param {String} option.data.position 必填 职位
    * @param {String} option.data['Last Name'] 选填 用户名字 模糊查询
@@ -85,33 +116,34 @@ let apiList = {
     };
   },
   /**
-   * 查找所有产品安装工程师&主管 搜索&获取列表
+   * 查找委外安装员
    * @param {String} option.data.position 必填 职位
    * @param {String} option.data['Last Name'] 选填 用户名字 模糊查询
    * @param {Object} option.paging 必填 翻页参数
    * @returns {{url: string}}
    */
   findInstaller: option => {
-    let position = option.data.position.split('||');
+    let companyId = option.data['companyId'];
     let name = option.data['Last Name'];
-    let specPosi = [];
     let specName = '';
-    // 职位过滤
-    for (let i in position) {
-      specPosi.push('[KL Primary Position Type]="' + position[i] + '"');
-    };
     // 名字过滤
     if (name) {
-      specName += '[Last Name] ~LIKE "' + name + '*" OR ([KL Parent Service Region Name] ~LIKE "' + name + '*" OR [Service Region] ~LIKE "' + name + '*") AND';
+      specName += '[Channel Partner.Name] ~LIKE ' + "'" + name + '*' + "'" + ' AND ';
     };
     return {
-      method: 'get',
-      url: 'data/KL Employee Interface BO/Employee/?searchspec=' + specName + '(' + specPosi.join(' OR ') + ')&' + KND.Util.param(option.paging)
+      method: 'POST',
+      url: 'service/EAI Siebel Adapter/QueryPage',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base Channel Partner',
+          'SearchSpec': specName + '[Channel Partner.Id]=' + "'" + companyId + "'" + ' AND [User.User Type]=LookupValue(\'CONTACT_USER_TYPE\',\'Outsourcing Worker\')',
+          // 'SearchSpec': specName + '[Channel Partner.Id]=\'1-2BSAS0OA\' AND [User.User Type]=LookupValue(\'CONTACT_USER_TYPE\',\'Outsourcing Worker\')',
+          'ViewMode': 'All',
+          'StartRowNum': option.paging.StartRowNum,
+          'PageSize': option.paging.PageSize
+        }
+      }
     };
-    /* return {
-      method: 'PUT',
-      url: 'data/KL User/User/?searchspec=' + specName + '(' + specPosi.join(' OR ') + ')&' + KND.Util.param(option.paging)
-    };*/
   },
   /*
   * 协同团队修改负责人
@@ -163,6 +195,13 @@ let apiList = {
       data: {}
     };
   },
+  getInstaller: option => { // 获取批次详情联系人
+    return {
+      method: 'get',
+      url: 'data/KL Installation Task/KL Installation Task/' + option.data.id + '/Contact',
+      data: {}
+    };
+  },
   setPlan: option => { // 批次详细计划提交
     return {
       url: 'data/KL Installation Task/KL Installation Task/' + option.data['Parent Activity Id'] + '/KL Installation Task Detail Plan'
@@ -177,6 +216,27 @@ let apiList = {
   setApproval: option => { // 审批操作
     return {
       url: 'service/Workflow Process Manager/RunProcess'
+    };
+  },
+  /*
+  * 审批列表数据
+  * */
+  getApproval: option => {
+    return {
+      url: 'service/EAI Siebel Adapter/Query'
+    };
+  },
+  selIntaller: option => { // 选择委外安装员保存
+    return {
+      url: 'service/EAI Siebel Adapter/Synchronize'
+    };
+  },
+  /*
+  * 真锁初始化楼栋
+  * */
+  setBuild: option => {
+    return {
+      url: 'service/Workflow Process Manager/RunProcess/'
     };
   },
   getJournalData: option => {

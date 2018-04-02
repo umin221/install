@@ -11,11 +11,12 @@
         </mt-cell>
         <mt-cell title="计划开始日期" @click.native="open('picker')" :value="start_Date" is-link></mt-cell>
         <mt-cell title="计划完成日期" @click.native="open('pickerEnd')" :value="end_Date" is-link></mt-cell>
-        <mt-field label="计划开孔数量" placeholder="请输入"
-                  :class="heartVisible" v-model="batchNum"></mt-field>
+        <mt-cell v-show="!show_zs" title="计划开孔数量" placeholder="请输入"
+                  :class="heartVisible" v-model="batchNum" is-link></mt-cell>
         <mt-cell title="是否委外" :class="heartVisible">
           <mt-switch v-model="box1"></mt-switch>
         </mt-cell>
+        <mt-cell v-show="box1" title="合作伙伴" @click.native="selectCompany" :value="companyName" is-link></mt-cell>
         <div v-show="box1">
           <mt-cell v-show="show_zs" title="真锁交接日期" @click.native="open('picker', 'Planned Completion')" is-link></mt-cell>
         </div>
@@ -24,11 +25,8 @@
         <lock-line title="委外安装员" @click="addInstaller('')">
           <mt-cell-swipe v-for="(installer, index) in installerList" class="lock-line-cell enable" ref="body" :key=index>
             <div class="co-flex co-jc" slot="title">
-              <span class="co-f1">{{installer.Description}}</span>
-              <span class="co-f1">{{installer['KL Detail Type']}}</span>
-            </div>
-            <div class="co-flex co-jc" slot="title">
-              <span class="co-f1" >{{installer['KL Detail Type']}}</span>
+              <span class="co-f1">{{installer['Last Name']}}</span>
+              <span class="co-f1">{{installer['Work Phone #']}}</span>
             </div>
           </mt-cell-swipe>
         </lock-line>
@@ -58,7 +56,6 @@
       </div>
       <button-group>
         <mt-button class="single"
-                   v-show="show_zs"
                    @click.native="nextPageFn">下一步</mt-button>
         <mt-button class="single"
                    v-show="!show_zs"
@@ -132,6 +129,7 @@
       self.state = param.state;
       self.type = param.type;
       self.item = param.item;
+      self.orderID = param.orderID;
       if (self.item['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次
         self.show_zs = true;
       } else { // 替代锁
@@ -146,8 +144,11 @@
           self.end_Date = new Date(self.pcObj['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
           self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
           self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
-          self.batchNum = self.pcObj['KL Install Amount Requested'] || 0; // 数量
-          self.getPlanList(self.batchCode);
+          self.batchNum = self.pcObj['KL Install Amount Requested']; // 数量
+          self.companyId = self.pcObj['KL Partner Id'];
+          self.companyName = self.pcObj['KL Partner Name'];
+          self.getPlanList(self.batchCode); // 详细计划
+          self.getInstallerList(self.batchCode); // 委外联系人
         }
       } else if (self.type === 'edit') {
         if (self.pcObj.Id) { // 批次页面新增保存有数据
@@ -157,13 +158,17 @@
           self.end_Date = new Date(self.pcObj['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
           self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
           self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
-          self.batchNum = self.pcObj['KL Install Amount Requested'] || 0; // 数量
-          self.getPlanList(self.batchCode);
+          self.batchNum = self.pcObj['KL Install Amount Requested']; // 数量
+          self.companyId = self.pcObj['KL Partner Id'];
+          self.companyName = self.pcObj['KL Partner Name'];
+          self.getPlanList(self.batchCode); // 详细计划
+          self.getInstallerList(self.batchCode); // 委外联系人
         } else {
           self.getBatch(self.item.Id);
           self.id = self.item.Id;
           self.batchCode = self.item.Id; // 详情的ID
-          self.getPlanList(self.item.Id);
+          self.getPlanList(self.item.Id); // 详细计划
+          self.getInstallerList(self.item.Id); // 委外联系人
         }
       }
     },
@@ -177,12 +182,15 @@
         end_Date: '',        // 结束时间
         endDate: '',
         batchNum: 0, // 数量
+        companyName: '', // 合作伙伴名称
+        companyId: '', // 合作伙伴id
         isPrimaryMVGPosition: '',
-        pickerVisible: true,
+        pickerVisible: new Date(),
         box1: true,
         planList: [],
         installerList: [],
         item: '',
+        orderID: '', // 订单id
         id: '', // 记录新增后的批次ID
         type: 'edit', // add 新增 / edit 编辑 / read 只读
         editable: true,
@@ -228,11 +236,52 @@
         me.end_Date = value.format('yyyy/MM/dd');
         me.endDate = value.format('MM/dd/yyyy');
       },
+      selectCompany() {
+        var self = this;
+        var insId = '';
+        if (self.installerList.length > 0) {
+          insId = self.installerList[0].Id;
+        };
+        if (self.id) { // 有批次直接跳转
+          self.$router.push({
+            name: 'company',
+            query: {
+              type: 'add',
+              id: self.id,
+              insId: insId,
+              item: ''
+            }
+          });
+        } else {
+          this.toSaveFn('4');
+        }
+      },
       nextPageFn() {
+        var self = this;
+        if (!self.id) {
+          Toast('请先保存批次信息！');
+          return;
+        }
+        /* if (self.box1) {
+          if (!self.companyId) {
+            Toast('合作伙伴不能为空，请选择！');
+            return;
+          }
+          if (self.installerList.length === 0) {
+            Toast('委外联系人不能为空，请选择！');
+            return;
+          }
+        }
+        if (self.planList.length === 0) {
+          Toast('详细计划不能为空！');
+          return;
+        }*/
         this.$router.push({
           name: 'buildingInfo',
           query: {
-            type: 'add'
+            type: 'add',
+            id: self.id,
+            orderID: self.orderID
           }
         });
       },
@@ -254,6 +303,24 @@
           }
         });
       },
+      getInstallerList(id) { // 联系人
+        var self = this;
+        self.installerList = [];
+        api.get({ // 提交数据
+          key: 'getInstaller',
+          method: 'GET',
+          data: {
+            id: id
+          },
+          success: function(data) {
+            if (data.items) {
+              self.installerList = data.items;
+            } else {
+              self.installerList = KND.Util.toArray(data);
+            }
+          }
+        });
+      },
       getBatch(id) {
         var self = this;
         api.get({ // 批次详情
@@ -270,6 +337,8 @@
               self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
               self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
               self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
+              self.companyId = data['KL Partner Id'];
+              self.companyName = data['KL Partner Name'];
               self.getPcObj(data); // 保存store
             }
           }
@@ -277,17 +346,22 @@
       },
       addInstaller() { // 选择委外安装员
         var self = this;
-        if (self.id) { // 有批次直接跳转
-          this.$router.push({
-            name: 'installer',
-            query: {
-              type: 'add',
-              id: self.id,
-              item: ''
-            }
-          });
+        if (self.companyId) {
+          if (self.id) { // 有批次直接跳转
+            self.$router.push({
+              name: 'installer',
+              query: {
+                type: 'add',
+                id: self.id,
+                companyId: self.companyId,
+                item: ''
+              }
+            });
+          } else {
+            this.toSaveFn('3');
+          }
         } else {
-          this.toSaveFn('3');
+          Toast('请先选择合作伙伴');
         }
       },
       addPlanFn(obj) {
@@ -307,7 +381,7 @@
           this.toSaveFn('1');
         }
       },
-      toSaveFn(num) { // num=1 保存并跳转详细计划  num = 2 只是保存 不跳转 num=3 保存跳转选择委外安装员
+      toSaveFn(num) { // num=1 保存并跳转详细计划  num = 2 只是保存 不跳转 num=3 保存跳转选择委外安装员  num=4 合作公司
         var self = this;
         var aId = '';
         if (self.type === 'add') {
@@ -355,9 +429,64 @@
                         item: ''
                       }
                     });
+                  } else if (num === 2) {
+                    // 判断是否选择委外
+                    var insId = '';
+                    if (self.installerList.length > 0) {
+                      insId = self.installerList[0].Id;
+                    };
+                    if (!self.box1) {
+                      if (self.companyId) { // 清空合作伙伴
+                        self.companyId = '';
+                        self.companyName = '';
+                        var parma = {
+                          'Id': self.id,
+                          'KL Partner Id': ''
+                        };
+                        api.get({ // 提交数据
+                          key: 'getUPData',
+                          method: 'PUT',
+                          data: parma,
+                          success: function(data) {
+                          }
+                        });
+                      }
+                      if (insId) { // 清空联系人
+                        api.get({
+                          key: 'selIntaller',
+                          method: 'POST',
+                          data: {
+                            'body': {
+                              'SiebelMessage': {
+                                'MessageId': '',
+                                'MessageType': 'Integration Object',
+                                'IntObjectFormat': 'Siebel Hierarchical',
+                                'ListOfBase KL Installation Task': {
+                                  'KL Installation Task': {
+                                    'Id': self.batchCode,
+                                    'ListOfContact': {}
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          success: function(data) {
+                          }
+                        });
+                      }
+                    }
                   } else if (num === '3') {
                     this.$router.push({
                       name: 'installer',
+                      query: {
+                        type: 'add',
+                        id: self.id,
+                        item: ''
+                      }
+                    });
+                  } else if (num === '4') {
+                    self.$router.push({
+                      name: 'company',
                       query: {
                         type: 'add',
                         id: self.id,
@@ -375,6 +504,24 @@
       },
       submitFn() {
         var self = this;
+        if (!self.id) {
+          Toast('请先保存批次信息！');
+          return;
+        }
+        if (self.box1) {
+          if (!self.companyId) {
+            Toast('合作伙伴不能为空，请选择！');
+            return;
+          }
+          if (self.installerList.length === 0) {
+            Toast('委外联系人不能为空，请选择！');
+            return;
+          }
+        }
+        if (self.planList.length === 0) {
+          Toast('详细计划不能为空！');
+          return;
+        }
         api.get({ // 更改按钮状态
           key: 'getUPStatus',
           method: 'POST',

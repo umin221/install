@@ -123,7 +123,7 @@
     data: () => {
       return {
         value: '',
-        pickerVisible: true,
+        pickerVisible: new Date(),
         index: '',
         id: '',
         timeKey: '', // 标记什么时间

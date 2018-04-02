@@ -141,7 +141,7 @@
         end_Date: '',        // 结束时间
         endDate: '',
         batchNum: 0, // 数量
-        pickerVisible: true,
+        pickerVisible: new Date(),
         planList: [],
         item: '',
         id: '', // 记录新增后的批次ID
@@ -301,6 +301,10 @@
       },
       submitFn() {
         var self = this;
+        if (self.planList.length === 0) {
+          Toast('详细计划不能为空！');
+          return;
+        }
         api.get({ // 更改按钮状态
           key: 'getUPStatus',
           method: 'POST',

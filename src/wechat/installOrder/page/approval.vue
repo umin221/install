@@ -1,0 +1,142 @@
+<template>
+  <div>
+    <mt-header fixed :title="titleVal">
+      <fallback slot="left"></fallback>
+    </mt-header>
+    <div class="mint-content journal editable">
+      <div class="lock-line">
+        <lock-line title="详细计划" @click="addPlanFn('')">
+          <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
+            <ul class="content">
+              <li class="bd-radius">
+                <span class="icon"></span>
+              </li>
+              <li style="color: #888;line-height: 40px;font-size: 0.9rem;">{{new Date(item['Install Date']).format('yyyy-MM-dd')}}
+                <span class="journalName">{{item['Contact Login Name']}}</span>
+              </li>
+              <div class="content-div">
+                <div>已开孔数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
+                <div>合格数量/异常数量：{{item['Qualified Amoun']}}/{{item['Unqualified Amount']}}</div>
+                <div>异常处理数量：{{item['Unqualified Solve Amount']}}</div>
+              </div>
+            </ul>
+          </div>
+        </lock-line>
+      </div>
+    </div>
+  </div>
+</template>
+<style lang="scss">
+  .journal {
+    background: white;
+    .lock-line {
+      margin-top: 10px;
+
+      .lock-line-cell {
+        background-color: $bg-light;
+      }
+      .co-flex {
+        line-height: 30px;
+      }
+    }
+    /*流程*/
+    .crm-zyList {
+      overflow: hidden;
+    }
+    .crm-zyList ul {
+      padding-left: 0;
+    }
+    .crm-zyList ul li {
+      list-style: none;
+    }
+    .crm-zyList .content {
+      position: relative;
+      border-left: 1px solid #dddddd;
+      padding-bottom: 10px;
+      margin: 0 30px;
+      padding-left: 20px;
+    }
+    .crm-zyList .journalName {
+      position: absolute;
+      right: 0px;
+    }
+    .crm-zyList .content .bd-radius {
+      background: #fff;
+      position: absolute;
+      left: -20px;
+      top: 0px;
+    }
+    .crm-zyList .icon{
+      border-radius: 26px;
+      background: #8bc17c;
+      color: #fff;
+      padding: 1px 7px;
+      margin-left: 13px;
+      font-size: 12px;
+      top: 10px;
+    }
+    .crm-zyList .content {
+      margin-top: 5px;
+      line-height: 27px;
+    }
+    .content-div {
+      border-radius: 5px;
+      padding-left: 10px;
+      font-size: 0.7rem;
+    }
+  }
+</style>
+<script type="application/javascript">
+  import api from '../api/api';
+  import lockLine from '../components/cusLockLine';
+  export default {
+    name: 'approval',
+    created() {
+      var self = this;
+      self.titleVal = '审批记录';
+      let param = this.$route.query;
+      this.id = param.id;
+      this.type = param.type;
+      this.getApproval();
+    },
+    data: () => {
+      return {
+        value: '',
+        processDate: [],
+        titleVal: '审批记录'
+      };
+    },
+    beforeRouteEnter(to, from, next) {
+      console.dir(2);
+      next(vm => {
+        let query = vm.$route.query;
+        console.dir(query);
+      });
+    },
+    computed: {
+    },
+    components: {lockLine},
+    methods: {
+      getApproval() {
+        var self = this;
+        api.get({ // 提交数据
+          key: 'getApproval',
+          method: 'POST',
+          data: {
+            'body': {
+              'OutputIntObjectName': 'Base UInbox Item History',
+              'PrimaryRowId': self.id
+            }
+          },
+          success: function(data) {
+            if (data.items) {
+              self.processDate = KND.Util.toArray(data.items);
+            } else {
+              self.processDate = KND.Util.toArray(data); // 一条数据时只返回对象
+            }
+          }
+        });
+      }
+    }
+  };
+</script>

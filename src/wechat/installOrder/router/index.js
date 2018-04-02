@@ -77,6 +77,18 @@ export default new Router({
       require(['../page/detailPlan'], resolve);
     }
   }, {
+    path: '/approval', // 审批记录
+    name: 'approval',
+    component(resolve) {
+      require(['../page/approval'], resolve);
+    }
+  }, {
+    path: '/company', // 合作伙伴
+    name: 'company',
+    component(resolve) {
+      require(['../page/company'], resolve);
+    }
+  }, {
     path: '/installer', // 委外安装员
     name: 'installer',
     component(resolve) {
