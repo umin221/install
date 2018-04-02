@@ -6,7 +6,7 @@
         @click.native="changeFn('minus')">
         <i class="xs-icon icon-minus"></i>
       </mt-button>
-      <input type="number" v-model="value" min="0" />
+      <input type="number" v-model="value" min="1" />
       <mt-button
         type="default"
         size="small"
@@ -22,12 +22,12 @@
     props: ['index'],
     data() {
       return {
-        value: 0
+        value: 1
       };
     },
     methods: {
       changeFn(type) {
-        if (type === 'minus' && this.value) {
+        if (type === 'minus' && this.value - 1) {
           this.value = this.value - 1;
         } else if (type === 'add') {
           this.value = this.value + 1;

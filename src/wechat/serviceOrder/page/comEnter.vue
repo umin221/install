@@ -17,14 +17,16 @@
           <input type="text" placeholder="楼层" v-model="floor">
           <input type="text" placeholder="房号" v-model="room">
         </div>
-        <mt-cell class="require mint-field" title="产品型号" placeholder="请选择" @click.native="toSearchT('fault')" is-link>{{ProductModel}}</mt-cell>
+        <mt-cell class="require mint-field" title="产品型号" placeholder="请选择" @click.native="toSearchT('fault')" is-link>{{ProductModel||Product_model}}</mt-cell>
         <mt-cell class="mint-field require" title="故障现象" placeholder="请选择" @click.native="showArea('SR_ROOTCAUSE')" is-link>{{rootcause}}</mt-cell>
         <mt-cell class="mint-field require" :value="Responsbility" @click.native="showArea('KL_SR_RESP')" title="责任划分" is-link></mt-cell>
-        <mt-field class="block require" label="解决方法" v-model="repairDetails" placeholder="详细描述或附加需求..." type="textarea" rows="3">
-          <div style="line-height: 2rem"><i class="xs-icon icon-mic" style="float: right;"></i></div>
-        </mt-field>
+        <mt-field class="block require" label="解决方法" v-model="repairDetails" placeholder="详细描述或附加需求..." type="textarea" rows="3"></mt-field>
         <div>
-          <div style="color: #777;font-size: 0.75rem;text-indent:0.75em;line-height: 40px">上传图片</div>
+          <attach ioName="KL Service Request Attachment IO" ref="attach"
+                  :attach="attach.list"
+                  :edit="attach.edit"
+                  :title="attach.title">
+          </attach>
         </div>
       </div>
       <mt-popup v-if="showBox" v-model="showBox" position="bottom" style="width: 100%">
@@ -63,6 +65,24 @@
   export default {
     name: NameSpace,
     created() {
+      let me = this;
+      let serviceId = me.$route.query.id;
+      let serviceType = me.$route.query.type;
+      if (serviceType === 'child') {
+        me.childId = serviceId;
+      } else if (serviceId) {
+        me.getServiceR({
+          Id: serviceId,
+          callback: function(data) {
+            me.SerialNumber = data['Serial Number'];
+            me.rootcause = data['SR Rootcause'];
+            me.AssetNumber = data['Asset Number'];
+            me.Responsbility = data['KL Responsbility'];
+            me.repairDetails = data['Repair Details'];
+            me.setProductModel(data['KL Product Model']);
+          }
+        });
+      }
     },
     data: () => {
       return {
@@ -76,10 +96,17 @@
         rootcause: '',           // 故障分类
         repairDetails: '', // 方法明细
         ProductId: '',    // 产品Id
+        Product_model: '',
+        childId: '',
         building: '',
         floor: '',
         room: '',
-        lovType: ''
+        lovType: '',
+        attach: { // 附件
+          list: [],
+          edit: true,
+          title: '相关照片'
+        }
       };
     },
     computed: {
@@ -87,8 +114,8 @@
       ...mapState('detail', ['ServiceRequest'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getAsset', 'getLov1', 'valueChange1', 'upDateService']),
-      ...mapMutations(NameSpace, ['errorTips']),
+      ...mapActions(NameSpace, ['getAsset', 'getLov1', 'valueChange1', 'upDateService', 'getServiceR']),
+      ...mapMutations(NameSpace, ['errorTips', 'setProductModel']),
       ...mapMutations('detail', ['setPartner']),
       sarech() {
         let me = this;

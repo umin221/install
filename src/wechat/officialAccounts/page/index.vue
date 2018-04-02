@@ -29,6 +29,8 @@
       KND.Native.getUserInfo((userInfo) => {
         console.log(userInfo);
       });
+      let openId = KND.Util.getParam('openid');
+      console.log(openId);
     },
     data: () => {
       return {

@@ -4,9 +4,10 @@
       <div class="addDevice">
         <mt-field label="产品条形码"
                   v-model="klsn"
+                  class="klsn"
                   @change.native="search"
                   placeholder="请输入条形码" >
-            <i class="xs-icon icon-scan"></i>
+            <i class="xs-icon icon-scan" @click="toScan"></i>
         </mt-field>
         <mt-cell title="产品品牌" value="坚朗海贝斯"></mt-cell>
         <mt-cell title="产品型号" :value="productModel"></mt-cell>
@@ -64,6 +65,13 @@
             me.productModel = data['KL Product Model'];
           }
         });
+      },
+      toScan() {
+        KND.Native.scanQRCode({
+          success(data) {
+            console.log(data);
+          }
+        });
       }
     },
     components: {menuBox}
@@ -72,5 +80,8 @@
 <style lang="scss">
   .deviceDetail{
     background-color: #ffffff;
+  }
+  .klsn>.mint-cell-wrapper>.mint-cell-value>input{
+    margin-right: 0.5rem;
   }
 </style>

@@ -5,12 +5,36 @@
     </mt-header>
     <div class="mint-content addService">
       <div class="addform">
-        <mt-field label="联系电话" type="number" placeholder="请输入联系电话" v-model.trim="Contact_Phone" class="textRight require"></mt-field>
-        <mt-field label="报修联系人" type="text" :attr="isCall" placeholder="请输入联系人" v-model="Contact_Name" class="textRight require"></mt-field>
-        <mt-cell class="require mint-field"  @click.native="getLov('CONTACT_TYPE')" title="联系人类型"  :value="CONTACT_TYPE" placeholder="请选择" is-link></mt-cell>
-        <!--<mt-cell class="require mint-field margin-right" title="联系人类型"  :value="SR_TYPE"></mt-cell>-->
-        <mt-cell class="require mint-field" @click.native="getLov('KL_PROVINCE','CN')" title="省市" :value="KL_PROVINCE" placeholder="请选择"  is-link></mt-cell>
-        <mt-field class="block require" id="addressText" :attr="isEdit" label="详细地址" :placeholder="placeHold" v-model="Address" type="textarea" rows="2">
+        <mt-field label="联系电话"
+                  type="number"
+                  placeholder="请输入联系电话"
+                  v-model.trim="Contact_Phone"
+                  class="textRight"></mt-field>
+        <mt-field label="报修联系人"
+                  type="text"
+                  id="contactText"
+                  :attr="isCall"
+                  placeholder="请输入联系人"
+                  v-model="Contact_Name"
+                  class="textRight"></mt-field>
+        <mt-cell class="mint-field"
+                 @click.native="getLov('CONTACT_TYPE')"
+                 title="联系人类型"
+                 :value="CONTACT_TYPE"
+                 placeholder="请选择" is-link></mt-cell>
+        <mt-cell title="省市区"
+                 class="mint-field"
+                 @click.native="showLovFn('KL_PROVINCE')"
+                 placeholder="请选择"
+                 is-link
+                 v-model="provinces"></mt-cell>
+        <mt-field class="block require"
+                  id="addressText"
+                  :attr="isEdit"
+                  label="详细地址"
+                  placeholder="请输入详细地址"
+                  v-model="Address"
+                  type="textarea" rows="2">
           <i class="xs-icon icon-edit" @click="editAddress" style="position: absolute;bottom: 1.8rem;right: 0.8rem;"></i>
         </mt-field>
         <mt-cell class="mint-field"  title="服务类型" :value="SR_TYPE" @click.native="getLov('SR_TYPE','')"  placeholder="请选择" is-link></mt-cell>
@@ -30,11 +54,36 @@
         </div>
       </div>
       <mt-popup v-if="showBox" v-model="showBox" position="bottom">
-        <menuBox v-show="lovType === 'SR_TYPE'" @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType" :slots="srTypeSlots"></menuBox>
-        <menuBox v-show="lovType === 'KL_PROVINCE'" @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType" :slots="provinceSlots"></menuBox>
-        <menuBox v-show="lovType === 'CONTACT_TYPE'" @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType"  :slots="typeSlots"></menuBox>
-        <menuBox v-show="lovType === 'SR_AREA'" @my-enter="enter" @my-change="onValuesChange" @my-cancel="cancel" :type="lovType" :slots="areaSlots"></menuBox>
+        <menu-box v-show="lovType === 'SR_TYPE'"
+                 @my-enter="enter"
+                 @my-change="onValuesChange"
+                 @my-cancel="cancel"
+                 :type="lovType"
+                 :slots="srTypeSlots"></menu-box>
+        <menu-box v-show="lovType === 'CONTACT_TYPE'"
+                 @my-enter="enter"
+                 @my-change="onValuesChange"
+                 @my-cancel="cancel"
+                 :type="lovType"
+                 :slots="typeSlots"></menu-box>
+        <menu-box v-show="lovType === 'SR_AREA'"
+                 @my-enter="enter"
+                 @my-change="onValuesChange"
+                 @my-cancel="cancel"
+                 :type="lovType"
+                 :slots="areaSlots"></menu-box>
       </mt-popup>
+
+      <mt-popup v-model="showBox1" position="bottom">
+        <menu-box1 @my-enter="enter1"
+                  @my-cancel="showBox1 = false"
+                  @my-change="onValuesChange1"
+                  @my-change1="onValuesChange2"
+                  :slots="slots"
+                  :slots1="slots1"
+                  :slots2="slots2"></menu-box1>
+      </mt-popup>
+
       <mt-datetime-picker
         ref="picker1"
         v-model="pickerVisible"
@@ -57,8 +106,24 @@
 </template>
 <script>
   import {mapState, mapActions, mapMutations} from 'vuex';
-  import menuBox from '../../../public/components/cus-menu.vue';
-//  import { MessageBox } from 'mint-ui';
+  import Vue from 'vue';
+  import vp from 'public/plugin/validator';
+  import menuBox1 from '../components/cus-menu';
+  import menuBox from '../../../public/components/cus-menu';
+  Vue.use(vp);
+  let today = new Date();
+  //  import { MessageBox } from 'mint-ui';
+  let isMunicipality = function(...args) {
+    let me = this;
+    let city = args.pop();
+    let isMun = true;
+    for (let i = 0;i < me.Municipality.length; i++) {
+      if (city === me.Municipality[i]) {
+        isMun = false;
+      }
+    }
+    return isMun;
+  };
   const delay = (function() {
     let timer = 0;
     return function(callback, ms) {
@@ -67,9 +132,9 @@
     };
   })();
   const setAttrButt = (function() {
-    return function(id) {
+    return function(id, type) {
       let parent = document.getElementById(id);
-      let child = parent.getElementsByTagName('textarea');
+      let child = parent.getElementsByTagName(type);
       child[0].removeAttribute('disabled');
     };
   })();
@@ -77,7 +142,7 @@
     return function(callNum) {
       let phoneReg = new RegExp('^[1][3,4,5,7,8][0-9]{9}$');
       let workPhoneReg = new RegExp('^(([0\\+]\\d{2,3})?(0\\d{2,3}))(\\d{7,8})((\\d{3,}))?$');
-      return (phoneReg.test(callNum) || phoneReg.test(workPhoneReg));
+      return (phoneReg.test(callNum) || workPhoneReg.test(callNum));
     };
   })();
   const NameSpace = 'addService';
@@ -88,20 +153,23 @@
     data: () => {
       return {
         hideMore: false,
-        startDate: new Date(),
-        value: '12',
-        pickerVisible: true,
+        startDate: today,
+        pickerVisible: today,
         showBox: false,
+        showBox1: false,
         lovType: '',
+        slots: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
+        slots1: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
+        slots2: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
         Contact_Phone: '',     // 联系电话
         Contact_Name: '',   // 报修联系人
         Contact_Id: '',     // 客户Id
         Address: '',       // 详细地址
-        PROVINCE: '',      // 省
-        CITY: '',           // 市
+        KL_PROVINCE: '',      // 省
+        KL_CITY: '',           // 市
+        KL_TOWN: '',            // 区
         CONTACT_TYPE: '业主',  //  联系人类型
         SR_TYPE: '',
-        KL_PROVINCE: '',  // 省市
         SR_AREA: '',        // 故障现象
         Area: '',
         Priority: '',          // 故障等级
@@ -109,17 +177,25 @@
         Start_Date: null,        // 客户预约时间
         KL_SN: '',           // 条形码
         isCall: {},
-        isEdit: {disabled: false},
-        isClick: false,
-        placeHold: ''
+        isEdit: {},
+        isClick: false
       };
     },
     computed: {
-      ...mapState(NameSpace, ['search', 'provinceSlots', 'typeSlots', 'areaSlots', 'srTypeSlots', 'form', 'mustField']),
-      ...mapState('index', ['loginMeg'])
+      ...mapState(NameSpace, ['search', 'provinceSlots', 'typeSlots', 'areaSlots', 'srTypeSlots', 'form', 'mustField', 'Municipality']),
+      ...mapState('index', ['loginMeg']),
+      provinces() {
+        let me = this;
+        let isMun = isMunicipality.call(this, me.KL_PROVINCE);
+        if (isMun) {
+          return me.KL_PROVINCE + me.KL_CITY + me.KL_TOWN;
+        } else {
+          return me.KL_CITY + me.KL_TOWN;
+        }
+      }
     },
     methods: {
-      ...mapActions(NameSpace, ['getSearch', 'getValue', 'valueChange', 'getSn', 'submitService']),
+      ...mapActions(NameSpace, ['getSearch', 'getValue', 'valueChange', 'getSn', 'addContact', 'upDateContact', 'getLov1']),
       ...mapMutations(NameSpace, ['removeSearch']),
       showMore() {
         let me = this;
@@ -146,16 +222,16 @@
             }
           }
         }
-        let key = (!me.isEdit.id && me.isClick) ? 'upDateContact' : 'submitService';
-        console.log(me.loginMeg);
+        let key = (me.isClick) ? 'upDateContact' : 'addContact';
         let submitForm = {
           Contact_Id: me.Contact_Id,
           AddressId: me.AddressId,
           Contact_Phone: me.Contact_Phone,
           Contact_Name: me.Contact_Name,
           CONTACT_TYPE: me.CONTACT_TYPE,
-          PROVINCE: me.PROVINCE,
-          CITY: me.CITY,
+          KL_PROVINCE: me.KL_PROVINCE,      // 省
+          KL_CITY: me.KL_CITY,           // 市
+          KL_TOWN: me.KL_TOWN,            // 区
           Address: me.Address,
           Area: me.Area,
           SR_AREA: me.SR_AREA,
@@ -168,10 +244,14 @@
           KL_Cutoff_Date: me.form.KL_Cutoff_Date,
           Product_Warranty_Flag: me.form.Product_Warranty_Flag,
           key: key,
-          Owner: me.loginMeg['Login Name']
+          Owner: me.loginMeg['Login Name'],
+          callback: function(data) {
+            if (data) {
+              me.$router.go(-1);
+            }
+          }
         };
-        me.submitService(submitForm);
-        me.$router.go(-1);
+        me[submitForm.key](submitForm);
       },
       getLov(type) {
         let me = this;
@@ -189,18 +269,52 @@
           me.valueChange({type: type, value: values[0]});
         }
       },
+      onValuesChange1(value) {
+        let me = this;
+        me.slots1[0].values = [];
+        if (value[0]) {
+          me.getLov1({
+            type: 'KL_CITY',
+            parent: value[0],
+            success: data => {
+              let datas = KND.Util.toArray(data.items) ;
+              for (let i = 0;i < datas.length; i++) {
+                me.slots1[0].values.push(datas[i].Value);
+              }
+            }
+          });
+        }
+      },
+      onValuesChange2(value) {
+        let me = this;
+        me.slots2[0].values = [];
+        if (value[0]) {
+          me.getLov1({
+            type: 'KL_TOWN',
+            parent: value[0],
+            success: data => {
+              let datas = KND.Util.toArray(data.items) ;
+              for (let i = 0;i < datas.length; i++) {
+                me.slots2[0].values.push(datas[i].Value);
+              }
+            }
+          });
+        }
+      },
       selectCaLL(val) {
+        console.log(val);
         let me = this;
         me.Contact_Id = val['Id'];
         me.Contact_Phone = val['Work Phone #'];
         me.AddressId = val['Primary Personal Address Id'];
         me.Contact_Name = val['Last Name'];
+        me.KL_PROVINCE = val['KL Primary Personal Province'];      // 省
+        me.KL_CITY = val['Primary Personal City'];           // 市
+        me.KL_TOWN = val['KL Primary Personal Town'];            // 区
         me.Address = val['Primary Personal Street Address'];
-        me.PROVINCE = val['KL Primary Personal Province'];
-        me.CITY = val['Primary Personal City'];
-        me.isCall = {disabled: false};
+        me.isCall = {disabled: true};
+        me.isEdit = {disabled: true};
         me.isClick = true;
-        me.KL_PROVINCE = me.PROVINCE + me.CITY;
         me.removeSearch();
       },
       open(picker) {
@@ -209,6 +323,21 @@
       handleChange(value) {
         let me = this;
         me.Start_Date = value.format('MM/dd/yyyy hh:mm:ss');
+      },
+      showLovFn(type) {
+        let me = this;
+        me.slots[0].values = [];
+        me.showBox1 = true;
+        me.getLov1({
+          type: 'KL_PROVINCE',
+          parent: '中国',
+          success: data => {
+            let datas = KND.Util.toArray(data.items) ;
+            for (let i = 0;i < datas.length; i++) {
+              me.slots[0].values.push(datas[i].Value);
+            }
+          }
+        });
       },
       enter(values, type) {
         let me = this;
@@ -225,10 +354,16 @@
           me[type] = values[2];
         }
       },
+      enter1(values) {
+        let me = this;
+        me.showBox1 = false;
+        me.KL_PROVINCE = values['KL_PROVINCE'];
+        me.KL_CITY = values['KL_CITY'];
+        me.KL_TOWN = values['KL_TOWN'];
+      },
       editAddress() {
-        setAttrButt('addressText');
+        setAttrButt('addressText', 'textarea');
         this.isEdit = {};
-        this.placeHold = '请输入详细地址...';
       },
       cancel() {
         let me = this;
@@ -252,15 +387,22 @@
     watch: {
       Contact_Phone() {
         delay(() => {
-          if (this.isClick) {
+          if (!this.isCall.disabled && this.isClick) {
             this.isClick = false;
-          } else {
-            this.fetchData();
           }
+          if (!this.isClick) {
+            this.fetchData();
+            setAttrButt('contactText', 'input');
+            setAttrButt('addressText', 'textarea');
+          } else {
+            this.isCall = {};
+            this.isEdit = {};
+          }
+          console.log(this.isClick);
         }, 500);
       }
     },
-    components: {menuBox}
+    components: {menuBox, menuBox1, vp}
   };
 </script>
 <style lang="scss">

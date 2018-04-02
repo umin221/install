@@ -33,19 +33,13 @@ let ApiList = {
     };
     // 列表
   },
-  // getSearchList: option => {
-  //   return {
-  //     method: 'post',
-  //     url: 'service/EAI Siebel Adapter/Query',
-  //     data: {
-  //       'body': {
-  //         'OutputIntObjectName': 'Base KL Service Request Interface BO',
-  //         'SearchSpec': '[Service Request.Owner]=' + option.data['Owner'] + ' AND [Service Request.SR Number] ~LIKE "*' + option.data.status + '*"'
-  //       }
-  //     }
-  //   };
-  //   // 列表搜索
-  // },
+  getServiceR: option => {
+    return {
+      method: 'get',
+      url: 'data/KL Service Request Interface BO/Service Request/' + option.data.Id
+    };
+  // 通过ID查询服务请求
+  },
   getDetail: option => {
     return {
       method: 'post',
@@ -71,6 +65,44 @@ let ApiList = {
       }
     };
     // 通过序列号查询
+  },
+  addContact: option => {
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Upsert',
+      data: {
+        'body': {
+          'SiebelMessage': {
+            'MessageId': '',
+            'MessageType': 'Integration Object',
+            'IntObjectName': 'Base KL Contact Interface BO',
+            'IntObjectFormat': 'Siebel Hierarchical',
+            'ListOfBase KL Contact Interface BO': {
+              'Contact': {
+                'Id': '1',
+                'M/F': '男',
+                'Type': option.data.form.CONTACT_TYPE,
+                'Last Name': option.data.form.Contact_Name,
+                'Work Phone #': option.data.form.Contact_Phone,
+                'User Type': '售后',
+                'ListOfCutAddress': {
+                  'CUT Address': [
+                    {
+                      'Id': '1',
+                      'Country': '中国',
+                      'Province': option.data.form.KL_PROVINCE,
+                      'City': option.data.form.KL_CITY,
+                      'County': option.data.form.KL_TOWN,
+                      'Street Address': option.data.form.Address
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    };
   },
   getClose: option => {
     return {
@@ -192,7 +224,7 @@ let ApiList = {
   getSearch: option => {
     return {
       method: 'get',
-      url: 'data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] ~LIKE "' + option.data.val + '*" AND [User Type]=LookupValue("CONTACT_USER_TYPE", "Sales") &PageSize=10&StartRowNum=0'
+      url: 'data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] ~LIKE "' + option.data.val + '*" AND [User Type]<>LookupValue("CONTACT_USER_TYPE", "Sales") &PageSize=10&StartRowNum=0'
     };
     // 搜索电话联系人
   },
@@ -202,8 +234,14 @@ let ApiList = {
       url: 'data/KL Service Request Interface BO/Service Request/1-2BSB0DZ1',
       data: {
         // 'KL Contact Mobile Phone': option.data.form.Contact_Phone,
-        // 'KL Personal Province': option.data.form.PROVINCE,
-        // 'Personal City': option.data.form.CITY,
+        'KL Country': '中国',
+        'KL Province': option.data.form.KL_PROVINCE,
+        'KL City': option.data.form.KL_CITY,
+        'KL Town': option.data.form.KL_TOWN,
+        'KL Address': option.data.form.Address,
+        // 'KL Personal Province': option.data.form.KL_PROVINCE,
+        // 'Personal City': option.data.form.KL_CITY,
+        // 'Personal Town': option.data.form.KL_TOWN,
         // 'Personal Street Address': option.data.form.Address,
         'Contact Last Name': option.data.form.Contact_Name,
         'Primary Personal Address Id': option.data.form['Primary Personal Address Id'],
@@ -278,7 +316,7 @@ let ApiList = {
             'IntObjectFormat': 'Siebel Hierarchical',
             'ListOfBase KL Contact Interface BO': {
               'Contact': {
-                'Id': '1',
+                'Id': option.data.form.Contact_Id,
                 'M/F': '女',
                 'Type': option.data.form.CONTACT_TYPE,
                 'Last Name': option.data.form.Contact_Name,
@@ -286,10 +324,11 @@ let ApiList = {
                 'ListOfCUT Address': {
                   'CUT Address': [
                     {
-                      'Id': '1',
+                      'Id': option.data.form.AddressId,
                       'Country': '中国',
-                      'Province': option.data.form.PROVINCE,
-                      'City': option.data.form.CITY,
+                      'Province': option.data.form.KL_PROVINCE,
+                      'City': option.data.form.KL_CITY,
+                      'County': option.data.form.KL_TOWN,
                       'Street Address': option.data.form.Address
                     }
                   ]
@@ -306,6 +345,13 @@ let ApiList = {
     return {
       method: 'get',
       url: 'data/KL Asset Interface BO/Asset Mgmt - Asset/?searchspec=[Serial Number] = "' + option.data.num + '"'
+    };
+  },
+  getLov: option => {
+    option.data.parent = option.data.parent ? 'Parent Value = "' + option.data.parent + '"' : 'Parent is null';
+    return {
+      method: 'get',
+      url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND Type= "' + option.data.type + '" AND ' + option.data.parent + ' &PageSize=100&StartRowNum=0'
     };
   },
   getLov1: option => {
@@ -378,6 +424,19 @@ let ApiList = {
       }
     };
   },
+  addChildService: option => {          // 创建子服务请求再记一单
+    return {
+      method: 'PUT',
+      url: 'data/KL Service Request Interface BO/Service Request/',
+      data: {
+        'Id': '1', // 新建传1
+        'Parent Service Request Id': option.data.parentId,  // 父服务请求的Id，一定要填
+        'Contact Id': option.data.contactId, // 父服务请求的联系人Id
+        'Contact Last Name': option.data.lastName,  // 父服务请求的联系人名字
+        'Personal Location Id': option.data.locationId  // 父服务请求的主要维修地址Id
+      }
+    };
+  },
   serviceDone: option => {
     return {
       method: 'post',
@@ -392,19 +451,19 @@ let ApiList = {
     };
     //  服务请求完成状态
   },
-  getMoreOrder: option => {
-    return {
-      method: 'put',
-      url: 'data/KL Service Request Interface BO/Service Request',
-      data: {
-        'Id': '1',
-        'Contact Id': option.data.ContactId,
-        'Contact Last Name': option.data.ContactName,
-        'Personal Location Id': option.data.LocationId
-      }
-    };
-    //  经纬度逆地理转换
-  },
+  // getMoreOrder: option => {
+  //   return {
+  //     method: 'put',
+  //     url: 'data/KL Service Request Interface BO/Service Request',
+  //     data: {
+  //       'Id': '1',
+  //       'Contact Id': option.data.ContactId,
+  //       'Contact Last Name': option.data.ContactName,
+  //       'Personal Location Id': option.data.LocationId
+  //     }
+  //   };
+  //   //  经纬度逆地理转换
+  // },
   getMapAddress: option => {
     console.log(option);
     let lat = option.data.LngLat.latitude;

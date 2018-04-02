@@ -14,8 +14,8 @@
         <div class="servesParts">
           <div class="Parts" v-for="(item, index) in Product">
             <mt-switch
-            @click.native="change(index,switchStatus[index])"
-            v-model="switchStatus[index]">
+              @click.native="change(index,switchStatus[index])"
+              v-model="switchStatus[index]">
               {{switchStatus[index]?"保内":"保外"}}
             </mt-switch>
             <div class="PartsDetail">
@@ -36,7 +36,11 @@
         <mt-cell class="require" title="总费用">￥{{allFee}}</mt-cell>
         <mt-cell class="require" title="附件"></mt-cell>
         <div style="background-color: #ffffff">
-          <div style="color: #777;font-size: 0.75rem;text-indent:0.75em;line-height: 40px">上传图片</div>
+          <attach ioName="KL Service Request Attachment IO" ref="attach"
+                  :attach="attach.list"
+                  :edit="attach.edit"
+                  :title="attach.title">
+          </attach>
         </div>
         <mt-popup v-if="showBox" v-model="showBox" position="bottom">
           <menu-box @my-enter="enter" @my-cancel="cancel" :slots="slots" :type="lovType"></menu-box>
@@ -67,7 +71,12 @@ export default {
       switchStatus: [],
       fee: 0,
       allFee: 0,
-      one: 1
+      one: 1,
+      attach: { // 附件
+        list: [],
+        edit: true,
+        title: '相关照片'
+      }
     };
   },
   computed: {
@@ -111,6 +120,16 @@ export default {
           me.allFee = me.allFee - parseInt(me.productData[num]['List Price'], 0);
         }
       }
+    },
+    getSwipeBtn(item) {
+      return this.isConfirming ? [{
+        content: '删除',
+        style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
+        handler: () => this.deleteFn(item)
+      }] : [];
+    },
+    deleteFn(item) {
+      console.lot(item);
     },
     submit() {
       let me = this;

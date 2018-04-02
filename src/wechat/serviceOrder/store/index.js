@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import api from '../api/api';
-import { MessageBox } from 'mint-ui';
+// import { MessageBox } from 'mint-ui';
 import { app } from 'public/store';
 
 Vue.use(Vuex);
@@ -20,14 +20,6 @@ const PAGESIZE = config.pageSize;
 let mapps;
 
 // tipBox
-const tipBox = (function() {
-  return function(callback) {
-    MessageBox({
-      title: '提示',
-      message: callback
-    });
-  };
-})();
 const systemSort = function(array) {
   return array.sort(function(a, b) {
     return new Date(b['Created']) - new Date(a['Created']);
@@ -131,6 +123,7 @@ export default new Vuex.Store({
           {name: '详细地址', key: 'Address'},
           {name: '服务类型', key: 'SR_TYPE'}
         ],
+        Municipality: ['上海', '天津', '澳门', '重庆', '香港', '北京'],
         search: [],
         provinceSlots: [
           {flex: 1, values: [], className: 'slot1', textAlign: 'center'},
@@ -277,31 +270,62 @@ export default new Vuex.Store({
             }
           });
         },
-        submitService({commit}, form) {
+        // 新建联系人
+        addContact({commit, dispatch}, form) {
+          api.get({
+            key: 'addContact',
+            data: {
+              form
+            },
+            success: function(data) {
+              form.Contact_Id = data.PrimaryRowId;
+              dispatch('submitService', form);
+            },
+            error: function(data) {
+              commit('changeValue', 'error');
+            }
+          });
+        },
+        upDateContact({commit, dispatch}, form) {
+          console.log(form);
           api.get({
             key: form.key,
             data: {
               form
             },
             success: function(data) {
-              if (form.key === 'upDateContact' && data) {
-                api.get({
-                  key: 'submitService',
-                  data: {
-                    form
-                  },
-                  success: function(data) {
-                    tipBox('新建成功！');
-                  },
-                  error: function(data) {
-                    commit('changeValue', 'error');
-                  }
-                });
-              }
-              // commit('setSn', data['SiebelMessage']['Asset Mgmt - Asset']);
+              dispatch('submitService', form);
             },
             error: function(data) {
               commit('changeValue', 'error');
+            }
+          });
+        },
+        submitService({commit}, form) {
+          api.get({
+            key: 'submitService',
+            data: {
+              form
+            },
+            success: function(data) {
+              Toast('提交成功！');
+              form.callback(data);
+            },
+            error: function(data) {
+              commit('changeValue', 'error');
+            }
+          });
+        },
+        getLov1({commit}, {type, parent, success, error}) {
+          api.get({
+            key: 'getLov',
+            data: {
+              type,
+              parent
+            },
+            success,
+            error: data => {
+              console.log(data);
             }
           });
         }
@@ -328,7 +352,8 @@ export default new Vuex.Store({
         BtnStatu: '',
         starAddress: '',
         visitAddress: '',
-        endAddress: ''
+        endAddress: '',
+        orderEntry: []
       },
       mutations: {
         setPartner(state, form) {
@@ -363,6 +388,9 @@ export default new Vuex.Store({
             } else if (form.Status === '未开始' && form['SR Type'] === '上门维修') {
               state.BtnStatu = 'status4';
             }
+          }
+          if (form['Order Entry - Orders']) {
+            state.orderEntry = KND.Util.toArray(form['Order Entry - Orders']);
           }
         },
         setAddress(state, {data, type}) {
@@ -451,17 +479,34 @@ export default new Vuex.Store({
             }
           });
         },
-        getMoreOrder({commit}, {ContactId, ContactName, LocationId}) {
+        // getMoreOrder({commit}, {ContactId, ContactName, LocationId}) {
+        //   api.get({
+        //     key: 'getMoreOrder',
+        //     data: {
+        //       ContactId,
+        //       ContactName,
+        //       LocationId
+        //     },
+        //     success: function(data) {
+        //       commit('setAddress', {data: data['formatted_address'], type: type});
+        //       console.log(data);
+        //     }
+        //   });
+        // },
+        addChildService({commit}, {parentId, contactId, lastName, locationId}) {
           api.get({
-            key: 'getMoreOrder',
+            key: 'addChildService',
             data: {
-              ContactId,
-              ContactName,
-              LocationId
+              parentId,
+              contactId,
+              lastName,
+              locationId
             },
             success: function(data) {
-              // commit('setAddress', {data: data['formatted_address'], type: type});
-              // console.log(data);
+              console.log(data);
+            },
+            error: function(data) {
+              console.log(data);
             }
           });
         }
@@ -516,6 +561,9 @@ export default new Vuex.Store({
         },
         errorTips(state) {
           Toast(state.tips);
+        },
+        setProductModel(state, value) {
+          state.ProductModel = value;
         },
         addValue1(state, val) {
           state.slots[0].values = [];
@@ -594,21 +642,24 @@ export default new Vuex.Store({
               form
             },
             success: function(data) {
-              // if (data) {
-              //   api.get({
-              //     key: 'getDetail',
-              //     data: {
-              //       srNumber: form.srNum
-              //     },
-              //     success: function(data) {
-              //     }
-              //   });
-              // }
-              // console.log(data);
               form.callBack();
             },
             error: function(data) {
               form.callBack();
+              console.log('error');
+            }
+          });
+        },
+        getServiceR({commit}, {Id, callback}) {
+          api.get({
+            key: 'getServiceR',
+            data: {
+              Id
+            },
+            success: function(data) {
+              callback(data);
+            },
+            error: function(data) {
               console.log('error');
             }
           });

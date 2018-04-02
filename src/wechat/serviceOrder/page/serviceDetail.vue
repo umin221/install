@@ -3,7 +3,9 @@
     <div class="service-continer">
       <mt-header fixed :title="headTitle">
         <fallback slot="left"></fallback>
-        <mt-button  slot="right" @click.native="openConfirm">关闭</mt-button>
+        <mt-button  slot="right"
+                    @click.native="openConfirm"
+                    v-if="role === 'install'">关闭</mt-button>
       </mt-header>
 
       <div class="mint-content service-detail">
@@ -19,7 +21,7 @@
             <mt-tab-item v-for="tab in tabList" :id="tab.id" :key="tab.id">{{tab.name}}</mt-tab-item>
           </mt-navbar>
           <mt-tab-container v-model="active">
-            <mt-tab-container-item id="tab-container1">
+            <mt-tab-container-item id="tab-container1" class="marginB">
               <div class="mt-Detail-info">
                 <div>产品条形码：<a href="javascript:void(0);" class="detail-call">{{ServiceRequest['KL SN']}}</a></div>
                 <div>产品型号：{{ServiceRequest['KL Product Model']}}</div>
@@ -32,7 +34,11 @@
                   <div>{{ServiceRequest['Description']}}</div>
                 </div>
                 <div>相关照片：
-                  <div><img src="" alt="" height="100"></div>
+                  <attach ioName="KL Service Request Attachment IO" ref="attach"
+                          :attach="attach.list"
+                          :edit="attach.edit"
+                          :title="attach.title">
+                  </attach>
                 </div>
               </div>
             </mt-tab-container-item>
@@ -50,16 +56,16 @@
                     </ul>
                   </toggle>
                   <toggle :title="false" label="完工确认单">
-                    <div v-if="ServiceRequest['Order Entry - Orders']">
-                      <div class="enter-order">
-                        <div>保修期</div>
-                        <div>配件名称</div>
-                        <div>数量</div>
-                      </div>
-                      <div class="enter-order">
-                        <div>{{ServiceRequest['Order Entry - Orders']['Order Entry - Line Items']['KL Warranty Flag']}}</div>
-                        <div>{{ServiceRequest['Order Entry - Orders']['Order Entry - Line Items']['KL Product Name Join']}}</div>
-                        <div>{{ServiceRequest['Order Entry - Orders']['Order Entry - Line Items']['Quantity Requested']}}</div>
+                    <div v-if="orderEntry.length" v-for="(item, index) in orderEntry">
+                      <div v-if="item['Order Entry - Line Items']">
+                        <div class="enter-order">
+                          <div>{{item['Order Entry - Line Items']['KL Warranty Flag'] === "N" ? '保内': '保外'}}</div>
+                          <div>{{item['Order Entry - Line Items']['KL Product Name Join']}}</div>
+                          <div>{{item['Order Entry - Line Items']['Quantity Requested']}}</div>
+                        </div>
+                        <div class="enter-order">
+                          <div>总金额：{{item['Order Total']}}</div>
+                        </div>
                       </div>
                     </div>
                     <div v-else>
@@ -121,18 +127,28 @@
           <mt-button v-else-if="Action['Status']==='已预约'" style="background: gainsboro">签到</mt-button>
         </mt-cell>
         <mt-cell title="记录故障">
-          <mt-button v-if="Action['Status']==='已上门'&& ServiceRequest['SR Rootcause']"
-                     @click="clickPosition('comEnter')">已填写</mt-button>
-          <mt-button v-else-if="Action['Status']==='已上门' && !ServiceRequest['SR Rootcause']"
-                     @click="clickPosition('comEnter')">填写</mt-button>
-          <mt-button v-else style="background: gainsboro">填写</mt-button>
+          <div v-if="!ServiceRequest['KL Child Service Request']">
+            <mt-button v-if="Action['Status']==='已上门'&& ServiceRequest['SR Rootcause']"
+                       @click="fillIn">已填写</mt-button>
+            <mt-button v-else-if="Action['Status']==='已上门' && !ServiceRequest['SR Rootcause']"
+                       @click="clickPosition('comEnter')">填写</mt-button>
+            <mt-button v-else style="background: gainsboro">填写</mt-button>
+          </div>
+          <div v-else>
+            <mt-button @click.native="childCom(ServiceRequest['KL Child Service Request'])">填写</mt-button>
+          </div>
         </mt-cell>
         <mt-cell title="完工确认">
-          <mt-button v-if="Action['Status']==='已上门'&& ServiceRequest['SR Rootcause'] && ServiceRequest['Status'] !== '已完成'"
-                     @click.native="clickPosition('failureRecord')">填写</mt-button>
-          <mt-button v-else-if="ServiceRequest['Status'] === '已完成'"
-                     @click.native="moreOrder">再记一单</mt-button>
-          <mt-button v-else style="background: gainsboro">填写</mt-button>
+          <div v-if="!ServiceRequest['KL Child Service Request']">
+            <mt-button v-if="Action['Status']==='已上门'&& ServiceRequest['SR Rootcause'] && ServiceRequest['Status'] !== '已完成'"
+                       @click.native="clickPosition('failureRecord')">填写</mt-button>
+            <mt-button v-else-if="ServiceRequest['Status'] === '已完成'"
+                       @click.native="moreOrder">再记一单</mt-button>
+            <mt-button v-else style="background: gainsboro">填写</mt-button>
+          </div>
+          <div v-else>
+            <mt-button v-if="" @click.native="childRecord(ServiceRequest['KL Child Service Request'])">填写</mt-button>
+          </div>
         </mt-cell>
         <mt-cell class="completeEnd" title="结束">
           <mt-button v-if="ServiceRequest['Status'] === '已完成'" @click.native="clickPosition('end')">确认</mt-button>
@@ -180,15 +196,20 @@
         endTime: '',
         callEnd: false,
         AppointEnd: false,
-        call: false
+        call: false,
+        attach: { // 附件
+          list: [],
+          edit: false,
+          title: '相关照片'
+        }
       };
     },
     computed: {
       ...mapState('index', ['loginMeg', 'role']),
-      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress'])
+      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress', 'orderEntry'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress', 'getMoreOrder']),
+      ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress', 'addChildService']),
       boxClose(msg) {               // 关闭取消事件
         this.showBox = false;
       },
@@ -269,7 +290,7 @@
       },
       callSolve() {
         let me = this;
-        MessageBox.confirm('远程电话沟通客户已解决，确认提交？?', '').then(action => {
+        MessageBox.confirm('远程电话沟通客户已解决，确认提交？', '').then(action => {
           let obj = {
             srId: me.ServiceRequest['Id'],
             actionId: me.Action['Id'],
@@ -346,11 +367,41 @@
       moreOrder() {
         let me = this;
         let params = {
-          ContactId: me.ServiceRequest['Contact Id'],
-          ContactName: me.ServiceRequest['Contact Last Name'],
-          LocationId: me.ServiceRequest['Personal Location Id']
+          parentId: me.ServiceRequest['Id'],
+          contactId: me.ServiceRequest['Contact Id'],
+          lastName: me.ServiceRequest['Contact Last Name'],
+          locationId: me.ServiceRequest['Personal Location Id']
         };
-        me.getMoreOrder(params);
+        console.log(params);
+        me.addChildService(params);
+      },
+      fillIn() {
+        let me = this;
+        me.$router.push({
+          name: 'comEnter',
+          query: {
+            id: me.ServiceRequest['Id']
+          }
+        });
+      },
+      childCom(child) {
+        let me = this;
+        me.$router.push({
+          name: 'comEnter',
+          query: {
+            id: child['Id'],
+            type: 'child'
+          }
+        });
+      },
+      childRecord(child) {
+        let me = this;
+        me.$router.push({
+          name: 'saveFault',
+          query: {
+            id: child['Id']
+          }
+        });
       },
       changeMy() {              // 主管接单
         let me = this;
@@ -396,6 +447,9 @@
   @mixin remove-decoration (){
     text-decoration: none;
     color: lightblue;
+  }
+  .marginB{
+    margin-bottom: 40px;
   }
   .service-continer{
     position: relative;

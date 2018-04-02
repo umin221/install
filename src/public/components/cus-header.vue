@@ -89,7 +89,7 @@
     }
 
     .cus-header-menu {
-      position: absolute;
+      position: fixed;
       top: $header-height;
       width: 40%;
       font-size: $font-size-small;
