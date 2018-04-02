@@ -42,7 +42,7 @@
   import buttonGroup from 'public/components/cus-button-group';
 
   // 任务id
-  let activityId = '1-2BSETV8Y';
+  let activityId; // '1-2BSETV8Y'
   // 楼层&房号信息
   let layers = {};
   // 当前最高楼层
@@ -52,6 +52,7 @@
   export default {
     name: NAMESPACE,
     created() {
+      activityId = this.$route.query.id || '1-2BSETV8Y';
       // 查询所有楼栋
       this.queryBuilding({
         data: {
@@ -87,7 +88,7 @@
       }
     },
     methods: {
-      ...mapActions(NAMESPACE, ['queryBuilding', 'getLayer', 'deleteBuilding']),
+      ...mapActions(NAMESPACE, ['queryBuilding', 'getLayer', 'removeBuilding']),
       /**
        * 编辑楼栋信息
        */
@@ -169,19 +170,21 @@
        * @param {Object} floor 楼层
        */
       deleteBuildingFn(floor) {
-        let floorNum = floor[0]['Integration Id 3'];
-        this.deleteBuilding({
-          data: {
-            'Object Id': activityId,
-            'BuildingNum': this.selected,
-            'FloorNum': floorNum
-          },
-          success: data => {
-            this.getLayer({
-              'KL Activity Id': activityId,
-              'Integration Id 2': this.selected
-            });
-          }
+        MessageBox.confirm('是否删除整层？', '请确认').then(() => {
+          let floorNum = floor[0]['Integration Id 3'];
+          this.removeBuilding({
+            data: {
+              'Object Id': activityId,
+              'BuildingNum': this.selected,
+              'FloorNum': floorNum
+            },
+            success: data => {
+              this.getLayer({
+                'KL Activity Id': activityId,
+                'Integration Id 2': this.selected
+              });
+            }
+          });
         });
       },
       /**

@@ -12,7 +12,7 @@
                      :right="[{
                         content: '删除',
                         style: { background: 'red', color: '#fff' },
-                        handler: () => this.$messagebox('delete')
+                        handler: () => removeFn(room, index)
                       }]"
                      :key="index">
         <input type="text" class="mint-field-core" v-model="room['Street Address 4']"/>
@@ -86,7 +86,7 @@
       };
     },
     methods: {
-      ...mapActions(NAMESPACE, ['upsertRoom']),
+      ...mapActions(NAMESPACE, ['upsertRoom', 'removeRoom']),
       // 更新房号&楼层信息
       saveFn() {
         this.upsertRoom(format(this.floor, this.floorName));
@@ -112,6 +112,20 @@
           }
         };
         floor.push(room);
+      },
+      // 删除房号
+      removeFn(room, index) {
+        MessageBox.confirm('是否删除这个房间？', '请确认').then(() => {
+          let remove = () => this.floor.splice(index, 1);
+          console.log(room);
+          // 有如下字段，表示为本地对象 未提交服务器
+          room['ListOfKL Install Order Asset'] ? remove() : this.removeRoom({
+            data: { id: room.Id },
+            success: data => {
+              remove();
+            }
+          });
+        });
       }
     },
     components: {buttonGroup}

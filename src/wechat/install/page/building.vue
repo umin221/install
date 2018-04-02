@@ -10,7 +10,7 @@
                      :right="[{
                         content: '删除',
                         style: { background: 'red', color: '#fff' },
-                        handler: () => deleteFn(item, index)
+                        handler: () => removeFn(item, index)
                       }]"
                      :key="index">
         <input type="text" class="mint-field-core" v-model="item['BuildingName']"/>
@@ -39,18 +39,18 @@
     },
     methods: {
       ...mapActions(NAMESPACE, ['save']),
-      ...mapActions(ASSETS, ['deleteBuilding']),
+      ...mapActions(ASSETS, ['removeBuilding']),
       ...mapMutations(ASSETS, ['remove']),
       // 保存楼栋信息
       saveFn() {
         this.save();
       },
       // 删除整栋
-      deleteFn(item, index) {
+      removeFn(item, index) {
         let me = this;
         MessageBox.confirm('删除后无法撤销', '请确认').then(() => {
           let id = me.$route.query.id;
-          me.deleteBuilding({
+          me.removeBuilding({
             data: {
               'Object Id': id,
               'BuildingNum': item['BuildingNum']

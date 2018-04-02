@@ -102,7 +102,7 @@ let apiList = {
    * @param {String} option.data.id 房号id
    * @returns {{url: string, data: {}}}
    */
-  deleteRoom: option => {
+  removeRoom: option => {
     return {
       url: 'data/KL Install Order Asset/KL Install Order Asset/' + option.data.id,
       data: {}
@@ -116,7 +116,7 @@ let apiList = {
    * @param {String} option.data['FloorNum'] 必填 楼层编号 如不传则删除整栋
    * @returns {{url: string, data: {body: {ProcessName: string, Object Id: string, BuildingNum: string, FloorNum: string}}}}
    */
-  deleteBuilding: option => {
+  removeBuilding: option => {
     let body = option.data;
     body.ProcessName = 'KL Install Order Asset Room Delete Process';
     delete option.data;

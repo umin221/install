@@ -1,9 +1,5 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
 import api from '../api/api';
 import { app } from 'public/store';
-
-Vue.use(Vuex);
 
 // 缓存页面
 app.state.alive = ['index'];
@@ -13,7 +9,7 @@ const PAGESIZE = config.pageSize;
 // mapp
 let mapps = config.mapp['manager'];
 
-export default new Vuex.Store({
+export default {
   modules: {
     app,
     /**
@@ -134,8 +130,8 @@ export default new Vuex.Store({
         /**
          * 删除楼栋或楼层
          */
-        deleteBuilding({state}, setting) {
-          setting.key = 'deleteBuilding';
+        removeBuilding({state}, setting) {
+          setting.key = 'removeBuilding';
           api.get(setting);
         }
       }
@@ -166,6 +162,13 @@ export default new Vuex.Store({
               });
             }
           });
+        },
+        /**
+         * 删除房号
+         */
+        removeRoom(setting) {
+          setting.key = 'removeRoom';
+          api.get(setting);
         }
       }
     },
@@ -184,4 +187,4 @@ export default new Vuex.Store({
       }
     }
   }
-});
+};

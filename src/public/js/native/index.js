@@ -238,8 +238,10 @@ import cache from '../lib/cache';
         if (option.error) {
           option.error(error);
         } else {
-          console.error(error);
           let message = error.response && error.response.data.ERROR;
+          // 屏蔽空数据报错
+          if (message === 'There is no data for the requested resource') return;
+          console.error(error);
           Toast({
             message: message || '获取数据失败',
             position: 'bottom',
