@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import api from '../api/api';
 import { app } from 'public/store';
+import sto from '../../install/store';
 
 Vue.use(Vuex);
 
@@ -13,7 +14,7 @@ const PAGESIZE = config.pageSize;
 // map
 let mapp = config.mapp['list'];
 
-export default new Vuex.Store({
+export default new Vuex.Store(Object.extend(true, sto, {
   modules: {
     app,
     index: {
@@ -695,4 +696,4 @@ export default new Vuex.Store({
       }
     }
   }
-});
+}));

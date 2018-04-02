@@ -18,7 +18,9 @@
         <mt-field label="计划开始日期"  :value="start_Date"></mt-field>
         <mt-field label="计划完成日期" :value="end_Date"></mt-field>
         <mt-field label="计划开孔数量"
-                   :value="batchNum" is-link></mt-field>
+                  :value="batchNum"
+                  @click.native="editBuildingFn"
+                  is-link></mt-field>
         <mt-field v-show="is_installer" label="合作伙伴"  :value="companyName"></mt-field>
         <mt-field v-show="is_zs" label="真锁交接日期"  :value="deliveryTime"></mt-field>
       </div>
@@ -330,6 +332,18 @@
               Toast('提交成功');
               KND.Util.back();
             }
+          }
+        });
+      },
+      /**
+       * 编辑楼栋信息
+       */
+      editBuildingFn() {
+        let id = this.$route.query.Id;
+        this.$router.push({
+          path: 'assets',
+          query: {
+            id: id
           }
         });
       }

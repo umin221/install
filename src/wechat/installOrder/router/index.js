@@ -161,22 +161,22 @@ export default new Router({
       require(['../page/buildingInfo'], resolve);
     }
   }, { // 项目楼层信息采集---楼层
+    path: '/assets',
+    name: 'assets',
+    component(resolve) {
+      require(['../../install/page/assets'], resolve);
+    }
+  }, { // 项目楼层信息采集 -- 栋
     path: '/building',
     name: 'building',
     component(resolve) {
-      require(['../page/building'], resolve);
-    }
-  }, { // 项目楼层信息采集 -- 栋
-    path: '/ban',
-    name: 'ban',
-    component(resolve) {
-      require(['../page/ban'], resolve);
+      require(['../../install/page/building'], resolve);
     }
   }, { // 项目楼层信息采集 -- 层
     path: '/floor',
     name: 'floor',
     component(resolve) {
-      require(['../page/floor'], resolve);
+      require(['../../install/page/floor'], resolve);
     }
   }]
 });
