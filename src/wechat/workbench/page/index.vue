@@ -38,17 +38,15 @@
         listObj: [
           {'id': 'demo', 'vul': 'demo', 'icon': 'demo'},
           {'id': 'workPlan', 'vul': '工作计划', 'icon': 'plan'},
-          /* {'id': 1, 'vul': '安装打卡'},*/
           {'id': 'transferOrder', 'vul': '安装交接单', 'icon': 'transfer'},
           {'id': 'installOrder', 'vul': '安装订单', 'icon': 'install'},
           {'id': 'serviceOrder', 'vul': '维修工单', 'icon': 'service'},
           {'id': 'orderForms', 'vul': '维修订单', 'icon': 'forms'},
-          /* {'id': 1, 'vul': '维修订单'},
+          /*
           {'id': 1, 'vul': '我的配件'},
           {'id': 1, 'vul': '配件领用'},
           {'id': 1, 'vul': '配件退入'},*/
-          {'id': 'outsourcing', 'vul': '委外人员管理', 'icon': 'out'},
-          {'id': 'officialAccounts', 'vul': '公众号', 'icon': 'out'}
+          {'id': 'outsourcing', 'vul': '委外人员管理', 'icon': 'out'}
         ]
       };
     },

@@ -126,8 +126,8 @@
       ...mapState(NAMESPACE, ['order', 'lines']),
       // 是否可编辑
       editable() {
-        let status = this.order['Status'];
-        return (!status || status === '草稿') && !this.isTeam;
+        let status = this.order['Calculated Order Status'];
+        return (!status || status === 'Draft' || status === 'Rejected') && !this.isTeam;
       },
       // 是否显示 发起提交 按钮
       showSubmit() {
