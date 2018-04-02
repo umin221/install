@@ -147,8 +147,7 @@ export default new Vuex.Store({
             },
             success: data => {
               commit('setOrders', data.items);
-            },
-            error: data => {}
+            }
           });
         },
         /**

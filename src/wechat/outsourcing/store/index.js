@@ -227,10 +227,6 @@ export default new Vuex.Store({
             key: 'findContact',
             data: data,
             success: data => {
-
-            },
-            error: data => {
-              console.log(data);
             }
           });
         },
