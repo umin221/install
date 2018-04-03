@@ -58,7 +58,16 @@ export default {
   name: NAMESPACE,
   created() {
     let me = this;
-    me.isBn = me.ServiceRequest['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
+    let serviceId = me.$route.query.id;
+    if (serviceId) {
+      me.getServiceR({
+        Id: serviceId,
+        callback: function(data) {
+          me.ServiceRequest = data;
+          me.isBn = me.ServiceRequest['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
+        }
+      });
+    }
   },
   data: () => {
     return {
@@ -72,6 +81,7 @@ export default {
       fee: 0,
       allFee: 0,
       one: 1,
+      ServiceRequest: {},
       attach: { // 附件
         list: [],
         edit: true,
@@ -81,7 +91,7 @@ export default {
   },
   computed: {
     ...mapState('searchTrans', ['returnSelect', 'priceId']),
-    ...mapState('detail', ['ServiceRequest']),
+//    ...mapState('detail', ['ServiceRequest']),
     Product() {
       let me = this;
       let arr = [];
@@ -101,7 +111,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(NAMESPACE, ['addServiceOrder']),
+    ...mapActions(NAMESPACE, ['addServiceOrder', 'getServiceR']),
     ...mapMutations('searchTrans', ['initSelect']),
     ...mapMutations('detail', ['setPartner']),
     productNumber(val, num, type) {

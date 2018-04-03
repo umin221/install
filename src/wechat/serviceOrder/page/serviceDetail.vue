@@ -129,13 +129,16 @@
         <mt-cell title="记录故障">
           <div v-if="!ServiceRequest['KL Child Service Request']">
             <mt-button v-if="Action['Status']==='已上门'&& ServiceRequest['SR Rootcause']"
-                       @click="fillIn">已填写</mt-button>
+                       @click="fillIn('ServiceRequest')">已填写</mt-button>
             <mt-button v-else-if="Action['Status']==='已上门' && !ServiceRequest['SR Rootcause']"
                        @click="clickPosition('comEnter')">填写</mt-button>
             <mt-button v-else style="background: gainsboro">填写</mt-button>
           </div>
           <div v-else>
-            <mt-button @click.native="childCom(ServiceRequest['KL Child Service Request'])">填写</mt-button>
+            <mt-button v-if="childService['SR Rootcause']"
+                       @click="fillIn('childService')">已填写</mt-button>
+            <mt-button v-else
+              @click.native="childCom(childService)">填写</mt-button>
           </div>
         </mt-cell>
         <mt-cell title="完工确认">
@@ -147,7 +150,11 @@
             <mt-button v-else style="background: gainsboro">填写</mt-button>
           </div>
           <div v-else>
-            <mt-button v-if="" @click.native="childRecord(ServiceRequest['KL Child Service Request'])">填写</mt-button>
+            <mt-button v-if="childService['SR Rootcause'] && childService['Status'] !== '已完成'"
+                       @click.native="childRecord(childService)">填写</mt-button>
+            <mt-button v-else-if="childService['Status'] === '已完成'"
+                       @click.native="moreOrder">再记一单</mt-button>
+            <mt-button v-else style="background: gainsboro">填写</mt-button>
           </div>
         </mt-cell>
         <mt-cell class="completeEnd" title="结束">
@@ -206,7 +213,7 @@
     },
     computed: {
       ...mapState('index', ['loginMeg', 'role']),
-      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress', 'orderEntry'])
+      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress', 'orderEntry', 'childService'])
     },
     methods: {
       ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress', 'addChildService']),
@@ -370,17 +377,18 @@
           parentId: me.ServiceRequest['Id'],
           contactId: me.ServiceRequest['Contact Id'],
           lastName: me.ServiceRequest['Contact Last Name'],
-          locationId: me.ServiceRequest['Personal Location Id']
+          locationId: me.ServiceRequest['Personal Location Id'],
+          srNumber: me.ServiceRequest['SR Number']
         };
         console.log(params);
         me.addChildService(params);
       },
-      fillIn() {
+      fillIn(key) {
         let me = this;
         me.$router.push({
           name: 'comEnter',
           query: {
-            id: me.ServiceRequest['Id']
+            id: me[key]['Id']
           }
         });
       },

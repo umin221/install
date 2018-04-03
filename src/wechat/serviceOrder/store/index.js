@@ -336,6 +336,7 @@ export default new Vuex.Store({
       state: {
         ServiceRequest: {},
         Action: {},
+        childService: [],
         processDate: [],
         Statu: {
           '接单': 'Accept',
@@ -391,6 +392,10 @@ export default new Vuex.Store({
           }
           if (form['Order Entry - Orders']) {
             state.orderEntry = KND.Util.toArray(form['Order Entry - Orders']);
+          }
+          if (form['KL Child Service Request']) {
+            let childService = KND.Util.toArray(form['KL Child Service Request']);
+            state.childService = childService[0];
           }
         },
         setAddress(state, {data, type}) {
@@ -493,7 +498,7 @@ export default new Vuex.Store({
         //     }
         //   });
         // },
-        addChildService({commit}, {parentId, contactId, lastName, locationId}) {
+        addChildService({commit, dispatch}, {parentId, contactId, lastName, locationId, srNumber}) {
           api.get({
             key: 'addChildService',
             data: {
@@ -503,7 +508,9 @@ export default new Vuex.Store({
               locationId
             },
             success: function(data) {
-              console.log(data);
+              if (data) {
+                dispatch('getDetail', srNumber);
+              }
             },
             error: function(data) {
               console.log(data);
@@ -554,10 +561,8 @@ export default new Vuex.Store({
       },
       mutations: {
         successCall(state, data) {
-          console.log(data);
           data.type = data.type || '';
           state.ProductModel = data.item['KL Product Model' + data.type];
-          console.log(state);
         },
         errorTips(state) {
           Toast(state.tips);
@@ -868,6 +873,20 @@ export default new Vuex.Store({
                   }
                 });
               }
+            }
+          });
+        },
+        getServiceR({commit}, {Id, callback}) {
+          api.get({
+            key: 'getServiceR',
+            data: {
+              Id
+            },
+            success: function(data) {
+              callback(data);
+            },
+            error: function(data) {
+              console.log('error');
             }
           });
         }

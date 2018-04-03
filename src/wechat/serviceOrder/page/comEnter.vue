@@ -17,7 +17,7 @@
           <input type="text" placeholder="楼层" v-model="floor">
           <input type="text" placeholder="房号" v-model="room">
         </div>
-        <mt-cell class="require mint-field" title="产品型号" placeholder="请选择" @click.native="toSearchT('fault')" is-link>{{ProductModel||Product_model}}</mt-cell>
+        <mt-cell class="require mint-field" title="产品型号" placeholder="请选择" @click.native="toSearchT('fault')" is-link>{{ProductModel}}</mt-cell>
         <mt-cell class="mint-field require" title="故障现象" placeholder="请选择" @click.native="showArea('SR_ROOTCAUSE')" is-link>{{rootcause}}</mt-cell>
         <mt-cell class="mint-field require" :value="Responsbility" @click.native="showArea('KL_SR_RESP')" title="责任划分" is-link></mt-cell>
         <mt-field class="block require" label="解决方法" v-model="repairDetails" placeholder="详细描述或附加需求..." type="textarea" rows="3"></mt-field>
@@ -194,8 +194,10 @@
             return;
           }
         }
+        console.log(me.childId);
+        console.log(me.ServiceRequest['Id']);
         let form = {
-          'Id': me.ServiceRequest['Id'],
+          'Id': me.childId || me.ServiceRequest['Id'],
           'Asset Number': me.AssetNumber, // 产品ID
           'SR Rootcause': me.rootcause,                   // 故障反馈
           'KL Responsibility': me.Responsbility,     // 责任划分
