@@ -81,7 +81,6 @@
             me.AssetNumber = data['Asset Number'];
             me.Responsbility = data['KL Responsbility'];
             me.repairDetails = data['Repair Details'];
-            me.setProductModel(data['KL Product Model']);
             me.sarech();
           }
         });
@@ -173,10 +172,11 @@
         });
       },
       scan() {
-//        let me = this;
+        let me = this;
         KND.Native.scanQRCode({
           success(data) {
-            console.log(data);
+            me.SerialNumber = data.resultStr;
+            me.sarech();
 //            me.AssetNumber = data['Asset Number'];
 //            me.ProductId = data['Id'];  // 产品ID
 //            me.Personal = data['KL Personal Province'] + data['Personal City'];    // 省市
@@ -206,12 +206,17 @@
           'Repair Details': me.repairDetails, // 解决方法明细
           'KL Product Model': me.ProductModel,
           'srNum': me.ServiceRequest['SR Number'],
-          callBack: function(data) {
-//            me.setPartner(data);
-            me.$router.go(-1);
+          callback: function(data) {
+            if (data) {
+              let name = me.$router.currentRoute.name;
+              if (name === 'comEnter') {
+                me.$router.go(-2);
+              } else {
+                me.$router.go(-1);
+              }
+            }
           }
         };
-        console.log(form);
         me.upDateService(form);
       }
     },

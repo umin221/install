@@ -20,9 +20,9 @@ const PAGESIZE = config.pageSize;
 let mapps;
 
 // tipBox
-const systemSort = function(array) {
+const systemSort = function(array, type) {
   return array.sort(function(a, b) {
-    return new Date(b['Created']) - new Date(a['Created']);
+    return new Date(b[type]) - new Date(a[type]);
   });
 };
 
@@ -91,7 +91,7 @@ export default new Vuex.Store({
             success: data => {
               let serviceOrders = KND.Util.toArray(data.SiebelMessage['Service Request']);
               if (serviceOrders) {
-                serviceOrders = systemSort(serviceOrders);
+                serviceOrders = systemSort(serviceOrders, 'Created');
                 console.log(serviceOrders);
                 commit(more ? 'addOrders' : 'setOrders', {
                   serviceOrders: serviceOrders,
@@ -395,9 +395,8 @@ export default new Vuex.Store({
           }
           if (form['KL Child Service Request']) {
             let childService = KND.Util.toArray(form['KL Child Service Request']);
-            let len = childService.length;
-            let i = len <= 2 ? 0 : len - 1;
-            state.childService = childService[i];
+            childService = systemSort(childService, 'Opened Date');
+            state.childService = childService[0];
           }
         },
         setAddress(state, {data, type}) {
@@ -650,11 +649,10 @@ export default new Vuex.Store({
               form
             },
             success: function(data) {
-              form.callBack();
+              form.callback(data);
             },
             error: function(data) {
-              form.callBack();
-              console.log('error');
+              console.log(data);
             }
           });
         },
