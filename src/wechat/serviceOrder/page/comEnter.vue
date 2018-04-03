@@ -17,7 +17,7 @@
           <input type="text" placeholder="楼层" v-model="floor">
           <input type="text" placeholder="房号" v-model="room">
         </div>
-        <mt-cell class="require mint-field" title="产品型号" placeholder="请选择" @click.native="toSearchT('fault')" is-link>{{ProductModel||Product_model}}</mt-cell>
+        <mt-cell class="require mint-field" title="产品型号" placeholder="请选择" @click.native="toSearchT('fault')" is-link>{{ProductModel}}</mt-cell>
         <mt-cell class="mint-field require" title="故障现象" placeholder="请选择" @click.native="showArea('SR_ROOTCAUSE')" is-link>{{rootcause}}</mt-cell>
         <mt-cell class="mint-field require" :value="Responsbility" @click.native="showArea('KL_SR_RESP')" title="责任划分" is-link></mt-cell>
         <mt-field class="block require" label="解决方法" v-model="repairDetails" placeholder="详细描述或附加需求..." type="textarea" rows="3"></mt-field>
@@ -68,9 +68,11 @@
       let me = this;
       let serviceId = me.$route.query.id;
       let serviceType = me.$route.query.type;
+      me.setProductModel('');
       if (serviceType === 'child') {
         me.childId = serviceId;
-      } else if (serviceId) {
+      }
+      if (serviceType === 'save') {
         me.getServiceR({
           Id: serviceId,
           callback: function(data) {
@@ -80,6 +82,7 @@
             me.Responsbility = data['KL Responsbility'];
             me.repairDetails = data['Repair Details'];
             me.setProductModel(data['KL Product Model']);
+            me.sarech();
           }
         });
       }
@@ -170,16 +173,17 @@
         });
       },
       scan() {
-        let me = this;
+//        let me = this;
         KND.Native.scanQRCode({
           success(data) {
-            me.AssetNumber = data['Asset Number'];
-            me.ProductId = data['Id'];  // 产品ID
-            me.Personal = data['KL Personal Province'] + data['Personal City'];    // 省市
-            me.Address = data['Personal Address'];// 详细地址
-            me.building = data['KL Personal Address Building'];
-            me.floor = data['KL Personal Address Floor'];
-            me.room = data['KL Personal Address Room'];
+            console.log(data);
+//            me.AssetNumber = data['Asset Number'];
+//            me.ProductId = data['Id'];  // 产品ID
+//            me.Personal = data['KL Personal Province'] + data['Personal City'];    // 省市
+//            me.Address = data['Personal Address'];// 详细地址
+//            me.building = data['KL Personal Address Building'];
+//            me.floor = data['KL Personal Address Floor'];
+//            me.room = data['KL Personal Address Room'];
           }
         });
       },
@@ -195,7 +199,7 @@
           }
         }
         let form = {
-          'Id': me.ServiceRequest['Id'],
+          'Id': me.childId || me.ServiceRequest['Id'],
           'Asset Number': me.AssetNumber, // 产品ID
           'SR Rootcause': me.rootcause,                   // 故障反馈
           'KL Responsibility': me.Responsbility,     // 责任划分

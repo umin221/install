@@ -215,7 +215,6 @@
             this.days = [];
           }
         }
-        console.log(this.daysUL);
       },
       initTableTime() {             // 时间表格初始化
         let arr = [];
@@ -236,7 +235,6 @@
       },
       changeTime(value) {
         let x = '2010-09-28 ' + value;
-        console.log(x.replace(/-/g, '/'));
         let time = new Date(x.replace(/-/g, '/'));
         const b = 30;
         time.setMinutes(time.getMinutes() + b, time.getSeconds(), 0);

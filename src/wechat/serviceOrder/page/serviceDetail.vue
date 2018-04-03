@@ -42,7 +42,7 @@
                 </div>
               </div>
             </mt-tab-container-item>
-            <mt-tab-container-item id="tab-container2">
+            <mt-tab-container-item id="tab-container2" class="marginB">
               <toggle v-if="ServiceRequest['Action']" :title="true" label="单据编号">
                 <div>
                   <toggle :title="false" label="故障记录">
@@ -76,7 +76,7 @@
               </toggle>
               <div v-else style="line-height: 5rem;text-align: center">暂无数据</div>
             </mt-tab-container-item>
-            <mt-tab-container-item id="tab-container3">
+            <mt-tab-container-item id="tab-container3" class="marginB">
               <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
                 <ul class="content">
                   <li class="bd-radius">
@@ -129,13 +129,16 @@
         <mt-cell title="记录故障">
           <div v-if="!ServiceRequest['KL Child Service Request']">
             <mt-button v-if="Action['Status']==='已上门'&& ServiceRequest['SR Rootcause']"
-                       @click="fillIn">已填写</mt-button>
+                       @click="fillIn('ServiceRequest')">已填写</mt-button>
             <mt-button v-else-if="Action['Status']==='已上门' && !ServiceRequest['SR Rootcause']"
                        @click="clickPosition('comEnter')">填写</mt-button>
             <mt-button v-else style="background: gainsboro">填写</mt-button>
           </div>
           <div v-else>
-            <mt-button @click.native="childCom(ServiceRequest['KL Child Service Request'])">填写</mt-button>
+            <mt-button v-if="childService['SR Rootcause']"
+                       @click="fillIn('childService')">已填写</mt-button>
+            <mt-button v-else
+              @click.native="childCom(childService)">填写</mt-button>
           </div>
         </mt-cell>
         <mt-cell title="完工确认">
@@ -147,7 +150,11 @@
             <mt-button v-else style="background: gainsboro">填写</mt-button>
           </div>
           <div v-else>
-            <mt-button v-if="" @click.native="childRecord(ServiceRequest['KL Child Service Request'])">填写</mt-button>
+            <mt-button v-if="childService['SR Rootcause'] && childService['Status'] !== '已完成'"
+                       @click.native="childRecord(childService)">填写</mt-button>
+            <mt-button v-else-if="childService['Status'] === '已完成'"
+                       @click.native="moreOrder">再记一单</mt-button>
+            <mt-button v-else style="background: gainsboro">填写</mt-button>
           </div>
         </mt-cell>
         <mt-cell class="completeEnd" title="结束">
@@ -206,7 +213,7 @@
     },
     computed: {
       ...mapState('index', ['loginMeg', 'role']),
-      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress', 'orderEntry'])
+      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress', 'orderEntry', 'childService'])
     },
     methods: {
       ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress', 'addChildService']),
@@ -305,11 +312,18 @@
         let parms = {};
         let statu = me.Action['Status'];
         if (value1 === 'setOut') {
-//          KND.Native.getLocation({
-//            success(data) {
-//              me.getMapAddress({data: data, type: 'starAddress'});
-//            }
-//          });
+          KND.Native.getLocation({
+            success(data) {
+              console.log(data);
+              me.getMapAddress({
+                LngLat: data,
+                type: 'visitAddress',
+                callback: function(data) {
+                  console.log(data);
+                }
+              });
+            }
+          });
           parms = {
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
@@ -318,11 +332,18 @@
             'type': 'setOut'
           };
         } else if (value1 === 'reach') {
-//          KND.Native.getLocation({
-//            success(data) {
-//              me.getMapAddress({data: data, type: 'visitAddress'});
-//            }
-//          });
+          KND.Native.getLocation({
+            success(data) {
+              console.log(data);
+              me.getMapAddress({
+                LngLat: data,
+                type: 'visitAddress',
+                callback: function(data) {
+                  console.log(data);
+                }
+              });
+            }
+          });
           parms = {
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
@@ -331,11 +352,18 @@
             'type': 'reach'
           };
         } else if (value1 === 'end') {
-//          KND.Native.getLocation({
-//            success(data) {
-//              me.getMapAddress({data: data, type: 'endAddress'});
-//            }
-//          });
+          KND.Native.getLocation({
+            success(data) {
+              console.log(data);
+              me.getMapAddress({
+                LngLat: data,
+                type: 'visitAddress',
+                callback: function(data) {
+                  console.log(data);
+                }
+              });
+            }
+          });
           parms = {
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
@@ -370,17 +398,19 @@
           parentId: me.ServiceRequest['Id'],
           contactId: me.ServiceRequest['Contact Id'],
           lastName: me.ServiceRequest['Contact Last Name'],
-          locationId: me.ServiceRequest['Personal Location Id']
+          locationId: me.ServiceRequest['Personal Location Id'],
+          srNumber: me.ServiceRequest['SR Number']
         };
         console.log(params);
         me.addChildService(params);
       },
-      fillIn() {
+      fillIn(key) {
         let me = this;
         me.$router.push({
           name: 'comEnter',
           query: {
-            id: me.ServiceRequest['Id']
+            id: me[key]['Id'],
+            type: 'save'
           }
         });
       },

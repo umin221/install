@@ -92,12 +92,13 @@ export default new Vuex.Store({
               openId
             },
             success: function(data) {
-              let Contact = data.SiebelMessage.Contact;
+              let Contact = KND.Util.toArray(data.SiebelMessage.Contact);
+              let len = Contact.length;
               if (Contact) {
-                commit('setContact', Contact);
+                commit('setContact', Contact[len - 1]);
               }
               if (callback) {
-                callback(Contact);
+                callback(Contact[len - 1]);
               }
             },
             error: data => {
@@ -328,10 +329,10 @@ export default new Vuex.Store({
               openId
             },
             success: data => {
-              console.log(data);
-              let Contact = data.SiebelMessage.Contact;
+              let Contact = KND.Util.toArray(data.SiebelMessage.Contact);
+              let len = Contact.length;
               if (Contact) {
-                commit('setContact', Contact);
+                commit('setContact', Contact[len - 1]);
               }
             },
             error: data => {

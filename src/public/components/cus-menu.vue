@@ -31,7 +31,6 @@
         self.$emit('my-enter', self.value, self.type);
       },
       onValuesChange(picker, values) {
-        console.log(values);
         let self = this;
         self.value = values;
         if (self.value1 !== self.value[0]) {

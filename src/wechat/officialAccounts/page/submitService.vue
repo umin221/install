@@ -131,7 +131,7 @@
           let me = this;
           let form = {
             'Address Id': me.form.type === 'add' ? me.form.Id : '', // 如果是用户自己新建了地址，传新建的地址Id,如果只是简单定位，不用传
-            'Appoint Time': me.AppointTime ? new Date(me.AppointTime).format('MM/dd/yyyy hh:mm:ss') : '', // 用户的预约上门时间
+            'Appoint Time': me.AppointTime ? me.AppointTime : '', // 用户的预约上门时间
             'Asset Id': me.AssetId,  // 如果是用户扫码了，并带出了资产，传资产Id，扫不出来，不用传
             'Province': me.form.Province, // 省
             'City': me.form.City, // 城市
@@ -157,7 +157,7 @@
       },
       handleChange(value) {
         let me = this;
-        me.AppointTime = value.format('yyyy-MM-dd hh:mm:ss');
+        me.AppointTime = value.format('MM/dd/yyyy hh:mm:ss');
         console.log(me.AppointTime);
       },
       open(picker) {

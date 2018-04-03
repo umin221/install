@@ -200,7 +200,7 @@
       ...mapState(NameSpace, ['loginMeg', 'pending', 'process', 'completed', 'cusService', 'role'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getList', 'getLoginMeg', 'getMapAddress']),
+      ...mapActions(NameSpace, ['getList', 'getLoginMeg']),
       ...mapMutations(NameSpace, ['setManager', 'setLoginMeg']),
       toSearch() {
         this.$router.push({path: '/search'});
@@ -226,7 +226,7 @@
         }, param.list, 'onBottomLoaded');
       },
       clickAdd() {
-        this.$router.push({path: '/addService'});
+//        this.$router.push({path: '/addService'});
       },
       toDetail(type, name) {
         this.$router.push({

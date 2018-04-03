@@ -82,7 +82,7 @@
         if (this.type !== 'fault') {
           this.count({index, isShow});
         } else {
-          this.$router.go(-1);
+          this.$router.back();
           this.successCall({item: index, type: ' No'});
         }
       },
