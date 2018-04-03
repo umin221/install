@@ -136,6 +136,7 @@
         deliveryTime: '', // 交接日期
         batchNum: 0, // 数量
         planList: [],
+        installerList: [],
         appData: {}, // 审批信息头
         appDataTask: {}, // 审批信息子任务信息
         id: '',

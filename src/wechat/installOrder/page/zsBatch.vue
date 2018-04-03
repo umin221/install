@@ -522,20 +522,28 @@
           Toast('详细计划不能为空！');
           return;
         }
-        api.get({ // 更改按钮状态
-          key: 'getUPStatus',
-          method: 'POST',
-          data: {
-            'body': {
-              'ProcessName': 'KL Install Task Submit For Approval Workflow',
-              'RowId': self.id
-            }
-          },
-          success: function(data) {
-            if (!data.ERROR) {
-              Toast('提交成功');
-              KND.Util.back();
-            }
+        MessageBox({
+          title: '提示',
+          message: ' 确认提交？一经提交不可修改',
+          showCancelButton: true
+        }).then(action => {
+          if (action === 'confirm') {
+            api.get({ // 更改按钮状态
+              key: 'getUPStatus',
+              method: 'POST',
+              data: {
+                'body': {
+                  'ProcessName': 'KL Install Task Submit For Approval Workflow',
+                  'RowId': self.id
+                }
+              },
+              success: function(data) {
+                if (!data.ERROR) {
+                  Toast('提交成功');
+                  KND.Util.back();
+                }
+              }
+            });
           }
         });
       }

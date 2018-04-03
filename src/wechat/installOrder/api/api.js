@@ -239,6 +239,16 @@ let apiList = {
       url: 'service/Workflow Process Manager/RunProcess/'
     };
   },
+  /*
+  * 获取零星房屋信息
+  * */
+  getSporadic: option => {
+    return {
+      method: 'POST',
+      url: 'data/KL Install Order Asset/KL Install Order Asset/?[KL Activity Id]=' + "'" + option.data.id + "'" + '&PageSize=200&StartRowNum=0',
+      data: {}
+    };
+  },
   getJournalData: option => {
     return {
       method: 'get',

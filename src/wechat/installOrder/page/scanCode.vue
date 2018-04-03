@@ -3,19 +3,42 @@
     <mt-header fixed :title="titleVal">
       <fallback slot="left"></fallback>
     </mt-header>
-    <div class="mint-content scanCode">
-      <mt-cell is-link >
-        <div slot="title" class="list-text"><span style="color:red">*</span>省市区</div>
-      </mt-cell>
-      <mt-cell title="安装详细地址"></mt-cell>
-      <mt-field label=""  type="textarea" rows="4"></mt-field>
-      <mt-cell>
-        <div slot="title" class="list-text"><span style="color:red">*</span>产品条形码</div>
-      </mt-cell>
-      <mt-cell is-link >
-        <div slot="title" class="list-text"><span style="color:red">*</span>产品型号</div>
-      </mt-cell>
-      <div class="button-cla"><mt-button @click.native="handleClick()">提交</mt-button></div>
+    <div class="mint-content scanCode" :class="{'disable': !type}">
+      <mt-cell title="省市区"
+               @click.native="showLovFn('KL_PROVINCE')"
+               placeholder="请选择"
+               is-link
+               v-model="provinces"></mt-cell>
+      <cus-field class="block"
+                 label="详细地址"
+                 v-model= 'detailAddress'
+                 type="textarea"
+                 placeholder="请输入详细地址"></cus-field>
+      <mt-cell title="楼栋名" placeholder="请输入"
+               :class="heartVisible" v-model="BuilingName" is-link></mt-cell>
+      <mt-cell title="楼层" placeholder="请输入"
+               :class="heartVisible" v-model="FloorName" is-link></mt-cell>
+      <mt-cell title="房间号" placeholder="请输入"
+               :class="heartVisible" v-model="RoomName" is-link></mt-cell>
+      <mt-cell title="产品条形码" placeholder="请输入"
+               :class="heartVisible" v-model="SerialNumber" is-link></mt-cell>
+      <mt-cell title="产品型号" placeholder="请输入"
+               :class="heartVisible" v-model="batchNum" is-link></mt-cell>
+      <!--下拉菜单-->
+      <mt-popup v-model="showBox" position="bottom">
+        <menu-box @my-enter="enter"
+                  @my-cancel="showBox = false"
+                  @my-change="onValuesChange"
+                  @my-change1="onValuesChange1"
+                  :slots="slots"
+                  :slots1="slots1"
+                  :slots2="slots2"></menu-box>
+      </mt-popup>
+      <button-group>
+        <mt-button class="single"
+                   v-show="type"
+                   @click.native="scavenging">保存</mt-button>
+      </button-group>
     </div>
   </div>
 </template>
@@ -42,15 +65,51 @@
   }
 </style>
 <script type="application/javascript">
+  import {mapState, mapActions} from 'vuex';
+  import buttonGroup from 'public/components/cus-button-group';
+  import cusField from 'public/components/cus-field';
+  import menuBox from '../components/cus-menu';
+  import api from '../api/api';
+
+  let isMunicipality = function(...args) {
+    let me = this;
+    let city = args.pop();
+    let isMun = true;
+    for (let i = 0;i < me.Municipality.length; i++) {
+      if (city === me.Municipality[i]) {
+        isMun = false;
+      }
+    }
+    return isMun;
+  };
+  const NameSpace = 'scanCode';
   export default {
-    name: 'detail',
-    created: () => {
-      console.dir(1);
+    name: NameSpace,
+    created() {
+      let param = this.$route.query;
+      this.id = param.id;
+      this.type = param.type;
+      this.orderID = param.orderID;
     },
     data: () => {
       return {
-        value: '',
+        id: '',
+        type: false,
+        orderID: '',
         titleVal: '扫码录入',
+        slots: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
+        slots1: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
+        slots2: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
+        showBox: false,
+        provinces: '',
+        BuilingName: '',
+        FloorName: '',
+        RoomName: '',
+        SerialNumber: '',
+        KL_PROVINCE: '',
+        KL_CITY: '',
+        KL_TOWN: '',
+        detailAddress: '',
         active: 'tab-container'
       };
     },
@@ -61,9 +120,130 @@
         console.dir(query);
       });
     },
+    components: {buttonGroup, menuBox, cusField},
+    computed: {
+      ...mapState('buildingInfo', ['Municipality']),
+      // 表单只读
+      read() {
+        return !this.type;
+      },
+      // * 是否显示
+      heartVisible() {
+        return this.type ? '' : 'require';
+      }
+    },
     methods: {
-      handleClick() {
-        console.dir('提交');
+      ...mapActions('buildingInfo', ['reduceValFn', 'plusValFn', 'getLov']),
+      showLovFn(type) {
+        let me = this;
+        me.slots[0].values = [];
+        me.showBox = true;
+        me.getLov({
+          type: 'KL_PROVINCE',
+          parent: '中国',
+          success: data => {
+            let datas = KND.Util.toArray(data.items) ;
+            for (let i = 0;i < datas.length; i++) {
+              me.slots[0].values.push(datas[i].Value);
+            }
+          }
+        });
+      },
+      enter(values) {
+        let me = this;
+        let isMun = isMunicipality.call(this, values['KL_PROVINCE']);
+        me.showBox = false;
+        me.KL_PROVINCE = values['KL_PROVINCE'];
+        me.KL_CITY = values['KL_CITY'];
+        me.KL_TOWN = values['KL_TOWN'];
+        if (isMun) {
+          me.provinces = values['KL_PROVINCE'] + values['KL_CITY'] + values['KL_TOWN'];
+        } else {
+          me.provinces = values['KL_CITY'] + values['KL_TOWN'];
+        }
+      },
+      onValuesChange(value) {
+        let me = this;
+        me.slots1[0].values = [];
+        if (value[0]) {
+          me.getLov({
+            type: 'KL_CITY',
+            parent: value[0],
+            success: data => {
+              let datas = KND.Util.toArray(data.items) ;
+              for (let i = 0;i < datas.length; i++) {
+                me.slots1[0].values.push(datas[i].Value);
+              }
+            }
+          });
+        }
+      },
+      onValuesChange1(value) {
+        let me = this;
+        me.slots2[0].values = [];
+        if (value[0]) {
+          me.getLov({
+            type: 'KL_TOWN',
+            parent: value[0],
+            success: data => {
+              let datas = KND.Util.toArray(data.items) ;
+              for (let i = 0;i < datas.length; i++) {
+                me.slots2[0].values.push(datas[i].Value);
+              }
+            }
+          });
+        }
+      },
+      scavenging() {
+        console.dir('保存');
+        var self = this;
+        api.get({
+          key: 'setBuild',
+          method: 'POST',
+          data: {
+            'body': {
+              'ProcessName': 'KL Install Order Asset Room Upsert Process', // 详情ID
+              'SiebelMessage': {
+                'MessageId': '',
+                'MessageType': 'Integration Object',
+                'IntObjectName': 'Base KL Install Order Asset Address',
+                'IntObjectFormat': 'Siebel Hierarchical',
+                'ListOfBase KL Install Order Asset Address': {
+                  'Base KL Install Order Asset Address': [
+                    {
+                      'Country': '中国',
+                      'Province': self.KL_PROVINCE,
+                      'City': self.KL_CITY,
+                      'Street Address': self.detailAddress,
+                      'Street Address 2': self.BuilingName,
+                      'Street Address 3': self.FloorName,
+                      'Street Address 4': self.RoomName,
+                      'Serial Number': self.SerialNumber,
+                      'Integration Id 2': '',
+                      'Integration Id 3': '',
+                      'Integration Id': '',
+                      'Id': '',
+                      'ListOfKL Install Order Asset': {
+                        'KL Install Order Asset': {
+                          'Original Order Id': self.orderID,
+                          'KL Activity Id': self.id,
+                          'Id': ''
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          success: function(data) {
+            if (!data.ERROR) {
+              Toast('保存成功');
+              KND.Util.back();
+            }
+          }
+        });
+
       }
     }
   };

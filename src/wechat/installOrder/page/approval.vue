@@ -4,20 +4,18 @@
       <fallback slot="left"></fallback>
     </mt-header>
     <div class="mint-content journal editable">
-      <div class="lock-line">
-        <lock-line title="详细计划" @click="addPlanFn('')">
-          <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
+      <div class="lock-line" :class="{'disable': !editable}">
+        <lock-line title="详细计划" v-for="(item, index) in processDate" :key="index">
+          <div class="crm-zyList" v-for="(itemTask, index) in upList(item['UInbox Item Task'])" :key="index">
             <ul class="content">
               <li class="bd-radius">
                 <span class="icon"></span>
               </li>
-              <li style="color: #888;line-height: 40px;font-size: 0.9rem;">{{new Date(item['Install Date']).format('yyyy-MM-dd')}}
-                <span class="journalName">{{item['Contact Login Name']}}</span>
+              <li style="color: #888;line-height: 40px;font-size: 0.8rem;">审批人：{{itemTask['Owner Full Name']}}
+                <span class="journalName">{{new Date(itemTask['End Working Time']).format('yyyy-MM-dd')}}</span>
               </li>
               <div class="content-div">
-                <div>已开孔数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
-                <div>合格数量/异常数量：{{item['Qualified Amoun']}}/{{item['Unqualified Amount']}}</div>
-                <div>异常处理数量：{{item['Unqualified Solve Amount']}}</div>
+                <div>审批意见：{{itemTask['KL Request Description']}}</div>
               </div>
             </ul>
           </div>
@@ -81,7 +79,6 @@
     }
     .content-div {
       border-radius: 5px;
-      padding-left: 10px;
       font-size: 0.7rem;
     }
   }
@@ -103,6 +100,7 @@
       return {
         value: '',
         processDate: [],
+        editable: false,
         titleVal: '审批记录'
       };
     },
@@ -117,6 +115,9 @@
     },
     components: {lockLine},
     methods: {
+      upList(obj) {
+        return KND.Util.toArray(obj);
+      },
       getApproval() {
         var self = this;
         api.get({ // 提交数据
@@ -125,14 +126,13 @@
           data: {
             'body': {
               'OutputIntObjectName': 'Base UInbox Item History',
-              'PrimaryRowId': self.id
+              'SearchSpec': '[UInbox Item.Item Object Id]=' + '"' + self.id + '"'
+
             }
           },
           success: function(data) {
-            if (data.items) {
-              self.processDate = KND.Util.toArray(data.items);
-            } else {
-              self.processDate = KND.Util.toArray(data); // 一条数据时只返回对象
+            if (data.SiebelMessage['UInbox Item']) {
+              self.processDate = KND.Util.toArray(data.SiebelMessage['UInbox Item']);
             }
           }
         });
