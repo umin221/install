@@ -395,7 +395,9 @@ export default new Vuex.Store({
           }
           if (form['KL Child Service Request']) {
             let childService = KND.Util.toArray(form['KL Child Service Request']);
-            state.childService = childService[0];
+            let len = childService.length;
+            let i = len <= 2 ? 0 : len - 1;
+            state.childService = childService[i];
           }
         },
         setAddress(state, {data, type}) {
@@ -563,6 +565,7 @@ export default new Vuex.Store({
         successCall(state, data) {
           data.type = data.type || '';
           state.ProductModel = data.item['KL Product Model' + data.type];
+          console.log(state.ProductModel);
         },
         errorTips(state) {
           Toast(state.tips);
@@ -869,6 +872,9 @@ export default new Vuex.Store({
                     'Object Id': form.ServiceRequestId
                   },
                   success: function(data) {
+                    form.callBack(data);
+                  },
+                  error: function(data) {
                     console.log(data);
                   }
                 });

@@ -68,9 +68,11 @@
       let me = this;
       let serviceId = me.$route.query.id;
       let serviceType = me.$route.query.type;
+      me.setProductModel('');
       if (serviceType === 'child') {
         me.childId = serviceId;
-      } else if (serviceId) {
+      }
+      if (serviceType === 'save') {
         me.getServiceR({
           Id: serviceId,
           callback: function(data) {
@@ -80,6 +82,7 @@
             me.Responsbility = data['KL Responsbility'];
             me.repairDetails = data['Repair Details'];
             me.setProductModel(data['KL Product Model']);
+            me.sarech();
           }
         });
       }
@@ -170,16 +173,17 @@
         });
       },
       scan() {
-        let me = this;
+//        let me = this;
         KND.Native.scanQRCode({
           success(data) {
-            me.AssetNumber = data['Asset Number'];
-            me.ProductId = data['Id'];  // 产品ID
-            me.Personal = data['KL Personal Province'] + data['Personal City'];    // 省市
-            me.Address = data['Personal Address'];// 详细地址
-            me.building = data['KL Personal Address Building'];
-            me.floor = data['KL Personal Address Floor'];
-            me.room = data['KL Personal Address Room'];
+            console.log(data);
+//            me.AssetNumber = data['Asset Number'];
+//            me.ProductId = data['Id'];  // 产品ID
+//            me.Personal = data['KL Personal Province'] + data['Personal City'];    // 省市
+//            me.Address = data['Personal Address'];// 详细地址
+//            me.building = data['KL Personal Address Building'];
+//            me.floor = data['KL Personal Address Floor'];
+//            me.room = data['KL Personal Address Room'];
           }
         });
       },
@@ -194,8 +198,6 @@
             return;
           }
         }
-        console.log(me.childId);
-        console.log(me.ServiceRequest['Id']);
         let form = {
           'Id': me.childId || me.ServiceRequest['Id'],
           'Asset Number': me.AssetNumber, // 产品ID

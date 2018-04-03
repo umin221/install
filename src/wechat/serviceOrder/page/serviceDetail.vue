@@ -42,7 +42,7 @@
                 </div>
               </div>
             </mt-tab-container-item>
-            <mt-tab-container-item id="tab-container2">
+            <mt-tab-container-item id="tab-container2" class="marginB">
               <toggle v-if="ServiceRequest['Action']" :title="true" label="单据编号">
                 <div>
                   <toggle :title="false" label="故障记录">
@@ -76,7 +76,7 @@
               </toggle>
               <div v-else style="line-height: 5rem;text-align: center">暂无数据</div>
             </mt-tab-container-item>
-            <mt-tab-container-item id="tab-container3">
+            <mt-tab-container-item id="tab-container3" class="marginB">
               <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
                 <ul class="content">
                   <li class="bd-radius">
@@ -312,11 +312,18 @@
         let parms = {};
         let statu = me.Action['Status'];
         if (value1 === 'setOut') {
-//          KND.Native.getLocation({
-//            success(data) {
-//              me.getMapAddress({data: data, type: 'starAddress'});
-//            }
-//          });
+          KND.Native.getLocation({
+            success(data) {
+              console.log(data);
+              me.getMapAddress({
+                LngLat: data,
+                type: 'visitAddress',
+                callback: function(data) {
+                  console.log(data);
+                }
+              });
+            }
+          });
           parms = {
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
@@ -325,11 +332,18 @@
             'type': 'setOut'
           };
         } else if (value1 === 'reach') {
-//          KND.Native.getLocation({
-//            success(data) {
-//              me.getMapAddress({data: data, type: 'visitAddress'});
-//            }
-//          });
+          KND.Native.getLocation({
+            success(data) {
+              console.log(data);
+              me.getMapAddress({
+                LngLat: data,
+                type: 'visitAddress',
+                callback: function(data) {
+                  console.log(data);
+                }
+              });
+            }
+          });
           parms = {
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
@@ -338,11 +352,18 @@
             'type': 'reach'
           };
         } else if (value1 === 'end') {
-//          KND.Native.getLocation({
-//            success(data) {
-//              me.getMapAddress({data: data, type: 'endAddress'});
-//            }
-//          });
+          KND.Native.getLocation({
+            success(data) {
+              console.log(data);
+              me.getMapAddress({
+                LngLat: data,
+                type: 'visitAddress',
+                callback: function(data) {
+                  console.log(data);
+                }
+              });
+            }
+          });
           parms = {
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
@@ -388,7 +409,8 @@
         me.$router.push({
           name: 'comEnter',
           query: {
-            id: me[key]['Id']
+            id: me[key]['Id'],
+            type: 'save'
           }
         });
       },
