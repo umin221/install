@@ -5,20 +5,22 @@
       <mt-button slot="right" @click.native="submit"  v-show="type">提交</mt-button>
     </mt-header>
     <div class="mint-content">
-      <mt-cell v-for="item in objList" :key="item.id" is-link @click.native="scavenging">
-        <div slot="title" class="list-text"><span>产品型号:</span><span>{{item.code}}</span></div>
-        <div slot="title" class="list-text"><span>产品条形码:</span><span>{{item.savrsNo}}</span></div>
-        <div slot="title" class="list-text"><span></span><span>{{item.name}}</span></div>
+      <mt-cell v-for="item in objList" :key="item.id" is-link @click.native="scavenging(item, '')">
+        <div slot="title" class="list-text"><span>产品型号:</span><span>{{item['Product Model No']}}</span></div>
+        <div slot="title" class="list-text">
+          <span v-show="type" class="icon-copy" @click.stop="scavenging(item,'copy')"></span>
+          <span>产品条形码:</span><span>{{item['Serial Number']}}</span>
+        </div>
+        <div slot="title" class="list-text"><span></span><span>{{item.Province}}{{item.City}}{{item['Street Address']}}{{item['Street Address 2']}}{{item['Street Address 3']}}{{item['Street Address 4']}}</span></div>
       </mt-cell>
       <button-group>
         <mt-button class="single"
                    v-show="type"
-                   @click.native="scavenging">扫码安装</mt-button>
+                   @click.native="scavenging('','')">扫码安装</mt-button>
       </button-group>
     </div>
   </div>
 </template>
-
 <script type="application/javascript">
   // import api from '../api/api';
   import buttonGroup from 'public/components/cus-button-group';
@@ -87,26 +89,29 @@
           }
         });
       },
-      scavenging() {
+      scavenging(item, copy) {
         var self = this;
         self.$router.push({
           name: 'scanCode',
           query: {
             type: self.type,
+            item: item,
             id: self.id,
+            copy: copy,
             orderID: self.orderID
           }
         });
       },
       getSporadic() {
         var self = this;
-        api.get({ // 更改按钮状态
+        api.get({ // 获取零星列表数据
           key: 'getSporadic',
           data: {
             id: self.id
           },
           success: function(data) {
-            if (data) {
+            if (data.items) {
+              self.objList = data.items;
             }
           }
         });
@@ -115,14 +120,22 @@
     components: {buttonGroup}
   };
 </script>
-<style>
+<style lang="scss">
   .mint-search {
     height: 8vh!important;
   }
   .list-img {
     color: #A2BBFC;
   }
+  .icon-copy {
+    position: absolute;
+    left: 10px;
+    font-family: "kinlong-icon" !important;
+    font-style: normal;
+    font-size: 1rem;
+  }
   .list-text {
     line-height: 30px;
+    padding-left: 30px;
   }
 </style>

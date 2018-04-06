@@ -244,8 +244,8 @@ let apiList = {
   * */
   getSporadic: option => {
     return {
-      method: 'POST',
-      url: 'data/KL Install Order Asset/KL Install Order Asset/?[KL Activity Id]=' + "'" + option.data.id + "'" + '&PageSize=200&StartRowNum=0',
+      method: 'get',
+      url: 'data/KL Install Order Asset/KL Install Order Asset/?[KL Activity Id]=' + "'" + option.data.id + "'" + '&PageSize=100&StartRowNum=0',
       data: {}
     };
   },

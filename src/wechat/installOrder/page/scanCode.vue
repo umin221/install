@@ -14,16 +14,18 @@
                  v-model= 'detailAddress'
                  type="textarea"
                  placeholder="请输入详细地址"></cus-field>
-      <mt-cell title="楼栋名" placeholder="请输入"
-               :class="heartVisible" v-model="BuilingName" is-link></mt-cell>
-      <mt-cell title="楼层" placeholder="请输入"
-               :class="heartVisible" v-model="FloorName" is-link></mt-cell>
-      <mt-cell title="房间号" placeholder="请输入"
-               :class="heartVisible" v-model="RoomName" is-link></mt-cell>
-      <mt-cell title="产品条形码" placeholder="请输入"
-               :class="heartVisible" v-model="SerialNumber" is-link></mt-cell>
+      <mt-field label="楼栋名" placeholder="请输入"
+               :class="heartVisible" v-model="BuilingName" is-link></mt-field>
+      <mt-field label="楼层" placeholder="请输入"
+               :class="heartVisible" v-model="FloorName" is-link></mt-field>
+      <mt-field label="房间号" placeholder="请输入"
+               :class="heartVisible" v-model="RoomName" is-link></mt-field>
+      <mt-field label="产品条形码" placeholder="请输入"
+               :class="heartVisible" v-model="SerialNumber" is-link>
+        <i class="xs-icon icon-scan" @click="scan"></i>
+      </mt-field>
       <mt-cell title="产品型号" placeholder="请输入"
-               :class="heartVisible" v-model="batchNum" is-link></mt-cell>
+               :class="heartVisible" v-model="productCode" is-link></mt-cell>
       <!--下拉菜单-->
       <mt-popup v-model="showBox" position="bottom">
         <menu-box @my-enter="enter"
@@ -89,12 +91,31 @@
       let param = this.$route.query;
       this.id = param.id;
       this.type = param.type;
+      this.copy = param.copy;
+      this.item = param.item;
       this.orderID = param.orderID;
+      if (this.item) {
+        if (this.copy) { // 复制把ID置空 新增
+          this.item['Personal Address Id'] = '';
+          this.item.Id = '';
+        }
+        this.KL_PROVINCE = this.item.Province;
+        this.KL_CITY = this.item.City;
+        this.SerialNumber = this.item['Serial Number'];
+        this.provinces = this.item.Province + this.item.City;
+        this.detailAddress = this.item['Street Address'];
+        this.BuilingName = this.item['Street Address 2'];
+        this.FloorName = this.item['Street Address 3'];
+        this.RoomName = this.item['Street Address 4'];
+        this.productId = this.item['Product Id'];
+        this.productCode = this.item['Product Model No'];
+      }
     },
     data: () => {
       return {
         id: '',
         type: false,
+        copy: '', // 是否复制
         orderID: '',
         titleVal: '扫码录入',
         slots: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
@@ -110,6 +131,8 @@
         KL_CITY: '',
         KL_TOWN: '',
         detailAddress: '',
+        productId: '',
+        productCode: '',
         active: 'tab-container'
       };
     },
@@ -134,6 +157,14 @@
     },
     methods: {
       ...mapActions('buildingInfo', ['reduceValFn', 'plusValFn', 'getLov']),
+      scan() {
+        let me = this;
+        KND.Native.scanQRCode({
+          success(data) {
+            me.SerialNumber = data.resultStr;
+          }
+        });
+      },
       showLovFn(type) {
         let me = this;
         me.slots[0].values = [];
@@ -209,29 +240,28 @@
                 'IntObjectName': 'Base KL Install Order Asset Address',
                 'IntObjectFormat': 'Siebel Hierarchical',
                 'ListOfBase KL Install Order Asset Address': {
-                  'Base KL Install Order Asset Address': [
-                    {
-                      'Country': '中国',
-                      'Province': self.KL_PROVINCE,
-                      'City': self.KL_CITY,
-                      'Street Address': self.detailAddress,
-                      'Street Address 2': self.BuilingName,
-                      'Street Address 3': self.FloorName,
-                      'Street Address 4': self.RoomName,
-                      'Serial Number': self.SerialNumber,
-                      'Integration Id 2': '',
-                      'Integration Id 3': '',
-                      'Integration Id': '',
-                      'Id': '',
-                      'ListOfKL Install Order Asset': {
-                        'KL Install Order Asset': {
-                          'Original Order Id': self.orderID,
-                          'KL Activity Id': self.id,
-                          'Id': ''
-                        }
+                  'Base KL Install Order Asset Address': {
+                    'Country': '中国',
+                    'Province': self.KL_PROVINCE,
+                    'City': self.KL_CITY,
+                    'Street Address': self.detailAddress,
+                    'Street Address 2': self.BuilingName,
+                    'Street Address 3': self.FloorName,
+                    'Street Address 4': self.RoomName,
+                    'Integration Id 2': '',
+                    'Integration Id 3': '',
+                    'Integration Id': '',
+                    'Id': self.item['Personal Address Id'] || '00009',
+                    'ListOfKL Install Order Asset': {
+                      'KL Install Order Asset': {
+                        'Original Order Id': self.orderID,
+                        'KL Activity Id': self.id,
+                        'Serial Number': self.SerialNumber,
+                        'Product Id': self.productId,
+                        'Id': self.item.Id || '0000'
                       }
                     }
-                  ]
+                  }
                 }
               }
             }
