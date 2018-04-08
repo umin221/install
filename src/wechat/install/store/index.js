@@ -207,6 +207,20 @@ export default {
       mutations: {
       },
       actions: {
+        /**
+         * 查询订单行
+         */
+        queryOrderLines({state}, setting) {
+          setting.key = 'queryOrderLines';
+          api.get(setting);
+        },
+        /**
+         * 绑定资产条码型号等
+         */
+        installOrderAssets({state}, setting) {
+          setting.key = 'installOrderAssets';
+          api.get(setting);
+        }
       }
     }
   }

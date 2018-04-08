@@ -1,6 +1,6 @@
 let apiList = {
   /**
-   * 获取委外列表 只获取团队内的
+   * 获取安装批次列表
    * @param {String} option.data['Name'] 选填 厂商名称
    * @param {Object} option.data 选填 查询条件
    * @param {Object} option.paging 必填 翻页参数
@@ -155,6 +155,36 @@ let apiList = {
       url: 'service/Workflow Process Manager/RunProcess',
       data: {
         'body': body
+      }
+    };
+  },
+
+  /**
+   * 查询订单行
+   * @param option
+   */
+  queryOrderLines: option => {
+    return {
+      method: 'get',
+      url: 'data/Order Entry - Line Items/Order Entry - Line Items/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=100&StartRowNum=0',
+      error: data => {
+        console.log(data);
+      }
+    };
+  },
+
+  /**
+   * 绑定资产条码型号等
+   * @param option
+   * @returns {{url: string}}
+   */
+  installOrderAssets: option => {
+    return {
+      method: 'put',
+      url: 'data/KL Install Order Asset/KL Install Order Asset',
+      data: {
+        'Id': '1-2BSHWBOE',
+        'Serial Number': '222111111'
       }
     };
   }

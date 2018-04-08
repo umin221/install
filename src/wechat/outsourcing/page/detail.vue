@@ -290,8 +290,4 @@
       }
     }
   }
-
-  .mint-content {
-    margin-bottom: 2.8rem;
-  }
 </style>

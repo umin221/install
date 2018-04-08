@@ -12,7 +12,8 @@
     </mt-header>
     <div class="mint-content assets" :class="{readonly: !editable}">
       <mt-navbar v-model="selected">
-        <mt-tab-item v-for="(item, index) in building"
+        <mt-tab-item class="xs-icon"
+                     v-for="(item, index) in building"
                      :key="index"
                      :id="item.BuildingNum"
                      @click.native="getLayerFn(item.BuildingNum)">{{item.BuildingName}}</mt-tab-item>
@@ -41,6 +42,18 @@
                    @click.native="addFloorFn">新增楼层</mt-button>
       </button-group>
     </div>
+
+    <mt-actionsheet
+      :actions="[{
+        name: '扫描',
+        method: toScanFn
+      },{
+        name: '录入',
+        method: toFillFn
+      }]"
+      v-model="sheetVisible">
+    </mt-actionsheet>
+
     <button-group>
       <mt-button class="single"
                  v-show="isSelect"
@@ -94,7 +107,11 @@
         // 已选择房号信息
         selectRooms: {},
         // 楼栋全选
-        selectAll: false
+        selectAll: false,
+        // 底部推出菜单操作
+        sheetVisible: false,
+        // 底部推出菜单操作对象
+        sheetObject: ''
       };
     },
     computed: {
@@ -236,16 +253,24 @@
       roomFn(room) {
         // 编辑状态下不操作房号
         if (!this.isEdit) {
-          if (room.selected) {
-            this.$set(room, 'selected', undefined);
-            delete this.selectRooms[room.Id];
+          if (this.isSelect) {
+            // 选择资产移交
+            if (room.selected) {
+              this.$set(room, 'selected', undefined);
+              delete this.selectRooms[room.Id];
+            } else {
+              this.$set(room, 'selected', 'selected');
+              this.selectRooms[room.Id] = room;
+            };
           } else {
-            this.$set(room, 'selected', 'selected');
-            this.selectRooms[room.Id] = room;
+            // 已扫码资产
+            if (room['Serial Number']) return;
+            // 推出操作菜单
+            this.sheetVisible = true;
+            this.sheetObject = room;
           };
         }
       },
-
       /**
        * 标记选中状态
        * @param {Object} room 必填 房号信息
@@ -260,12 +285,32 @@
         };
         return room;
       },
-
+      /**
+       * 安装订单－真锁移交－选择完毕跳转更新批次信息页面
+       * @param {Object} room 必填 房号信息
+       */
       toNextFn() {
         this.$router.push({
           name: 'yjBatch',
           query: {
             result: JSON.stringify(this.selectRooms)
+          }
+        });
+      },
+      /**
+       * 扫码填入资产信息
+       */
+      toScanFn() {
+        this.$router.push('detail');
+      },
+      /**
+       * 填入资产信息
+       */
+      toFillFn() {
+        this.$router.push({
+          name: 'detail',
+          query: {
+            room: JSON.stringify(this.sheetObject)
           }
         });
       }
@@ -288,6 +333,13 @@
       .mint-tab-item {
         flex: none;
         min-width: 80px;
+      }
+    }
+
+    .mint-navbar {
+      .mint-tab-item-label:before {
+        content: '\A157';
+        padding-right: 5px;
       }
     }
 
