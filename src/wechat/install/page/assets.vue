@@ -8,7 +8,7 @@
                  @click.native="editable = !editable"></mt-button>
       <mt-button slot="right"
                  v-show="isSelect"
-                 @click.native="selectAll = true;">全选本栋</mt-button>
+                 @click.native="selectAll = true;">全选</mt-button>
     </mt-header>
     <div class="mint-content assets" :class="{readonly: !editable}">
       <mt-navbar v-model="selected">
@@ -30,7 +30,7 @@
         </mt-cell-swipe>
         <div class="assets-div co-flex co-wp">
           <span v-for="(room, index) in floor"
-                :class="room.cls"
+                :class="{'active': room['Serial Number'], 'selected': room['selected']}"
                 :key="index"
                 @click="roomFn(room)">{{room['Street Address 4']}}</span>
         </div>
@@ -63,7 +63,7 @@
   const NAMESPACE = 'assets';
   export default {
     name: NAMESPACE,
-    activated(tt) {
+    activated() {
       let param = this.$route.query;
       let id = param.id;
       // 不同批次，清除楼栋
@@ -82,15 +82,15 @@
           }
         });
       }
-      // 页面操作类型
-      this.type = param.type;
+      // 页面交互模式
+      this.mode = param.mode;
     },
     data: () => {
       return {
         selected: '1',
         editable: false,
-        // type = select 移交前的选择房号
-        type: '',
+        // mode = select 移交前的选择房号  mode = edit 编辑楼栋信息
+        mode: '',
         // 已选择房号信息
         selectRooms: {},
         // 楼栋全选
@@ -100,10 +100,10 @@
     computed: {
       ...mapState(NAMESPACE, ['layer', 'building']),
       isSelect() {
-        return this.type === 'select';
+        return this.mode === 'select';
       },
       isEdit() {
-        return this.type === 'edit';
+        return this.mode === 'edit';
       },
       /**
        * 重构楼层信息&标记选中状态
@@ -236,11 +236,11 @@
       roomFn(room) {
         // 编辑状态下不操作房号
         if (!this.isEdit) {
-          if (room.cls) {
-            this.$set(room, 'cls', undefined);
+          if (room.selected) {
+            this.$set(room, 'selected', undefined);
             delete this.selectRooms[room.Id];
           } else {
-            this.$set(room, 'cls', 'active');
+            this.$set(room, 'selected', 'selected');
             this.selectRooms[room.Id] = room;
           };
         }
@@ -255,7 +255,7 @@
         let selectRooms = this.selectRooms;
         // 标记被选中的房号
         if (this.selectAll || selectRooms[room.Id]) {
-          this.$set(room, 'cls', 'active');
+          this.$set(room, 'selected', 'selected');
           selectRooms[room.Id] = room;
         };
         return room;
@@ -308,6 +308,12 @@
       &.active {
         border-color: #fff;
         background-color: #7ce87c;
+        color: #fff;
+      }
+
+      &.selected {
+        border-color: #fff;
+        background-color: #2a64e8;
         color: #fff;
       }
     }
