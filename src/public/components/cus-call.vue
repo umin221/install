@@ -1,13 +1,17 @@
 <template>
   <div>
     <mt-actionsheet cancelText="取消"
-                    :actions="actions"
+                    :actions="[{
+                      name: '拨号：' + this.number,
+                      method: callFn
+                    }]"
                     v-model="currentValue">
     </mt-actionsheet>
   </div>
 </template>
 
 <script type="es6">
+  /* eslint-disable */
   let call = function(number) {
     console.log('拨号：' + number);
     let a = document.createElement('a');
@@ -25,12 +29,6 @@
     },
     data() {
       return {
-        actions: [{
-          name: '拨号：' + this.number,
-          method: () => {
-            call(this.number);
-          }
-        }],
         currentValue: false
       };
     },
@@ -41,6 +39,12 @@
 
       value(val) {
         this.currentValue = val;
+      }
+    },
+
+    methods: {
+      callFn() {
+        call(this.number);
       }
     }
   };
