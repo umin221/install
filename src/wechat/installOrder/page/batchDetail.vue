@@ -17,7 +17,7 @@
         </mt-field>
         <mt-field label="计划开始日期"  :value="start_Date"></mt-field>
         <mt-field label="计划完成日期" :value="end_Date"></mt-field>
-        <mt-field label="计划开孔数量"
+        <mt-field label="计划数量"
                   :value="batchNum"
                   @click.native="editBuildingFn"
                   is-link></mt-field>
@@ -313,28 +313,58 @@
       submitFn(type) {
         var self = this;
         if (type === 'Approved') {
+          api.get({
+            key: 'setApproval',
+            method: 'POST',
+            data: {
+              'body': {
+                'Object Id': self.id,
+                'InboxItemId': self.InboxItemId,
+                'InboxTaskId': self.InboxTaskId,
+                'ActionLIC': type,
+                'KL Request Description': '',
+                'ProcessName': 'KL Install Task Approval Action Main Workflow'
+              }
+            },
+            success: function(data) {
+              if (!data.ERROR) {
+                Toast('审批成功');
+                if (this.option === 'approval') {
+                  this.getAppData();
+                }
+              }
+            }
+          });
         } else {
+          MessageBox.prompt('请填写驳回原因').then(({ value, action }) => {
+            if (value) {
+              api.get({
+                key: 'setApproval',
+                method: 'POST',
+                data: {
+                  'body': {
+                    'Object Id': self.id,
+                    'InboxItemId': self.InboxItemId,
+                    'InboxTaskId': self.InboxTaskId,
+                    'ActionLIC': type,
+                    'KL Request Description': value,
+                    'ProcessName': 'KL Install Task Approval Action Main Workflow'
+                  }
+                },
+                success: function(data) {
+                  if (!data.ERROR) {
+                    Toast('审批成功');
+                    if (this.option === 'approval') {
+                      this.getAppData();
+                    }
+                  }
+                }
+              });
+            } else {
+              Toast('请填写驳回原因');
+            }
+          });
         }
-        api.get({
-          key: 'setApproval',
-          method: 'POST',
-          data: {
-            'body': {
-              'Object Id': self.id,
-              'InboxItemId': self.InboxItemId,
-              'InboxTaskId': self.InboxTaskId,
-              'ActionLIC': type,
-              'KL Request Description': '测试',
-              'ProcessName': 'KL Install Task Approval Action Main Workflow'
-            }
-          },
-          success: function(data) {
-            if (!data.ERROR) {
-              Toast('提交成功');
-              KND.Util.back();
-            }
-          }
-        });
       },
       /**
        * 编辑楼栋信息
@@ -344,7 +374,8 @@
         this.$router.push({
           path: 'assets',
           query: {
-            id: id
+            id: id,
+            mode: 'edit'
           }
         });
       }

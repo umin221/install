@@ -149,6 +149,12 @@ export default new Router({
       require(['../page/zsBatch'], resolve);
     }
   }, {
+    path: '/yjBatch', // 真锁移交新增页面
+    name: 'yjBatch',
+    component(resolve) {
+      require(['../page/yjBatch'], resolve);
+    }
+  }, {
     path: '/orderLine', // 锁体&面板
     name: 'orderLine',
     component(resolve) {

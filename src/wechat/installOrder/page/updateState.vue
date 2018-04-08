@@ -74,7 +74,7 @@
             success: function(data) {
               if (!data.ERROR) {
                 Toast('提交成功');
-                self.$router.back();
+                KND.Util.back();
               }
             }
           });

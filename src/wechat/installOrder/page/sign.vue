@@ -4,14 +4,14 @@
     <mt-header fixed :title="title">
       <fallback slot="left"></fallback>
       <mt-button v-if="form['KL Signed Amount'] && is_edit" slot="right"
-                 @click="type = 'edit';is_edit = false">编辑</mt-button>
+                 @click="type = 'edit'">编辑</mt-button>
     </mt-header>
 
     <div class="mint-content wide-form">
       <div :class="{'readonly':read}">
         <mt-cell title="是否涉及签收" v-if="item['KL Detail Type LIC'] === 'Trompil Lock Sign' ||
           item['KL Detail Type LIC'] === 'Working Drawing Sign'" :class="{disable: !editable}">
-          <mt-switch v-if="form['KL Signed Amount']" v-model="box1"></mt-switch>
+          <mt-switch v-model="box1"></mt-switch>
         </mt-cell>
         <div v-show="box1" :class="{disable: !editable}">
           <mt-field label="签收数量" placeholder="请输入签收数量"

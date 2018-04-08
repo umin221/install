@@ -133,7 +133,7 @@
                     taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
                     taskData['KL Detail Type LIC'] === 'Transfer Summary'"
                     :value="taskData['KL Completed Install Amount']+'/'+taskData['KL Install Amount Requested']">
-                    <span @click.stop="closeTask(itemTask)" class="batchClose"></span>
+                    <span v-if="taskData['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
                   </mt-field>
                   <mt-field label="合格/计划数量"
                     v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
@@ -707,28 +707,7 @@
         var self = this;
         var itemTask = KND.Util.toArray(item['KL Installation Task'])[0];
         self.getTaskType(itemTask);
-        if (item['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次新增
-          if (self.detailData['KL Delivery Sales Type'] === '工程') { // 真锁---工程
-            // 跳转真锁安装批次新增页面
-            self.clear();
-            this.$router.push({
-              name: 'zsBatch',
-              query: {
-                type: 'add',
-                item: item,
-                orderID: self.id
-              }
-            });
-          } else { // 真锁---零星
-            this.$router.push({
-              name: 'batch',
-              query: {
-                type: 'add',
-                item: item
-              }
-            });
-          }
-        } else if (item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary') { // 替代锁批次
+        if ((item['KL Detail Type LIC'] === 'Lock Installation Summary' && self.detailData['KL Delivery Sales Type'] === '工程') || item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary') { // 真锁批次新增 替代锁批次
           // 跳转真锁安装批次新增页面
           self.clear();
           this.$router.push({
@@ -808,12 +787,18 @@
             if ((item['KL Detail Type LIC'] === 'Trompil Lock Sign' || item['KL Detail Type LIC'] === 'Working Drawing Sign') && !item['KL Signed Amount']) { // 开孔签收与图纸签证 不涉及签收不需要查看详情
               console.dir('===');
             } else {
+              var is_edit = true;
+              if (item['KL Detail Type LIC'] === 'Trompil Lock Sign' || item['KL Detail Type LIC'] === 'Working Drawing Sign') { // 开孔签收与图纸签证提交后可以编辑  其他不能
+                is_edit = true;
+              } else {
+                is_edit = false;
+              }
               this.$router.push({ // 编辑
                 name: 'sign',
                 query: {
                   type: 'read',
                   state: state,
-                  is_edit: true,
+                  is_edit: is_edit,
                   item: item
                 }
               });
@@ -901,7 +886,7 @@
         var self = this;
         // 跳转批次详情、编辑
         //  && (item['Calculated Activity Status'] === 'Draft' || item['Calculated Activity Status'] === 'Rejected')
-        if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'Rejected')) { // 草稿=Planning(设定计划)、驳回状态=Rejected 要编辑提交 并且有权限的人才可做此操作
+        if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'Declined') && fItem['Calculated Activity Status'] === 'In Progress') { // 汇总节点是否开启  未开始=Not Started、草稿=Planning(设定计划)、审批驳回=Declined 要编辑提交 并且有权限的人才可做此操作
           this.clear();
           var itemTask = KND.Util.toArray(fItem['KL Installation Task'])[0];
           this.getTaskType(itemTask);
@@ -1019,6 +1004,16 @@
                   query: {
                     type: 'add',
                     id: item.Id
+                  }
+                });
+              } else if (fItem['KL Detail Type LIC'] === 'Transfer Summary') { // 真锁移交更新
+                // 跳转真锁移交批次新增页面
+                self.getTaskType(item);
+                this.$router.push({
+                  path: 'assets',
+                  query: {
+                    id: item.Id,
+                    mode: 'select'
                   }
                 });
               } else {

@@ -11,7 +11,7 @@
               <li class="bd-radius">
                 <span class="icon"></span>
               </li>
-              <li style="color: #888;line-height: 40px;font-size: 0.8rem;">审批人：{{itemTask['Owner Full Name']}}
+              <li style="color: #888;line-height: 40px;font-size: 0.8rem;">审批人：{{itemTask['Task Owner Full Name']}}
                 <span class="journalName">{{new Date(itemTask['End Working Time']).format('yyyy-MM-dd')}}</span>
               </li>
               <div class="content-div">

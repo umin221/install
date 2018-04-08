@@ -127,7 +127,7 @@
         var objList = [];
         for (let i in select) {
           var obj = {};
-          obj.Id = select[i].Id;
+          obj['Contact Id'] = select[i].Id;
           objList.push(obj);
         }
         console.dir(objList);
@@ -141,10 +141,13 @@
                 'MessageType': 'Integration Object',
                 'IntObjectName': 'Base KL Installation Task',
                 'IntObjectFormat': 'Siebel Hierarchical',
+                'ViewMode': 'AllView',
                 'ListOfBase KL Installation Task': {
                   'KL Installation Task': {
                     'Id': self.id,
-                    'ListOfContact': objList
+                    'ListOfKL Installation Task_Contact': {
+                      'Contact': objList
+                    }
                   }
                 }
               }

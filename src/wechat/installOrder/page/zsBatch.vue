@@ -18,7 +18,7 @@
         </mt-cell>
         <mt-cell v-show="box1" title="合作伙伴" @click.native="selectCompany" :value="companyName" is-link></mt-cell>
         <div v-show="box1">
-          <mt-cell v-show="show_zs" title="真锁交接日期" @click.native="open('picker', 'Planned Completion')" is-link></mt-cell>
+          <mt-cell v-show="show_zs" title="真锁交接日期" @click.native="open('deliveryTime')" :value="delivery_Time" is-link></mt-cell>
         </div>
       </div>
       <div class="lock-line" v-show="box1">
@@ -80,6 +80,15 @@
         class="datetime"
         @confirm="handleChangeEnd">
       </mt-datetime-picker>
+      <mt-datetime-picker
+        ref="deliveryTime"
+        type="date"
+        year-format="{value} 年"
+        month-format="{value} 月"
+        date-format="{value} 日"
+        class="datetime"
+        @confirm="handleChangedeliveryTime">
+      </mt-datetime-picker>
     </div>
   </div>
 </template>
@@ -136,14 +145,15 @@
         self.show_zs = false;
       }
       if (self.type === 'add') {
-        self.batchCode = '10001'; // 随机默认
         if (self.pcObj.Id) { // 批次页面新增保存有数据
           self.id = self.pcObj.Id;
           self.batchCode = self.pcObj.Id; // 新增保存的ID
           self.start_Date = new Date(self.pcObj.Planned).format('yyyy-MM-dd'); // 开始时间
           self.end_Date = new Date(self.pcObj['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
+          self.delivery_Time = new Date(self.pcObj['KL Delivery Time']).format('yyyy-MM-dd'); // 结束时间
           self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
           self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
+          self.deliveryTime = new Date(self.delivery_Time).format('MM/dd/yyyy');
           self.batchNum = self.pcObj['KL Install Amount Requested']; // 数量
           self.companyId = self.pcObj['KL Partner Id'];
           self.companyName = self.pcObj['KL Partner Name'];
@@ -156,8 +166,10 @@
           self.batchCode = self.pcObj.Id; // 新增保存的ID
           self.start_Date = new Date(self.pcObj.Planned).format('yyyy-MM-dd'); // 开始时间
           self.end_Date = new Date(self.pcObj['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
+          self.delivery_Time = new Date(self.pcObj['KL Delivery Time']).format('yyyy-MM-dd'); // 结束时间
           self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
           self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
+          self.deliveryTime = new Date(self.delivery_Time).format('MM/dd/yyyy');
           self.batchNum = self.pcObj['KL Install Amount Requested']; // 数量
           self.companyId = self.pcObj['KL Partner Id'];
           self.companyName = self.pcObj['KL Partner Name'];
@@ -181,6 +193,8 @@
         startDate: '',
         end_Date: '',        // 结束时间
         endDate: '',
+        deliveryTime: '',
+        delivery_Time: '',
         batchNum: 0, // 数量
         companyName: '', // 合作伙伴名称
         companyId: '', // 合作伙伴id
@@ -235,6 +249,11 @@
         let me = this;
         me.end_Date = value.format('yyyy/MM/dd');
         me.endDate = value.format('MM/dd/yyyy');
+      },
+      handleChangedeliveryTime(value) {
+        let me = this;
+        me.delivery_Time = value.format('yyyy/MM/dd');
+        me.deliveryTime = value.format('MM/dd/yyyy');
       },
       selectCompany() {
         var self = this;
@@ -334,8 +353,10 @@
               self.batchCode = data.Id; // 批次
               self.start_Date = new Date(data.Planned).format('yyyy-MM-dd'); // 开始时间
               self.end_Date = new Date(data['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
+              self.delivery_Time = new Date(data['KL Delivery Time']).format('yyyy-MM-dd'); // 结束时间
               self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
               self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
+              self.deliveryTime = new Date(self.delivery_Time).format('MM/dd/yyyy');
               self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
               self.companyId = data['KL Partner Id'];
               self.companyName = data['KL Partner Name'];
@@ -392,8 +413,9 @@
         var parma = {
           'Planned': self.startDate,
           'Planned Completion': self.endDate,
+          'KL Delivery Time': self.deliveryTime,
           'KL Install Amount Requested': self.batchNum,
-          'Id': self.batchCode,
+          'Id': self.batchCode || '10001',
           'KL Detail Type': self.item['KL Detail Type'],
           'Parent Activity Id': aId
         };

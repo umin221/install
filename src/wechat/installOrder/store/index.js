@@ -7,7 +7,7 @@ import sto from '../../install/store';
 Vue.use(Vuex);
 
 // 缓存页面
-app.state.alive = ['index'];
+app.state.alive = ['index', 'assets'];
 
 // 每页加载条数
 const PAGESIZE = config.pageSize;
@@ -359,7 +359,6 @@ export default new Vuex.Store(Object.extend(true, sto, {
           });
         },
         getTpye({commit}, item) {
-          var self = this;
           var processName = ''; // KL Record Install Process Flg == N 请求关闭接口 Y 提交接口
           if (item['KL Record Install Process Flg'] === 'N') {
             if (item.box1) { // 涉及签收
@@ -382,7 +381,7 @@ export default new Vuex.Store(Object.extend(true, sto, {
             success: function(data) {
               if (!data.ERROR) {
                 Toast('提交成功');
-                self.$route().back();
+                KND.Util.back();
               }
             }
           });
@@ -510,6 +509,52 @@ export default new Vuex.Store(Object.extend(true, sto, {
           edit: false,
           title: '签收单据归档'
         } // 附件
+      }
+    },
+    yjBatch: {
+      namespaced: true,
+      state: {
+        form: '',
+        search: [],
+        attach: {
+          list: [{id: 1}, {id: 2}, {id: 3}],
+          edit: false,
+          title: '签收单据归档'
+        } // 附件
+      },
+      mutations: {
+        getSearch(state, data) {
+          state.search = [];
+          if (data.constructor === Array) {
+            state.search = data;
+          } else {
+            state.search.push(data);
+          }
+        },
+        removeSearch(state) {
+          state.search = [];
+        }
+      },
+      actions: {
+        getSearch({commit}, val) {
+          api.get({
+            key: 'getSearch',
+            data: {
+              val
+            },
+            success: function(data) {
+              console.log(data);
+              if (data.items) {
+                commit('getSearch', data.items);
+              } else {
+                commit('getSearch', data);
+              }
+            },
+            error: function(data) {
+              commit('removeSearch', '');
+            }
+          });
+        }
       }
     },
     buildingInfo: {

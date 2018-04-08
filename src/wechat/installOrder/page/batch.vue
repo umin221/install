@@ -11,7 +11,7 @@
         </mt-cell>
         <mt-cell title="计划开始日期" @click.native="open('picker')" :value="start_Date" is-link></mt-cell>
         <mt-cell title="计划完成日期" @click.native="open('pickerEnd')" :value="end_Date" is-link></mt-cell>
-        <mt-field label="计划开孔数量" placeholder="请输入"
+        <mt-field label="计划数量" placeholder="请输入"
                   :class="heartVisible" v-model="batchNum"></mt-field>
       </div>
       <div class="lock-line">
@@ -103,7 +103,6 @@
       self.type = param.type;
       self.item = param.item;
       if (self.type === 'add') {
-        self.batchCode = '10001'; // 随机默认
         if (self.pcObj.Id) { // 批次页面新增保存有数据
           self.id = self.pcObj.Id;
           self.batchCode = self.pcObj.Id; // 新增保存的ID
@@ -254,7 +253,7 @@
           'Planned': self.startDate,
           'Planned Completion': self.endDate,
           'KL Install Amount Requested': self.batchNum,
-          'Id': self.batchCode,
+          'Id': self.batchCode || '10001',
           'KL Detail Type': self.item['KL Detail Type'],
           'Parent Activity Id': aId
         };

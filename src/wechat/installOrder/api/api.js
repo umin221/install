@@ -202,6 +202,13 @@ let apiList = {
       data: {}
     };
   },
+  getSearch: option => {
+    return {
+      method: 'get',
+      url: 'data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] ~LIKE "' + option.data.val + '*" AND [User Type]<>LookupValue("CONTACT_USER_TYPE", "Sales") &PageSize=10&StartRowNum=0'
+    };
+    // 搜索电话联系人
+  },
   setPlan: option => { // 批次详细计划提交
     return {
       url: 'data/KL Installation Task/KL Installation Task/' + option.data['Parent Activity Id'] + '/KL Installation Task Detail Plan'
@@ -247,6 +254,14 @@ let apiList = {
       method: 'get',
       url: 'data/KL Install Order Asset/KL Install Order Asset/?[KL Activity Id]=' + "'" + option.data.id + "'" + '&PageSize=100&StartRowNum=0',
       data: {}
+    };
+  },
+  /*
+  * 真锁移交工程类更新
+  * */
+  setUpyj: option => { // 更新提交
+    return {
+      url: 'service/Workflow Process Manager/RunProcess'
     };
   },
   getJournalData: option => {
