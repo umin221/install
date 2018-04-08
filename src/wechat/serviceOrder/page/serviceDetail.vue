@@ -129,7 +129,7 @@
       <!--关闭盒子-->
       <close :showBox1="showBox" @my-enter="boxEnter" @my-close="boxClose"></close>
       <!--打电话-->
-      <cus-call :number="phoneNum" v-model="call"></cus-call>
+      <cus-call :number="ServiceRequest['Contact Business Phone']" v-model="call"></cus-call>
       <!--工单操作-->
       <mt-popup v-model="popupVisible1" position="bottom" popup-transition="popup-fade" class="mint-popup-2">
         <mt-cell class="setOut" title="出发" :value="Action['KL Departure Location']" >
@@ -197,7 +197,6 @@
       me.contactId = me.$route.query.id;
       me.getDetail(me.srNumber);
       me.setRole({meg: me.loginMeg, role: me.role});
-      me.getMapAddress({});
     },
     data: () => {
       return {
@@ -219,6 +218,7 @@
         callEnd: false,
         AppointEnd: false,
         call: false,
+        phoneNum: '',
         attach: { // 附件
           list: [],
           edit: false,
@@ -228,10 +228,7 @@
     },
     computed: {
       ...mapState('index', ['loginMeg', 'role']),
-      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress', 'orderEntry', 'childService']),
-      phoneNum() {
-        return this.ServiceRequest['Contact Business Phone'];
-      }
+      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress', 'orderEntry', 'childService'])
     },
     methods: {
       ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress', 'addChildService']),

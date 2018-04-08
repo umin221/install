@@ -215,7 +215,7 @@
             if (data) {
               let name = me.$router.currentRoute.name;
               if (name === 'comEnter') {
-                me.$router.go(-2);
+                me.$router.go(-1);
               } else {
                 me.$router.go(-1);
               }

@@ -228,8 +228,7 @@
         let me = this;
         KND.Native.scanQRCode({
           success(data) {
-            data.resultStr = 'CODE_39,HBS1803014006';
-            data.resultStr = data.resultStr.split(',');
+            data.resultStr[1] = data.resultStr.split(',');
             me.getAsset({
               num: data.resultStr,
               callback: function(data) {

@@ -66,7 +66,6 @@ export default {
           me.ServiceRequest = data;
           if (!me.isBn) {
             let isBn = me.ServiceRequest['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
-            console.log(isBn);
             me.setIsBn(isBn);
           }
         }
