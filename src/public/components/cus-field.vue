@@ -4,13 +4,19 @@
       :label="label"
       :placeholder="placeholder"
       :value="currentValue"
+      :state="state"
       :type="type"
-      @input="handleInput"></mt-field>
+      @input="handleInput">
+      <slot></slot>
+    </mt-field>
     <mt-cell v-else
       :title="label"
       :placeholder="placeholder"
       :value="currentValue"
-      :isLink="isLink"></mt-cell>
+      :state="state"
+      :isLink="isLink">
+      <slot></slot>
+    </mt-cell>
   </div>
 </template>
 
@@ -27,7 +33,8 @@
           default: true
         },
         value: String,
-        isLink: Boolean
+        isLink: Boolean,
+        state: String
       },
       data() {
         return {

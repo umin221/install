@@ -36,7 +36,8 @@
    */
   import titleGroup from '../../cus-title-group';
 
-  let downloadUrl = (config.proxy + '/webchat/api/external/downloadattachment?url=http://192.168.166.8:9001/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess');
+  let downloadFromSiebel = (config.proxy + '/webchat/api/external/downloadattachment?url=http://192.168.166.8:9001/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess');
+  let downloadFromWechat = (config.proxy + '/webchat/api/local/downloadmedia?appNO=CONTACT&media_id=');
 
   export default {
     name: 'cus-attach',
@@ -63,6 +64,7 @@
         let me = this;
         KND.Native.chooseImage({
           success: function(res) {
+            console.log(res);
             // andriod中localId可以作为img标签的src属性显示图片；
             // 而在IOS中需通过上面的接口getLocalImgData获取图片base64数据，从而用于img标签的显示
             let localIds = res.localIds;
@@ -98,7 +100,7 @@
         });
       },
       convertImgSrc(item) {
-        item.src = item.localId ? item.localId : encodeURI(downloadUrl + '&IOName=' + this.ioName + '&Object Id=' + item.Id + '&ProcessName=KL Attachment Query Process');
+        item.src = encodeURI(item.serverId ? (downloadFromWechat + item.serverId) : (downloadFromSiebel + '&IOName=' + this.ioName + '&Object Id=' + item.Id + '&ProcessName=KL Attachment Query Process'));
         return item.src;
       },
       /**
