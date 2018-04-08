@@ -164,7 +164,7 @@
         if (m < 10) m = `0${m}`;
         let d = day;
         if (d < 10) d = `0${d}`;
-        return `${y}-${m}-${d}`;
+        return `${m}/${d}/${y}`;
       },
       initData(cur) {            // 日历初始化
         let date = '';

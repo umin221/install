@@ -8,6 +8,7 @@
         <mt-field label="产品条形码"
                   v-model="KLSN"
                   class="klsn"
+                  @change.native="serchSn"
                   placeholder="请扫码或输入条形码">
           <i class="xs-icon icon-scan" @click="toScan"></i></mt-field>
         <mt-field label="联系人" tag="联系人"
@@ -63,7 +64,6 @@
                  @my-change="onValuesChange"
                  @my-cancel="showBox = !showBox"
                  :slots="slots"></menuBox></mt-popup>
-
       <button-group>
         <mt-button class="single" @click.native="submit">提交</mt-button>
       </button-group>
@@ -71,23 +71,30 @@
   </div>
 </template>
 <script>
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import Vue from 'vue';
   import menuBox from 'public/components/cus-menu';
   import vp from 'public/plugin/validator';
   const NameSpace = 'index';
+  let t = new Date().getTime() + 3600000;
   Vue.use(vp);
   export default {
     name: NameSpace,
     created() {
       let me = this;
       me.openId = KND.Util.getParam('openid');
-      console.log(me.openId);
+      if (!me.callPhone) {
+        me.getContact(function(data) {
+          console.log(data);
+          me.lastName = data['Last Name']; // 名字
+          me.callPhone = data['Work Phone #']; // 电话
+        });
+      }
     },
     data: () => {
       return {
         pickerVisible: new Date(),
-        startDate: new Date(),
+        startDate: new Date(t),
         slots: [
           {flex: 1, values: [], className: 'slot1', textAlign: 'center'},
           {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
@@ -125,7 +132,8 @@
       }
     },
     methods: {
-      ...mapActions(NameSpace, ['getLov', 'submitService']),
+      ...mapActions(NameSpace, ['getLov', 'submitService', 'getContact', 'getAsset']),
+      ...mapMutations(NameSpace, ['addressBack']),
       submit() {
         tools.valid.call(this, () => {
           let me = this;
@@ -153,6 +161,23 @@
             }
           };
           me.submitService(form);
+        });
+      },
+      serchSn() {
+        let me = this;
+        me.getAsset({
+          num: me.KLSN,
+          callback: function(data) {
+            let form = {
+              Province: data['KL Personal Province'],
+              City: data['Personal City'],
+              County: data['KL Personal Town'],
+              'Street Address': data['Personal Address'],
+              id: 'Asset'
+            };
+            me.AssetId = data.Id;
+            me.addressBack(form);
+          }
         });
       },
       handleChange(value) {
@@ -192,7 +217,6 @@
           parent: value[0],
           success: function(data) {
             let items = data.items;
-            console.log(items);
             for (let i = 0; i < items.length;i++) {
               me.slots[1].values.push(items[i].Value);
             }
@@ -200,9 +224,18 @@
         });
       },
       toScan() {
+        let me = this;
         KND.Native.scanQRCode({
           success(data) {
             console.log(data);
+            me.getAsset({
+              num: data.resultStr,
+              callback: function(data) {
+                me.ProductModel = data['KL Product Model'];// 产品型号
+                me.AssetNumber = data['Asset Number'];
+                me.ProductId = data['Id'];  // 产品ID
+              }
+            });
           }
         });
       }

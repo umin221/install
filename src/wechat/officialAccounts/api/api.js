@@ -33,6 +33,12 @@ let ApiList = {
       }
     };
   },
+  getAsset: option => {
+    return {
+      method: 'get',
+      url: 'data/KL Asset Interface BO/Asset Mgmt - Asset/?searchspec=[Serial Number] = "' + option.data.num + '"'
+    };
+  },
   addressManage: option => {           // 新增地址
     return {
       method: 'put',

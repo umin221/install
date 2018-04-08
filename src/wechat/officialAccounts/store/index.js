@@ -8,6 +8,11 @@ Vue.use(Vuex);
 // 缓存页面
 app.state.alive = ['index'];
 
+const systemSort = function(array, type) {
+  return array.sort(function(a, b) {
+    return new Date(b[type]) - new Date(a[type]);
+  });
+};
 export default new Vuex.Store({
   modules: {
     app,
@@ -55,6 +60,48 @@ export default new Vuex.Store({
               console.log(data);
             }
           });
+        },
+        getContact({commit}, callback) {
+          let openId = KND.Util.getParam('openid');
+          console.log(openId);
+          api.get({
+            key: 'getContact',
+            data: {
+              openId
+            },
+            success: data => {
+              let Contact = KND.Util.toArray(data.SiebelMessage.Contact);
+              if (Contact) {
+                Contact = systemSort(Contact, 'Updated');
+                let CUTAddress = KND.Util.toArray(Contact[0]['CUT Address']);
+                for (let i = 0; i < CUTAddress.length; i++) {
+                  if (CUTAddress[i]['SSA Primary Field'] === 'Y') {
+                    commit('addressBack', CUTAddress[i]);
+                  }
+                }
+                callback(Contact[0]);
+              }
+            },
+            error: data => {
+              console.log(data);
+            }
+          });
+        },
+        getAsset({commit}, {num, callback}) {
+          api.get({
+            key: 'getAsset',
+            data: {
+              num
+            },
+            success: function(data) {
+              // commit('successCall', {item: data});
+              callback(data);
+            },
+            error: function(data) {
+              console.log(data);
+              // commit('errorTips', data);
+            }
+          });
         }
       }
     },
@@ -85,7 +132,6 @@ export default new Vuex.Store({
       actions: {
         getContact({commit}, callback) {
           let openId = KND.Util.getParam('openid');
-          console.log(openId);
           api.get({
             key: 'getContact',
             data: {
@@ -93,12 +139,12 @@ export default new Vuex.Store({
             },
             success: function(data) {
               let Contact = KND.Util.toArray(data.SiebelMessage.Contact);
-              let len = Contact.length;
               if (Contact) {
-                commit('setContact', Contact[len - 1]);
-              }
-              if (callback) {
-                callback(Contact[len - 1]);
+                Contact = systemSort(Contact, 'Updated');
+                commit('setContact', Contact[0]);
+                if (callback) {
+                  callback(Contact[0]);
+                }
               }
             },
             error: data => {
@@ -330,9 +376,9 @@ export default new Vuex.Store({
             },
             success: data => {
               let Contact = KND.Util.toArray(data.SiebelMessage.Contact);
-              let len = Contact.length;
               if (Contact) {
-                commit('setContact', Contact[len - 1]);
+                Contact = systemSort(Contact, 'Updated');
+                commit('setContact', Contact[0]);
               }
             },
             error: data => {
