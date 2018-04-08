@@ -104,7 +104,6 @@
       this.id = param.Id;
       this.option = param.option; // 区分从哪跳转到详情页
       if (this.option === 'approval') {
-        this.is_option = true; // 是否审批
         this.orderId = param.OrderId;
         this.InboxItemId = param.InboxItemId;
         this.InboxTaskId = param.InboxTaskId;
@@ -270,6 +269,7 @@
       },
       getAppData() {
         var self = this;
+        self.is_option = true; // 是否审批
         api.get({
           key: 'getAppData',
           method: 'POST',
