@@ -25,6 +25,7 @@
       <mt-datetime-picker
         ref="picker"
         v-model="pickerVisible"
+        :startDate="sDate"
         type="datetime"
         year-format="{value} 年"
         month-format="{value} 月"
@@ -78,6 +79,7 @@
   // const NameSpace = 'detailPlan';
   // mapp
   let mapp = config.mapp;
+  let today = new Date();
   export default {
     name: 'detailPlan',
     created() {
@@ -123,7 +125,8 @@
     data: () => {
       return {
         value: '',
-        pickerVisible: new Date(),
+        pickerVisible: today,
+        sDate: today,
         index: '',
         id: '',
         timeKey: '', // 标记什么时间
@@ -168,7 +171,11 @@
       ...mapActions('app', ['getLov']),
       open(picker, key) {
         this.timeKey = key;
-        this.$refs[picker].open();
+        var self = this;
+        if (key === 'PlannedCompletion') {
+          self.aDate = new Date(self.start_Date);
+        }
+        self.$refs[picker].open();
       },
       handleChangePlan(value) {
         let self = this;

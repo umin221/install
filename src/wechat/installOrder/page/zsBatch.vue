@@ -65,6 +65,7 @@
         ref="picker"
         v-model="pickerVisible"
         type="date"
+        :startDate="sDate"
         year-format="{value} 年"
         month-format="{value} 月"
         date-format="{value} 日"
@@ -74,6 +75,7 @@
       <mt-datetime-picker
         ref="pickerEnd"
         type="date"
+        :startDate="eDate"
         year-format="{value} 年"
         month-format="{value} 月"
         date-format="{value} 日"
@@ -83,6 +85,7 @@
       <mt-datetime-picker
         ref="deliveryTime"
         type="date"
+        :startDate="sDate"
         year-format="{value} 年"
         month-format="{value} 月"
         date-format="{value} 日"
@@ -129,7 +132,7 @@
   import lockLine from '../components/cusLockLine';
   import api from '../api/api';
   const NameSpace = 'zsBatch';
-
+  let today = new Date();
   export default {
     name: 'zsBatch',
     created() {
@@ -195,11 +198,13 @@
         endDate: '',
         deliveryTime: '',
         delivery_Time: '',
-        batchNum: 0, // 数量
+        batchNum: '', // 数量
         companyName: '', // 合作伙伴名称
         companyId: '', // 合作伙伴id
         isPrimaryMVGPosition: '',
-        pickerVisible: new Date(),
+        pickerVisible: today,
+        sDate: today,
+        eDate: today,
         box1: true,
         planList: [],
         installerList: [],
@@ -238,7 +243,9 @@
       ...mapActions('app', ['getLov']),
       ...mapActions('batch', ['getPcObj']),
       open(picker) {
-        this.$refs[picker].open();
+        var self = this;
+        self.eDate = new Date(self.start_Date);
+        self.$refs[picker].open();
       },
       handleChange(value) {
         let me = this;

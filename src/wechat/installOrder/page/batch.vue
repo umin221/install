@@ -38,6 +38,7 @@
       <mt-datetime-picker
         ref="picker"
         v-model="pickerVisible"
+        :startDate="sDate"
         type="date"
         year-format="{value} 年"
         month-format="{value} 月"
@@ -48,6 +49,7 @@
       <mt-datetime-picker
         ref="pickerEnd"
         type="date"
+        :startDate="eDate"
         year-format="{value} 年"
         month-format="{value} 月"
         date-format="{value} 日"
@@ -94,6 +96,7 @@
   import lockLine from '../components/cusLockLine';
   import api from '../api/api';
   const NameSpace = 'batch';
+  let today = new Date();
   export default {
     name: 'batch',
     created() {
@@ -139,8 +142,10 @@
         startDate: '',
         end_Date: '',        // 结束时间
         endDate: '',
-        batchNum: 0, // 数量
-        pickerVisible: new Date(),
+        batchNum: '', // 数量
+        pickerVisible: today,
+        sDate: today,
+        eDate: today,
         planList: [],
         item: '',
         id: '', // 记录新增后的批次ID
@@ -173,7 +178,9 @@
       ...mapActions('app', ['getLov']),
       ...mapActions(NameSpace, ['getPcObj']),
       open(picker) {
-        this.$refs[picker].open();
+        var self = this;
+        self.eDate = new Date(self.start_Date);
+        self.$refs[picker].open();
       },
       handleChange(value) {
         let me = this;
