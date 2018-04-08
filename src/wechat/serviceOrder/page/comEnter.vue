@@ -10,7 +10,7 @@
         <mt-field label="产品条形码" type="text" placeholder="输入或扫门锁条形码" @change="sarech" v-model="SerialNumber" class="textRight">
           <i class="xs-icon icon-scan" @click="scan"></i>
         </mt-field>
-        <mt-cell class="mint-field" title="所在省市区" placeholder="请选择" is-link>{{Personal}}</mt-cell>
+        <mt-cell class="mint-field" title="所在省市区" placeholder="请选择">{{Personal}}</mt-cell>
         <mt-field class="block" label="详细地址" v-model="Address" placeholder="如设备过旧未贴条码,允许为空" type="textarea" rows="2"></mt-field>
         <div class="floor-box">
           <input type="text" placeholder="楼栋名" v-model="building">
@@ -68,7 +68,6 @@
       let me = this;
       let serviceId = me.$route.query.id;
       let serviceType = me.$route.query.type;
-      me.setProductModel('');
       if (serviceType === 'child') {
         me.childId = serviceId;
       }

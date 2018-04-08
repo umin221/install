@@ -40,22 +40,29 @@ export default new Vuex.Store({
           'Id': '1-2BSBYRFU'
         },
         role: '',       // 角色
+        // 工号
+        owner: '',
         // 待处理
         pending: [],
         // 处理中
         process: [],
         // 已处理
         completed: [],
-        // 客服
-        cusService: []
+        // 客服待处理
+        cusPending: [],
+        // 客服已分配
+        cusProcess: []
+
       },
       mutations: {
         setManager(state, isManager) {
-          mapps = config.mapp[isManager];
-          state.role = isManager;
+          mapps = config.mapp[isManager.role];
+          state.role = isManager.role;
+          state.owner = isManager.owner;
         },
         setOrders(state, {serviceOrders, list}) {
           state[list] = serviceOrders;
+          console.log(state['cusPending']);
           // for (let i = 0; i < serviceOrders.length; i++) {
           //   console.log(serviceOrders[i]['Created']);
           // }
@@ -68,21 +75,21 @@ export default new Vuex.Store({
         }
       },
       actions: {
-        /**
-         * 获取交接
-         * @param {Object} data 必填 接口请求参数
-         * @param {Boolean} more 选填 是否加载更多
-         * @param {Function} callback 选填 处理回调
-         * @param {Function} error 选填 错误回调
-         */
         getList({state, commit, dispatch}, {data, more, callback, error}) {
+          let key = '';
+          if (state.role === 'custom') {
+            data.owner = state.owner;
+            key = 'getServiceList';
+          } else {
+            key = 'getList';
+          }
           let status = data['Status'];
           let mapp = mapps[status] || {};
           // 搜索时，没有状态
           let list = mapp['list'] || 'result';
           data['Status'] = mapp['status'];
           api.get({
-            key: 'getList',
+            key: key,
             data: data,
             paging: {
               StartRowNum: more ? state[list].length : 0,
@@ -92,7 +99,6 @@ export default new Vuex.Store({
               let serviceOrders = KND.Util.toArray(data.SiebelMessage['Service Request']);
               if (serviceOrders) {
                 serviceOrders = systemSort(serviceOrders, 'Created');
-                console.log(serviceOrders);
                 commit(more ? 'addOrders' : 'setOrders', {
                   serviceOrders: serviceOrders,
                   list: list
@@ -354,7 +360,8 @@ export default new Vuex.Store({
         starAddress: '',
         visitAddress: '',
         endAddress: '',
-        orderEntry: []
+        orderEntry: [],
+        meg: ''
       },
       mutations: {
         setPartner(state, form) {
@@ -371,23 +378,36 @@ export default new Vuex.Store({
           } else {
             state.processDate = [{Note: '暂无数据'}];
           }
-          if (form.Action) {
-            let Action = KND.Util.isArray(form.Action) ? form.Action[0] : form.Action;
-            if (Action.Status === '已派工' || Action.Status === '未开始') {
-              state.BtnStatu = 'status1';
-            } else if (Action.Status === '已接单') {
-              state.BtnStatu = 'status2';
-            } else if (Action.Status === '已预约' || Action.Status === '已出发' || Action.Status === '已上门') {
-              state.BtnStatu = 'status3';
+          if (state.role === 'custom') {
+            console.log(state.meg['Emp #']);
+            console.log(form.Owner);
+            if (form.Owner === state.meg['Emp #'] || !form.Owner) {
+              if ((form.Status === '未开始' || form.Status === '待分配') && form['SR Type'] === '上门维修') {
+                state.BtnStatu = 'status4';
+              } else {
+                state.BtnStatu = '';
+              }
             } else {
               state.BtnStatu = '';
             }
-            state.Action = Action;
+
           } else {
-            if (form.Status === '待分配') {
-              state.BtnStatu = 'status5';
-            } else if (form.Status === '未开始' && form['SR Type'] === '上门维修') {
-              state.BtnStatu = 'status4';
+            if (form.Action) {
+              let Action = KND.Util.isArray(form.Action) ? form.Action[0] : form.Action;
+              if (Action.Status === '已派工' || Action.Status === '未开始') {
+                state.BtnStatu = 'status1';
+              } else if (Action.Status === '已接单') {
+                state.BtnStatu = 'status2';
+              } else if (Action.Status === '已预约' || Action.Status === '已出发' || Action.Status === '已上门') {
+                state.BtnStatu = 'status3';
+              } else {
+                state.BtnStatu = '';
+              }
+              state.Action = Action;
+            } else {
+              if (form.Status === '待分配') {
+                state.BtnStatu = 'status5';
+              }
             }
           }
           if (form['Order Entry - Orders']) {
@@ -401,6 +421,10 @@ export default new Vuex.Store({
         },
         setAddress(state, {data, type}) {
           state[type] = data;
+        },
+        setRole(state, {meg, role}) {
+          state.role = role;
+          state.meg = meg;
         }
       },
       actions: {
@@ -564,7 +588,6 @@ export default new Vuex.Store({
         successCall(state, data) {
           data.type = data.type || '';
           state.ProductModel = data.item['KL Product Model' + data.type];
-          console.log(state.ProductModel);
         },
         errorTips(state) {
           Toast(state.tips);

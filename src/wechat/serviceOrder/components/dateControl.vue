@@ -278,6 +278,7 @@
           self.params.Time2.time = self.am[seleat].time[index - seleat * 8];
           self.params.Time2.key = (index1 + 1) * (index2 + 1);
         }
+        console.log(self.params);
       }
     }
   };

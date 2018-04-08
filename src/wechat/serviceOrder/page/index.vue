@@ -102,30 +102,66 @@
       </mt-tab-container>
     </div>
     <div v-else-if="role === 'custom'" class="mint-content customService" >
-      <loadmore @loadTop="loadTopFn"
-                @loadBottom="loadBottomFn"
-                :param="{status:'all', list:'cusService'}"
-                ref="cusService">
-        <div class="list-content"
-             v-for="(item,index) in cusService"
-             @click="toDetail(item['SR Number'],item['Contact Id'])"
-             :key="index">
-          <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}
-            <mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge>
-          </div>
-          <mt-cell class="multiple" is-link>
-            <div class="my-cell-sub" slot="title">
-              申请时间: {{item.Created}}
+      <mt-navbar v-model="cusSelected">
+        <mt-tab-item id="cusPending"
+                     @click.native="!cusPending.length && loadBottomFn({status:'待处理', list:'cusPending'})">待处理</mt-tab-item>
+        <mt-tab-item id="cusProcess"
+                     @click.native="!cusProcess.length && loadBottomFn({status:'已分配', list:'cusProcess'})">已分配</mt-tab-item>
+      </mt-navbar>
+      <mt-tab-container v-model="cusSelected">
+        <mt-tab-container-item id="cusPending">
+          <loadmore @loadTop="loadTopFn"
+                    @loadBottom="loadBottomFn"
+                    :param="{status:'待处理', list:'cusPending'}"
+                    ref="cusPending">
+            <div class="list-content"
+                 v-for="(item,index) in cusPending"
+                 @click="toDetail(item['SR Number'],item['Contact Id'])"
+                 :key="index">
+              <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}
+                <mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge>
+              </div>
+              <mt-cell class="multiple" is-link>
+                <div class="my-cell-sub" slot="title">
+                  申请时间: {{item.Created}}
+                </div>
+                <div class="my-cell-sub" slot="title">
+                  优先级: {{item.Priority}}
+                </div>
+                <div class="my-cell-sub" slot="title">
+                  地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}
+                </div>
+              </mt-cell>
             </div>
-            <div class="my-cell-sub" slot="title">
-              优先级: {{item.Priority}}
+          </loadmore>
+        </mt-tab-container-item>
+        <mt-tab-container-item id="cusProcess">
+          <loadmore @loadTop="loadTopFn"
+                    @loadBottom="loadBottomFn"
+                    :param="{status:'已分配', list:'cusProcess'}"
+                    ref="cusProcess">
+            <div class="list-content"
+                 v-for="(item,index) in cusProcess"
+                 @click="toDetail(item['SR Number'],item['Contact Id'])"
+                 :key="index">
+              <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}
+                <mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge>
+              </div>
+              <mt-cell class="multiple" is-link>
+                <div class="my-cell-sub" slot="title">
+                  申请时间: {{item.Created}}
+                </div>
+                <div class="my-cell-sub" slot="title">
+                  优先级: {{item.Priority}}
+                </div>
+                <div class="my-cell-sub" slot="title">
+                  地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}
+                </div>
+              </mt-cell>
             </div>
-            <div class="my-cell-sub" slot="title">
-              地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}
-            </div>
-          </mt-cell>
-        </div>
-      </loadmore>
+          </loadmore>
+        </mt-tab-container-item>
+      </mt-tab-container>
     </div>
     <div v-else-if="role === 'other'" class="mint-content customService" >
       <empty></empty>
@@ -180,12 +216,15 @@
           list = 'pending';
         } else if (role === 'Agent Manager' || role === 'Agent') {
           role = 'custom';
-          status = 'all';
-          list = 'cusService';
+          status = '待处理';
+          list = 'cusPending';
         } else {
           role = 'other';
         }
-        me.setManager(role);
+        me.setManager({
+          role: role,
+          owner: info['Emp #']
+        });
         me.loadTopFn({status: status, list: list});
       });
       me.getLoginMeg();
@@ -193,11 +232,12 @@
     data: () => {
       return {
         selected: 'pending',
+        cusSelected: 'cusPending',
         topStatus: ''
       };
     },
     computed: {
-      ...mapState(NameSpace, ['loginMeg', 'pending', 'process', 'completed', 'cusService', 'role'])
+      ...mapState(NameSpace, ['loginMeg', 'pending', 'process', 'completed', 'cusPending', 'cusProcess', 'role'])
     },
     methods: {
       ...mapActions(NameSpace, ['getList', 'getLoginMeg']),

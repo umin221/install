@@ -23,15 +23,48 @@ let ApiList = {
       data: {
         'body': {
           'OutputIntObjectName': 'Base KL Service Request Interface BO',
-          // 'SearchSpec': KND.Util.condition2D(condition, 'Service Request', ' OR ', operator),
-          'SearchSpec': parmer,
+          'SearchSpec': '(' + parmer + ')AND [Service Request.Parent Service Request Id] IS NULL',
           'SortSpec': 'Created(DESCENDING)',
           'StartRowNum': option.paging.StartRowNum,
           'PageSize': option.paging.PageSize
         }
       }
     };
-    // 列表
+    // 工程师列表
+  },
+  getServiceList: option => {
+    console.log(option);
+    let condition = Object.assign({}, option.data);
+    let status = condition.Status;
+    let parmer = '';
+    let SearchSpec = '';
+    if (status) {
+      condition['Status'] = status.split(',');
+      for (let i = 0; i < condition['Status'].length; i++) {
+        if (!parmer) {
+          parmer = '[Service Request.Status] = LookupValue("SR_STATUS",' + '"' + condition['Status'][i] + '"' + ')';
+        } else {
+          parmer = parmer + 'OR [Service Request.Status] = LookupValue("SR_STATUS",' + '"' + condition['Status'][i] + '"' + ')';
+        }
+      }
+      SearchSpec = '([Service Request.Owner] = "' + option.data.owner + '" OR [Service Request.Owner] IS NULL) AND ' + parmer + 'AND [Service Request.Parent Service Request Id] IS NULL';
+    } else {
+      SearchSpec = '[Service Request.KL Dispatcher Login] = ' + option.data.owner + ' AND [Service Request.Parent Service Request Id] IS NULL';
+    }
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/QueryPage',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base KL Service Request Interface BO',
+          'SearchSpec': SearchSpec,
+          'SortSpec': 'Created(DESCENDING)',
+          'StartRowNum': option.paging.StartRowNum,
+          'PageSize': option.paging.PageSize
+        }
+      }
+    };
+    // 客服列表
   },
   getServiceR: option => {
     return {

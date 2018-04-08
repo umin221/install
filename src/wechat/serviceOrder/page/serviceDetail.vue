@@ -5,7 +5,7 @@
         <fallback slot="left"></fallback>
         <mt-button  slot="right"
                     @click.native="openConfirm"
-                    v-if="role === 'install'">关闭</mt-button>
+                    v-if="role === 'install'&& BtnStatu !== 'status5'">关闭</mt-button>
       </mt-header>
 
       <div class="mint-content service-detail">
@@ -53,6 +53,11 @@
                       <li>故障描述：{{ServiceRequest['Sub-Area']}}</li>
                       <li>故障现象：{{ServiceRequest['Area']}}</li>
                       <li>照片附件</li>
+                      <attach ioName="KL Service Request Attachment IO" ref="attach"
+                              :attach="attach.list"
+                              :edit="attach.edit"
+                              :title="attach.title">
+                      </attach>
                     </ul>
                   </toggle>
                   <toggle :title="false" label="完工确认单">
@@ -167,7 +172,7 @@
   </div>
 </template>
 <script>
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import { MessageBox } from 'mint-ui';
   import close from '../components/close';
   import cusCall from 'public/components/cus-call';
@@ -182,7 +187,8 @@
       let me = this;
       me.srNumber = me.$route.query.type;
       me.contactId = me.$route.query.id;
-      this.getDetail(me.srNumber);
+      me.getDetail(me.srNumber);
+      me.setRole({meg: me.loginMeg, role: me.role});
     },
     data: () => {
       return {
@@ -217,6 +223,7 @@
     },
     methods: {
       ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress', 'addChildService']),
+      ...mapMutations(NameSpace, ['setRole']),
       boxClose(msg) {               // 关闭取消事件
         this.showBox = false;
       },
@@ -263,7 +270,6 @@
       enter(val) {                     // 日历确定
         let me = this;
           // 判断开始结束时间
-        console.log(val);
         if (val.Time1.time && val.Time2.time) {
           if (val.Time1.key <= val.Time2.key) {
             me.starTime = val.Time1.time;
@@ -401,7 +407,6 @@
           locationId: me.ServiceRequest['Personal Location Id'],
           srNumber: me.ServiceRequest['SR Number']
         };
-        console.log(params);
         me.addChildService(params);
       },
       fillIn(key) {
