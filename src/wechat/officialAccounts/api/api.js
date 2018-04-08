@@ -187,11 +187,14 @@ let ApiList = {
   getServiceList: option => {           // 服务工单列表请求
     return {
       method: 'post',
-      url: 'service/EAI Siebel Adapter/Query',
+      url: 'service/EAI Siebel Adapter/QueryPage',
       data: {
         'body': {
           'OutputIntObjectName': 'Base KL Service Request Interface BO',
-          'SearchSpec': '[Service Request.' + option.data.search + ']= ' + '"' + option.data.value + '"'
+          'SearchSpec': '[Service Request.' + option.data.search + ']= ' + '"' + option.data.value + '" AND [Service Request.Parent Service Request Id] IS NULL',
+          'SortSpec': 'Created(DESCENDING)',
+          'StartRowNum': 0,
+          'PageSize': 100
         }
       }
     };

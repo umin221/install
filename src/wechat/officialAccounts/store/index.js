@@ -99,7 +99,7 @@ export default new Vuex.Store({
             },
             error: function(data) {
               console.log(data);
-              // commit('errorTips', data);
+              commit('errorTips', data);
             }
           });
         }
@@ -132,6 +132,7 @@ export default new Vuex.Store({
       actions: {
         getContact({commit}, callback) {
           let openId = KND.Util.getParam('openid');
+          console.log(openId);
           api.get({
             key: 'getContact',
             data: {

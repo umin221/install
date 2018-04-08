@@ -15,7 +15,11 @@
                   :key="item.Id"
                   @click.native="toDetail(item['SR Number'])"
                   is-link>
-          <div class="mint-cell-sub-title" slot="title">服务单编号：{{item['SR Number']}}</div>
+          <div class="mint-cell-sub-title" slot="title">
+            服务单编号：{{item['SR Number']}}
+            <mt-badge class="badge-status"
+                      style="line-height: 1rem;float: right;"
+                      size="small">{{item.Status}}</mt-badge></div>
           <div class="mint-cell-sub-title" slot="title">申请日期：{{item['Created']}}</div>
           <div class="mint-cell-sub-title" slot="title">产品类型：{{item['KL Product Model']}}</div>
         </cus-cell>
@@ -70,3 +74,4 @@
     }
   }
 </style>
+

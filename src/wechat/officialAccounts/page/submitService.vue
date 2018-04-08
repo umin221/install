@@ -25,18 +25,20 @@
                  placeholder="请选择"
                  :value="address"
                  to="address"
-                 class="require"
+                 class="requisite"
                  v-valid.require
+                 is-link></mt-cell>
+        <mt-cell title="故障现象" tag="故障现象"
+                 placeholder="请选择"
+                 :value="SubArea"
+                 class="requisite"
+                 v-valid.require
+                 @click.native="showAreaBox"
                  is-link></mt-cell>
         <mt-cell title="预约时间"
                  placeholder="请选择"
                  :value="AppointTime"
                  @click.native="open('picker1')"
-                 is-link></mt-cell>
-        <mt-cell title="故障现象"
-                 placeholder="请选择"
-                 :value="SubArea"
-                 @click.native="showAreaBox"
                  is-link></mt-cell>
         <mt-field label="问题说明"
                   v-model="ComplaintDescription"
@@ -85,7 +87,6 @@
       me.openId = KND.Util.getParam('openid');
       if (!me.callPhone) {
         me.getContact(function(data) {
-          console.log(data);
           me.lastName = data['Last Name']; // 名字
           me.callPhone = data['Work Phone #']; // 电话
         });
@@ -227,13 +228,20 @@
         let me = this;
         KND.Native.scanQRCode({
           success(data) {
-            console.log(data);
+            data.resultStr = 'CODE_39,HBS1803014006';
+            data.resultStr = data.resultStr.split(',');
             me.getAsset({
               num: data.resultStr,
               callback: function(data) {
-                me.ProductModel = data['KL Product Model'];// 产品型号
-                me.AssetNumber = data['Asset Number'];
-                me.ProductId = data['Id'];  // 产品ID
+                let form = {
+                  Province: data['KL Personal Province'],
+                  City: data['Personal City'],
+                  County: data['KL Personal Town'],
+                  'Street Address': data['Personal Address'],
+                  id: 'Asset'
+                };
+                me.addressBack(form);
+                me.AssetId = data['Id'];  // 产品ID
               }
             });
           }
@@ -256,5 +264,10 @@
     .datetime>.picker>.picker-items>.picker-slot:nth-child(5){
       display: none;
     }
+  }
+  .requisite>.mint-cell-wrapper>.mint-cell-title>.mint-cell-text:before{
+    content: '*';
+    color: red;
+    margin-right: 5px;
   }
 </style>
