@@ -502,8 +502,8 @@ let ApiList = {
     let lat = option.data.LngLat.latitude;
     let lng = option.data.LngLat.longitude;
     return {
-      method: 'get',
-      url: 'http://api.map.baidu.com/geocoder/v2/?callback=renderReverse&location=' + lat + ',' + lng + '&output=json&pois=1&ak=ggrtlGUIUfci06YK9TNZfxLAOQblo3du'
+      method: 'GET',
+      url: 'http://api.map.baidu.com/geocoder/v2/?location=' + lat + ',' + lng + '&output=json&ak=ggrtlGUIUfci06YK9TNZfxLAOQblo3du'
     };
     //  经纬度逆地理转换
   }

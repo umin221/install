@@ -342,7 +342,8 @@ export default new Vuex.Store({
       state: {
         ServiceRequest: {},
         Action: {},
-        childService: [],
+        allChildService: [],
+        childService: {},
         processDate: [],
         Statu: {
           '接单': 'Accept',
@@ -367,6 +368,7 @@ export default new Vuex.Store({
         setPartner(state, form) {
           state.ServiceRequest = form;
           state.processDat = [];
+          state.BtnStatu = '';
           let Note = null;
           Note = form['FIN Service Request Notes'];
           if (Note) {
@@ -384,13 +386,8 @@ export default new Vuex.Store({
             if (form.Owner === state.meg['Emp #'] || !form.Owner) {
               if ((form.Status === '未开始' || form.Status === '待分配') && form['SR Type'] === '上门维修') {
                 state.BtnStatu = 'status4';
-              } else {
-                state.BtnStatu = '';
               }
-            } else {
-              state.BtnStatu = '';
             }
-
           } else {
             if (form.Action) {
               let Action = KND.Util.isArray(form.Action) ? form.Action[0] : form.Action;
@@ -400,8 +397,8 @@ export default new Vuex.Store({
                 state.BtnStatu = 'status2';
               } else if (Action.Status === '已预约' || Action.Status === '已出发' || Action.Status === '已上门') {
                 state.BtnStatu = 'status3';
-              } else {
-                state.BtnStatu = '';
+              } else if (Action.Status === '已完成') {
+                state.BtnStatu = 'status6';
               }
               state.Action = Action;
             } else {
@@ -416,11 +413,12 @@ export default new Vuex.Store({
           if (form['KL Child Service Request']) {
             let childService = KND.Util.toArray(form['KL Child Service Request']);
             childService = systemSort(childService, 'Opened Date');
+            state.allChildService = childService;
             state.childService = childService[0];
           }
         },
         setAddress(state, {data, type}) {
-          state[type] = data;
+          state[type] = data['formatted_address'] + data['sematic_description'];
         },
         setRole(state, {meg, role}) {
           state.role = role;
@@ -504,8 +502,11 @@ export default new Vuex.Store({
               LngLat
             },
             success: function(data) {
-              commit('setAddress', {data: data['formatted_address'], type: type});
-              // console.log(data);
+              console.log(data);
+              commit('setAddress', {data: data, type: type});
+            },
+            error: function(data) {
+              console.log(data);
             }
           });
         },
@@ -578,6 +579,7 @@ export default new Vuex.Store({
         slots1: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
         ProductModel: '',  // 产品型号
         mustForm: [
+          {name: '产品条形码', key: 'SerialNumber'},
           {name: '产品型号', key: 'ProductModel'},
           {name: '故障现象', key: 'rootcause'},
           {name: '责任划分', key: 'Responsbility'},
@@ -875,8 +877,12 @@ export default new Vuex.Store({
     saveFault: {                     // 完成工单
       namespaced: true,
       state: {
+        isBn: '保内'
       },
       mutations: {
+        setIsBn(state, value) {
+          state.isBn = value;
+        }
       },
       actions: {
         addServiceOrder({state, commit}, form) {

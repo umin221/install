@@ -5,7 +5,7 @@
         <fallback slot="left"></fallback>
         <mt-button  slot="right"
                     @click.native="openConfirm"
-                    v-if="role === 'install'&& BtnStatu !== 'status5'">关闭</mt-button>
+                    v-if="role === 'install'&& BtnStatu !== 'status5' && BtnStatu ">关闭</mt-button>
       </mt-header>
 
       <div class="mint-content service-detail">
@@ -14,7 +14,15 @@
           <div v-if="role === 'install'" class="mt-Detail-title" >优先级：{{ServiceRequest['Priority']}}</div>
           <div class="mt-Detail-title">联系人：{{ServiceRequest['Contact Last Name']}}</div>
           <div v-if="role === 'custom'"   class="mt-Detail-title">服务类型：{{ServiceRequest['SR Type']}}</div>
-          <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call i">{{ServiceRequest['Contact Business Phone']}}</a></div>
+          <div class="mt-Detail-title">联系电话：
+            <a href="javascript:void(0);"
+               class="detail-call i"
+              @click="call = !call">
+              <i class="xs-icon icon-call"
+                  style="font-size: 0.75rem">
+              {{ServiceRequest['Contact Business Phone']}}
+              </i>
+            </a></div>
         </div>
         <div class="detail-content">
           <mt-navbar v-model="active">
@@ -121,7 +129,7 @@
       <!--关闭盒子-->
       <close :showBox1="showBox" @my-enter="boxEnter" @my-close="boxClose"></close>
       <!--打电话-->
-      <cus-call :number="ServiceRequest['Contact Business Phone']" v-model="call"></cus-call>
+      <cus-call :number="phoneNum" v-model="call"></cus-call>
       <!--工单操作-->
       <mt-popup v-model="popupVisible1" position="bottom" popup-transition="popup-fade" class="mint-popup-2">
         <mt-cell class="setOut" title="出发" :value="Action['KL Departure Location']" >
@@ -189,6 +197,7 @@
       me.contactId = me.$route.query.id;
       me.getDetail(me.srNumber);
       me.setRole({meg: me.loginMeg, role: me.role});
+      me.getMapAddress({});
     },
     data: () => {
       return {
@@ -219,7 +228,10 @@
     },
     computed: {
       ...mapState('index', ['loginMeg', 'role']),
-      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress', 'orderEntry', 'childService'])
+      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress', 'orderEntry', 'childService']),
+      phoneNum() {
+        return this.ServiceRequest['Contact Business Phone'];
+      }
     },
     methods: {
       ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress', 'addChildService']),
@@ -320,13 +332,9 @@
         if (value1 === 'setOut') {
           KND.Native.getLocation({
             success(data) {
-              console.log(data);
               me.getMapAddress({
                 LngLat: data,
-                type: 'visitAddress',
-                callback: function(data) {
-                  console.log(data);
-                }
+                type: 'visitAddress'
               });
             }
           });
@@ -334,7 +342,7 @@
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
             'key': 'getDepart',
-            'KL Departure Location': '出发地址',
+            'KL Departure Location': me.starAddress ? me.starAddress : '出发地址',
             'type': 'setOut'
           };
         } else if (value1 === 'reach') {
@@ -343,10 +351,7 @@
               console.log(data);
               me.getMapAddress({
                 LngLat: data,
-                type: 'visitAddress',
-                callback: function(data) {
-                  console.log(data);
-                }
+                type: 'starAddress'
               });
             }
           });
@@ -354,7 +359,7 @@
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
             'key': 'getDepart',
-            'MeetingLocation': '上门地址',
+            'MeetingLocation': me.visitAddress ? me.visitAddress : '上门地址',
             'type': 'reach'
           };
         } else if (value1 === 'end') {
@@ -363,10 +368,7 @@
               console.log(data);
               me.getMapAddress({
                 LngLat: data,
-                type: 'visitAddress',
-                callback: function(data) {
-                  console.log(data);
-                }
+                type: 'visitAddress'
               });
             }
           });
@@ -374,7 +376,7 @@
             'Object Id': me.ServiceRequest.Id,
             'ActivityId': me.Action.Id,
             'key': 'getDone',
-            'DoneLoc': '完成地址'
+            'DoneLoc': me.endAddress ? me.endAddress : '完成地址'
           };
           me.popupVisible1 = !me.popupVisible1;
         }
@@ -393,7 +395,8 @@
           this.$router.push({
             name: 'comEnter',
             query: {
-              id: this.ServiceRequest['Id']
+              id: this.ServiceRequest['Id'],
+              statu: this.ServiceRequest['Status']
             }
           });
         }

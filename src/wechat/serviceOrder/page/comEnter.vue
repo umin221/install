@@ -7,7 +7,7 @@
 
     <div class="mint-content addService">
       <div class="addform">
-        <mt-field label="产品条形码" type="text" placeholder="输入或扫门锁条形码" @change="sarech" v-model="SerialNumber" class="textRight">
+        <mt-field label="产品条形码" type="text" placeholder="输入或扫门锁条形码" @change="sarech" v-model="SerialNumber" class="textRight require">
           <i class="xs-icon icon-scan" @click="scan"></i>
         </mt-field>
         <mt-cell class="mint-field" title="所在省市区" placeholder="请选择">{{Personal}}</mt-cell>
@@ -68,8 +68,12 @@
       let me = this;
       let serviceId = me.$route.query.id;
       let serviceType = me.$route.query.type;
+      let status = me.$route.query.statu;
       if (serviceType === 'child') {
         me.childId = serviceId;
+      }
+      if (status) {
+        me.status = status;
       }
       if (serviceType === 'save') {
         me.getServiceR({
@@ -80,6 +84,7 @@
             me.AssetNumber = data['Asset Number'];
             me.Responsbility = data['KL Responsbility'];
             me.repairDetails = data['Repair Details'];
+            me.status = data['Status'];
             me.sarech();
           }
         });
@@ -98,6 +103,7 @@
         repairDetails: '', // 方法明细
         ProductId: '',    // 产品Id
         Product_model: '',
+        status: '',
         childId: '',
         building: '',
         floor: '',

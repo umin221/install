@@ -64,7 +64,11 @@ export default {
         Id: serviceId,
         callback: function(data) {
           me.ServiceRequest = data;
-          me.isBn = me.ServiceRequest['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
+          if (!me.isBn) {
+            let isBn = me.ServiceRequest['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
+            console.log(isBn);
+            me.setIsBn(isBn);
+          }
         }
       });
     }
@@ -73,7 +77,6 @@ export default {
     return {
       isSwitch: false,
       value: '',
-      isBn: '',
       showBox: false,
       slots: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
       productData: [],
@@ -90,6 +93,7 @@ export default {
     };
   },
   computed: {
+    ...mapState(NAMESPACE, ['isBn']),
     ...mapState('searchTrans', ['returnSelect', 'priceId']),
 //    ...mapState('detail', ['ServiceRequest']),
     Product() {
@@ -112,12 +116,13 @@ export default {
   },
   methods: {
     ...mapActions(NAMESPACE, ['addServiceOrder', 'getServiceR']),
+    ...mapMutations(NAMESPACE, ['setIsBn']),
     ...mapMutations('searchTrans', ['initSelect']),
     ...mapMutations('detail', ['setPartner']),
     productNumber(val, num, type) {
       let me = this;
       me.productData[num].num = val;
-      if (val) {
+      if (val - 1) {
         if (!me.switchStatus[num]) {
           if (type === 'minus') {
             me.allFee = me.allFee - parseInt(me.productData[num]['List Price'], 0);
@@ -127,7 +132,13 @@ export default {
         }
       } else {
         if (me.allFee - me.fee !== 0 && !me.switchStatus[num]) {
-          me.allFee = me.allFee - parseInt(me.productData[num]['List Price'], 0);
+          if (type !== 'minus') {
+            me.allFee = me.allFee + parseInt(me.productData[num]['List Price'], 0);
+          } else {
+            if (me.allFee - (parseInt(me.productData[num]['List Price'], 0) * me.switchStatus.length)) {
+              me.allFee = me.allFee - parseInt(me.productData[num]['List Price'], 0);
+            }
+          }
         }
       }
     },
@@ -180,7 +191,7 @@ export default {
       me.showBox = !me.showBox;
       me.allFee = me.allFee - me.fee;
       if (type === 'bn') {
-        me.isBn = val[0];
+        me.setIsBn(val[0]);
         me.allFee = 0;
         if (me.isBn === '保外') {
           for (let i = 0; i < me.productData.length; i++) {
@@ -209,13 +220,12 @@ export default {
       }
     },
     change(index, type) {
+      console.log(index);
       let me = this;
       me.one = me.one + 1;
       if (me.one === 2) {
         if (!me.switchStatus[index]) {
-          if (me.allFee) {
-            me.allFee = me.allFee - me.productData[index].num * parseInt(me.productData[index]['List Price'], 0);
-          }
+          me.allFee = me.allFee - me.productData[index].num * parseInt(me.productData[index]['List Price'], 0);
         } else {
           me.allFee = me.allFee + me.productData[index].num * parseInt(me.productData[index]['List Price'], 0);
         }
