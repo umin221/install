@@ -28,6 +28,9 @@
                    type="number"
                    v-valid.require.number
                    v-model="line['Quantity Requested']"></cus-field>
+        <cus-field label="颜色" v-show="isPanel"
+                   v-valid.require
+                   v-model="line['KL Gate Plate Specification']"></cus-field>
         <cus-field label="门材质"
                    @click.native="showLovFn('KL Door Material Quality')"
                    v-model="line['KL Door Material Quality']"
@@ -35,6 +38,7 @@
         <cus-field label="门厚" v-show="!isPanel"
                    v-model="line['KL Door Thickness']"></cus-field>
         <cus-field label="锁舌导向板规格" v-show="!isPanel"
+                   v-valid.require
                    v-model="line['KL Guide Plate Specification']"></cus-field>
         <cus-field label="门扣板规格" v-show="!isPanel"
                    v-model="line['KL Gate Plate Specification']"></cus-field>

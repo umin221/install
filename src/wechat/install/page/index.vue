@@ -27,12 +27,12 @@
                         :topStatus="topStatus">
             <cus-cell class="multiple"
                       @click.native="toDetailFn(item.Id)"
-                     :key="item.id"
-                     :title="'订单批次:'+ item.Name"
+                     :key="item.Id"
+                     :title="'订单批次:'+ item.Id"
                      v-for="item in pending"
                      is-link>
-              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Partner Owner Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">创建日期: {{item['Main Phone Number']}}</div>
+              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">创建日期: {{item['Created']}}</div>
             </cus-cell>
           </cus-loadmore>
         </mt-tab-container-item>
@@ -45,12 +45,12 @@
                         :topStatus="topStatus">
             <cus-cell class="multiple"
                       @click.native="toDetailFn(item.Id)"
-                     :key="item.id"
-                     :title="'订单批次:'+ item.Name"
+                     :key="item.Id"
+                     :title="'订单批次:'+ item.Id"
                      v-for="item in completed"
                      is-link>
-              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Partner Owner Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">创建日期: {{item['Main Phone Number']}}</div>
+              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">创建日期: {{item['Created']}}</div>
             </cus-cell>
           </cus-loadmore>
         </mt-tab-container-item>
@@ -74,12 +74,13 @@
     let event = args.pop();
     let list = args.pop();
     let param = Object.extend({
+      list: list,
       callback: (data) => {
         me.$refs[list][event](data.length);
       }
     }, args.pop());
     // 获取团队列表
-    me.getPartners(param);
+    me.queryInstallTask(param);
   };
 
   export default {
@@ -108,7 +109,7 @@
       ...mapState(NAMESPACE, ['pending', 'completed', 'isManager'])
     },
     methods: {
-      ...mapActions(NAMESPACE, ['getPartners']),
+      ...mapActions(NAMESPACE, ['queryInstallTask']),
       ...mapMutations(NAMESPACE, ['setManager']),
       // 已失效顶部加载
       loadTopFn(param) {
@@ -134,7 +135,10 @@
       // To detail or create
       toDetailFn(id) {
         this.$router.push({
-          name: 'assets'
+          name: 'assets',
+          query: {
+            id: id
+          }
         });
       }
     }

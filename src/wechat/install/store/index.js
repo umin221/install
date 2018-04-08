@@ -2,12 +2,7 @@ import api from '../api/api';
 import { app } from 'public/store';
 
 // 缓存页面
-app.state.alive = ['index'];
-
-// 每页加载条数
-const PAGESIZE = config.pageSize;
-// mapp
-let mapps = config.mapp['manager'];
+app.state.alive = ['index', 'assets'];
 
 export default {
   modules: {
@@ -27,15 +22,8 @@ export default {
         result: []
       },
       mutations: {
-        setPartners(state, {partners, list}) {
-          state[list] = partners;
-        },
-        addPartners(state, {partners, list}) {
-          state[list].push(...partners);
-        },
-        setManager(state, isManager) {
-          mapps = config.mapp[isManager ? 'manager' : 'employee'];
-          state.isManager = isManager;
+        setTask(state, {installTask, list}) {
+          state[list] = KND.Util.toArray(installTask);
         }
       },
       actions: {
@@ -47,29 +35,14 @@ export default {
          * @param {Function} callback 选填 处理回调
          * @param {Function} error 选填 错误回调
          */
-        getPartners({state, commit, dispatch}, {data, more, lst, callback, error}) {
-          let mapp = mapps[data['KL Partner Status']] || {};
-          let list = lst || mapp.list;
-          data['KL Partner Status'] = mapp.status;
-
+        queryInstallTask({state, commit, dispatch}, {data, list}) {
           api.get({
-            key: 'queryPartners',
+            key: 'queryInstallTask',
             data: data,
-            paging: {
-              StartRowNum: more ? state[list].length : 0,
-              PageSize: PAGESIZE
-            },
             success: data => {
-              let partners = KND.Util.toArray(data.SiebelMessage['Channel Partner']);
-              commit(more ? 'addPartners' : 'setPartners', {
-                partners: partners,
-                list: list
-              });
-              if (callback) {
-                callback(partners);
-              }
-            },
-            error
+              let installTask = data.SiebelMessage.Contact['KL Installation Task'];
+              commit('setTask', {installTask, list});
+            }
           });
         }
       }
@@ -81,18 +54,25 @@ export default {
     assets: {
       namespaced: true,
       state: {
-        assets: [],
+        building: [],
         layer: []
       },
       mutations: {
+        // 填充楼栋
         setLayer(state, layer) {
           state.layer = layer;
         },
-        setBuilding(state, assets) {
-          state.assets = assets;
+        // 填充栋列表
+        setBuilding(state, building) {
+          state.building = building;
         },
+        // 移除楼栋
         remove(state, index) {
           state.assets.splice(index, 1);
+        },
+        // 清空楼栋
+        clearLayer(state) {
+          state.layer = [];
         }
       },
       actions: {
@@ -104,12 +84,12 @@ export default {
             key: 'queryBuilding',
             data: option.data,
             success: data => {
-              let assets = data.SiebelMessage.Building;
-              commit('setBuilding', assets);
+              let building = data.SiebelMessage.Building;
+              commit('setBuilding', building);
               // 默认获取第一栋信息
               dispatch('getLayer', {
                 'KL Activity Id': option.data.id,
-                'Integration Id 2': assets[0].BuildingNum
+                'Integration Id 2': building[0].BuildingNum
               });
             }
           };
@@ -138,7 +118,7 @@ export default {
     },
 
     /**
-     * 楼层&房间
+     * 楼层&房号信息
      */
     floor: {
       namespaced: true,
@@ -166,9 +146,52 @@ export default {
         /**
          * 删除房号
          */
-        removeRoom(setting) {
+        removeRoom({state}, setting) {
           setting.key = 'removeRoom';
           api.get(setting);
+        }
+      }
+    },
+
+    /**
+     * 楼栋信息
+     */
+    building: {
+      namespaced: true,
+      state: {
+      },
+      mutations: {
+      },
+      actions: {
+        /**
+         * 批量更新楼栋名字
+         */
+        updateBuildingName({state}, {upArr, id}) {
+          // 更新名字
+          let update = (data) => {
+            api.get({
+              key: 'updateBuildingName',
+              data: data,
+              success: data => {
+                run(upArr.pop());
+              }
+            });
+          };
+          //
+          let run = (data, result) => {
+            if (data) {
+              update({
+                TaskId: id,
+                BuildingNum: data.BuildingNum,
+                Builing: data.BuildingName
+              });
+            } else {
+              tools.success(data, {
+                successTips: '更新成功'
+              });
+            };
+          };
+          run(upArr.pop());
         }
       }
     },

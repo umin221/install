@@ -2,11 +2,17 @@
   <div>
     <mt-header fixed title="项目楼层信息">
       <fallback slot="left"></fallback>
-      <mt-button @click.native="editable = !editable" slot="right" v-text="editable ? '保存' : '编辑'"></mt-button>
+      <mt-button slot="right"
+                 v-show="isEdit"
+                 v-text="editable ? '保存' : '编辑'"
+                 @click.native="editable = !editable"></mt-button>
+      <mt-button slot="right"
+                 v-show="isSelect"
+                 @click.native="selectAll = true;">全选本栋</mt-button>
     </mt-header>
     <div class="mint-content assets" :class="{readonly: !editable}">
       <mt-navbar v-model="selected">
-        <mt-tab-item v-for="(item, index) in assets"
+        <mt-tab-item v-for="(item, index) in building"
                      :key="index"
                      :id="item.BuildingNum"
                      @click.native="getLayerFn(item.BuildingNum)">{{item.BuildingName}}</mt-tab-item>
@@ -24,21 +30,27 @@
         </mt-cell-swipe>
         <div class="assets-div co-flex co-wp">
           <span v-for="(room, index) in floor"
-                :class="{'fill-green': room['Product Model No']}"
+                :class="room.cls"
                 :key="index"
                 @click="roomFn(room)">{{room['Street Address 4']}}</span>
         </div>
       </div>
 
       <button-group>
-        <mt-button class="single" @click.native="addFloorFn">新增楼层</mt-button>
+        <mt-button class="single"
+                   @click.native="addFloorFn">新增楼层</mt-button>
       </button-group>
     </div>
+    <button-group>
+      <mt-button class="single"
+                 v-show="isSelect"
+                 @click.native="toNextFn">下一步</mt-button>
+    </button-group>
   </div>
 </template>
 
 <script type="es6">
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
 
   // 任务id
@@ -51,43 +63,73 @@
   const NAMESPACE = 'assets';
   export default {
     name: NAMESPACE,
-    created() {
-      activityId = this.$route.query.id || '1-2BSETV8Y';
-      // 查询所有楼栋
-      this.queryBuilding({
-        data: {
-          id: activityId
-        }
-      });
+    activated(tt) {
+      let param = this.$route.query;
+      let id = param.id;
+      // 不同批次，清除楼栋
+      if (id !== activityId || this.isEdit) {
+        if (this.$parent.transitionName === 'turn-on') this.editable = false;
+        // 清空楼栋
+        this.clearLayer();
+        // 清空选中房号
+        this.selectRooms = {};
+        // 活动id
+        activityId = id || '1-2BSETV8Y';
+        // 查询所有楼栋
+        this.queryBuilding({
+          data: {
+            id: activityId
+          }
+        });
+      }
+      // 页面操作类型
+      this.type = param.type;
     },
     data: () => {
       return {
         selected: '1',
         editable: false,
-        type: ''
+        // type = select 移交前的选择房号
+        type: '',
+        // 已选择房号信息
+        selectRooms: {},
+        // 楼栋全选
+        selectAll: false
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['layer', 'assets']),
+      ...mapState(NAMESPACE, ['layer', 'building']),
+      isSelect() {
+        return this.type === 'select';
+      },
+      isEdit() {
+        return this.type === 'edit';
+      },
       /**
-       * 重构楼层信息
+       * 重构楼层信息&标记选中状态
        */
       layers() {
         let layer = this.layer;
         layers = {};
         maxFloor = 0;
         for (let i = 0, len = layer.length; i < len; i++) {
-          //
-          let floor = parseInt(layer[i]['Integration Id 3'], 10);
+          // 房号
+          let room = this.markFn(layer[i]);
+          // 楼层
+          let floor = parseInt(room['Integration Id 3'], 10);
+          // 楼层分组
           layers[floor] = layers[floor] || [];
-          layers[floor].push(layer[i]);
+          layers[floor].push(room);
           // 更新最高楼层
           if (floor > maxFloor) maxFloor = floor;
         };
+        // 清空全选操作
+        this.selectAll = false;
         return layers;
       }
     },
     methods: {
+      ...mapMutations(NAMESPACE, ['clearLayer']),
       ...mapActions(NAMESPACE, ['queryBuilding', 'getLayer', 'removeBuilding']),
       /**
        * 编辑楼栋信息
@@ -188,11 +230,44 @@
         });
       },
       /**
-       * 点击房号 扫码安装
+       * 选中房号 或 选中安装
        * @param {Object} room 必填 房号信息
        */
       roomFn(room) {
-        console.log(room);
+        // 编辑状态下不操作房号
+        if (!this.isEdit) {
+          if (room.cls) {
+            this.$set(room, 'cls', undefined);
+            delete this.selectRooms[room.Id];
+          } else {
+            this.$set(room, 'cls', 'active');
+            this.selectRooms[room.Id] = room;
+          };
+        }
+      },
+
+      /**
+       * 标记选中状态
+       * @param {Object} room 必填 房号信息
+       */
+      markFn(room) {
+        // 被选中的房号
+        let selectRooms = this.selectRooms;
+        // 标记被选中的房号
+        if (this.selectAll || selectRooms[room.Id]) {
+          this.$set(room, 'cls', 'active');
+          selectRooms[room.Id] = room;
+        };
+        return room;
+      },
+
+      toNextFn() {
+        this.$router.push({
+          name: 'yjBatch',
+          query: {
+            result: JSON.stringify(this.selectRooms)
+          }
+        });
       }
     },
     components: {buttonGroup}
@@ -202,6 +277,20 @@
 
 <style lang="scss">
   .assets {
+
+    .mint-navbar {
+      overflow-x: auto;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      .mint-tab-item {
+        flex: none;
+        min-width: 80px;
+      }
+    }
+
     .assets-div {
       padding: 5px 0;
       border-top: 1px solid #eaeaea;
@@ -216,7 +305,8 @@
       color: #777;
       font-size: $font-size-default;
 
-      &.fill-green {
+      &.active {
+        border-color: #fff;
         background-color: #7ce87c;
         color: #fff;
       }

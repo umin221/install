@@ -5,7 +5,7 @@
       <mt-button @click.native="saveFn" slot="right" >保存</mt-button>
     </mt-header>
     <div class="mint-content ban">
-      <mt-cell-swipe v-for="(item, index) in assets"
+      <mt-cell-swipe v-for="(item, index) in building"
                      title="楼栋名称"
                      :right="[{
                         content: '删除',
@@ -26,24 +26,37 @@
 <script type="es6">
   import {mapState, mapActions, mapMutations} from 'vuex';
 
+  let tempBuilding;
   const ASSETS = 'assets';
   const NAMESPACE = 'building';
   export default {
     name: NAMESPACE,
+    created() {
+      tempBuilding = JSON.stringify(this.building);
+    },
     data: () => {
       return {
       };
     },
     computed: {
-      ...mapState(ASSETS, ['assets'])
+      ...mapState(ASSETS, ['building'])
     },
     methods: {
-      ...mapActions(NAMESPACE, ['save']),
+      ...mapActions(NAMESPACE, ['updateBuildingName']),
       ...mapActions(ASSETS, ['removeBuilding']),
       ...mapMutations(ASSETS, ['remove']),
-      // 保存楼栋信息
+      // 更新楼栋名称
       saveFn() {
-        this.save();
+        let temp = KND.Util.parse(tempBuilding);
+        let id = this.$route.query.id;
+        let upArr = [];
+        for (let t in temp) {
+          if (temp[t].BuildingName !== this.building[t].BuildingName) upArr.push(this.building[t]);
+        }
+        this.updateBuildingName({
+          upArr: upArr,
+          id: id
+        });
       },
       // 删除整栋
       removeFn(item, index) {

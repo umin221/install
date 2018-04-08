@@ -6,26 +6,17 @@ let apiList = {
    * @param {Object} option.paging 必填 翻页参数
    * @returns {{method: string, url: string}}
    */
-  queryPartners: option => {
-    let name = option.data.Name;
-    let arr = [];
-    if (name) {
-      arr.push('[Channel Partner.Name] LIKE "*' + name + '*"');
-      delete option.data.Name;
-    };
-    let spec = KND.Util.condition(option.data, 'Channel Partner');
-    if (spec) arr.push(spec);
-
+  queryInstallTask: option => {
     return {
       method: 'post',
-      url: 'service/EAI Siebel Adapter/QueryPage',
+      url: 'service/EAI Siebel Adapter/Query',
       data: {
         'body': {
-          'OutputIntObjectName': 'KL Channel Partner',
-          'SearchSpec': arr.join(' AND '),
-          'ViewMode': 'Sales Rep',
-          'StartRowNum': option.paging.StartRowNum,
-          'PageSize': option.paging.PageSize
+          'OutputIntObjectName': 'Base KL Contact - Installation Task',
+          'PrimaryRowId': '1-2BSH6IWP',
+          'ViewMode': 'All',
+          'StartRowNum': '0',
+          'PageSize': '50'
         }
       }
     };
@@ -104,6 +95,7 @@ let apiList = {
    */
   removeRoom: option => {
     return {
+      method: 'delete',
       url: 'data/KL Install Order Asset/KL Install Order Asset/' + option.data.id,
       data: {}
     };
@@ -143,6 +135,26 @@ let apiList = {
           'ProcessName': 'KL Install Order Asset Building Query Process',
           'TaskId': option.data.id
         }
+      }
+    };
+  },
+
+  /**
+   * 更新楼栋名字
+   * @param {String} option.data['ProcessName'] 选填 更新楼栋名字的工作流名字
+   * @param {String} option.data['TaskId'] 必填 批次id
+   * @param {String} option.data['BuildingNum'] 必填 楼栋编号
+   * @param {String} option.data['Builing'] 必填 更新的名字
+   * @returns {{url: string, data: {body: {ProcessName: string, Object Id: string, BuildingNum: string, FloorNum: string}}}}
+   */
+  updateBuildingName: option => {
+    let body = option.data;
+    body.ProcessName = 'KL Install Order Asset Building Update Process';
+    delete option.data;
+    return {
+      url: 'service/Workflow Process Manager/RunProcess',
+      data: {
+        'body': body
       }
     };
   }
