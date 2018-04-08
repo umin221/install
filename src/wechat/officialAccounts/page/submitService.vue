@@ -228,9 +228,10 @@
         let me = this;
         KND.Native.scanQRCode({
           success(data) {
-            data.resultStr[1] = data.resultStr.split(',');
+            console.log(data);
+            let resultStr = data.resultStr.split(',')[1];
             me.getAsset({
-              num: data.resultStr,
+              num: resultStr,
               callback: function(data) {
                 let form = {
                   Province: data['KL Personal Province'],
@@ -239,6 +240,7 @@
                   'Street Address': data['Personal Address'],
                   id: 'Asset'
                 };
+                me.KLSN = resultStr;
                 me.addressBack(form);
                 me.AssetId = data['Id'];  // 产品ID
               }
