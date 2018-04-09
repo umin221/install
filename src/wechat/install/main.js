@@ -30,6 +30,16 @@ Vue.use(Vuex);
 
 let store = new Vuex.Store(sto);
 
+/**
+ * 导航守卫
+ * 如果未匹配到路由
+ * 如果上级也未匹配到路由则跳转登录页面，如果上级能匹配到则转上级路由
+ * 如果匹配到正确跳转
+ */
+router.beforeEach((to, from, next) => {
+  to.matched.length === 0 ? from.name ? next({ name: from.name }) : next('/login') : next();
+});
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

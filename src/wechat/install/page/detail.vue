@@ -12,9 +12,15 @@
                  v-valid.require>
         <div class="xs-icon icon-scan" @click="toScanFn"></div>
       </cus-field>
-      <cus-field label="产品型号"  tag="产品型号"
-                 :value="modelNo"
-                 v-valid.require is-link></cus-field>
+      <cus-field label="锁体型号"  tag="锁体型号"
+                 :value="bodyNo"
+                 v-valid.require
+                 is-link></cus-field>
+
+      <cus-field label="面板型号"  tag="面板型号"
+                 :value="bodyNo"
+                 v-valid.require
+                 is-link></cus-field>
 
       <button-group>
         <mt-button class="single"
@@ -58,7 +64,7 @@
       };
     },
     computed: {
-      modelNo() {
+      bodyNo() {
         let model = this.panel[0];
         let modelNo = model && model['KL Product Model No Cal'];
         this.assets['Product Model No'] = modelNo;

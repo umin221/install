@@ -10,11 +10,20 @@ import Router from 'vue-router';
 Vue.use(Router);
 
 export default new Router({
-  routes: [{ // 首页
+  routes: [{ // 登录页
+    path: '/login',
+    name: 'login',
+    component(resolve) {
+      require(['../page/login'], resolve);
+    }
+  }, { // 首页
     path: '/',
     name: 'index',
     component(resolve) {
       require(['../page/index'], resolve);
+    },
+    meta: {
+      transition: 'scale'
     }
   }, { // 创建/编辑/查看 委外团队详情
     path: '/detail',
