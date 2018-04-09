@@ -14,7 +14,7 @@
         </cus-cell>
       </div>
       <button-group>
-        <mt-button class="single" @click.native="addDevice">添加</mt-button>
+        <mt-button class="single" v-if="Contact" @click.native="addDevice">添加</mt-button>
       </button-group>
     </div>
   </div>
@@ -55,7 +55,7 @@
         me.$router.push({
           name: 'addDevice',
           query: {
-            id: me.Contact.Id
+            id: me.Contact ? me.Contact.Id : ''
           }
         });
       }

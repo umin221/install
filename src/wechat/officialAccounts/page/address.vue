@@ -20,7 +20,7 @@
           <mt-badge class="xs-icon icon-delete"
                     style="color: #ffffff;"
                     type="error"
-                    @click.native="deleteAddr(item.Id)">删除</mt-badge>
+                    @click.native="deleteAddr(item.Id, 'cutAddr')">删除</mt-badge>
           <mt-badge class="xs-icon icon-edit"
                     type="success"
                     @click.native="editAddr(item.Id)">编辑</mt-badge>
@@ -86,7 +86,7 @@
         me.$router.push({
           name: 'addAddress',
           query: {
-            ContactId: me.Contact.Id,
+            ContactId: me.Contact ? me.Contact.Id : '',
             type: 'add'
           }
         });

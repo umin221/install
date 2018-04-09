@@ -71,7 +71,7 @@ export default new Vuex.Store({
             },
             success: data => {
               let Contact = KND.Util.toArray(data.SiebelMessage.Contact);
-              if (Contact) {
+              if (Contact.length) {
                 Contact = systemSort(Contact, 'Updated');
                 let CUTAddress = KND.Util.toArray(Contact[0]['CUT Address']);
                 for (let i = 0; i < CUTAddress.length; i++) {
@@ -140,7 +140,7 @@ export default new Vuex.Store({
             },
             success: function(data) {
               let Contact = KND.Util.toArray(data.SiebelMessage.Contact);
-              if (Contact) {
+              if (Contact.length) {
                 Contact = systemSort(Contact, 'Updated');
                 commit('setContact', Contact[0]);
                 if (callback) {
@@ -377,7 +377,7 @@ export default new Vuex.Store({
             },
             success: data => {
               let Contact = KND.Util.toArray(data.SiebelMessage.Contact);
-              if (Contact) {
+              if (Contact.length) {
                 Contact = systemSort(Contact, 'Updated');
                 commit('setContact', Contact[0]);
               }
