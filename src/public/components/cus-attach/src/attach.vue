@@ -1,7 +1,7 @@
 <template>
   <div class="cus-attach-container">
 
-    <title-group v-if="title">合同附件</title-group>
+    <title-group v-if="title" v-text="title"></title-group>
 
     <empty v-show="empty" tips="暂无附件"></empty>
 

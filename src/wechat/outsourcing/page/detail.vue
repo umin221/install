@@ -32,10 +32,9 @@
                    v-model="form['Primary Address Street']"></cus-field>
       </div>
 
-      <attach ioName="KL Channel Partner Attachments" ref="attach"
+      <attach ioName="KL Channel Partner Attachments" title="合同附件" ref="attach"
               :attach="attach.list"
-              :edit="!read"
-              :title="title">
+              :edit="!read">
       </attach>
 
       <!--pending -->
@@ -160,8 +159,7 @@
         },
         attach: { // 附件
           list: [],
-          edit: false,
-          title: '合同附件'
+          edit: false
         }
       };
     },

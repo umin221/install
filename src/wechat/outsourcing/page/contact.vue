@@ -7,14 +7,14 @@
     <div class="mint-content">
       <div>
         <mt-field label="联系电话" placeholder="请输入电话" tag="电话"
-                  v-model="contact['Cellular Phone #']"
+                  v-model="contact['Phone #']"
                   v-valid.require.phone
                   @change="findContactFn"></mt-field>
         <mt-field label="姓名" placeholder="请输入姓名" tag="姓名"
                   v-valid.require
                   v-model="contact['Last Name']"></mt-field>
         <mt-field label="登陆账号" class="readonly"
-                  :value="contact['Cellular Phone #']"></mt-field>
+                  :value="contact['Phone #']"></mt-field>
         <!--<mt-field label="登陆密码" placeholder="请输入密码"-->
           <!--v-model="contact['KL Outsource Password']"></mt-field>-->
       </div>
@@ -60,14 +60,14 @@
       // 通过电话号码查询联系人 查询到则直接关联用户
       findContactFn() {
         this.findContact({
-          'Login Name': this.contact['Cellular Phone #']
+          'Login Name': this.contact['Phone #']
         });
       },
       // 创建&编辑联系人
       saveFn() {
         tools.valid.call(this, () => {
           let c = this.contact;
-          c['Login Name'] = c['Cellular Phone #'];
+          c['Login Name'] = c['Phone #'];
           // 保存联系人
           this.upsertContact(this.contact);
         });
