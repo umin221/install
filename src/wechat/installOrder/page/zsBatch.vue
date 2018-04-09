@@ -11,14 +11,14 @@
         </mt-cell>
         <mt-cell title="计划开始日期" @click.native="open('picker')" :value="start_Date" is-link></mt-cell>
         <mt-cell title="计划完成日期" @click.native="open('pickerEnd')" :value="end_Date" is-link></mt-cell>
-        <mt-cell v-show="!show_zs" title="计划开孔数量" placeholder="请输入"
+        <mt-cell v-show="!showZs" title="安装数量" placeholder="请输入"
                   :class="heartVisible" v-model="batchNum" is-link></mt-cell>
         <mt-cell title="是否委外" :class="heartVisible">
           <mt-switch v-model="box1"></mt-switch>
         </mt-cell>
         <mt-cell v-show="box1" title="合作伙伴" @click.native="selectCompany" :value="companyName" is-link></mt-cell>
         <div v-show="box1">
-          <mt-cell v-show="show_zs" title="真锁交接日期" @click.native="open('deliveryTime')" :value="delivery_Time" is-link></mt-cell>
+          <mt-cell v-show="showZs" title="真锁交接日期" @click.native="open('deliveryTime')" :value="delivery_Time" is-link></mt-cell>
         </div>
       </div>
       <div class="lock-line" v-show="box1">
@@ -58,7 +58,7 @@
         <mt-button class="single"
                    @click.native="nextPageFn">下一步</mt-button>
         <mt-button class="single"
-                   v-show="!show_zs"
+                   v-show="!showZs"
                    @click.native="submitFn">提交</mt-button>
       </button-group>
       <mt-datetime-picker
@@ -142,11 +142,6 @@
       self.type = param.type;
       self.item = param.item;
       self.orderID = param.orderID;
-      if (self.item['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次
-        self.show_zs = true;
-      } else { // 替代锁
-        self.show_zs = false;
-      }
       if (self.type === 'add') {
         if (self.pcObj.Id) { // 批次页面新增保存有数据
           self.id = self.pcObj.Id;
@@ -190,7 +185,6 @@
     data: () => {
       return {
         value: '',
-        show_zs: true, // 真锁显示
         batchCode: '', // 批次
         start_Date: '',        // 开始时间
         startDate: '',
@@ -226,7 +220,7 @@
     },
     computed: {
       ...mapState(NameSpace, ['attach']),
-      ...mapState('detail', ['itemTask']),
+      ...mapState('detail', ['itemTask', 'showZs']),
       ...mapState('batch', ['pcObj']),
       // 表单只读
       read() {
@@ -334,9 +328,12 @@
         self.installerList = [];
         api.get({ // 提交数据
           key: 'getInstaller',
-          method: 'GET',
+          method: 'POST',
           data: {
-            id: id
+            'body': {
+              'OutputIntObjectName': 'Base KL Installation Task',
+              'PrimaryRowId': id
+            }
           },
           success: function(data) {
             if (data.items) {

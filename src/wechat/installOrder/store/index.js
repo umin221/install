@@ -93,6 +93,7 @@ export default new Vuex.Store(Object.extend(true, sto, {
     detail: {
       namespaced: true,
       state: {
+        showZs: false,
         itemTask: [],
         taskDataST: '' // 面板锁体
       },
@@ -105,6 +106,13 @@ export default new Vuex.Store(Object.extend(true, sto, {
         }
       },
       actions: {
+        setShowZs({state}, data) {
+          if (data) {
+            state.showZs = true;
+          } else {
+            state.showZs = false;
+          }
+        },
         getTaskType({state}, itemTask) {
           state.itemTask = itemTask;
         },
@@ -310,11 +318,7 @@ export default new Vuex.Store(Object.extend(true, sto, {
       namespaced: true,
       state: {
         form: '',
-        attach: {
-          list: [{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}],
-          edit: false,
-          title: '合同附件'
-        } // 附件
+        setItemObj: {}
       },
       mutations: {
         setSign(state, form) {
@@ -328,6 +332,9 @@ export default new Vuex.Store(Object.extend(true, sto, {
         }
       },
       actions: {
+        setItemObj({state}, item) {
+          state.setItemObj = item;
+        },
         getSign({commit}, item) {
           api.get({ // 批次详情
             key: 'findBatchById', // 'findBatchById',
@@ -343,7 +350,7 @@ export default new Vuex.Store(Object.extend(true, sto, {
             }
           });
         },
-        getUPData({state, dispatch}, item) {
+        /* getUPData({state, dispatch}, item) {
           let partner = state.form;
           api.get({ // 提交数据
             key: 'getUPData',
@@ -354,11 +361,26 @@ export default new Vuex.Store(Object.extend(true, sto, {
               'Id': item.Id
             },
             success: function(data) {
-              dispatch('getTpye', item);
+              dispatch('getTpye');
             }
           });
+        },*/
+        getUPData({state, dispatch}, success) {
+          success = success || (data => console.log(data));
+          let partner = state.form;
+          api.get({ // 提交数据
+            key: 'getUPData',
+            method: 'PUT',
+            data: {
+              'KL Signed Amount': partner['KL Signed Amount'],
+              'Description': partner.Description,
+              'Id': state.setItemObj.Id
+            },
+            success: success
+          });
         },
-        getTpye({commit}, item) {
+        getTpye({state}) {
+          var item = state.setItemObj;
           var processName = ''; // KL Record Install Process Flg == N 请求关闭接口 Y 提交接口
           if (item['KL Record Install Process Flg'] === 'N') {
             if (item.box1) { // 涉及签收
@@ -509,6 +531,8 @@ export default new Vuex.Store(Object.extend(true, sto, {
           edit: false,
           title: '签收单据归档'
         } // 附件
+      },
+      actions: {
       }
     },
     yjBatch: {

@@ -56,6 +56,22 @@ let apiList = {
       url: 'service/EAI Siebel Adapter/Query'
     };
   },
+  /*
+  * 获取经纬度
+  */
+  getLatLong: option => {
+    return {
+      url: 'service/EAI Siebel Adapter/Query'
+    };
+  },
+  /*
+  * 打卡提交
+  */
+  setPunchClock: option => {
+    return {
+      url: 'data/KL Order Employee Clock/KL Order Employee Clock/'
+    };
+  },
   getTaskAdd: option => { // 任务开始更新状态
     return {
       url: 'service/Workflow Process Manager/RunProcess/'
@@ -197,9 +213,7 @@ let apiList = {
   },
   getInstaller: option => { // 获取批次详情联系人
     return {
-      method: 'get',
-      url: 'data/KL Installation Task/KL Installation Task/' + option.data.id + '/Contact',
-      data: {}
+      url: 'service/EAI Siebel Adapter/Query'
     };
   },
   getSearch: option => {

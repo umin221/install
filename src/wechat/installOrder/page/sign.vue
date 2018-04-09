@@ -9,24 +9,31 @@
 
     <div class="mint-content wide-form">
       <div :class="{'readonly':read}">
-        <mt-cell title="是否涉及签收" v-if="item['KL Detail Type LIC'] === 'Trompil Lock Sign' ||
-          item['KL Detail Type LIC'] === 'Working Drawing Sign'" :class="{disable: !editable}">
-          <mt-switch v-model="box1"></mt-switch>
+        <mt-cell title="是否涉及签收"
+                 v-if="item['KL Detail Type LIC'] === 'Trompil Lock Sign' ||
+                       item['KL Detail Type LIC'] === 'Working Drawing Sign'"
+                 :class="{disable: !editable}">
+                <mt-switch v-model="box1"></mt-switch>
         </mt-cell>
         <div v-show="box1" :class="{disable: !editable}">
-          <mt-field label="签收数量" placeholder="请输入签收数量"
-                    :class="heartVisible" v-model="form['KL Signed Amount']"></mt-field>
+          <mt-field label="签收数量"
+                    placeholder="请输入签收数量"
+                    :class="heartVisible"
+                    v-model="form['KL Signed Amount']">
+
+          </mt-field>
         </div>
       </div>
-      <attach :attach="attach.list"
+      <attach ioName="KL Action Attachment" ref="attach"
+              :attach="attach.list"
               :edit="!read"
-              :title="title" v-show="box1">
+              :title="title"
+              v-show="box1">
       </attach>
-      <div :class="{'readonly':read}">
+      <div :class="{'readonly':read}" v-show="box1">
         <mt-field label="备注说明" type="textarea" v-model="form['Description']"></mt-field>
       </div>
     </div>
-
     <button-group>
       <mt-button class="single" v-show="!read"
                  @click.native="submitFn">提交</mt-button>
@@ -45,7 +52,29 @@
     style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
     handler: () => this.$messagebox('delete')
   }];
-
+  /**
+   * 附件上传
+   * @param {Array} serverIds 企业微信临时素材id => mediaId
+   * @param {String} id 业务id
+   */
+  let _upload = function(serverIds, id) {
+    // 成功回调
+    let callback = data => {
+      tools.success(data, {
+        back: true,
+        successTips: '提交成功'
+      });
+    };
+    // 上传附件
+    serverIds ? this.upload({
+      data: {
+        MediaId: serverIds,
+        Id: id,
+        IOName: 'KL Action Attachment'
+      },
+      success: callback
+    }) : callback(id);
+  };
   const NameSpace = 'sign';
   export default {
     name: 'sign',
@@ -61,6 +90,17 @@
       // 获取详情
       if (this.type === 'read') {
         this.getSign(this.item);
+        this.queryMedias({
+          data: {
+            'IOName': 'KL Action Attachment',
+            'SearchSpec': {
+              'Action Attachment.Activity Id': param.item.Id
+            }
+          },
+          success: data => {
+            this.attach.list = KND.Util.toArray(data['SiebelMessage']['Action Attachment']);
+          }
+        });
         /* if (this.form['KL Signed Amount']) {
           this.box1 = true;
         } else {
@@ -83,6 +123,11 @@
           list: [{
             text: '提交'
           }]
+        },
+        attach: { // 附件
+          list: [],
+          edit: false,
+          title: '附件'
         }
       };
     },
@@ -94,7 +139,7 @@
       });
     },
     computed: {
-      ...mapState(NameSpace, ['form', 'attach']),
+      ...mapState(NameSpace, ['form']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -131,16 +176,36 @@
       }
     },
     methods: {
+      ...mapActions('app', ['upload', 'queryMedias']),
       ...mapMutations(NameSpace, ['clear']),
-      ...mapActions(NameSpace, ['getSign', 'getUPData', 'getTpye']),
+      ...mapActions(NameSpace, ['getSign', 'getUPData', 'getTpye', 'setItemObj']),
       submit() {
         var self = this;
         var item = self.item;
+        this.setItemObj(item);
         item.box1 = self.box1;
-        if (self.box1) { // 涉及签收 才提交数据  不涉及只更新状态
-          self.getUPData(item);
-        } else {
-          self.getTpye(item);
+        // 提交图片
+        let uploadAttach = id => {
+          _upload.call(self, self.$refs.attach.getServerIds(), id);
+        };
+        if (self.type === 'add') { // 新增
+          if (self.box1) { // 涉及签收 才提交数据  不涉及只更新状态
+            if (self.form['KL Signed Amount']) {
+              // self.getUPData(item);
+              // 新增签收
+              self.getUPData(data => {
+                console.dir(data.items.Id);
+                uploadAttach(data.items.Id);
+                self.getTpye();
+              });
+            } else {
+              Toast('签收数量不能为空！');
+            }
+          } else {
+            self.getTpye();
+          }
+        } else { // 编辑  提交后能编辑的只有附件可以修改  附件只能增加不能把原来的删除
+          uploadAttach(self.form.Id);
         }
       },
       submitFn() {

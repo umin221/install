@@ -4,7 +4,7 @@
       <fallback slot="left"></fallback>
     </mt-header>
     <div class="mint-content buildingInfo">
-      <mt-cell title="省市区"
+      <!--<mt-cell title="省市区"
                @click.native="showLovFn('KL_PROVINCE')"
                placeholder="请选择"
                is-link
@@ -14,7 +14,7 @@
                  v-model= 'detailAddress'
                  type="textarea"
                  placeholder="请输入详细地址"></cus-field>
-      <div style="height: 5px"></div>
+      <div style="height: 5px"></div>-->
       <div style="background: white;padding-bottom: 10px;">
         <mt-cell>
           <div slot="title" class="list-text"><span class="list-text-span">楼层信息</span></div>
@@ -250,12 +250,12 @@
               'BuildingNum': self.buildingNum,
               'FloorName': 'F',
               'FloorNum': self.layerNum,
-              'RoomNum': self.roomNum,
+              'RoomNum': self.roomNum /* ,
               'Country': '中国',
               'Province': self.KL_PROVINCE,
               'City': self.KL_CITY,
               'County': self.KL_TOWN,
-              'Street Address': self.detailAddress
+              'Street Address': self.detailAddress*/
             }
           },
           success: function(data) {
@@ -272,7 +272,7 @@
                 success: function(dataObj) {
                   if (!dataObj.ERROR) {
                     Toast('提交成功');
-                    KND.Util.back(-2);
+                    KND.Util.back(2);
                   }
                 }
               });

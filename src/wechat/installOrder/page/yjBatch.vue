@@ -252,30 +252,29 @@
           self.Contact_Phone = '';
           return;
         }
+        var newDate = new Date().format('MM/dd/yyyy hh:mm:ss');
         api.get({ // 更新工程真锁移交
           key: 'setUpyj',
           method: 'POST',
           data: {
             'body': {
-              'KL Property Contact Id': self.Contact_Id, // 联系人ID
-              'Description': '',
               'ContactName': self.Contact_Name,
               'ContactPhone': self.Contact_Phone,
               'ProcessName': 'KL Install Order Asset Lock Transfer Process',
               'SiebelMessage': {
                 'MessageId': '',
                 'MessageType': 'Integration Object',
-                'IntObjectName': 'Base KL Installation Task',
+                'IntObjectName': 'KL Install Order',
                 'IntObjectFormat': 'Siebel Hierarchical',
-                'ListOfBase KL Installation Task': {
-                  'KL Installation Task': {
-                    'Id': '1-2BSHWXMW',
+                'ListOfKL Install Order': {
+                  'Order Entry - Orders': {
+                    'Id': self.itemTask['Order Id'], // 订单ID
                     'ListOfKL Install Order Asset': {
                       'KL Install Order Asset': [
                         {
-                          'Id': '1-2BSHXI3X',
-                          'KL Transfer Activity Id': '1-2BSGZGGI',
-                          'Install Date': '3/1/2018 17:15:23'
+                          'Id': '', // 资产ID
+                          'KL Transfer Activity Id': self.itemTask.Id, // 批次ID
+                          'Install Date': newDate
                         }
                       ]
                     }

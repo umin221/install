@@ -28,8 +28,8 @@
         <lock-line title="委外安装员">
           <mt-cell-swipe v-for="(installer, index) in installerList" class="lock-line-cell enable" ref="body" :key=index>
             <div class="co-flex co-jc" slot="title">
-              <span class="co-f1">{{installer['Last Name']}}</span>
-              <span class="co-f1">{{installer['Work Phone #']}}</span>
+              <span class="co-f1">{{installer['Contact Last Name']}}</span>
+              <span class="co-f1">{{installer['Contact Phone']}}</span>
             </div>
           </mt-cell-swipe>
         </lock-line>
@@ -219,6 +219,15 @@
               self.end_Date = new Date(data['Planned Completion']).format('yyyy-MM-dd') || ''; // 结束时间
             }
             self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
+            /*
+            * 根据类型判断是否可以审批
+            * 审批中=Approved
+            * 关闭中=Closing
+            * 可以审批
+            * */
+            if (data['Calculated Activity Status'] === 'Approved' || data['Calculated Activity Status'] === 'Closing') {
+              self.is_but = false;
+            }
           }
         });
       },
@@ -245,16 +254,15 @@
         self.installerList = [];
         api.get({ // 提交数据
           key: 'getInstaller',
-          method: 'GET',
+          method: 'POST',
           data: {
-            id: id
+            'body': {
+              'OutputIntObjectName': 'Base KL Installation Task',
+              'PrimaryRowId': '1-2BSH0TBL'
+            }
           },
           success: function(data) {
-            if (data.items) {
-              self.installerList = data.items;
-            } else {
-              self.installerList = KND.Util.toArray(data);
-            }
+            self.installerList = KND.Util.toArray(data.SiebelMessage['KL Installation Task']['KL Installation Task_Contact']);
           }
         });
       },
@@ -283,30 +291,6 @@
             console.dir(data.SiebelMessage);
             self.appData = data.SiebelMessage['UInbox Item'];
             self.appDataTask = self.appData['UInbox Item Task'];
-            var lov = [];
-            self.getLov({ // 取类型值
-              data: {
-                'Type': 'UINBOX_ITEM_STATUS_TYPE'
-              },
-              success: data => {
-                lov = KND.Util.toArray(data.items);
-                var lov_date = [];
-                for (var i = 0; i < lov.length; i++) {
-                  if (lov[i].Value !== 'Approving') {
-                    lov_date.push(lov[i]);
-                  }
-                }
-                if (lov_date) {
-                  var Status = self.appData.Action; // 取状态判断是否已审批
-                  for (var j = 0; j < lov_date.length; j++) {
-                    if (lov_date[j].Value === Status) {
-                      self.is_but = false;
-                    }
-                  }
-                }
-              }
-            });
-            console.dir(self.appData);
           }
         });
       },
@@ -330,6 +314,7 @@
               if (!data.ERROR) {
                 Toast('审批成功');
                 if (this.option === 'approval') {
+                  this.getBatch(self.id);
                   this.getAppData();
                 }
               }
@@ -355,6 +340,7 @@
                   if (!data.ERROR) {
                     Toast('审批成功');
                     if (this.option === 'approval') {
+                      this.getBatch(self.id);
                       this.getAppData();
                     }
                   }

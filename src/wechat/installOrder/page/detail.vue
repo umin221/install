@@ -9,7 +9,11 @@
           <mt-field label="项目名称" :value="detailData['KL Agreement Opportunity Name']"></mt-field>
           <mt-field label="销售类型" :value="detailData['KL Delivery Sales Type']"></mt-field>
           <mt-field label="安装数量" :value="detailData['KL Install Amount'] || 0"></mt-field>
-          <div slot="title" class="mint-content-div"><div class="mint-content-xt" @click="butXttd">协同团队</div></div>
+          <mt-field label="地址" :value="detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery Country'] + detailData['KL Delivery Address']"></mt-field>
+          <div slot="title" class="mint-content-div">
+            <div class="mint-content-xt" @click="punchClock">安装打卡</div>
+            <div class="mint-content-xt" @click="butXttd">协同团队</div>
+          </div>
       </div>
       <toggle :show="isConfirming">
         <div style="height: 0.5rem;background: #eaeaea;"></div>
@@ -523,9 +527,10 @@
       });
     },
     methods: {
+      ...mapActions('app', ['getLov']),
       ...mapMutations('batch', ['clear']),
       ...mapMutations(NameSpace, ['setTaskDataST']),
-      ...mapActions(NameSpace, ['getTaskType', 'deleteOrderLine']),
+      ...mapActions(NameSpace, ['getTaskType', 'deleteOrderLine', 'setShowZs']),
       detail() {
         var self = this;
         api.get({
@@ -617,6 +622,86 @@
           self.is_show_sx = true;
         }
       },*/
+      punchClock() { // 安装打卡
+        var self = this;
+        var url = 'http://restapi.amap.com/v3/geocode/regeo?key=5b5046542494d008341eaf5b62a95109&location=22.615108,114.035529&poitype=&radius=&extensions=base&batch=false&roadlevel=0';
+        console.dir(url);
+        // 获取订单经纬度
+        api.get({
+          key: 'getLatLong',
+          method: 'POST',
+          data: {
+            'body': {
+              'OutputIntObjectName': 'KL App Lead List IO',
+              'PrimaryRowId': '1-103TCKOJ'
+            }
+          },
+          success: function(data) {
+            var obj = data.SiebelMessage.Lead;
+            if (obj['KL Lead Address Latitude'] && obj['KL Lead Address Longitude']) {
+              KND.Native.getLocation({ // 获取当前位置
+                success(dataList) {
+                  console.log(dataList);
+                  var newLatitude = dataList.latitude;
+                  var newLongitude = dataList.longitude;
+                  var dis1 = getDisance(obj['KL Lead Address Latitude'], obj['KL Lead Address Longitude'], newLatitude, newLongitude);
+                  MessageBox('联想到深圳北的直线距离(公里)', dis1.toFixed(2));
+                  // 查询限制的范围距离
+                  var lov = '';
+                  self.getLov({ // 取类型值
+                    data: {
+                      'Type': 'KL_DISTANCE'
+                    },
+                    success: data => {
+                      lov = KND.Util.toArray(data.items)[0].Value;
+                      console.dir(lov);
+                      if (dis1.toFixed(2) > lov) {
+                        Toast('不在范围内不能打卡！');
+                      } else {
+                        MessageBox({
+                          message: '',
+                          showCancelButton: true
+                        }).then(action => {
+                          if (action === 'confirm') {
+                            var newDate = new Date().format('MM/dd/yyyy hh:mm:ss');
+                            api.get({ // 提交打卡
+                              key: 'setPunchClock',
+                              method: 'PUT',
+                              data: {
+                                'Id': self.id,
+                                'Employee Full Name': userInfo['KL Employee Full Name'],
+                                'Time': newDate,
+                                'Address': '东莞'
+                              },
+                              success: function(data) {
+                                if (!data.ERROR) {
+                                  Toast('打卡成功');
+                                }
+                              }
+                            });
+                          }
+                        });
+                      }
+                    }
+                  });
+                }
+              });
+            } else {
+              Toast('暂不能打卡,请联系管理员！');
+            }
+          }
+        });
+        // 获取当前的经纬度
+        function toRad(d) { return d * Math.PI / 180; }
+        function getDisance(lat1, lng1, lat2, lng2) { // #lat为纬度, lng为经度, 一定不要弄错
+          var radLat1 = toRad(lat1);
+          var radLat2 = toRad(lat2);
+          var deltaLat = radLat1 - radLat2;
+          var deltaLng = toRad(lng1) - toRad(lng2);
+          var dis = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(deltaLat / 2), 2) + Math.cos(radLat1) * Math.cos(radLat2) * Math.pow(Math.sin(deltaLng / 2), 2)));
+          return dis * 6378.137;
+        }
+      },
       butXttd() { // 跳转协同团队
         let me = this;
         this.$router.push({
@@ -709,6 +794,11 @@
         self.getTaskType(itemTask);
         if ((item['KL Detail Type LIC'] === 'Lock Installation Summary' && self.detailData['KL Delivery Sales Type'] === '工程') || item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary') { // 真锁批次新增 替代锁批次
           // 跳转真锁安装批次新增页面
+          if (item['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次
+            self.setShowZs(true);
+          } else { // 替代锁
+            self.setShowZs(false);
+          }
           self.clear();
           this.$router.push({
             name: 'zsBatch',
@@ -900,6 +990,11 @@
                 }
               });
             } else {
+              if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次
+                self.setShowZs(true);
+              } else { // 替代锁
+                self.setShowZs(false);
+              }
               this.$router.push({
                 name: 'zsBatch',
                 query: {
