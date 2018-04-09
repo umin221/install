@@ -28,7 +28,7 @@ export const app = {
       ajax(Object.assign({
         method: 'get',
         cache: true, // PickList Hierarchical
-        url: 'data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND ' + KND.Util.condition(data) + '&PageSize=100&StartRowNum=0',
+        url: `data/List Of Values/List Of Values/?searchspec=Active="Y" AND Language="CHS" AND ${KND.Util.condition(data)}&PageSize=100&StartRowNum=0`,
         success: data => {
           console.log(data);
         }
@@ -39,10 +39,9 @@ export const app = {
      * 获取企业微信&微信公众号 js sdk 权限
      */
     getAuthority({state}, option) {
-      let appNO = 'CONTACT'; // 公众号：KINLONG2013  企业号：CONTACT
       ajax({
         method: 'get',
-        url: (proxy + '/webchat/api/local/permission?url=' + encodeURIComponent(location.href.split('#')[0]) + '&appNO=' + appNO),
+        url: (`${proxy}/webchat/api/local/permission?url=${encodeURIComponent(location.href.split('#')[0])}&appNO=${config.appNo}`),
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
@@ -94,7 +93,7 @@ export const app = {
       let push = (media) => {
         ajax({
           method: 'get',
-          url: (proxy + '/webchat/api/external/uploadattachment?url=http://192.168.166.8:9001/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess&IOName=' + data.IOName + '&Object Id=' + data.Id + '&ProcessName=KL Attachment Upload Process&appNO=CONTACT&mediaID=' + media),
+          url: (`${proxy}/webchat/api/external/uploadattachment?url=http://192.168.166.8:9001/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess&IOName=${data.IOName}&Object Id=${data.Id}&ProcessName=KL Attachment Upload Process&appNO=${config.appNo}&mediaID=${media}`),
           success: result => {
             console.log(result);
             run(MediaId.pop(), result);
