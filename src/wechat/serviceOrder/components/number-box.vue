@@ -4,7 +4,7 @@
         type="default"
         size="small"
         @click.native="changeFn('minus')">
-        <i class="xs-icon icon-minus"></i>
+        <i class="" style="display: block;border: 1px solid;"></i>
       </mt-button>
       <input type="number" v-model="value" min="1" />
       <mt-button

@@ -207,7 +207,7 @@ export default new Vuex.Store({
         setSn(state, data) {
           state.form['KL_Product_Model'] = data['KL Product Model']; // 产品类型
           state.form['KL_Cutoff_Date'] = data['Install Date'];  // 移交日期
-          state.form['Product_Warranty_Flag'] = data['Product Warranty Flag'];  // 保修期限
+          state.form['Product_Warranty_Flag'] = data['KL Warranty Flag'] === 'Y' ? '保内' : '保外';  // 保修期限
         }
       },
       actions: {
@@ -579,7 +579,7 @@ export default new Vuex.Store({
         slots1: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
         ProductModel: '',  // 产品型号
         mustForm: [
-          {name: '产品条形码', key: 'SerialNumber'},
+          // {name: '产品条形码', key: 'SerialNumber'},
           {name: '产品型号', key: 'ProductModel'},
           {name: '故障现象', key: 'rootcause'},
           {name: '责任划分', key: 'Responsbility'},
@@ -707,21 +707,11 @@ export default new Vuex.Store({
       },
       mutations: {
         count(state, val) {
+          console.log(val);
           if (val.isShow) {
             state.selected.splice(val.index, 1, false);
           } else {
             state.selected.splice(val.index, 1, true);
-          }
-        },
-        selectProduct(state) {                    // 确认选择的配件
-          state.returnSelect = [];
-          for (let i = 0; i < state.result.length; i++) {
-            if (state.selected[i]) {
-              state.returnSelect.push(state.result[i]);
-            }
-          }
-          if (!state.returnSelect.length) {
-            Toast('请选择配件');
           }
         },
         setProduct(state, data) {
@@ -740,8 +730,11 @@ export default new Vuex.Store({
             state.selected.push(false);
           }
         },
-        initSelect(state) {
-          state.returnSelect = [];
+        initSelected(state) {
+          state.selected = [];
+          for (let i = 0; i < state.result.length;i++) {
+            state.selected.push(false);
+          }
         }
       },
       actions: {
@@ -877,11 +870,27 @@ export default new Vuex.Store({
     saveFault: {                     // 完成工单
       namespaced: true,
       state: {
-        isBn: '保内'
+        isBn: '保内',
+        returnSelect: []
       },
       mutations: {
         setIsBn(state, value) {
           state.isBn = value;
+        },
+        selectProduct(state, select) {                    // 确认选择的配件
+          state.returnSelect.push(select);
+          if (!state.returnSelect.length) {
+            Toast('请选择配件');
+          }
+        },
+        initSelect(state) {
+          state.returnSelect = [];
+        },
+        ProductNum(state, {num, val}) {
+          state.returnSelect[num].num = val;
+        },
+        deleteProduct(state, index) {
+          state.returnSelect.splice(index, 1);
         }
       },
       actions: {

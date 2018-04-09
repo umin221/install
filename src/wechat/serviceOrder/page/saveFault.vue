@@ -12,17 +12,20 @@
         <mt-cell class="require" title="是否保修范围" @click.native="getLov('bn')" is-link>{{isBn}}</mt-cell>
         <mt-cell title="维修配件"><i class="xs-icon icon-arrow-down"></i></mt-cell>
         <div class="servesParts">
-          <div class="Parts" v-for="(item, index) in Product">
-            <mt-switch
-              @click.native="change(index,switchStatus[index])"
-              v-model="switchStatus[index]">
-              {{switchStatus[index]?"保内":"保外"}}
-            </mt-switch>
-            <div class="PartsDetail">
-              <div>{{item['KL Translated Name']}}</div>
-              <div class="toRed">￥{{item['List Price']}}</div>
-              <num-box :index="index" :type="switchStatus[index]" @input="productNumber"></num-box>
-            </div>
+          <div class="Parts" v-for="(item, index) in returnSelect">
+            <mt-cell-swipe class="lock-line-cell enable"
+                           :right="getSwipeBtn(index)">
+              <mt-switch
+                v-model="switchStatus[index]">
+                {{switchStatus[index]?"保内":"保外"}}
+              </mt-switch>
+              <div class="TranslatedLine">
+                <div>配件代码： {{item['KL Product Model No']}}</div>
+                <div>配件名称： {{item['KL Translated Name']}}</div>
+                <div class="toRed">￥{{item['List Price']}}</div>
+                <num-box :index="index" :type="switchStatus[index]" @input="productNumber"></num-box>
+              </div>
+            </mt-cell-swipe>
           </div>
           <div class="Parts" v-show="isBn === '保外'">
             <div style="width: 30%"></div>
@@ -33,7 +36,7 @@
             <mt-button type="primary" v-show="isBn === '保外'" @click.native="getLov('wm')"><i class="xs-icon icon-add" ></i>添加上门费</mt-button>
           </div>
         </div>
-        <mt-cell class="require" title="总费用">￥{{allFee}}</mt-cell>
+        <mt-cell class="require" title="总费用">￥{{Product}}</mt-cell>
         <mt-cell class="require" title="附件"></mt-cell>
         <div style="background-color: #ffffff">
           <attach ioName="KL Service Request Attachment IO" ref="attach"
@@ -43,7 +46,7 @@
           </attach>
         </div>
         <mt-popup v-if="showBox" v-model="showBox" position="bottom">
-          <menu-box @my-enter="enter" @my-cancel="cancel" :slots="slots" :type="lovType"></menu-box>
+          <menu-box @my-enter="enter" @my-cancel="showBox = !showBox" :slots="slots" :type="lovType"></menu-box>
         </mt-popup>
       </div>
     </div>
@@ -71,6 +74,14 @@ export default {
         }
       });
     }
+    me.switchStatus = [];
+    for (let i = 0;i < me.returnSelect.length;i++) {
+      if (me.isBn === '保内') {
+        me.switchStatus.push(true);
+      } else {
+        me.switchStatus.push(false);
+      }
+    }
   },
   data: () => {
     return {
@@ -92,74 +103,58 @@ export default {
     };
   },
   computed: {
-    ...mapState(NAMESPACE, ['isBn']),
-    ...mapState('searchTrans', ['returnSelect', 'priceId']),
+    ...mapState(NAMESPACE, ['isBn', 'returnSelect']),
+    ...mapState('searchTrans', ['priceId']),
 //    ...mapState('detail', ['ServiceRequest']),
     Product() {
       let me = this;
-      let arr = [];
-      me.productData = me.returnSelect;
-      for (let i = 0; i < me.returnSelect.length; i++) {
-        if (me.isBn === '保内') {
-          arr.push(true);
-        } else {
-          arr.push(false);
-        }
-        if (me.productData[i].num === undefined) {
-          me.productData[i].num = 0;
+      let len = me.returnSelect.length;
+      me.allFee = 0;
+      if (me.isBn === '保外') {
+        me.allFee = me.allFee + me.fee;
+      } else {
+        me.allFee = me.allFee + 0;
+      }
+      console.log(me.returnSelect);
+      if (len) {
+        for (let i = 0;i < len;i++) {
+          if (!me.switchStatus[i]) {
+            me.allFee += me.returnSelect[i].num * parseInt(me.returnSelect[i]['List Price'], 0);
+          }
         }
       }
-      me.switchStatus = arr;
-      return me.productData;
+      return me.allFee;
     }
   },
   methods: {
     ...mapActions(NAMESPACE, ['addServiceOrder', 'getServiceR']),
-    ...mapMutations(NAMESPACE, ['setIsBn']),
+    ...mapMutations(NAMESPACE, ['setIsBn', 'ProductNum', 'deleteProduct']),
     ...mapMutations('searchTrans', ['initSelect']),
     ...mapMutations('detail', ['setPartner']),
     productNumber(val, num, type) {
       let me = this;
-      me.productData[num].num = val;
-      if (val - 1) {
-        if (!me.switchStatus[num]) {
-          if (type === 'minus') {
-            me.allFee = me.allFee - parseInt(me.productData[num]['List Price'], 0);
-          } else {
-            me.allFee = me.allFee + parseInt(me.productData[num]['List Price'], 0);
-          }
-        }
-      } else {
-        if (me.allFee - me.fee !== 0 && !me.switchStatus[num]) {
-          if (type !== 'minus') {
-            me.allFee = me.allFee + parseInt(me.productData[num]['List Price'], 0);
-          } else {
-            if (me.allFee - (parseInt(me.productData[num]['List Price'], 0) * me.switchStatus.length)) {
-              me.allFee = me.allFee - parseInt(me.productData[num]['List Price'], 0);
-            }
-          }
-        }
-      }
+      console.log(val);
+      me.ProductNum({num, val});
     },
     getSwipeBtn(item) {
-      return this.isConfirming ? [{
+      return [{
         content: '删除',
         style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
         handler: () => this.deleteFn(item)
-      }] : [];
+      }];
     },
     deleteFn(item) {
-      console.lot(item);
+      this.deleteProduct(item);
     },
     submit() {
       let me = this;
       let lineItems = [];
       let obj = {};
-      for (let i = 0;i < me.productData.length; i++) {
+      for (let i = 0;i < me.returnSelect.length; i++) {
         obj = {
           'Id': '1',
-          'Product': me.productData[i].Name, // 产品编码
-          'Quantity Requested': me.productData[i].num, // 数量
+          'Product': me.returnSelect[i].Name, // 产品编码
+          'Quantity Requested': me.returnSelect[i].num, // 数量
           'KL Warranty Flag': me.switchStatus[i] ? 'Y' : 'N'
         };
         lineItems.push(obj);
@@ -188,25 +183,19 @@ export default {
     enter(val, type) {
       let me = this;
       me.showBox = !me.showBox;
-      me.allFee = me.allFee - me.fee;
       if (type === 'bn') {
-        me.setIsBn(val[0]);
-        me.allFee = 0;
-        if (me.isBn === '保外') {
-          for (let i = 0; i < me.productData.length; i++) {
-            if (me.switchStatus[i]) {
-              me.allFee += parseInt(me.productData[i]['List Price'], 0) * me.productData[i]['num'];
-            }
+        me.switchStatus = [];
+        for (let i = 0;i < me.returnSelect.length;i++) {
+          if (val[0] === '保内') {
+            me.switchStatus.push(true);
+          } else {
+            me.switchStatus.push(false);
           }
-          me.allFee = me.allFee + me.fee;
         }
+        me.setIsBn(val[0]);
       } else {
         me.fee = val[0] === '工作时间' ? 100 : 150;
-        me.allFee = me.allFee + me.fee;
       }
-    },
-    cancel() {
-      this.showBox = !this.showBox;
     },
     getLov(type) {
       let me = this;
@@ -220,17 +209,17 @@ export default {
     },
     change(index, type) {
       console.log(index);
-      let me = this;
-      me.one = me.one + 1;
-      if (me.one === 2) {
-        if (!me.switchStatus[index]) {
-          me.allFee = me.allFee - me.productData[index].num * parseInt(me.productData[index]['List Price'], 0);
-        } else {
-          me.allFee = me.allFee + me.productData[index].num * parseInt(me.productData[index]['List Price'], 0);
-        }
-      } else {
-        me.one = 1;
-      }
+//      let me = this;
+//      me.one = me.one + 1;
+//      if (me.one === 2) {
+//        if (!me.switchStatus[index]) {
+//          me.allFee = me.allFee - me.productData[index].num * parseInt(me.productData[index]['List Price'], 0);
+//        } else {
+//          me.allFee = me.allFee + me.productData[index].num * parseInt(me.productData[index]['List Price'], 0);
+//        }
+//      } else {
+//        me.one = 1;
+//      }
     }
   },
   components: {menuBox, numBox}
@@ -255,6 +244,27 @@ export default {
           div{
             width: 30%;
             text-align: center;
+          }
+        }
+        .enable{
+          width: 100%;
+          .mint-cell-wrapper{
+            width: 100%;
+            .mint-cell-value{
+              width: 100%;
+              .TranslatedLine{
+                position: relative;
+                width: 70%;
+              }
+              .TranslatedLine>div{
+                line-height: 25px;
+              }
+              .cus-number-box{
+                position: absolute;
+                right: 0;
+                top: 25px;
+              }
+            }
           }
         }
       }

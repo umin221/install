@@ -149,7 +149,6 @@
         this.selectIndex = index;
         this.isSelected = [];
         this.params.selectDay = this.formatDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
-        console.log(this.params);
         for (let i = 0; i < 42; i++) {
           if (index === i) {
             this.isSelected.push(true);
@@ -278,7 +277,6 @@
           self.params.Time2.time = self.am[seleat].time[index - seleat * 8];
           self.params.Time2.key = (index1 + 1) * (index2 + 1);
         }
-        console.log(self.params);
       }
     }
   };

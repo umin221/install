@@ -7,7 +7,7 @@
 
     <div class="mint-content addService">
       <div class="addform">
-        <mt-field label="产品条形码" type="text" placeholder="输入或扫门锁条形码" @change="sarech" v-model="SerialNumber" class="textRight require">
+        <mt-field label="产品条形码" type="text" placeholder="输入或扫门锁条形码" @change="sarech" v-model="SerialNumber" class="textRight">
           <i class="xs-icon icon-scan" @click="scan"></i>
         </mt-field>
         <mt-cell class="mint-field" title="所在省市区" placeholder="请选择">{{Personal}}</mt-cell>
@@ -62,6 +62,7 @@
     };
   })();
   const NameSpace = 'comEnter';
+  let mapp = config.mapp;
   export default {
     name: NameSpace,
     created() {
@@ -89,6 +90,13 @@
           }
         });
       }
+
+      me.getLov({
+        type: 'KL_HOLE_TYPE',
+        success: data => {
+          mapp.option['KL Hole Type'] = data.items;
+        }
+      });
     },
     data: () => {
       return {
@@ -103,7 +111,6 @@
         repairDetails: '', // 方法明细
         ProductId: '',    // 产品Id
         Product_model: '',
-        status: '',
         childId: '',
         building: '',
         floor: '',
@@ -215,13 +222,16 @@
             if (data) {
               let name = me.$router.currentRoute.name;
               if (name === 'comEnter') {
-                me.$router.go(-1);
+                me.$router.go(-2);
               } else {
                 me.$router.go(-1);
               }
             }
           }
         };
+        if (!me.AssetNumber) {
+          delete form['Asset Number'];
+        }
         me.upDateService(form);
       }
     },

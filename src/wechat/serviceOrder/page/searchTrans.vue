@@ -56,6 +56,7 @@
     name: NAMESPACE,
     created() {
       this.type = this.$route.query.type;
+      this.initSelected();
     },
     components: {cusLoadmore, cusSearch, cusCell},
     data: () => {
@@ -71,7 +72,8 @@
     },
     methods: {
       ...mapActions(NAMESPACE, ['getProduct']),
-      ...mapMutations(NAMESPACE, ['count', 'selectProduct', 'saveModelData']),
+      ...mapMutations(NAMESPACE, ['count', 'saveModelData', 'initSelected']),
+      ...mapMutations('saveFault', ['selectProduct']),
       ...mapMutations('comEnter', ['successCall']),
       searchFn(val) {
         this.getProduct({value: val, type: this.type});
@@ -87,7 +89,13 @@
         }
       },
       selectEnter() {
-        this.selectProduct();
+        let me = this;
+        for (let i = 0; i < me.result.length; i++) {
+          if (me.selected[i]) {
+            me.result[i].num = 1;
+            this.selectProduct(me.result[i]);
+          }
+        }
         this.$router.go(-1);
       }
     }

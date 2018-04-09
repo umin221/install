@@ -305,7 +305,7 @@ let ApiList = {
         'SR Rootcause': option.data.form['SR Rootcause'],               // 故障反馈
         'KL Responsbility': option.data.form['KL Responsibility'],     // 责任划分
         'Repair Details': option.data.form['Repair Details'], // 解决方法明细
-        'KL Product Model': option.data.form['ProductModel']
+        'KL Product Model': option.data.form['KL Product Model']
       }
     };
     // 更新服务请求
