@@ -67,9 +67,17 @@
         });
       },
       toScan() {
+        let me = this;
         KND.Native.scanQRCode({
           success(data) {
             console.log(data);
+            let resultStr = data.resultStr.split(',')[1];
+            me.getAssetSn({
+              klsn: resultStr,
+              callback: function(data) {
+                me.productModel = data['KL Product Model'];
+              }
+            });
           }
         });
       }

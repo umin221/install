@@ -79,7 +79,6 @@
     },
     methods: {
       ...mapActions(NameSpace, ['getContact', 'deleteAddress', 'setDefaultAddress']),
-      ...mapMutations(NameSpace, ['deleteAddress']),
       ...mapMutations('index', ['addressBack']),
       toAddAddress() {
         let me = this;
@@ -109,6 +108,7 @@
         });
       },
       deleteAddr(Id, type) {
+        console.log(Id);
         let me = this;
         me.deleteAddress({Id, type});
       },

@@ -10,16 +10,13 @@
     <div class="mint-content">
       <div class="myRepair">
         <empty v-show="!serviceList.length"></empty>
-        <cus-cell class="myRepairList"
+        <cus-cell class="multiple"
                   v-for="(item, index) in serviceList"
                   :key="item.Id"
+                  :title="'服务单编号:'+ item['SR Number']"
                   @click.native="toDetail(item['SR Number'])"
                   is-link>
-          <div class="mint-cell-sub-title" slot="title">
-            服务单编号：{{item['SR Number']}}
-            <mt-badge class="badge-status"
-                      style="line-height: 1rem;float: right;"
-                      size="small">{{item.Status}}</mt-badge></div>
+          <div slot="after" style="color: #A2BBFC">{{item['Status']}}</div>
           <div class="mint-cell-sub-title" slot="title">申请日期：{{item['Created']}}</div>
           <div class="mint-cell-sub-title" slot="title">产品类型：{{item['KL Product Model']}}</div>
         </cus-cell>

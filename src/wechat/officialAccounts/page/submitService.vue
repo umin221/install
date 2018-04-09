@@ -25,7 +25,7 @@
                  placeholder="请选择"
                  :value="address"
                  to="address"
-                 class="requisite"
+                 class="requisite hideText"
                  v-valid.require
                  is-link></mt-cell>
         <mt-cell title="故障现象" tag="故障现象"
@@ -46,7 +46,7 @@
         <attach ioName="KL Service Request Attachment IO" ref="attach"
                 :attach="attach.list"
                 :edit="attach.edit"
-                :title="attach.title">
+                title="相关照片">
         </attach>
       </div>
       <mt-datetime-picker
@@ -174,7 +174,7 @@
               City: data['Personal City'],
               County: data['KL Personal Town'],
               'Street Address': data['Personal Address'],
-              id: 'Asset'
+              Id: 'Asset'
             };
             me.AssetId = data.Id;
             me.addressBack(form);
@@ -238,7 +238,7 @@
                   City: data['Personal City'],
                   County: data['KL Personal Town'],
                   'Street Address': data['Personal Address'],
-                  id: 'Asset'
+                  Id: 'Asset'
                 };
                 me.KLSN = resultStr;
                 me.addressBack(form);
@@ -270,5 +270,13 @@
     content: '*';
     color: red;
     margin-right: 5px;
+  }
+  .hideText>.mint-cell-wrapper>.mint-cell-value{
+    width: 65%;
+    span{
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
   }
 </style>

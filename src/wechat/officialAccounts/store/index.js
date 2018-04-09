@@ -93,12 +93,12 @@ export default new Vuex.Store({
             data: {
               num
             },
-            success: function(data) {
-              // commit('successCall', {item: data});
+            success: function(data) {                                       // HBS1803014006
+              commit('addressBack', data);
               callback(data);
             },
             error: function(data) {
-              console.log(data);
+              Toast('该码未录入系统');
               commit('errorTips', data);
             }
           });
@@ -412,6 +412,7 @@ export default new Vuex.Store({
               commit('setContact', data.items);
             },
             error: data => {
+              Toast('该码未录入系统');
               console.log(data);
             }
           });
@@ -443,7 +444,7 @@ export default new Vuex.Store({
               }
             },
             error: data => {
-              Toast('系统中找不到该此产品条形码');
+              Toast('该码未录入系统');
             }
           });
         },

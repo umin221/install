@@ -191,8 +191,8 @@
                   data: data.items,
                   index: me.$route.query.index
                 });
-                me.$router.back();
               }
+              me.$router.back();
             }
           };
           me.upDateAddress(form);
