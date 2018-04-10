@@ -115,7 +115,6 @@ export default {
       } else {
         me.allFee = me.allFee + 0;
       }
-      console.log(me.returnSelect);
       if (len) {
         for (let i = 0;i < len;i++) {
           if (!me.switchStatus[i]) {
@@ -133,7 +132,6 @@ export default {
     ...mapMutations('detail', ['setPartner']),
     productNumber(val, num, type) {
       let me = this;
-      console.log(val);
       me.ProductNum({num, val});
     },
     getSwipeBtn(item) {
