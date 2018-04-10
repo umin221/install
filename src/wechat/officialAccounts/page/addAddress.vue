@@ -170,12 +170,13 @@
             'Street Address': me.street_Address,
             'contactId': me.ContactId,
             success: function(data) {
-              if (!me.contactId && data) {
+              if (!me.ContactId && data) {
                 me.setLocalAddress({data: data.items});
               }
               me.$router.back();
             }
           };
+          console.log(form);
           me.addressManage(form);
         } else {
           form = {

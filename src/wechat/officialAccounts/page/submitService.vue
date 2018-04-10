@@ -274,9 +274,12 @@
   .hideText>.mint-cell-wrapper>.mint-cell-value{
     width: 65%;
     span{
+      text-align: right;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
+      display: block;
+      width: 100%;
     }
   }
 </style>
