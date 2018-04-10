@@ -127,7 +127,7 @@
         var objList = [];
         for (let i in select) {
           var obj = {};
-          obj['Contact Id'] = select[i].Id;
+          obj['Id'] = select[i].Id;
           objList.push(obj);
         }
         console.dir(objList);
@@ -145,7 +145,7 @@
                 'ListOfBase KL Installation Task': {
                   'KL Installation Task': {
                     'Id': self.id,
-                    'ListOfKL Installation Task_Contact': {
+                    'ListOfContact': {
                       'Contact': objList
                     }
                   }

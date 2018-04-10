@@ -11,8 +11,8 @@
         </mt-cell>
         <mt-cell title="计划开始日期" @click.native="open('picker')" :value="start_Date" is-link></mt-cell>
         <mt-cell title="计划完成日期" @click.native="open('pickerEnd')" :value="end_Date" is-link></mt-cell>
-        <mt-cell v-show="!showZs" title="安装数量" placeholder="请输入"
-                  :class="heartVisible" v-model="batchNum" is-link></mt-cell>
+        <mt-field v-show="!showZs" label="安装数量" placeholder="请输入"
+                 v-model="batchNum"></mt-field>
         <mt-cell title="是否委外" :class="heartVisible">
           <mt-switch v-model="box1"></mt-switch>
         </mt-cell>
@@ -25,8 +25,8 @@
         <lock-line title="委外安装员" @click="addInstaller('')">
           <mt-cell-swipe v-for="(installer, index) in installerList" class="lock-line-cell enable" ref="body" :key=index>
             <div class="co-flex co-jc" slot="title">
-              <span class="co-f1">{{installer['Contact Last Name']}}</span>
-              <span class="co-f1">{{installer['Contact Phone']}}</span>
+              <span class="co-f1">{{installer['Last Name']}}</span>
+              <span class="co-f1">{{installer['Work Phone #']}}</span>
             </div>
           </mt-cell-swipe>
         </lock-line>
@@ -337,7 +337,7 @@
             }
           },
           success: function(data) {
-            self.installerList = KND.Util.toArray(data.SiebelMessage['KL Installation Task']['KL Installation Task_Contact']);
+            self.installerList = KND.Util.toArray(data.SiebelMessage['KL Installation Task']['Contact']);
           }
         });
       },

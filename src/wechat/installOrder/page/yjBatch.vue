@@ -9,14 +9,15 @@
     <div class="mint-content batch">
       <div>
         <mt-cell title="批次">
-          <span>{{batchCode}}</span>
+          <span>{{itemTask.Id}}</span>
         </mt-cell>
-        <mt-cell title="移交数量" placeholder="请输入"
-                  :class="heartVisible" v-model="batchNum"></mt-cell>
-        <mt-field  label="联系电话"
-                   type="number"
-                   placeholder="请输入联系电话"
-                   v-model.trim="Contact_Phone"></mt-field>
+        <mt-cell title="移交数量">
+          <span>{{assetsLeng}}</span>
+        </mt-cell>
+        <mt-field label="联系电话"
+                  type="number"
+                  placeholder="请输入联系电话"
+                  v-model.trim="Contact_Phone"></mt-field>
         <mt-field label="物业联系人"
                   type="text"
                   id="contactText"
@@ -118,13 +119,17 @@
       var self = this;
       let param = this.$route.query;
       self.state = param.state;
-      self.assetsObj = param.result;
-      console.dir('============');
-      console.dir(self.assetsObj);
+      self.assetsObj = KND.Util.parse(param.result);
+      for (let i in self.assetsObj) {
+        console.dir(i);
+        self.assetsLeng ++;
+      }
+      console.dir(self.itemTask);
     },
     data: () => {
       return {
         value: '',
+        assetsLeng: '',
         assetsObj: {},
         batchCode: '', // 批次
         Contact_Id: '', // id
@@ -139,7 +144,6 @@
       };
     },
     beforeRouteEnter(to, from, next) {
-      console.dir(2);
       next(vm => {
         let query = vm.$route.query;
         console.dir(query);
@@ -258,7 +262,7 @@
         }
         var newDate = new Date().format('MM/dd/yyyy hh:mm:ss');
         var assetsList = [];
-        var assetsObj = KND.Util.parse(self.assetsObj);
+        var assetsObj = self.assetsObj;
         console.dir(assetsObj);
         for (let i in assetsObj) {
           var obj = {};
