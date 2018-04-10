@@ -1,4 +1,5 @@
 import api from '../api/api';
+import cache from '../api/cache';
 import { app } from 'public/store';
 
 // 缓存页面
@@ -47,13 +48,15 @@ export default {
          * @param {Function} callback 选填 处理回调
          * @param {Function} error 选填 错误回调
          */
-        queryInstallTask({state, commit, dispatch}, {data, list}) {
-          api.get({
+        queryInstallTask({state, commit, dispatch}, {data, mode, list, callback}) {
+          cache.invoke({
             key: 'queryInstallTask',
             data: data,
+            mode: mode,
             success: data => {
               let installTask = data.SiebelMessage.Contact['KL Installation Task'];
               commit('setTask', {installTask, list});
+              if (callback) callback(installTask);
             }
           });
         }
@@ -100,19 +103,20 @@ export default {
               commit('setBuilding', building);
               // 默认获取第一栋信息
               dispatch('getLayer', {
-                'KL Activity Id': option.data.id,
+                'Original Order Id': option.data.OrderId,
+                'KL Activity Id': option.data.TaskId,
                 'Integration Id 2': building[0].BuildingNum
               });
             }
           };
-          api.get(setting);
+          cache.invoke(setting);
         },
         /**
          * 获取楼栋下所有楼层&房号
          */
         getLayer({commit}, data) {
           api.get({
-            key: 'getLayerSort', // 'findTransferOrderById', //
+            key: 'getLayer',
             data: data,
             success: data => {
               commit('setLayer', data['SiebelMessage']['Asset Room']);

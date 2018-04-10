@@ -10,12 +10,12 @@
 
     <div class="mint-content">
 
-      <mt-navbar v-model="selected" v-if="isManager">
-        <mt-tab-item id="pending"
-          @click.native="!pending.length && loadBottomFn({status:'待处理', list:'pending'})">待处理</mt-tab-item>
-        <mt-tab-item id="completed"
-          @click.native="!completed.length && loadBottomFn({status:'已完成', list:'completed'})">已完成</mt-tab-item>
-      </mt-navbar>
+      <!--<mt-navbar v-model="selected" v-if="isManager">-->
+        <!--<mt-tab-item id="pending"-->
+          <!--@click.native="!pending.length && loadBottomFn({status:'待处理', list:'pending'})">待处理</mt-tab-item>-->
+        <!--<mt-tab-item id="completed"-->
+          <!--@click.native="!completed.length && loadBottomFn({status:'已完成', list:'completed'})">已完成</mt-tab-item>-->
+      <!--</mt-navbar>-->
 
       <!-- tab-container -->
       <mt-tab-container v-model="selected">
@@ -37,23 +37,23 @@
           </cus-loadmore>
         </mt-tab-container-item>
 
-        <mt-tab-container-item id="completed">
-          <cus-loadmore ref="completed"
-                        @loadTop="loadTopFn"
-                        @loadBottom="loadBottomFn"
-                        :param="{status: '已完成', list: 'completed'}"
-                        :topStatus="topStatus">
-            <cus-cell class="multiple"
-                      @click.native="toDetailFn(item.Id)"
-                     :key="item.Id"
-                     :title="'订单批次:'+ item.Id"
-                     v-for="item in completed"
-                     is-link>
-              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">创建日期: {{item['Created']}}</div>
-            </cus-cell>
-          </cus-loadmore>
-        </mt-tab-container-item>
+        <!--<mt-tab-container-item id="completed">-->
+          <!--<cus-loadmore ref="completed"-->
+                        <!--@loadTop="loadTopFn"-->
+                        <!--@loadBottom="loadBottomFn"-->
+                        <!--:param="{status: '已完成', list: 'completed'}"-->
+                        <!--:topStatus="topStatus">-->
+            <!--<cus-cell class="multiple"-->
+                      <!--@click.native="toDetailFn(item.Id)"-->
+                     <!--:key="item.Id"-->
+                     <!--:title="'订单批次:'+ item.Id"-->
+                     <!--v-for="item in completed"-->
+                     <!--is-link>-->
+              <!--<div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>-->
+              <!--<div class="mint-cell-sub-title" slot="title">创建日期: {{item['Created']}}</div>-->
+            <!--</cus-cell>-->
+          <!--</cus-loadmore>-->
+        <!--</mt-tab-container-item>-->
 
       </mt-tab-container>
 
@@ -114,9 +114,7 @@
       // 已失效顶部加载
       loadTopFn(param) {
         loader.call(this, {
-          data: {
-            'KL Partner Status': param.status
-          }
+          mode: 'refresh'
         }, param.list, 'onTopLoaded');
       },
       // 待审批底部加载
@@ -137,7 +135,7 @@
         this.$router.push({
           name: 'assets',
           query: {
-            id: id
+            TaskId: id
           }
         });
       }

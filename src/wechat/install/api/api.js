@@ -122,9 +122,9 @@ let apiList = {
 
   /**
    * 查询楼栋列表
-   * @param {String} option.data['Object Id'] 必填 批次id
-   * @param {String} option.data['BuildingNum'] 必填 楼栋编号
-   * @param {String} option.data['FloorNum'] 必填 楼层编号
+   * @param {String} option.data['ProcessName'] 必填 工作流名称
+   * @param {String} option.data['OrderId'] 选填 订单id 与批次id 2填1
+   * @param {String} option.data['TaskId'] 选填 批次id 与订单id 2填1
    * @returns {{url: string, data: {body: {ProcessName: string, Object Id: string, BuildingNum: string, FloorNum: string}}}}
    */
   queryBuilding: option => {
@@ -133,7 +133,8 @@ let apiList = {
       data: {
         'body': {
           'ProcessName': 'KL Install Order Asset Building Query Process',
-          'TaskId': option.data.id
+          'OrderId': option.data.OrderId,
+          'TaskId': option.data.TaskId
         }
       }
     };
