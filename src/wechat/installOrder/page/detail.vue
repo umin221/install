@@ -774,7 +774,7 @@
               method: 'POST',
               data: {
                 'body': {
-                  'ProcessName': 'KL Install Task Submit For Approval Workflow',
+                  'ProcessName': 'KL Install Task Complete Action Workflow',
                   'RowId': item.Id
                 }
               },
@@ -930,7 +930,7 @@
           * Transfer Summary 移交汇总
           * */
          // self.$router.push('batch');
-          if (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Rejected') { // 汇总节点未开始、已驳回的时候 开启节点
+          if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Rejected')) { // 汇总节点未开始、已驳回的时候 开启节点
             /*
             * 批次汇总开启节点
             * */
@@ -962,13 +962,15 @@
               }
             });
           } else {
-            this.$router.push({
-              name: 'batchDetail',
-              query: {
-                type: 'read',
-                Id: item.Id
-              }
-            });
+            if (item['Calculated Activity Status'] !== 'Not Started') {
+              this.$router.push({
+                name: 'batchDetail',
+                query: {
+                  type: 'read',
+                  Id: item.Id
+                }
+              });
+            }
           }
         }
       },
@@ -1050,7 +1052,7 @@
               });
             }
           } else { // 其他批次都是跳转 更新页面
-            if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary' || fItem['KL Detail Type LIC'] === 'Check Before Trans Summary') {
+            if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary') {
               typePage = 'updateDoorNext';
             } else {
               typePage = 'updateDoor';
@@ -1093,7 +1095,7 @@
             }
           } else { // 其他批次的更新 统一
             if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Approved')) { // 当前登录人与批次负责人相等并且状态是进行中才能更新
-              if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary' || fItem['KL Detail Type LIC'] === 'Check Before Trans Summary') {
+              if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary') {
                 self.$router.push({
                   name: 'updateDoorNext',
                   query: {
@@ -1107,7 +1109,7 @@
                 this.$router.push({
                   path: 'assets',
                   query: {
-                    id: item.Id,
+                    OrderId: self.id,
                     mode: 'select'
                   }
                 });
@@ -1122,7 +1124,7 @@
                 });
               }
             } else { // 没有权限更新和不是负责人只能看日志
-              if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary' || fItem['KL Detail Type LIC'] === 'Check Before Trans Summary') {
+              if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary') {
                 typePage = 'updateDoorNext';
               } else {
                 typePage = 'updateDoor';

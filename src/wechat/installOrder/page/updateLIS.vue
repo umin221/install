@@ -16,7 +16,7 @@
                    v-model="line['Spot Check Amount']"></cus-field>
         <cus-field label="合格数量"
                    type="number"
-                   v-model="line['Qualified Amoun']"></cus-field>
+                   v-model="line['Qualified Amount']"></cus-field>
         <cus-field label="异常数量"
                    type="number"
                    v-model="line['Unqualified Amount']"></cus-field>
@@ -111,7 +111,7 @@
             'Activity Id': self.id,
             'Completed Install Amount': lineObj['Completed Install Amount'], // 新增批次返回的ID
             'Spot Check Amount': lineObj['Spot Check Amount'], // 新增批次返回的ID
-            'Qualified Amoun': lineObj['Qualified Amoun'], // 新增批次返回的ID
+            'Qualified Amount': lineObj['Qualified Amount'], // 新增批次返回的ID
             'Unqualified Amount': lineObj['Unqualified Amount'], // 新增批次返回的ID
             'Unqualified Solve Amount': lineObj['Unqualified Solve Amount'], // 新增批次返回的ID
             'Unqualified Desc': lineObj['Unqualified Desc'], // 新增批次返回的ID
@@ -122,7 +122,7 @@
               Toast('提交成功');
               lineObj['Completed Install Amount'] = '';
               lineObj['Spot Check Amount'] = '';
-              lineObj['Qualified Amoun'] = '';
+              lineObj['Qualified Amount'] = '';
               lineObj['Unqualified Amount'] = '';
               lineObj['Unqualified Solve Amount'] = '';
               lineObj['Unqualified Desc'] = '';

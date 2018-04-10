@@ -118,10 +118,14 @@
       var self = this;
       let param = this.$route.query;
       self.state = param.state;
+      self.assetsObj = param.result;
+      console.dir('============');
+      console.dir(self.assetsObj);
     },
     data: () => {
       return {
         value: '',
+        assetsObj: {},
         batchCode: '', // 批次
         Contact_Id: '', // id
         Contact_Phone: '',     // 联系电话
@@ -253,6 +257,18 @@
           return;
         }
         var newDate = new Date().format('MM/dd/yyyy hh:mm:ss');
+        var assetsList = [];
+        var assetsObj = KND.Util.parse(self.assetsObj);
+        console.dir(assetsObj);
+        for (let i in assetsObj) {
+          var obj = {};
+          obj.Id = assetsObj[i].Id;
+          obj['KL Transfer Activity Id'] = self.itemTask.Id;
+          obj['Install Date'] = newDate;
+          assetsList.push(obj);
+        }
+        console.dir('0==========');
+        console.dir(assetsList);
         api.get({ // 更新工程真锁移交
           key: 'setUpyj',
           method: 'POST',
@@ -270,13 +286,7 @@
                   'Order Entry - Orders': {
                     'Id': self.itemTask['Order Id'], // 订单ID
                     'ListOfKL Install Order Asset': {
-                      'KL Install Order Asset': [
-                        {
-                          'Id': '', // 资产ID
-                          'KL Transfer Activity Id': self.itemTask.Id, // 批次ID
-                          'Install Date': newDate
-                        }
-                      ]
+                      'KL Install Order Asset': assetsList
                     }
                   }
                 }

@@ -25,8 +25,8 @@
         <lock-line title="委外安装员" @click="addInstaller('')">
           <mt-cell-swipe v-for="(installer, index) in installerList" class="lock-line-cell enable" ref="body" :key=index>
             <div class="co-flex co-jc" slot="title">
-              <span class="co-f1">{{installer['Last Name']}}</span>
-              <span class="co-f1">{{installer['Work Phone #']}}</span>
+              <span class="co-f1">{{installer['Contact Last Name']}}</span>
+              <span class="co-f1">{{installer['Contact Phone']}}</span>
             </div>
           </mt-cell-swipe>
         </lock-line>
@@ -56,6 +56,7 @@
       </div>
       <button-group>
         <mt-button class="single"
+                   v-show="showZs"
                    @click.native="nextPageFn">下一步</mt-button>
         <mt-button class="single"
                    v-show="!showZs"
@@ -336,11 +337,7 @@
             }
           },
           success: function(data) {
-            if (data.items) {
-              self.installerList = data.items;
-            } else {
-              self.installerList = KND.Util.toArray(data);
-            }
+            self.installerList = KND.Util.toArray(data.SiebelMessage['KL Installation Task']['KL Installation Task_Contact']);
           }
         });
       },

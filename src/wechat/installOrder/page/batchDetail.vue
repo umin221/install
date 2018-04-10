@@ -313,10 +313,8 @@
             success: function(data) {
               if (!data.ERROR) {
                 Toast('审批成功');
-                if (this.option === 'approval') {
-                  this.getBatch(self.id);
-                  this.getAppData();
-                }
+                self.getBatch(self.id);
+                self.getAppData();
               }
             }
           });
@@ -339,10 +337,8 @@
                 success: function(data) {
                   if (!data.ERROR) {
                     Toast('审批成功');
-                    if (this.option === 'approval') {
-                      this.getBatch(self.id);
-                      this.getAppData();
-                    }
+                    self.getBatch(self.id);
+                    self.getAppData();
                   }
                 }
               });
@@ -356,11 +352,15 @@
        * 编辑楼栋信息
        */
       editBuildingFn() {
+        var self = this;
+        if (self.is_option) { // 审批中不能查看楼栋编辑
+          return;
+        }
         let id = this.$route.query.Id;
         this.$router.push({
           path: 'assets',
           query: {
-            id: id,
+            TaskId: id,
             mode: 'edit'
           }
         });

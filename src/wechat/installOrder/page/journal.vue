@@ -14,7 +14,7 @@
           </li>
           <div class="content-div">
             <div>已开孔数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
-            <div>合格数量/异常数量：{{item['Qualified Amoun']}}/{{item['Unqualified Amount']}}</div>
+            <div>合格数量/异常数量：{{item['Qualified Amount']}}/{{item['Unqualified Amount']}}</div>
             <div>异常处理数量：{{item['Unqualified Solve Amount']}}</div>
             <div>异常描述：{{item['Unqualified Desc']}}</div>
             <div>异常跟进描述：{{item['Unqualified Solve Desc']}}</div>
