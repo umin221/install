@@ -11,16 +11,37 @@
           <i class="xs-icon icon-scan" @click="scan"></i>
         </mt-field>
         <mt-cell class="mint-field" title="所在省市区" placeholder="请选择">{{Personal}}</mt-cell>
-        <mt-field class="block" label="详细地址" v-model="Address" placeholder="如设备过旧未贴条码,允许为空" type="textarea" rows="2"></mt-field>
+        <mt-field class="block"
+                  label="详细地址"
+                  v-model="Address"
+                  placeholder="如设备过旧未贴条码,允许为空"
+                  type="textarea" rows="2"></mt-field>
         <div class="floor-box">
           <input type="text" placeholder="楼栋名" v-model="building">
           <input type="text" placeholder="楼层" v-model="floor">
           <input type="text" placeholder="房号" v-model="room">
         </div>
-        <mt-cell class="require mint-field" title="产品型号" placeholder="请选择" @click.native="toSearchT('fault')" is-link>{{ProductModel}}</mt-cell>
-        <mt-cell class="mint-field require" title="故障现象" placeholder="请选择" @click.native="showArea('SR_ROOTCAUSE')" is-link>{{rootcause}}</mt-cell>
-        <mt-cell class="mint-field require" :value="Responsbility" @click.native="showArea('KL_SR_RESP')" title="责任划分" is-link></mt-cell>
-        <mt-field class="block require" label="解决方法" v-model="repairDetails" placeholder="详细描述或附加需求..." type="textarea" rows="3"></mt-field>
+        <!--<mt-cell class="require mint-field" title="产品型号" placeholder="请选择" @click.native="toSearchT('fault')" is-link>{{ProductModel}}</mt-cell>-->
+        <mt-cell class="require mint-field"
+                 title="面板型号"
+                 placeholder="请选择"
+                 @click.native="toLov('KL_LOCK_BODY_MODEL')" is-link>{{KL_LOCK_BODY_MODEL}}</mt-cell>
+        <mt-cell class="require mint-field"
+                 title="锁体型号"
+                 placeholder="请选择"
+                 @click.native="toLov('KL_LOCK_MODEL')" is-link>{{KL_LOCK_MODEL}}</mt-cell>
+        <mt-cell class="mint-field require"
+                 title="故障现象"
+                 placeholder="请选择"
+                 @click.native="toLov('SR_ROOTCAUSE')" is-link>{{SR_ROOTCAUSE}}</mt-cell>
+        <mt-cell class="mint-field require"
+                 :value="KL_SR_RESP"
+                 @click.native="toLov('KL_SR_RESP')" title="责任划分" is-link></mt-cell>
+        <mt-field class="block require"
+                  label="解决方法"
+                  v-model="repairDetails"
+                  placeholder="详细描述或附加需求..."
+                  type="textarea" rows="3"></mt-field>
         <div>
           <attach ioName="KL Service Request Attachment IO" ref="attach"
                   :attach="attach.list"
@@ -46,6 +67,12 @@
           :slots="slots1">
         </menuBox>
       </mt-popup>
+      <mt-popup v-model="showBox1" position="bottom">
+        <menu-box @my-enter="enter1" vk="Value"
+                  @my-cancel="showBox1 = false"
+                  :type="lovType"
+                  :slots="slots2"></menu-box>
+      </mt-popup>
     </div>
   </div>
 </template>
@@ -54,6 +81,7 @@
   import menuBox from '../../../public/components/cus-menu';
   import { MessageBox } from 'mint-ui';
 
+  let mapp = config.mapp;
   const delay = (function() {
     let timer = 0;
     return function(callback, ms) {
@@ -62,7 +90,6 @@
     };
   })();
   const NameSpace = 'comEnter';
-  let mapp = config.mapp;
   export default {
     name: NameSpace,
     created() {
@@ -81,36 +108,58 @@
           Id: serviceId,
           callback: function(data) {
             me.SerialNumber = data['Serial Number'];
-            me.rootcause = data['SR Rootcause'];
+            me.SR_ROOTCAUSE = data['SR Rootcause'];
             me.AssetNumber = data['Asset Number'];
-            me.Responsbility = data['KL Responsbility'];
+            me.KL_SR_RESP = data['KL Responsbility'];
             me.repairDetails = data['Repair Details'];
             me.status = data['Status'];
             me.sarech();
           }
         });
       }
-
       me.getLov({
-        type: 'KL_HOLE_TYPE',
+        type: 'KL_LOCK_MODEL',
         success: data => {
-          mapp.option['KL Hole Type'] = data.items;
+          mapp.option['KL_LOCK_MODEL'] = data.items;
+        }
+      });
+      me.getLov({
+        type: 'KL_LOCK_BODY_MODEL',
+        success: data => {
+          mapp.option['KL_LOCK_BODY_MODEL'] = data.items;
+        }
+      });
+      me.getLov({
+        type: 'KL_SR_RESP',
+        success: data => {
+          mapp.option['KL_SR_RESP'] = data.items;
+        }
+      });
+      me.getLov({
+        type: 'SR_ROOTCAUSE',
+        success: data => {
+          mapp.option['SR_ROOTCAUSE'] = data.items;
         }
       });
     },
     data: () => {
       return {
         showBox: false,
+        showBox1: false,
+        slots2: [
+          {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
+        ],
         SerialNumber: '', // 条形码
         AssetNumber: '', // 产品编号
         ProductFlag: '', // 故障描述
         Personal: '',    // 省市
         Address: '',       // 详细地址
-        Responsbility: '', // 责任划分
-        rootcause: '',           // 故障分类
+        KL_SR_RESP: '', // 责任划分
+        SR_ROOTCAUSE: '',           // 故障分类
         repairDetails: '', // 方法明细
         ProductId: '',    // 产品Id
-        Product_model: '',
+        KL_LOCK_BODY_MODEL: '',
+        KL_LOCK_MODEL: '',
         childId: '',
         building: '',
         floor: '',
@@ -129,6 +178,7 @@
     },
     methods: {
       ...mapActions(NameSpace, ['getAsset', 'getLov1', 'valueChange1', 'upDateService', 'getServiceR']),
+      ...mapActions('app', ['getLov']),
       ...mapMutations(NameSpace, ['errorTips', 'setProductModel']),
       ...mapMutations('detail', ['setPartner']),
       sarech() {
@@ -138,6 +188,7 @@
             me.getAsset({
               num: me.SerialNumber,
               callback: function(data) {
+                console.log(data);
 //              me.ProductModel = data['KL Product Model'];// 产品型号
                 me.AssetNumber = data['Asset Number'];
                 me.ProductId = data['Id'];  // 产品ID
@@ -146,6 +197,8 @@
                 me.building = data['KL Personal Address Building'];
                 me.floor = data['KL Personal Address Floor'];
                 me.room = data['KL Personal Address Room'];
+                me.KL_LOCK_BODY_MODEL = data['KL Lock Body Model'];
+                me.KL_LOCK_MODEL = data['KL Lock Model'];
               }
             });
           }
@@ -156,6 +209,16 @@
         me.showBox = true;
         me.lovType = type;
         me.getLov1(type);
+      },
+      toLov(type) {
+        let me = this;
+        me.lovType = type;
+        me.showBox1 = true;
+        me.slots2[0].values = mapp.option[type];
+      },
+      enter1(value, type) {
+        this.showBox1 = false;
+        this[type] = value[0]['Value'];
       },
       enter(value, type) {
         this.showBox = false;
@@ -175,27 +238,20 @@
       cancel(value) {
         this.showBox = false;
       },
-      toSearchT(type) {
-        this.$router.push({
-          name: 'searchTrans',
-          query: {
-            type: type
-          }
-        });
-      },
+//      toSearchT(type) {
+//        this.$router.push({
+//          name: 'searchTrans',
+//          query: {
+//            type: type
+//          }
+//        });
+//      },
       scan() {
         let me = this;
         KND.Native.scanQRCode({
           success(data) {
             me.SerialNumber = data.resultStr;
             me.sarech();
-//            me.AssetNumber = data['Asset Number'];
-//            me.ProductId = data['Id'];  // 产品ID
-//            me.Personal = data['KL Personal Province'] + data['Personal City'];    // 省市
-//            me.Address = data['Personal Address'];// 详细地址
-//            me.building = data['KL Personal Address Building'];
-//            me.floor = data['KL Personal Address Floor'];
-//            me.room = data['KL Personal Address Room'];
           }
         });
       },
@@ -213,16 +269,18 @@
         let form = {
           'Id': me.childId || me.ServiceRequest['Id'],
           'Asset Number': me.AssetNumber, // 产品ID
-          'SR Rootcause': me.rootcause,                   // 故障反馈
-          'KL Responsibility': me.Responsbility,     // 责任划分
+          'SR Rootcause': me.SR_ROOTCAUSE,                   // 故障反馈
+          'KL Responsibility': me.KL_SR_RESP,     // 责任划分
           'Repair Details': me.repairDetails, // 解决方法明细
           'KL Product Model': me.ProductModel,
           'srNum': me.ServiceRequest['SR Number'],
+          'KL Lock Body Model': me['KL_LOCK_BODY_MODEL'],
+          'KL Lock Model': me['KL_LOCK_MODEL'],
           callback: function(data) {
             if (data) {
               let name = me.$router.currentRoute.name;
               if (name === 'comEnter') {
-                me.$router.go(-2);
+                me.$router.go(-1);
               } else {
                 me.$router.go(-1);
               }

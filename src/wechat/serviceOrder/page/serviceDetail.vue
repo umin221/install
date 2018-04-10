@@ -4,9 +4,10 @@
       <mt-header fixed :title="headTitle" >
         <fallback slot="left"></fallback>
         <mt-button  slot="right"
-                    @click.native="openConfirm"
-                    v-if="role === 'install'&& BtnStatu !== 'status5' && BtnStatu ">关闭</mt-button>
+                     @click.native="openConfirm"
+                     v-if="role === 'install'&& BtnStatu !== 'status5' && BtnStatu ">关闭</mt-button>
       </mt-header>
+
 
       <div class="mint-content service-detail">
         <div class="detail-title">
@@ -18,7 +19,7 @@
             <a href="javascript:void(0);"
                class="detail-call i"
               @click="call = !call">
-              <i class="xs-icon icon-call"
+            <i class="xs-icon icon-call"
                   style="font-size: 0.75rem">
               {{ServiceRequest['Contact Business Phone']}}
               </i>
@@ -41,13 +42,11 @@
                 <div>问题说明：
                   <div>{{ServiceRequest['Description']}}</div>
                 </div>
-                <div>相关照片：
-                  <attach ioName="KL Service Request Attachment IO" ref="attach"
-                          :attach="attach.list"
-                          :edit="attach.edit"
-                          :title="attach.title">
-                  </attach>
-                </div>
+                <attach ioName="KL Service Request Attachment IO" ref="attach"
+                        :attach="attach.list"
+                        :edit="attach.edit"
+                        :title="attach.title">
+                </attach>
               </div>
             </mt-tab-container-item>
             <mt-tab-container-item id="tab-container2" class="marginB">
@@ -61,11 +60,10 @@
                       <li>产品类型：{{ServiceRequest['KL Product Model']}}</li>
                       <li>故障描述：{{ServiceRequest['Sub-Area']}}</li>
                       <li>故障现象：{{ServiceRequest['Area']}}</li>
-                      <li>照片附件</li>
                       <attach ioName="KL Service Request Attachment IO" ref="attach"
-                              :attach="attach.list"
-                              :edit="attach.edit"
-                              :title="attach.title">
+                              :attach="attach1.list"
+                              :edit="attach1.edit"
+                              :title="attach1.title">
                       </attach>
                     </ul>
                   </toggle>
@@ -99,29 +97,28 @@
                       <li>产品类型：{{item['KL Product Model']}}</li>
                       <li>故障描述：{{item['Sub-Area']}}</li>
                       <li>故障现象：{{item['Area']}}</li>
-                      <li>照片附件</li>
-                      <attach ioName="KL Service Request Attachment IO" ref="attach"
+                      <attach1 ioName="KL Service Request Attachment IO" ref="attach"
                               :attach="attach.list"
                               :edit="attach.edit"
                               :title="attach.title">
-                      </attach>
+                      </attach1>
                     </ul>
                   </toggle>
                   <toggle :title="false" label="完工确认单">
-                    <div v-if="orderEntry.length" v-for="(item, index) in orderEntry">
-                      <div v-if="item['Order Entry - Line Items']">
-                        <div class="enter-order">
-                          <div>{{item['Order Entry - Line Items']['KL Warranty Flag'] === "N" ? '保内': '保外'}}</div>
-                          <div>{{item['Order Entry - Line Items']['KL Product Name Join']}}</div>
-                          <div>{{item['Order Entry - Line Items']['Quantity Requested']}}</div>
-                        </div>
-                        <div class="enter-order">
-                          <div>总金额：{{item['Order Total']}}</div>
-                        </div>
+                    <div v-if="item['KL Child SR Order']">
+                      <div class="enter-order">
+                        <div>保修期</div>
+                        <div>产品名称</div>
+                        <div>数量</div>
                       </div>
-                    </div>
-                    <div v-else>
-                      暂无数据
+                      <div class="enter-order">
+                        <div>{{item['KL Child SR Order']['KL Child SR Order Item']['KL Warranty Flag'] === "Y" ? '保内': '保外'}}</div>
+                        <div>{{item['KL Child SR Order']['KL Child SR Order Item']['KL Product Name Join']}}</div>
+                        <div>{{item['KL Child SR Order']['KL Child SR Order Item']['Quantity Requested']}}</div>
+                      </div>
+                      <div class="enter-order">
+                        <div>总金额：{{item['KL Child SR Order']['Order Total']}}</div>
+                      </div>
                     </div>
                   </toggle>
                 </div>
@@ -259,8 +256,13 @@
         phoneNum: '',
         attach: { // 附件
           list: [],
-          edit: false,
+          edit: true,
           title: '相关照片'
+        },
+        attach1: { // 附件
+          list: [],
+          edit: true,
+          title: '附件：维修单据存档'
         }
       };
     },
@@ -671,7 +673,7 @@
   }
   .enter-order {
     display: flex;
-
+    margin-top: 10px;
     div{
      width: 25%;
       text-align: center;
