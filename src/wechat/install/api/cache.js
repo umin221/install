@@ -91,6 +91,12 @@ let create = data => {
       }),
       me.invokeSQL('ct', 'assets', buildCreateField({order_id: null, task_id: null, building_num: null, data: 'VARCHAR(20000)', state: null, create_date: null})).then(result => {
         console.log('创建数据库表 assets...');
+      }),
+      me.invokeSQL('ct', 'product', buildCreateField({order_id: null, task_id: null, data: 'VARCHAR(2000)', state: null, create_date: null})).then(result => {
+        console.log('创建数据库表 product...');
+      }),
+      me.invokeSQL('ct', 'install', buildCreateField({order_id: null, task_id: null, data: null, state: null, create_date: null})).then(result => {
+        console.log('创建数据库表 install...');
       })
     ]).then(() => {
       console.log('init ok...');
@@ -315,7 +321,6 @@ class Cache {
       task_id: param['KL Activity Id'],
       building_num: param['Integration Id 2']
     }, result => {
-      console.log(result);
       setting.success(filter(result));
     });
   };
