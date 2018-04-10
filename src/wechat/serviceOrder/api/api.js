@@ -305,7 +305,8 @@ let ApiList = {
         'SR Rootcause': option.data.form['SR Rootcause'],               // 故障反馈
         'KL Responsbility': option.data.form['KL Responsibility'],     // 责任划分
         'Repair Details': option.data.form['Repair Details'], // 解决方法明细
-        'KL Product Model': option.data.form['KL Product Model']
+        'KL Lock Body Model': option.data.form['KL Lock Body Model'],
+        'KL Lock Model': option.data.form['KL Lock Model']
       }
     };
     // 更新服务请求
@@ -499,8 +500,10 @@ let ApiList = {
   // },
   getMapAddress: option => {
     console.log(option);
-    let lat = option.data.LngLat.latitude;
-    let lng = option.data.LngLat.longitude;
+    // let lat = option.data.LngLat.latitude;
+    // let lng = option.data.LngLat.longitude;
+    let lat = 22.777621;
+    let lng = 114.034378;
     let showLocation = option.data.showLocation;
     return {
       method: 'GET',

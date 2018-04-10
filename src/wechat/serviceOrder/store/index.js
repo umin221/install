@@ -20,16 +20,10 @@ const PAGESIZE = config.pageSize;
 let mapps;
 
 // tipBox
-const systemSort = function(array, type, d) {
-  if (d) {
-    return array.sort(function(a, b) {
-      return new Date(a[type]) - new Date(b[type]);
-    });
-  } else {
-    return array.sort(function(a, b) {
-      return new Date(b[type]) - new Date(a[type]);
-    });
-  }
+const systemSort = function(array, type) {
+  return array.sort(function(a, b) {
+    return new Date(b[type]) - new Date(a[type]);
+  });
 };
 
 export default new Vuex.Store({
@@ -381,7 +375,7 @@ export default new Vuex.Store({
             if (Object.prototype.toString.call(Note) !== '[object Array]') {
               state.processDate.push(Note);
             } else {
-              state.processDate = systemSort(Note, 'Created', true);
+              state.processDate = systemSort(Note, 'Created');
             }
           } else {
             state.processDate = [{Note: '暂无数据'}];
@@ -507,6 +501,7 @@ export default new Vuex.Store({
         getMapAddress({commit}, {LngLat, type}) {        // 获取地址
           let showLocation = function(data) {
             console.log(data);
+            commit('setAddress', {data: data.result, type: type});
           };
           api.get({
             key: 'getMapAddress',
@@ -515,7 +510,7 @@ export default new Vuex.Store({
               showLocation
             },
             success: function(data) {
-              commit('setAddress', {data: data.result, type: type});
+              showLocation(data);
             },
             error: function(data) {
               console.log(data);

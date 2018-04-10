@@ -6,7 +6,7 @@
         @click.native="changeFn('minus')">
         <i class="" style="display: block;border: 1px solid;"></i>
       </mt-button>
-      <input type="number" v-model="value" min="1" />
+      <input type="number" v-model="value" min="1"  disabled="disabled"/>
       <mt-button
         type="default"
         size="small"
