@@ -69,13 +69,13 @@ export default {
     assets: {
       namespaced: true,
       state: {
-        building: [],
+        building: [{}],
         layer: []
       },
       mutations: {
         // 填充楼栋
         setLayer(state, layer) {
-          state.layer = layer;
+          state.layer = KND.Util.toArray(layer);
         },
         // 填充栋列表
         setBuilding(state, building) {
@@ -115,7 +115,7 @@ export default {
          * 获取楼栋下所有楼层&房号
          */
         getLayer({commit}, data) {
-          api.get({
+          cache.invoke({
             key: 'getLayer',
             data: data,
             success: data => {
@@ -197,9 +197,9 @@ export default {
           let run = (data, result) => {
             if (data) {
               update({
-                TaskId: id,
-                BuildingNum: data.BuildingNum,
-                Builing: data.BuildingName
+                'Object Id': id,
+                'BuildingNum': data.BuildingNum,
+                'Builing': data.BuildingName
               });
             } else {
               tools.success(data, {

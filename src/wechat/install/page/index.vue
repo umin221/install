@@ -8,7 +8,7 @@
       </mt-button>
     </mt-header>
 
-    <div class="mint-content">
+    <div class="mint-content install">
 
       <!--<mt-navbar v-model="selected" v-if="isManager">-->
         <!--<mt-tab-item id="pending"-->
@@ -17,6 +17,7 @@
           <!--@click.native="!completed.length && loadBottomFn({status:'已完成', list:'completed'})">已完成</mt-tab-item>-->
       <!--</mt-navbar>-->
 
+      <div class="tips">下拉更新数据</div>
       <!-- tab-container -->
       <mt-tab-container v-model="selected">
         <mt-tab-container-item id="pending">
@@ -142,3 +143,19 @@
     }
   };
 </script>
+
+<style lang="scss">
+  .mint-content.install {
+    .tips {
+      background-color: #fff;
+      font-size: $font-size-default;
+      text-align: center;
+      padding: 6px 0;
+      color: $theme-color;
+    }
+  }
+
+  div.mint-indicator-wrapper {
+    background-color: #000;
+  }
+</style>

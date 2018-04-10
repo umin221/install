@@ -39,6 +39,8 @@ export const app = {
      * 获取企业微信&微信公众号 js sdk 权限
      */
     getAuthority({state}, option) {
+      // app 无需权限认证
+      if (config.offline) return;
       ajax({
         method: 'get',
         url: (`${proxy}/webchat/api/local/permission?url=${encodeURIComponent(location.href.split('#')[0])}&appNO=${config.appNo}`),

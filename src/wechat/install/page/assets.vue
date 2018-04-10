@@ -15,7 +15,7 @@
         <mt-tab-item class="xs-icon"
                      v-for="(item, index) in building"
                      :key="index"
-                     :id="item.BuildingNum"
+                     :id="index"
                      @click.native="getLayerFn(item.BuildingNum)">{{item.BuildingName}}</mt-tab-item>
         <span class="edit-class xs-icon icon-edit" @click="editBuildingFn"></span>
       </mt-navbar>
@@ -93,7 +93,7 @@
         // 清空选中房号
         this.selectRooms = {};
         // 重置tab选择
-        this.selected = '1';
+        this.selected = 0;
         // 活动id
         OrderId = orderId;
         TaskId = taskId;
@@ -108,7 +108,7 @@
     },
     data: () => {
       return {
-        selected: '1',
+        selected: 0,
         editable: false,
         // mode = select 移交前的选择房号  mode = edit 编辑楼栋信息
         mode: '',
