@@ -46,9 +46,6 @@
       let item = data[i];
       // 房号
       let roomName = item['Street Address 4'];
-      // 详细地址
-      let streetAddress = item['Street Address'].split(',').splice(0, 2);
-      streetAddress.push(floorName, roomName);
       arr.push({
         'Province': item['Province'],
         'Country': item['Country'],
@@ -57,7 +54,7 @@
         'Integration Id 3': item['Integration Id 3'],
         'Integration Id 2': item['Integration Id 2'],
         'City': item['City'],
-        'Street Address': streetAddress.join(','),
+        'Street Address': item['Street Address'],
         'Id': item['Personal Address Id'],
         'Street Address 4': roomName,
         'Street Address 3': floorName,

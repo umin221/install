@@ -67,7 +67,8 @@
   import buttonGroup from 'public/components/cus-button-group';
 
   // 任务id
-  let activityId; // '1-2BSETV8Y'
+  let OrderId;
+  let TaskId; // '1-2BSETV8Y'
   // 楼层&房号信息
   let layers = {};
   // 当前最高楼层
@@ -78,25 +79,32 @@
     name: NAMESPACE,
     activated() {
       let param = this.$route.query;
-      let id = param.id;
-      // 不同批次，清除楼栋
-      if (id !== activityId || this.isEdit) {
+      // 订单id & 批次id 2填1
+      let orderId = param.OrderId;
+      // 批次id & 订单id 2填1
+      let taskId = param.TaskId;
+      // 页面交互模式
+      this.mode = param.mode;
+      // 不同批次或订单，清除楼栋
+      if (orderId !== OrderId || taskId !== TaskId || this.isEdit) {
         if (this.$parent.transitionName === 'turn-on') this.editable = false;
         // 清空楼栋
         this.clearLayer();
         // 清空选中房号
         this.selectRooms = {};
+        // 重置tab选择
+        this.selected = '1';
         // 活动id
-        activityId = id || '1-2BSETV8Y';
+        OrderId = orderId;
+        TaskId = taskId;
         // 查询所有楼栋
         this.queryBuilding({
           data: {
-            id: activityId
+            OrderId: OrderId,
+            TaskId: TaskId
           }
         });
       }
-      // 页面交互模式
-      this.mode = param.mode;
     },
     data: () => {
       return {
@@ -150,12 +158,13 @@
       ...mapActions(NAMESPACE, ['queryBuilding', 'getLayer', 'removeBuilding']),
       /**
        * 编辑楼栋信息
+       * 只编辑批次楼栋
        */
       editBuildingFn() {
         this.$router.push({
           name: 'building',
           query: {
-            id: activityId
+            id: TaskId
           }
         });
       },
@@ -177,7 +186,8 @@
        */
       getLayerFn(code) {
         this.getLayer({
-          'KL Activity Id': activityId,
+          'Original Order Id': OrderId,
+          'KL Activity Id': TaskId,
           'Integration Id 2': code
         });
       },
@@ -231,15 +241,17 @@
       deleteBuildingFn(floor) {
         MessageBox.confirm('是否删除整层？', '请确认').then(() => {
           let floorNum = floor[0]['Integration Id 3'];
+          // 只批次编辑楼栋
           this.removeBuilding({
             data: {
-              'Object Id': activityId,
+              'Object Id': TaskId,
               'BuildingNum': this.selected,
               'FloorNum': floorNum
             },
             success: data => {
               this.getLayer({
-                'KL Activity Id': activityId,
+                'Original Order Id': OrderId,
+                'KL Activity Id': TaskId,
                 'Integration Id 2': this.selected
               });
             }
@@ -381,9 +393,14 @@
     .mint-cell-swipe-button {
       line-height: 34px;
     }
+
   }
 
   .readonly {
+    &.mint-content {
+      padding-bottom: 2rem;
+    }
+
     span.edit-class {
       display: none;
     }

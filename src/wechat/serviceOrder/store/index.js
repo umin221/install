@@ -20,10 +20,16 @@ const PAGESIZE = config.pageSize;
 let mapps;
 
 // tipBox
-const systemSort = function(array, type) {
-  return array.sort(function(a, b) {
-    return new Date(b[type]) - new Date(a[type]);
-  });
+const systemSort = function(array, type, d) {
+  if (d) {
+    return array.sort(function(a, b) {
+      return new Date(a[type]) - new Date(b[type]);
+    });
+  } else {
+    return array.sort(function(a, b) {
+      return new Date(b[type]) - new Date(a[type]);
+    });
+  }
 };
 
 export default new Vuex.Store({
@@ -375,7 +381,7 @@ export default new Vuex.Store({
             if (Object.prototype.toString.call(Note) !== '[object Array]') {
               state.processDate.push(Note);
             } else {
-              state.processDate = Note;
+              state.processDate = systemSort(Note, 'Created', true);
             }
           } else {
             state.processDate = [{Note: '暂无数据'}];
@@ -415,6 +421,9 @@ export default new Vuex.Store({
             childService = systemSort(childService, 'Opened Date');
             state.allChildService = childService;
             state.childService = childService[0];
+          } else {
+            state.allChildService = [];
+            state.childService = {};
           }
         },
         setAddress(state, {data, type}) {
@@ -496,14 +505,17 @@ export default new Vuex.Store({
           });
         },
         getMapAddress({commit}, {LngLat, type}) {        // 获取地址
+          let showLocation = function(data) {
+            console.log(data);
+          };
           api.get({
             key: 'getMapAddress',
             data: {
-              LngLat
+              LngLat,
+              showLocation
             },
             success: function(data) {
-              console.log(data);
-              commit('setAddress', {data: data, type: type});
+              commit('setAddress', {data: data.result, type: type});
             },
             error: function(data) {
               console.log(data);
@@ -887,7 +899,9 @@ export default new Vuex.Store({
           state.returnSelect = [];
         },
         ProductNum(state, {num, val}) {
-          state.returnSelect[num].num = val;
+          let arr = state.returnSelect[num];
+          arr.num = val;
+          state.returnSelect.splice(num, 1, arr);
         },
         deleteProduct(state, index) {
           state.returnSelect.splice(index, 1);

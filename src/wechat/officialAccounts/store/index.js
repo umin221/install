@@ -116,7 +116,12 @@ export default new Vuex.Store({
       mutations: {
         setContact(state, data) {
           state.Contact = data;
-          state.cutAddress = KND.Util.toArray(data['CUT Address']);
+          if (data['CUT Address']) {
+            state.cutAddress = KND.Util.toArray(data['CUT Address']);
+          } else {
+            state.cutAddress = [];
+          }
+          console.log(state.cutAddress);
         },
         setLocalAddress(state, {data, index}) {
           if (index) {

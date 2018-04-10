@@ -501,9 +501,10 @@ let ApiList = {
     console.log(option);
     let lat = option.data.LngLat.latitude;
     let lng = option.data.LngLat.longitude;
+    let showLocation = option.data.showLocation;
     return {
       method: 'GET',
-      url: 'http://api.map.baidu.com/geocoder/v2/?location=' + lat + ',' + lng + '&output=json&ak=ggrtlGUIUfci06YK9TNZfxLAOQblo3du'
+      url: 'http://api.map.baidu.com/geocoder/v2/?callback=' + showLocation + '&location=' + lat + ',' + lng + '&output=json&ak=ggrtlGUIUfci06YK9TNZfxLAOQblo3du'
     };
     //  经纬度逆地理转换
   }

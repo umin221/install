@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="service-continer">
-      <mt-header fixed :title="headTitle">
+      <mt-header fixed :title="headTitle" >
         <fallback slot="left"></fallback>
         <mt-button  slot="right"
                     @click.native="openConfirm"
@@ -51,7 +51,8 @@
               </div>
             </mt-tab-container-item>
             <mt-tab-container-item id="tab-container2" class="marginB">
-              <toggle v-if="ServiceRequest['Action']" :title="true" label="单据编号">
+              <empty v-show="!ServiceRequest['Action'] && !allChildService.length"></empty>
+              <toggle v-if="ServiceRequest['Action']" :type="true" :label="ServiceRequest['SR Number']">
                 <div>
                   <toggle :title="false" label="故障记录">
                     <ul class="failure-record">
@@ -60,6 +61,44 @@
                       <li>产品类型：{{ServiceRequest['KL Product Model']}}</li>
                       <li>故障描述：{{ServiceRequest['Sub-Area']}}</li>
                       <li>故障现象：{{ServiceRequest['Area']}}</li>
+                      <li>照片附件</li>
+                      <attach ioName="KL Service Request Attachment IO" ref="attach"
+                              :attach="attach.list"
+                              :edit="attach.edit"
+                              :title="attach.title">
+                      </attach>
+                    </ul>
+                  </toggle>
+                  <toggle :title="false" label="完工确认单">
+                    <empty v-show="!orderEntry.length"></empty>
+                    <div  v-for="(item, index) in orderEntry">
+                      <div v-if="item['Order Entry - Line Items']">
+                        <div class="enter-order">
+                          <div>{{item['Order Entry - Line Items']['KL Warranty Flag'] === "N" ? '保内': '保外'}}</div>
+                          <div>{{item['Order Entry - Line Items']['KL Product Name Join']}}</div>
+                          <div>{{item['Order Entry - Line Items']['Quantity Requested']}}</div>
+                        </div>
+                        <div class="enter-order">
+                          <div>总金额：{{item['Order Total']}}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </toggle>
+                </div>
+              </toggle>
+              <toggle v-if="allChildService.length"
+                      v-for="(item, index) in allChildService"
+                      :type="true"
+                      :key="item.Id"
+                      :label="item['SR Number']">
+                <div>
+                  <toggle :title="false" label="故障记录">
+                    <ul class="failure-record">
+                      <li>产品序列号：{{item['KL SN']}}</li>
+                      <li>详细地址：{{item['Personal Street Address']}}</li>
+                      <li>产品类型：{{item['KL Product Model']}}</li>
+                      <li>故障描述：{{item['Sub-Area']}}</li>
+                      <li>故障现象：{{item['Area']}}</li>
                       <li>照片附件</li>
                       <attach ioName="KL Service Request Attachment IO" ref="attach"
                               :attach="attach.list"
@@ -87,7 +126,6 @@
                   </toggle>
                 </div>
               </toggle>
-              <div v-else style="line-height: 5rem;text-align: center">暂无数据</div>
             </mt-tab-container-item>
             <mt-tab-container-item id="tab-container3" class="marginB">
               <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
@@ -228,7 +266,7 @@
     },
     computed: {
       ...mapState('index', ['loginMeg', 'role']),
-      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress', 'orderEntry', 'childService'])
+      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress', 'orderEntry', 'childService', 'allChildService'])
     },
     methods: {
       ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress', 'addChildService']),
@@ -331,7 +369,7 @@
             success(data) {
               me.getMapAddress({
                 LngLat: data,
-                type: 'visitAddress'
+                type: 'starAddress'
               });
             }
           });
@@ -348,7 +386,7 @@
               console.log(data);
               me.getMapAddress({
                 LngLat: data,
-                type: 'starAddress'
+                type: 'visitAddress'
               });
             }
           });
@@ -365,7 +403,7 @@
               console.log(data);
               me.getMapAddress({
                 LngLat: data,
-                type: 'visitAddress'
+                type: 'endAddress'
               });
             }
           });
@@ -561,7 +599,7 @@
               .content-div {
                 border-radius: 5px;
                 padding: 10px;
-                font-size: 0.15rem;
+                font-size: 0.75rem;
               }
               .mt-Detail-info{
                 div{
