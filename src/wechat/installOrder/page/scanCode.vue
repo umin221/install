@@ -4,7 +4,7 @@
       <fallback slot="left"></fallback>
     </mt-header>
     <div class="mint-content scanCode" :class="{'disable': !type}">
-      <mt-cell title="省市区"
+      <!--<mt-cell title="省市区"
                @click.native="showLovFn('KL_PROVINCE')"
                placeholder="请选择"
                is-link
@@ -13,7 +13,7 @@
                  label="详细地址"
                  v-model= 'detailAddress'
                  type="textarea"
-                 placeholder="请输入详细地址"></cus-field>
+                 placeholder="请输入详细地址"></cus-field>-->
       <mt-field label="楼栋名" placeholder="请输入"
                :class="heartVisible" v-model="BuilingName" is-link></mt-field>
       <mt-field label="楼层" placeholder="请输入"
@@ -25,6 +25,10 @@
         <i class="xs-icon icon-scan" @click="scan"></i>
       </mt-field>
       <mt-cell title="产品型号" placeholder="请输入"
+               :class="heartVisible" v-model="productCode" is-link></mt-cell>
+      <mt-cell title="面板型号" placeholder="请输入"
+               :class="heartVisible" v-model="productCode" is-link></mt-cell>
+      <mt-cell title="锁体型号" placeholder="请输入"
                :class="heartVisible" v-model="productCode" is-link></mt-cell>
       <!--下拉菜单-->
       <mt-popup v-model="showBox" position="bottom">

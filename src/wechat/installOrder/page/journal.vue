@@ -155,7 +155,7 @@
     methods: {
       getJournal() {
         var self = this;
-        api.get({ // 提交数据
+        /* api.get({
           key: 'getJournalData',
           data: {
             id: self.id
@@ -166,6 +166,20 @@
             } else {
               self.processDate = KND.Util.toArray(data); // 一条数据时只返回对象
             }
+          }
+        });*/
+        api.get({ // 获取日志
+          key: 'getDetail',
+          method: 'POST',
+          data: {
+            'body': {
+              'OutputIntObjectName': 'Base KL Installation Detail',
+              'SearchSpec': '[Base KL Installation Detail.Id]=' + '"' + self.id + '"'
+            }
+          },
+          success: function(data) {
+            self.processDate = KND.Util.toArray(data.SiebelMessage['KL Installation Task Detail Plan']);
+            console.dir(self.processDate);
           }
         });
       }

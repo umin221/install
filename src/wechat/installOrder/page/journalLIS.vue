@@ -157,17 +157,18 @@
     methods: {
       getJournal() {
         var self = this;
-        api.get({ // 提交数据
-          key: 'getJournalData',
+        api.get({ // 获取日志
+          key: 'getDetail',
+          method: 'POST',
           data: {
-            id: self.id
+            'body': {
+              'OutputIntObjectName': 'Base KL Installation Detail',
+              'SearchSpec': '[Base KL Installation Detail.Id]=' + '"' + self.id + '"'
+            }
           },
           success: function(data) {
-            if (data.items) {
-              self.processDate = KND.Util.toArray(data.items);
-            } else {
-              self.processDate = KND.Util.toArray(data); // 一条数据时只返回对象
-            }
+            self.processDate = KND.Util.toArray(data.SiebelMessage['KL Installation Task Detail Plan']);
+            console.dir(self.processDate);
           }
         });
       },
