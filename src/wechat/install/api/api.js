@@ -141,6 +141,35 @@ let apiList = {
   },
 
   /**
+   * 新增楼栋
+   * @param {String} option.data['OrderId'] 必填 订单id
+   * @param {String} option.data['TaskId'] 必填 批次id
+   * @param {String} option.data['Country'] 必填 国家
+   * @param {String} option.data['Province'] 必填 省
+   * @param {String} option.data['City'] 必填 市
+   * @param {String} option.data['DetailAddress'] 必填 详细地址
+   * @returns {{url: string, data: {body: {ProcessName: string, Object Id: string, BuildingNum: string, FloorNum: string}}}}
+   */
+  addBuilding: option => {
+    let body = Object.extend({
+      'Type': 'Add',
+      'BuilingName': '栋',
+      'FloorName': 'F',
+      'BuildingNum': '1',
+      'RoomNum': '4',
+      'ProcessName': 'KL Install Order Asset Create Process',
+      'FloorNum': '1'
+    }, option.data);
+    delete option.data;
+    return {
+      url: 'service/Workflow Process Manager/RunProcess/',
+      data: {
+        'body': body
+      }
+    };
+  },
+
+  /**
    * 更新楼栋名字
    * @param {String} option.data['ProcessName'] 选填 更新楼栋名字的工作流名字
    * @param {String} option.data['TaskId'] 必填 批次id

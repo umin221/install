@@ -59,7 +59,7 @@ function sqlite(database, version, note, size) {
    */
   var r = {};
   r.query = function (sql, callback) {
-    console.log('sql => ', sql);
+    //console.log('sql => ', sql);
     var object = this;
     db.transaction(function (tx) {
       tx.executeSql(sql, [], cb);

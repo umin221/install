@@ -69,13 +69,13 @@ export default {
     assets: {
       namespaced: true,
       state: {
-        building: [],
+        building: [{}],
         layer: []
       },
       mutations: {
         // 填充楼栋
         setLayer(state, layer) {
-          state.layer = layer;
+          state.layer = KND.Util.toArray(layer);
         },
         // 填充栋列表
         setBuilding(state, building) {
@@ -99,7 +99,7 @@ export default {
             key: 'queryBuilding',
             data: option.data,
             success: data => {
-              let building = data.SiebelMessage.Building;
+              let building = KND.Util.toArray(data.SiebelMessage.Building);
               commit('setBuilding', building);
               // 默认获取第一栋信息
               dispatch('getLayer', {
@@ -115,7 +115,7 @@ export default {
          * 获取楼栋下所有楼层&房号
          */
         getLayer({commit}, data) {
-          api.get({
+          cache.invoke({
             key: 'getLayer',
             data: data,
             success: data => {
@@ -180,6 +180,20 @@ export default {
       },
       actions: {
         /**
+         * 添加楼栋，默认添加一栋
+         */
+        addBuilding({state}, data) {
+          api.get({
+            key: 'addBuilding',
+            data: data,
+            success: data => {
+              tools.success(data, {
+                successTips: '添加成功'
+              });
+            }
+          });
+        },
+        /**
          * 批量更新楼栋名字
          */
         updateBuildingName({state}, {upArr, id}) {
@@ -197,9 +211,9 @@ export default {
           let run = (data, result) => {
             if (data) {
               update({
-                TaskId: id,
-                BuildingNum: data.BuildingNum,
-                Builing: data.BuildingName
+                'Object Id': id,
+                'BuildingNum': data.BuildingNum,
+                'Builing': data.BuildingName
               });
             } else {
               tools.success(data, {

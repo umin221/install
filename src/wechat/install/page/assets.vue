@@ -15,9 +15,9 @@
         <mt-tab-item class="xs-icon"
                      v-for="(item, index) in building"
                      :key="index"
-                     :id="item.BuildingNum"
+                     :id="index"
                      @click.native="getLayerFn(item.BuildingNum)">{{item.BuildingName}}</mt-tab-item>
-        <span class="edit-class xs-icon icon-edit" @click="editBuildingFn"></span>
+        <span class="edit-class xs-icon icon-edit" @click="editBuildingFn(layer[0])"></span>
       </mt-navbar>
       <div style="height: 5px"></div>
       <div style="background: white;margin-bottom: 5px;"  v-for="(floor, index) in layers"  :key="index" >
@@ -93,7 +93,7 @@
         // 清空选中房号
         this.selectRooms = {};
         // 重置tab选择
-        this.selected = '1';
+        this.selected = 0;
         // 活动id
         OrderId = orderId;
         TaskId = taskId;
@@ -108,7 +108,7 @@
     },
     data: () => {
       return {
-        selected: '1',
+        selected: 0,
         editable: false,
         // mode = select 移交前的选择房号  mode = edit 编辑楼栋信息
         mode: '',
@@ -160,11 +160,12 @@
        * 编辑楼栋信息
        * 只编辑批次楼栋
        */
-      editBuildingFn() {
+      editBuildingFn(room) {
         this.$router.push({
           name: 'building',
           query: {
-            id: TaskId
+            id: TaskId,
+            room: JSON.stringify(room)
           }
         });
       },
@@ -240,19 +241,20 @@
        */
       deleteBuildingFn(floor) {
         MessageBox.confirm('是否删除整层？', '请确认').then(() => {
+          let buildingNum = floor[0]['Integration Id 2'];
           let floorNum = floor[0]['Integration Id 3'];
           // 只批次编辑楼栋
           this.removeBuilding({
             data: {
               'Object Id': TaskId,
-              'BuildingNum': this.selected,
+              'BuildingNum': buildingNum,
               'FloorNum': floorNum
             },
             success: data => {
               this.getLayer({
                 'Original Order Id': OrderId,
                 'KL Activity Id': TaskId,
-                'Integration Id 2': this.selected
+                'Integration Id 2': buildingNum
               });
             }
           });

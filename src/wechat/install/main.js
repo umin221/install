@@ -30,6 +30,8 @@ Vue.use(Vuex);
 
 let store = new Vuex.Store(sto);
 
+config.offline = true;
+
 /**
  * 导航守卫
  * 如果未匹配到路由

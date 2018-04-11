@@ -15,6 +15,11 @@
                      :key="index">
         <input type="text" class="mint-field-core" v-model="item['BuildingName']"/>
       </mt-cell-swipe>
+
+      <button-group>
+        <mt-button class="single"
+                   @click.native="addBuildingFn">新增一栋</mt-button>
+      </button-group>
     </div>
   </div>
 </template>
@@ -25,6 +30,7 @@
 </style>
 <script type="es6">
   import {mapState, mapActions, mapMutations} from 'vuex';
+  import buttonGroup from 'public/components/cus-button-group';
 
   let tempBuilding;
   const ASSETS = 'assets';
@@ -42,7 +48,7 @@
       ...mapState(ASSETS, ['building'])
     },
     methods: {
-      ...mapActions(NAMESPACE, ['updateBuildingName']),
+      ...mapActions(NAMESPACE, ['updateBuildingName', 'addBuilding']),
       ...mapActions(ASSETS, ['removeBuilding']),
       ...mapMutations(ASSETS, ['remove']),
       // 更新楼栋名称
@@ -74,7 +80,20 @@
             }
           });
         });
+      },
+      // 添加楼栋
+      addBuildingFn() {
+        let room = KND.Util.parse(this.$route.query.room);
+        this.addBuilding({
+          'OrderId': room['Original Order Id'],
+          'City': room['City'],
+          'DetailAddress': room['Street Address'],
+          'Country': room['Country'],
+          'TaskId': room['KL Activity Id'],
+          'Province': room['Province']
+        });
       }
-    }
+    },
+    components: {buttonGroup}
   };
 </script>
