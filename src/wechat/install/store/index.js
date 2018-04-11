@@ -1,5 +1,5 @@
 import api from '../api/api';
-import cache from '../api/cache';
+import cache from '../api/db.cache';
 import { app } from 'public/store';
 
 // 缓存页面
@@ -99,14 +99,21 @@ export default {
             key: 'queryBuilding',
             data: option.data,
             success: data => {
-              let building = KND.Util.toArray(data.SiebelMessage.Building);
+              let building = [];
+              if (data.BuildingNumber === '0') {
+                MessageBox('提示', '无楼栋信息').then(result => {
+                  KND.Util.back();
+                });
+              } else {
+                building = KND.Util.toArray(data.SiebelMessage.Building);
+                // 默认获取第一栋信息
+                dispatch('getLayer', {
+                  'Original Order Id': option.data.OrderId,
+                  'KL Activity Id': option.data.TaskId,
+                  'Integration Id 2': building[0].BuildingNum
+                });
+              };
               commit('setBuilding', building);
-              // 默认获取第一栋信息
-              dispatch('getLayer', {
-                'Original Order Id': option.data.OrderId,
-                'KL Activity Id': option.data.TaskId,
-                'Integration Id 2': building[0].BuildingNum
-              });
             }
           };
           cache.invoke(setting);
@@ -129,6 +136,15 @@ export default {
         removeBuilding({state}, setting) {
           setting.key = 'removeBuilding';
           api.get(setting);
+        },
+        /**
+         * 获取本地扫码安装记录
+         */
+        queryLocalInstallRecord({state}, callback) {
+          cache.invoke({
+            key: 'queryLocalInstallRecord',
+            success: callback
+          });
         }
       }
     },
@@ -263,7 +279,7 @@ export default {
             // 标记楼栋资产刷新
             KND.Session.set('refreshAssets', true);
           };
-          api.get(setting);
+          cache.invoke(setting);
         }
       }
     }
