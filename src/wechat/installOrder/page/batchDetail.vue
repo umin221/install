@@ -198,15 +198,17 @@
               self.titleVal = '汇总详情';
             } else {
               self.getPlanList(id);
-              if (data['KL Detail Type LIC'] === 'Substitution Lock Inst Batch' ||
-                data['KL Detail Type LIC'] === 'Lock Installation Batch') { // 替代锁批次=Substitution Lock Inst Batch、真锁=Lock Installation Batch获取为外人员 显示合作伙伴
-                self.is_installer = true;
-                self.getInstallerList(id);
-                self.companyName = data['KL Partner Name'];
-                if (data['KL Detail Type LIC'] === 'Lock Installation Batch') { // 真锁
-                  self.is_zs = true;
-                  if (data['KL Delivery Time']) {
-                    self.deliveryTime = new Date(data['KL Delivery Time']).format('yyyy-MM-dd') || ''; // 结束时间
+              if (data['KL Delivery Sales Type'] === '工程') { // 区分工程还是零星  工程
+                if (data['KL Detail Type LIC'] === 'Substitution Lock Inst Batch' ||
+                  data['KL Detail Type LIC'] === 'Lock Installation Batch') { // 替代锁批次=Substitution Lock Inst Batch、真锁=Lock Installation Batch获取为外人员 显示合作伙伴
+                  self.is_installer = true;
+                  self.getInstallerList(id);
+                  self.companyName = data['KL Partner Name'];
+                  if (data['KL Detail Type LIC'] === 'Lock Installation Batch') { // 真锁
+                    self.is_zs = true;
+                    if (data['KL Delivery Time']) {
+                      self.deliveryTime = new Date(data['KL Delivery Time']).format('yyyy-MM-dd') || ''; // 结束时间
+                    }
                   }
                 }
               }
@@ -225,7 +227,7 @@
             * 关闭中=Closing
             * 可以审批
             * */
-            if (data['Calculated Activity Status'] === 'Approved' || data['Calculated Activity Status'] === 'Closing') {
+            if (data['Calculated Activity Status'] === 'Approved' || data['Calculated Activity Status'] === 'Closing' || data['Calculated Activity Status'] === 'Planning') {
               self.is_but = false;
             }
           }
@@ -364,6 +366,8 @@
             mode: 'edit'
           }
         });
+        // 标记楼栋资产刷新
+        KND.Session.set('refreshAssets', true);
       }
     },
     components: {buttonGroup, lockLine}

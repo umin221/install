@@ -5,7 +5,7 @@
     </mt-header>
     <div class="mint-content journal editable">
       <div class="lock-line" :class="{'disable': !editable}">
-        <lock-line title="详细计划" v-for="(item, index) in processDate" :key="index">
+        <lock-line :title="item['Item Type Display Name']" v-for="(item, index) in processDate" :key="index">
           <div class="crm-zyList" v-for="(itemTask, index) in upList(item['UInbox Item Task'])" :key="index">
             <ul class="content">
               <li class="bd-radius">

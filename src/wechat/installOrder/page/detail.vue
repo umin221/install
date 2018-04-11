@@ -930,6 +930,12 @@
           * Transfer Summary 移交汇总
           * */
          // self.$router.push('batch');
+          /*
+          *零星工程的移交前自检汇总、移交汇总 不走批次
+          * */
+          if ((item['KL Detail Type LIC'] === 'Check Before Trans Summary' || item['KL Detail Type LIC'] === 'Transfer Summary') && self.detailData['KL Delivery Sales Type'] !== '工程') {
+            return;
+          }
           if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Rejected')) { // 汇总节点未开始、已驳回的时候 开启节点
             /*
             * 批次汇总开启节点
@@ -976,14 +982,21 @@
       },
       taskClick(item, fItem) { // 子任务数据集事件
         var self = this;
-        // 跳转批次详情、编辑
+        /**
+         * 零星工程移交批次
+         * 没有详情
+         * */
+        if ((fItem['KL Detail Type LIC'] === 'Check Before Trans Summary' || fItem['KL Detail Type LIC'] === 'Transfer Summary') && self.detailData['KL Delivery Sales Type'] !== '工程') {
+          return;
+        }
+          // 跳转批次详情、编辑
         //  && (item['Calculated Activity Status'] === 'Draft' || item['Calculated Activity Status'] === 'Rejected')
         if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'Declined') && fItem['Calculated Activity Status'] === 'In Progress') { // 汇总节点是否开启  未开始=Not Started、草稿=Planning(设定计划)、审批驳回=Declined 要编辑提交 并且有权限的人才可做此操作
           this.clear();
           var itemTask = KND.Util.toArray(fItem['KL Installation Task'])[0];
           this.getTaskType(itemTask);
           if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary' || fItem['KL Detail Type LIC'] === 'Substitution Lock Inst Summary') { // 替代锁、真锁 编辑页面不同
-            if (fItem['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' && self.detailData['KL Delivery Sales Type'] !== '工程') { // 真锁-零星走统一批次
+            if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary' && self.detailData['KL Delivery Sales Type'] !== '工程') { // 真锁-零星走统一批次
               this.$router.push({ // 编辑
                 name: 'batch',
                 query: {
@@ -1026,94 +1039,23 @@
         }
       },
       updateDoor(item, fItem) {
+        /**
+         * 零星工程移交批次
+         * */
         var self = this;
-        var typePage = ''; // 区分跳转什么更新页面 updateDoor/updateDoorNext
-        // 根据状态跳转更新还是日志页面
-        if (item['Calculated Activity Status'] === 'Completed') { // 已完成=Completed、已忽略=Ignore 跳转日志不能再修改
-          if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次 完成状态先跳转日志   日志页面与其他日志页面不共用
-            if (self.detailData['KL Delivery Sales Type'] !== '工程') { // 零星
-              // 跳转真锁安装批次新增页面
-              this.$router.push({
-                name: 'sporadic',
-                query: {
-                  type: false,
-                  item: item,
-                  orderID: self.id
-                }
-              });
-            } else {
+        if ((fItem['KL Detail Type LIC'] === 'Check Before Trans Summary' || fItem['KL Detail Type LIC'] === 'Transfer Summary') && self.detailData['KL Delivery Sales Type'] !== '工程') {
+          if (fItem['KL Detail Type LIC'] === 'Check Before Trans Summary') { // 移交全检
+            if (item['Calculated Activity Status'] === 'Completed') { // 已完成=Completed 跳转看日志
               self.$router.push({
-                name: 'journalLIS',
+                name: 'journal',
                 query: {
                   id: item.Id,
                   fItem: fItem,
-                  type: false // 是否可以更新
-                }
-              });
-            }
-          } else { // 其他批次都是跳转 更新页面
-            if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary') {
-              typePage = 'updateDoorNext';
-            } else {
-              typePage = 'updateDoor';
-            }
-            self.$router.push({
-              name: 'journal',
-              query: {
-                id: item.Id,
-                fItem: fItem,
-                type: typePage
-              }
-            });
-          }
-        } else { // 更新 只有状态进行中=In Progress、审批通过=Approved 是责任人才能更新
-          // 详情
-          if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次 编辑跳转日志  判断日志页面有没有权限更新
-            var is_deit = false;
-            if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Approved')) {
-              is_deit = true;
-            }
-            if (self.detailData['KL Delivery Sales Type'] !== '工程') { // 零星
-              // 跳转真锁安装批次新增页面
-              this.$router.push({
-                name: 'sporadic',
-                query: {
-                  type: is_deit,
-                  item: item,
-                  orderID: self.id
+                  type: 'updateDoorNext'
                 }
               });
             } else {
-              self.$router.push({
-                name: 'journalLIS',
-                query: {
-                  id: item.Id,
-                  fItem: fItem,
-                  type: is_deit // 是否可以更新
-                }
-              });
-            }
-          } else { // 其他批次的更新 统一
-            if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Approved')) { // 当前登录人与批次负责人相等并且状态是进行中才能更新
-              if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary') {
-                self.$router.push({
-                  name: 'updateDoorNext',
-                  query: {
-                    type: 'add',
-                    id: item.Id
-                  }
-                });
-              } else if (fItem['KL Detail Type LIC'] === 'Transfer Summary') { // 真锁移交更新
-                // 跳转真锁移交批次新增页面
-                self.getTaskType(item);
-                this.$router.push({
-                  path: 'assets',
-                  query: {
-                    OrderId: self.id,
-                    mode: 'select'
-                  }
-                });
-              } else {
+              if (userInfo['Person UId'] === item['Primary Owner Id']) { // 有权限更新
                 self.$router.push({
                   name: 'updateDoor',
                   query: {
@@ -1122,8 +1064,54 @@
                     id: item.Id
                   }
                 });
+              } else {
+                Toast('当前状态不可查看！');
               }
-            } else { // 没有权限更新和不是负责人只能看日志
+            }
+          } else { // 零星移交
+            if (item['Calculated Activity Status'] === 'Completed') { // 已完成=Completed 跳转看日志
+              console.dir('零星移交完成状态');
+            } else {
+              if (userInfo['Person UId'] === item['Primary Owner Id']) { // 有权限更新
+                self.$router.push({
+                  name: 'updateDoorNext',
+                  query: {
+                    type: 'add',
+                    id: item.Id
+                  }
+                });
+              } else {
+                Toast('当前状态不可查看！');
+              }
+            }
+
+          }
+        } else {
+          var typePage = ''; // 区分跳转什么更新页面 updateDoor/updateDoorNext
+          // 根据状态跳转更新还是日志页面
+          if (item['Calculated Activity Status'] === 'Completed') { // 已完成=Completed、已忽略=Ignore 跳转日志不能再修改
+            if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次 完成状态先跳转日志   日志页面与其他日志页面不共用
+              if (self.detailData['KL Delivery Sales Type'] !== '工程') { // 零星
+                // 跳转真锁安装批次新增页面
+                this.$router.push({
+                  name: 'sporadic',
+                  query: {
+                    type: false,
+                    item: item,
+                    orderID: self.id
+                  }
+                });
+              } else {
+                self.$router.push({
+                  name: 'journalLIS',
+                  query: {
+                    id: item.Id,
+                    fItem: fItem,
+                    type: false // 是否可以更新
+                  }
+                });
+              }
+            } else { // 其他批次都是跳转 更新页面
               if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary') {
                 typePage = 'updateDoorNext';
               } else {
@@ -1138,8 +1126,83 @@
                 }
               });
             }
-          }
+          } else { // 更新 只有状态进行中=In Progress、审批通过=Approved 是责任人才能更新
+            // 详情
+            if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次 编辑跳转日志  判断日志页面有没有权限更新
+              var is_deit = false;
+              if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Approved')) {
+                is_deit = true;
+              }
+              if (self.detailData['KL Delivery Sales Type'] !== '工程') { // 零星
+                // 跳转真锁安装批次新增页面
+                this.$router.push({
+                  name: 'sporadic',
+                  query: {
+                    type: is_deit,
+                    item: item,
+                    orderID: self.id
+                  }
+                });
+              } else {
+                self.$router.push({
+                  name: 'journalLIS',
+                  query: {
+                    id: item.Id,
+                    fItem: fItem,
+                    type: is_deit // 是否可以更新
+                  }
+                });
+              }
+            } else { // 其他批次的更新 统一
+              if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Approved')) { // 当前登录人与批次负责人相等并且状态是进行中才能更新
+                if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary') {
+                  self.$router.push({
+                    name: 'updateDoorNext',
+                    query: {
+                      type: 'add',
+                      id: item.Id
+                    }
+                  });
+                } else if (fItem['KL Detail Type LIC'] === 'Transfer Summary') { // 真锁移交更新
+                  // 跳转真锁移交批次新增页面
+                  self.getTaskType(item);
+                  this.$router.push({
+                    path: 'assets',
+                    query: {
+                      OrderId: self.id,
+                      mode: 'select'
+                    }
+                  });
+                  // 标记楼栋资产刷新
+                  KND.Session.set('refreshAssets', true);
+                } else {
+                  self.$router.push({
+                    name: 'updateDoor',
+                    query: {
+                      type: 'add',
+                      fItem: fItem,
+                      id: item.Id
+                    }
+                  });
+                }
+              } else { // 没有权限更新和不是负责人只能看日志
+                if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary') {
+                  typePage = 'updateDoorNext';
+                } else {
+                  typePage = 'updateDoor';
+                }
+                self.$router.push({
+                  name: 'journal',
+                  query: {
+                    id: item.Id,
+                    fItem: fItem,
+                    type: typePage
+                  }
+                });
+              }
+            }
 
+          }
         }
       },
       // 提交安装订单

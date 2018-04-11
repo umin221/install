@@ -196,7 +196,20 @@
         console.log('取详细计划数据');
         var self = this;
         self.planList = [];
-        api.get({ // 提交数据
+        api.get({ // 获取详细计划数据
+          key: 'getDetail',
+          method: 'POST',
+          data: {
+            'body': {
+              'OutputIntObjectName': 'Base KL Installation Task Detail Plan',
+              'SearchSpec': '[KL Installation Task Detail Plan.Parent Activity Id]=' + '"' + id + '"'
+            }
+          },
+          success: function(data) {
+            self.planList = KND.Util.toArray(data.SiebelMessage['KL Installation Task Detail Plan']);
+          }
+        });
+        /* api.get({ // 提交数据
           key: 'getPlan',
           method: 'GET',
           data: {
@@ -209,7 +222,7 @@
               self.planList = KND.Util.toArray(data);
             }
           }
-        });
+        });*/
       },
       getBatch(id) {
         var self = this;

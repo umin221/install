@@ -65,7 +65,7 @@
       return {
         id: '',
         type: 'add', // add 新增 / edit 编辑 / read 只读
-        titleVal: '挂门进度更新',
+        titleVal: '',
         line: {},
         active: 'tab-container'
       };

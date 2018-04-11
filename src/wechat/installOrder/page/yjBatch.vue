@@ -318,6 +318,8 @@
                     success: function(data) {
                       if (!data.ERROR) {
                         Toast('提交成功');
+                        // 标记楼栋资产刷新
+                        KND.Session.set('refreshAssets', true);
                       }
                     }
                   });

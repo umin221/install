@@ -152,7 +152,9 @@
           self.delivery_Time = new Date(self.pcObj['KL Delivery Time']).format('yyyy-MM-dd'); // 结束时间
           self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
           self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
-          self.deliveryTime = new Date(self.delivery_Time).format('MM/dd/yyyy');
+          if (self.delivery_Time) {
+            self.deliveryTime = new Date(self.delivery_Time).format('MM/dd/yyyy');
+          }
           self.batchNum = self.pcObj['KL Install Amount Requested']; // 数量
           self.companyId = self.pcObj['KL Partner Id'];
           self.companyName = self.pcObj['KL Partner Name'];
@@ -168,7 +170,7 @@
           self.delivery_Time = new Date(self.pcObj['KL Delivery Time']).format('yyyy-MM-dd'); // 结束时间
           self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
           self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
-          self.deliveryTime = new Date(self.delivery_Time).format('MM/dd/yyyy');
+          self.deliveryTime = new Date(self.delivery_Time).format('MM/dd/yyyy') || '';
           self.batchNum = self.pcObj['KL Install Amount Requested']; // 数量
           self.companyId = self.pcObj['KL Partner Id'];
           self.companyName = self.pcObj['KL Partner Name'];
@@ -309,18 +311,18 @@
       getPlanList(id) {
         var self = this;
         self.planList = [];
-        api.get({ // 提交数据
-          key: 'getPlan',
-          method: 'GET',
+        api.get({ // 获取详细计划数据
+          key: 'getDetail',
+          method: 'POST',
           data: {
-            id: id
+            'body': {
+              'OutputIntObjectName': 'Base KL Installation Task Detail Plan',
+              'SearchSpec': '[KL Installation Task Detail Plan.Parent Activity Id]=' + '"' + id + '"'
+            }
           },
           success: function(data) {
-            if (data.items) {
-              self.planList = data.items;
-            } else {
-              self.planList = KND.Util.toArray(data);
-            }
+            self.planList = KND.Util.toArray(data.SiebelMessage['KL Installation Task Detail Plan']);
+            console.dir(self.planList);
           }
         });
       },
@@ -354,10 +356,10 @@
               self.batchCode = data.Id; // 批次
               self.start_Date = new Date(data.Planned).format('yyyy-MM-dd'); // 开始时间
               self.end_Date = new Date(data['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
-              self.delivery_Time = new Date(data['KL Delivery Time']).format('yyyy-MM-dd'); // 结束时间
+              self.delivery_Time = new Date(data['KL Delivery Time']).format('yyyy-MM-dd') || ''; // 结束时间
               self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
               self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
-              self.deliveryTime = new Date(self.delivery_Time).format('MM/dd/yyyy');
+              self.deliveryTime = new Date(self.delivery_Time).format('MM/dd/yyyy') || '';
               self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
               self.companyId = data['KL Partner Id'];
               self.companyName = data['KL Partner Name'];
@@ -410,6 +412,9 @@
           aId = self.item.Id;
         } else if (self.type === 'edit') {
           aId = self.item['Parent Activity Id'];
+        }
+        if (self.deliveryTime === 'aN/aN/NaN') {
+          self.deliveryTime = '';
         }
         var parma = {
           'Planned': self.startDate,
