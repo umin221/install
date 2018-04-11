@@ -193,7 +193,7 @@
         me.endDate = value.format('MM/dd/yyyy');
       },
       getPlanList(id) {
-        console.dir('取详细计划数据');
+        console.log('取详细计划数据');
         var self = this;
         self.planList = [];
         api.get({ // 提交数据

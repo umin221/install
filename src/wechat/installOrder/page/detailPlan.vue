@@ -243,7 +243,7 @@
           },
           success: function(data) {
             Toast('保存成功');
-            console.dir('保存详细计划');
+            console.log('保存详细计划');
             KND.Util.back();
           }
         });
