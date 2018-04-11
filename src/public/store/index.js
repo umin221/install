@@ -95,7 +95,7 @@ export const app = {
       let push = (media) => {
         ajax({
           method: 'get',
-          url: (`${proxy}/webchat/api/external/uploadattachment?url=http://192.168.166.8:9001/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess&IOName=${data.IOName}&Object Id=${data.Id}&ProcessName=KL Attachment Upload Process&appNO=${config.appNo}&mediaID=${media}`),
+          url: (`${proxy}/webchat/api/external/uploadattachment?url=http://192.168.166.8:9001/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess&IOName=${data.IOName}&Object Id=${data.Id}&Comment=${data.Comment || ''}&ProcessName=KL Attachment Upload Process&appNO=${config.appNo}&mediaID=${media}`),
           success: result => {
             console.log(result);
             run(MediaId.pop(), result);
