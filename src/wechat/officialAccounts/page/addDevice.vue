@@ -11,8 +11,8 @@
         </mt-field>
         <mt-cell title="产品品牌" value="坚朗海贝斯"></mt-cell>
         <mt-cell title="产品型号" :value="productModel"></mt-cell>
-        <mt-cell title="保修开始时间"></mt-cell>
-        <mt-cell title="保修结束时间"></mt-cell>
+        <mt-cell title="保修开始时间" :value="warrantyStarDate"></mt-cell>
+        <mt-cell title="保修结束时间" :value="warrantyEndDate"></mt-cell>
         <button-group>
           <mt-button class="single" @click.native="submit">提交</mt-button>
         </button-group>
@@ -36,7 +36,9 @@
       return {
         ContactId: '',
         klsn: '',
-        productModel: ''
+        productModel: '',
+        warrantyStarDate: '',
+        warrantyEndDate: ''
       };
     },
     computed: {
@@ -59,10 +61,19 @@
       },
       search() {
         let me = this;
+//        me.getAssetSn({
+//          klsn: me.klsn,
+//          callback: function(data) {
+//            me.productModel = data['KL Product Model'];
+//          }
+//        });
         me.getAssetSn({
           klsn: me.klsn,
           callback: function(data) {
+            me.klsn = data['Serial Number'];
             me.productModel = data['KL Product Model'];
+            me.warrantyStarDate = data['Install Date'];
+            me.warrantyEndDate = data['KL Warranty End Date'];
           }
         });
       },
@@ -70,14 +81,9 @@
         let me = this;
         KND.Native.scanQRCode({
           success(data) {
-            console.log(data);
             let resultStr = data.resultStr.split(',')[1];
-            me.getAssetSn({
-              klsn: resultStr,
-              callback: function(data) {
-                me.productModel = data['KL Product Model'];
-              }
-            });
+            me.klsn = resultStr;
+            me.search();
           }
         });
       }

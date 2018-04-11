@@ -7,7 +7,7 @@
                  :value="brand"></mt-cell>
         <mt-field label="产品条形码"
                   v-model="KLSN"
-                  class="klsn"
+                  class="klsn xs-icon"
                   @change.native="serchSn"
                   placeholder="请扫码或输入条形码">
           <i class="xs-icon icon-scan" @click="toScan"></i></mt-field>
@@ -78,6 +78,25 @@
   import menuBox from 'public/components/cus-menu';
   import vp from 'public/plugin/validator';
   const NameSpace = 'index';
+  let _upload = function(serverIds, id) {
+    // 成功回调
+    let callback = data => {
+      tools.success(data, {
+        back: false,
+        successTips: '提交成功'
+      });
+    };
+    // 上传附件
+    serverIds ? this.upload({
+      data: {
+        MediaId: serverIds,
+        Id: id,
+        IOName: 'KL Service Request Attachment IO',
+        Comment: this.value
+      },
+      success: callback
+    }) : callback(id);
+  };
   let t = new Date().getTime() + 3600000;
   Vue.use(vp);
   export default {
@@ -85,6 +104,18 @@
     created() {
       let me = this;
       me.openId = KND.Util.getParam('openid');
+      me.getLov({
+        type: 'KL_SR_ATT_TYPE',
+        parent: '',
+        success: function(data) {
+          let items = data.items;
+          for (let i = 0; i < items.length;i++) {
+            if (items[i].Name === 'Customer Upload File') {
+              me.value = items[i].Value;
+            }
+          }
+        }
+      });
       if (!me.callPhone) {
         me.getContact(function(data) {
           me.lastName = data['Last Name']; // 名字
@@ -101,6 +132,7 @@
           {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
         ],
         showBox: false,
+        value: '客户上传附件',
         KLSN: '',              // 条形码
         brand: '坚朗海贝斯',  // 品牌
         lastName: '',         // 联系人
@@ -133,11 +165,15 @@
       }
     },
     methods: {
+      ...mapActions('app', ['upload']),
       ...mapActions(NameSpace, ['getLov', 'submitService', 'getContact', 'getAsset']),
       ...mapMutations(NameSpace, ['addressBack']),
       submit() {
+        let me = this;
+        let uploadAttach = id => {
+          _upload.call(me, me.$refs.attach.getServerIds(), id);
+        };
         tools.valid.call(this, () => {
-          let me = this;
           let form = {
             'Address Id': me.form.type === 'add' ? me.form.Id : '', // 如果是用户自己新建了地址，传新建的地址Id,如果只是简单定位，不用传
             'Appoint Time': me.AppointTime ? me.AppointTime : '', // 用户的预约上门时间
@@ -153,6 +189,7 @@
             'Complaint Description': me.ComplaintDescription, // 故障详情描述
             'Open Id': me.openId, // 微信端的OpenId
             'callback': function(data) {
+              uploadAttach(data['SR Id']);
               me.$router.push({
                 name: 'myRepair',
                 query: {
@@ -205,6 +242,7 @@
         });
       },
       enter(value) {
+        console.log(value);
         let me = this;
         me.Area = value[0];
         me.SubArea = value[1];
@@ -260,6 +298,11 @@
 
       .klsn>.mint-cell-wrapper>.mint-cell-value>input{
         margin-right: 0.5rem;
+      }
+      .klsn>.mint-cell-wrapper>.mint-cell-title:before{
+        content: '\A133';
+        color: #000000;
+        font-size: 18px;
       }
     }
     .datetime>.picker>.picker-items>.picker-slot:nth-child(5){

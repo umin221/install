@@ -32,7 +32,11 @@
                   {{serviceDetail['Complaint Description']}}
                 </p>
               </div>
-              <div>相关照片：</div>
+              <attach ioName="KL Service Request Attachment IO" ref="attach"
+                      :attach="attach.list"
+                      :edit="attach.edit"
+                      title="相关照片">
+              </attach>
             </div>
           </mt-tab-container-item>
           <mt-tab-container-item id="tab-container2" style="margin-bottom: 2rem;">
@@ -54,7 +58,7 @@
     <button-group v-if="serviceDetail.Action">
       <mt-button class="single"
                  @click.native="toComment"
-                  v-if="action['Status'] === '完成'">点评</mt-button>
+                  v-if="action['Status'] === '完成' && survey">点评</mt-button>
     </button-group>
   </div>
 </template>
@@ -70,16 +74,33 @@
       let me = this;
       me.srNumber = me.$route.query.srNumber;
       me.getServiceDetail({search: 'SR Number', value: me.srNumber});
+      me.queryMedias({
+        data: {
+          'IOName': 'KL Service Request Attachment IO',
+          'SearchSpec': {
+            'Service Request Attachment.Activity Id': me.$route.query.srId
+          }
+        },
+        success: data => {
+          me.attach.list = KND.Util.toArray(data['SiebelMessage']['Service Request Attachment']);
+        }
+      });
     },
     data: () => {
       return {
-        active: 'tab-container1'
+        active: 'tab-container1',
+        attach: { // 附件
+          list: [],
+          edit: false,
+          title: '相关照片'
+        }
       };
     },
     computed: {
-      ...mapState(NameSpace, ['tabList', 'serviceDetail', 'action', 'note'])
+      ...mapState(NameSpace, ['tabList', 'serviceDetail', 'action', 'note', 'survey'])
     },
     methods: {
+      ...mapActions('app', ['queryMedias']),
       ...mapActions(NameSpace, ['getServiceDetail']),
       toComment() {
         let me = this;
@@ -173,7 +194,7 @@
               .content-div {
                 border-radius: 5px;
                 padding: 10px;
-                font-size: 0.15rem;
+                font-size: 0.75rem;
               }
               .mt-Detail-info {
                 div {
