@@ -13,13 +13,15 @@
         <div class="xs-icon icon-scan" @click="toScanFn"></div>
       </cus-field>
       <cus-field label="锁体型号"  tag="锁体型号"
-                 :value="bodyNo"
+                 :value="assets['KL Product Model No Lock Body']"
                  v-valid.require
+                 @click.native="showLovFn('body')"
                  is-link></cus-field>
 
       <cus-field label="面板型号"  tag="面板型号"
-                 :value="bodyNo"
+                 :value="assets['KL Product Model No Panel']"
                  v-valid.require
+                 @click.native="showLovFn('panel')"
                  is-link></cus-field>
 
       <button-group>
@@ -27,6 +29,15 @@
                    @click.native="saveFn">保存</mt-button>
       </button-group>
     </div>
+
+    <!--popup-->
+    <mt-popup v-model="showBox" position="bottom">
+      <menu-box @my-enter="enter"
+                @my-cancel="showBox=false"
+                vk="KL Product Model No Cal"
+                :type="lovType"
+                :slots="slots"></menu-box>
+    </mt-popup>
   </div>
 </template>
 
@@ -36,6 +47,7 @@
   import vp from 'public/plugin/validator';
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
+  import menuBox from 'public/components/cus-menu.vue';
   // use plugin
   Vue.use(vp);
 
@@ -52,24 +64,33 @@
           'Order Header Id': me.assets['Original Order Id']
         },
         success: data => {
-          this.panel = data.items.filter(item => item['KL Product Type LIC'] === 'Panel');
-          console.log(this.panel);
+          if (data.items) {
+            data.items.forEach(item => {
+              if (item['KL Product Type LIC'] === 'Panel') me.panel.push(item);
+              else if (item['KL Product Type LIC'] === 'Lock Body') me.body.push(item);
+            });
+            // 默认面板
+            let panel = me.panel[0] || {};
+            // 默认锁体
+            let body = me.body[0] || {};
+            me.assets['KL Product Model No Panel'] = panel['KL Product Model No Cal'];
+            me.assets['KL Product Model No Lock Body'] = body['KL Product Model No Cal'];
+            me.assets['Product Id'] = body['KL Final Product Id'];
+          }
         }
       });
     },
     data: () => {
       return {
-        assets: '',
-        panel: ''
+        assets: '', // 资产
+        panel: [], // 面板
+        body: [], // 锁体
+        slots: [
+          {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
+        ],
+        showBox: false,
+        lovType: ''
       };
-    },
-    computed: {
-      bodyNo() {
-        let model = this.panel[0];
-        let modelNo = model && model['KL Product Model No Cal'];
-        this.assets['Product Model No'] = modelNo;
-        return modelNo;
-      }
     },
     methods: {
       ...mapActions(NAMESPACE, ['queryOrderLines', 'installOrderAssets']),
@@ -77,7 +98,16 @@
       saveFn() {
         let me = this;
         tools.valid.call(me, () => {
-          console.log(me.assets);
+          let assets = me.assets;
+          this.installOrderAssets({
+            data: {
+              'Id': assets['Id'],
+              'Serial Number': assets['Serial Number'],
+              'Product Id': assets['Product Id'],
+              'KL Product Model No Lock Body': assets['KL Product Model No Lock Body'],
+              'KL Product Model No Panel': assets['KL Product Model No Panel']
+            }
+          });
         });
       },
       /**
@@ -85,9 +115,21 @@
        */
       toScanFn() {
         console.log('scan');
+      },
+      // 选择确认
+      enter(values, type) {
+        this.showBox = false;
+        this.assets[type === 'panel' ? 'KL Product Model No Panel' : 'KL Product Model No Lock Body'] = values[0]['KL Product Model No Cal'];
+      },
+      // 选择对话框
+      showLovFn(type) {
+        let me = this;
+        me.lovType = type;
+        me.showBox = true;
+        me.slots[0].values = me[type];
       }
     },
-    components: {buttonGroup, cusField}
+    components: {buttonGroup, cusField, menuBox}
   };
 </script>
 

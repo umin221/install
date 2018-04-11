@@ -56,6 +56,7 @@ let query = (table, condition, callback) => {
 let clear = data => {
   let me = this.a;
   return new Promise((resolve, reject) => {
+    console.log('------------ 获取最新数据 start ------------');
     console.log('清除历史数据...');
     me.invokeSQL('gt').then(result => {
       let tasks = [];
@@ -92,8 +93,8 @@ let create = data => {
       me.invokeSQL('ct', 'assets', buildCreateField({order_id: null, task_id: null, building_num: null, data: 'VARCHAR(20000)', state: null, create_date: null})).then(result => {
         console.log('创建数据库表 assets...');
       }),
-      me.invokeSQL('ct', 'product', buildCreateField({order_id: null, task_id: null, data: 'VARCHAR(2000)', state: null, create_date: null})).then(result => {
-        console.log('创建数据库表 product...');
+      me.invokeSQL('ct', 'order_line', buildCreateField({order_id: null, data: 'VARCHAR(2000)', state: null, create_date: null})).then(result => {
+        console.log('创建数据库表 order_line...');
       }),
       me.invokeSQL('ct', 'install', buildCreateField({order_id: null, task_id: null, data: null, state: null, create_date: null})).then(result => {
         console.log('创建数据库表 install...');
@@ -159,14 +160,14 @@ class Cache {
    */
   init(data) {
     let me = this;
-    clear().then(result => create()).then(result => me.cache(data)).catch(err => console.error(err));
+    clear().then(result => create()).then(result => me.reCache(data)).catch(err => console.error(err));
   };
 
   /**
-   * 缓存批次
+   * 刷新缓存
    * @param {Object} setting 接口参数配置
    */
-  cache(data = {}) {
+  reCache(data = {}) {
     /**
      * 1. 缓存批次数据
      * 2. 缓存楼栋数据
@@ -195,9 +196,37 @@ class Cache {
         });
       });
     }).then(batchs => {
-      // 2. 缓存楼栋数据
+      // 2. 缓存订单行
       return new Promise((resolve, reject) => {
-        console.log(batchs);
+        console.log('开始缓存订单行...');
+        let tasks = [];
+        for (let i = 0, len = batchs.length; i < len; i++) {
+          tasks.push(new Promise((resolve, reject) => {
+            let batch = batchs[i];
+            api.get({
+              key: 'queryOrderLines',
+              data: {
+                'Order Header Id': batch['Order Id']
+              },
+              success: data => {
+                console.log(data);
+                invokeSQL('insert', 'order_line', {
+                  order_id: batch['Order Id'],
+                  data: JSON.stringify(data),
+                  create_date: KND.Util.now()
+                }).then(resolve);
+              }
+            });
+          }));
+        };
+        Promise.all(tasks).then(result => {
+          console.log('订单行缓存完成...');
+          resolve(batchs);
+        });
+      });
+    }).then(batchs => {
+      // 3. 缓存楼栋数据
+      return new Promise((resolve, reject) => {
         console.log('开始缓存楼栋...');
         let tasks = [];
         for (let i = 0, len = batchs.length; i < len; i++) {
@@ -209,6 +238,7 @@ class Cache {
                 TaskId: batch.Id
               },
               success: data => {
+                console.log(data);
                 batch.building = data;
                 invokeSQL('insert', 'building', {
                   order_id: batch['Order Id'],
@@ -226,7 +256,7 @@ class Cache {
         });
       });
     }).then(result => {
-      // 3. 缓存房号资产数据
+      // 4. 缓存房号资产数据
       return new Promise((resolve, reject) => {
         console.log(result);
         console.log('开始缓存资产...');
@@ -247,6 +277,7 @@ class Cache {
                   'Integration Id 2': building[i].BuildingNum
                 },
                 success: data => {
+                  console.log(data);
                   invokeSQL('insert', 'assets', {
                     order_id: batch['Order Id'],
                     task_id: batch.Id,
@@ -266,7 +297,7 @@ class Cache {
       });
     }).then(result => {
       console.log(result);
-      console.log('缓存完成...');
+      console.log('------------ 获取最新数据 end ------------');
     }).catch(err => {
       console.error(err);
     });
@@ -324,6 +355,16 @@ class Cache {
       setting.success(filter(result));
     });
   };
+
+  queryOrderLines(setting) {
+    console.log(setting);
+    query('order_line', {
+      order_id: setting.data['Order Header Id']
+    }, result => {
+      console.log(result);
+      setting.success(filter(result));
+    });
+  }
 
 };
 
