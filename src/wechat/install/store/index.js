@@ -99,7 +99,7 @@ export default {
             key: 'queryBuilding',
             data: option.data,
             success: data => {
-              let building = data.SiebelMessage.Building;
+              let building = KND.Util.toArray(data.SiebelMessage.Building);
               commit('setBuilding', building);
               // 默认获取第一栋信息
               dispatch('getLayer', {
@@ -179,6 +179,20 @@ export default {
       mutations: {
       },
       actions: {
+        /**
+         * 添加楼栋，默认添加一栋
+         */
+        addBuilding({state}, data) {
+          api.get({
+            key: 'addBuilding',
+            data: data,
+            success: data => {
+              tools.success(data, {
+                successTips: '添加成功'
+              });
+            }
+          });
+        },
         /**
          * 批量更新楼栋名字
          */
