@@ -5,14 +5,14 @@
                 placeholder="请输入合作伙伴名称">
 
         <cus-loadmore ref="result"
-                      :loadBottom="loadBottomFn"
                       :emptyTips="false"
-                      :topStatus="topStatus">
+                      :refresh="false"
+                      @loadBottom="loadBottomFn">
           <cus-cell class="multiple"
+                    v-for="item in result"
                     :key="item.id"
                     :title="'合作伙伴名称:'+ item.Name"
                     @click.native="toDetailFn(item)"
-                    v-for="item in result"
                     is-link>
             <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
             <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Main Phone Number']}}</div>
@@ -29,23 +29,19 @@
   import cusSearch from 'public/components/cus-search';
   import cusCell from 'public/components/cus-cell';
   //
-  let loader = function(...args) {
+  let loader = function(more) {
     let me = this;
-    let event = args.pop();
     let name = me.value;
     let param = {
-      data: {
-        'Name': name
-      },
-      more: args.pop(),
+      type: 'result',
+      name,
+      more,
       callback: (data) => {
-        me.$refs.result[event](data.length);
-      },
-      // 结果渲染列表
-      lst: 'result'
+        me.$refs.result['onBottomLoaded'](data.length);
+      }
     };
     if (!this.isManager) {
-      param.data['KL Partner Status'] = '待审批';
+      param.data.type = 'pending';
     }
     // 获取团队列表
     me.getPartners(param);
@@ -57,8 +53,7 @@
     components: {cusLoadmore, cusSearch, cusCell},
     data: () => {
       return {
-        value: '',
-        topStatus: ''
+        value: ''
       };
     },
     computed: {
@@ -72,7 +67,7 @@
        * @param {String} val 搜索值
        */
       searchFn(val) {
-        loader.call(this, 'onBottomLoaded');
+        loader.call(this, true);
       },
       /**
        * To detail
@@ -93,9 +88,7 @@
        * Load more
        */
       loadBottomFn() {
-        loader.call(this, {
-          more: true
-        }, 'onBottomLoaded');
+        loader.call(this, true);
       }
     }
   };

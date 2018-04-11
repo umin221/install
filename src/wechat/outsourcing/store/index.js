@@ -10,8 +10,6 @@ app.state.alive = ['index'];
 
 // 每页加载条数
 const PAGESIZE = config.pageSize;
-// mapp
-let mapps;
 
 export default new Vuex.Store({
   modules: {
@@ -22,6 +20,9 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
+        // 列表&导航
+        navs: [],
+        // 是否管理员权限
         isManager: false,
         // 待审批
         pending: [],
@@ -40,7 +41,7 @@ export default new Vuex.Store({
           state[list].push(...partners);
         },
         setManager(state, isManager) {
-          mapps = config.mapp[isManager ? 'manager' : 'employee'];
+          state.navs = config.mapp[isManager ? 'manager' : 'employee'];
           state.isManager = isManager;
         }
       },
@@ -49,33 +50,29 @@ export default new Vuex.Store({
          * 获取委外团队列表
          * @param {Object} data 必填 接口请求参数
          * @param {Boolean} more 选填 是否加载更多
-         * @param {String} lst 选填 结果渲染列表
          * @param {Function} callback 选填 处理回调
          * @param {Function} error 选填 错误回调
          */
-        getPartners({state, commit, dispatch}, {data, more, lst, callback, error}) {
-          let mapp = mapps[data['KL Partner Status']] || {};
-          let list = lst || mapp.list;
-          data['KL Partner Status'] = mapp.status;
-
+        getPartners({state, commit, dispatch}, {type, name, more, callback}) {
+          let mapp = state.navs[type] || {};
           api.get({
             key: 'queryPartners',
-            data: data,
+            data: {
+              'KL Partner Status': mapp.status,
+              'Name': name
+            },
             paging: {
-              StartRowNum: more ? state[list].length : 0,
+              StartRowNum: more ? state[type].length : 0,
               PageSize: PAGESIZE
             },
             success: data => {
               let partners = KND.Util.toArray(data.SiebelMessage['Channel Partner']);
               commit(more ? 'addPartners' : 'setPartners', {
                 partners: partners,
-                list: list
+                list: type
               });
-              if (callback) {
-                callback(partners);
-              }
-            },
-            error
+              if (callback) callback(partners);
+            }
           });
         }
       }

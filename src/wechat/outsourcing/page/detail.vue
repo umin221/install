@@ -237,12 +237,16 @@
               },
               success: data => {
                 uploadAttach(data.items.Id);
+                // 标记列表刷新
+                KND.Session.set('refresh', 'pending,valid');
               }
             });
           } else {
             // 创建委外团队
             me.addPartner(data => {
               uploadAttach(data.PrimaryRowId);
+              // 标记列表刷新
+              KND.Session.set('refresh', 'pending');
             });
           }
         });
@@ -254,6 +258,8 @@
           me.update({
             success: data => {
               _upload.call(me, me.$refs.attach.getServerIds(), data.items.Id);
+              // 标记列表刷新
+              KND.Session.set('refresh', 'valid');
             }
           });
         });
