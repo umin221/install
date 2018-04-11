@@ -321,19 +321,31 @@ export default new Vuex.Store({
         ],
         serviceDetail: {},
         action: {},
-        note: []
+        note: [],
+        survey: true
       },
       mutations: {
         setServiceDetail(state, data) {
           state.serviceDetail = data;
+          state.survey = true;
+          state.action = {};
           if (state.serviceDetail.Action) {
             let action = state.serviceDetail.Action;
             state.action = KND.Util.isArray(action) ? action[0] : action;
           }
           if (state.serviceDetail['FIN Service Request Notes']) {
-            state.note = KND.Util.toArray(state.serviceDetail['FIN Service Request Notes']);
+            let note = KND.Util.toArray(state.serviceDetail['FIN Service Request Notes']);
+            state.note = systemSort(note, 'Created');
           } else {
             state.note = [{Note: '暂无数据'}];
+          }
+          if (state.serviceDetail['Customer Survey']) {
+            let survey = KND.Util.toArray(state.serviceDetail['Customer Survey']);
+            for (let i = 0;i < survey.length; i++) {
+              if (survey[i]['KL Status'] === '用户已点评') {
+                state.survey = false;
+              }
+            }
           }
         }
       },
@@ -487,11 +499,11 @@ export default new Vuex.Store({
               form
             },
             success: data => {
-              Toast('回访成功');
+              Toast('点评成功');
               form.callback(data);
             },
             error: data => {
-              Toast('回访失败，请联系管理员');
+              Toast('点评失败，请联系管理员');
             }
           });
         },

@@ -172,7 +172,7 @@ let apiList = {
   /**
    * 更新楼栋名字
    * @param {String} option.data['ProcessName'] 选填 更新楼栋名字的工作流名字
-   * @param {String} option.data['TaskId'] 必填 批次id
+   * @param {String} option.data['Object Id'] 必填 批次id
    * @param {String} option.data['BuildingNum'] 必填 楼栋编号
    * @param {String} option.data['Builing'] 必填 更新的名字
    * @returns {{url: string, data: {body: {ProcessName: string, Object Id: string, BuildingNum: string, FloorNum: string}}}}
@@ -205,17 +205,24 @@ let apiList = {
 
   /**
    * 绑定资产条码型号等
-   * @param option
+   * @param {String} option.data['Id'] 必填 资产id 1-2BSHWBOE
+   * @param {String} option.data['Serial Number'] 必填 条码
+   * @param {String} option.data['Product Id'] 必填 面板 final product id
+   * @param {String} option.data['KL Product Model No Lock Body'] 必填 锁体型号 S070B
+   * @param {String} option.data['KL Product Model No Panel'] 必填 面板型号 SZ3010
    * @returns {{url: string}}
    */
   installOrderAssets: option => {
     return {
       method: 'put',
-      url: 'data/KL Install Order Asset/KL Install Order Asset',
-      data: {
-        'Id': '1-2BSHWBOE',
-        'Serial Number': '222111111'
-      }
+      url: 'data/KL Install Order Asset/KL Install Order Asset'
+      // data: {
+      //  'Id': '',
+      //  'Serial Number': '',
+      //  'Product Id': '',
+      //  'KL Product Model No Lock Body': '',
+      //  'KL Product Model No Panel': ''
+      // }
     };
   }
 

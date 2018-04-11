@@ -78,15 +78,18 @@
   export default {
     name: NAMESPACE,
     activated() {
+      // 刷新当前页
+      let refresh = KND.Session.get('refreshAssets');
       let param = this.$route.query;
       // 订单id & 批次id 2填1
-      let orderId = param.OrderId;
+      OrderId = param.OrderId;
       // 批次id & 订单id 2填1
-      let taskId = param.TaskId;
+      TaskId = param.TaskId;
       // 页面交互模式
       this.mode = param.mode;
       // 不同批次或订单，清除楼栋
-      if (orderId !== OrderId || taskId !== TaskId || this.isEdit) {
+      if (refresh) {
+        KND.Session.remove('refreshAssets');
         if (this.$parent.transitionName === 'turn-on') this.editable = false;
         // 清空楼栋
         this.clearLayer();
@@ -94,9 +97,6 @@
         this.selectRooms = {};
         // 重置tab选择
         this.selected = 0;
-        // 活动id
-        OrderId = orderId;
-        TaskId = taskId;
         // 查询所有楼栋
         this.queryBuilding({
           data: {
@@ -277,8 +277,6 @@
               this.selectRooms[room.Id] = room;
             };
           } else {
-            // 已扫码资产
-            if (room['Serial Number']) return;
             // 推出操作菜单
             this.sheetVisible = true;
             this.sheetObject = room;

@@ -8,30 +8,15 @@ import cache from '../lib/cache';
 
 (function(context) {
   // 工具类
-  let Util = context['Util'];
+  let util = context['Util'];
+  // 会话缓存
+  let session = context.Session;
   // 用户ID
   let userID;
   // 是否本地调试
   let debug = config.debug;
   // 缓存超时
   let exp = config.cacheExp;
-  // 时间戳
-  const LOCK = 1521174072972;
-  // 会话缓存
-  let session = {
-    set: (key, val) => {
-      key += LOCK;
-      sessionStorage.setItem(key, val);
-    },
-    get: (key) => {
-      key += LOCK;
-      return sessionStorage.getItem(key);
-    },
-    remove: (key) => {
-      key += LOCK;
-      return sessionStorage.removeItem(key);
-    }
-  };
 
   /**
    * 本地化服务
@@ -42,7 +27,7 @@ import cache from '../lib/cache';
      * 构造函数
      */
     constructor() {
-      Util.log('Native init...');
+      util.log('Native init...');
 
       userID = this.getUserID();
       Object.defineProperty(this, 'userID', {
@@ -67,10 +52,10 @@ import cache from '../lib/cache';
      * @response {Object} data 用户信息 包含职位等数据
      */
     getUserInfo(callback) {
-      Util.log('获取用户信息 ' + userID);
+      util.log('获取用户信息 ' + userID);
       let user = session.get('userInfo');
       if (user) {
-        callback(Util.parse(user));
+        callback(util.parse(user));
       } else {
         this.ajax({
           method: 'get',
@@ -89,7 +74,7 @@ import cache from '../lib/cache';
      * IM02 IE01
      */
     getUserID() {
-      return session.get('userID') || 'IM02' || Util['getParam']('userID');
+      return session.get('userID') || 'IM02' || util['getParam']('userID');
     };
 
     /**
@@ -114,7 +99,7 @@ import cache from '../lib/cache';
       }, option));
       // 本地调试
       if (debug) {
-        KND.Util.invoke(option.success, {
+        util.invoke(option.success, {
           localIds: ['img:///storage/emulated/0/Tencent/WeixinWork/tempimagecache/1688852028455906/b4bc209fa2f44c64a57c159645330240.jpg'],
           errMsg: 'chooseImage:ok'
         });
@@ -139,7 +124,7 @@ import cache from '../lib/cache';
       }, option));
       // 本地调试
       if (debug) {
-        KND.Util.invoke(option.success, {
+        util.invoke(option.success, {
           serverId: '1sb9A-V1qJt4tcfiKMM4UzpjMHuBHMMIIgYKl96OQ1_pBe8h0xte9G6aTPNjEQaYI',
           errMsg: 'uploadImage:ok'
         });

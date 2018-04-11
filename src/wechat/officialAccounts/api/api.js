@@ -247,8 +247,6 @@ let ApiList = {
             'ListOfBase KL Service Request Interface BO': {
               'Service Request': {
                 'Id': option.data.form.Id,
-                'Status': '已回访',
-                'SR Status Date': option.data.form.statusDate,
                 'ListOfCustomer Survey': {
                   'Customer Survey': {
                     'Id': '1',
@@ -257,7 +255,7 @@ let ApiList = {
                     'Overall': option.data.form.Overall,          // 维修服务态度？
                     'Resolved': option.data.form.Resolved,        // 是否维修完成？
                     'Comments': option.data.form.Comments,        // 建议与反馈
-                    'KL Status': '完成'
+                    'KL Status': '用户已点评'
                   }
                 }
               }

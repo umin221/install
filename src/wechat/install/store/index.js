@@ -83,7 +83,7 @@ export default {
         },
         // 移除楼栋
         remove(state, index) {
-          state.assets.splice(index, 1);
+          state.building.splice(index, 1);
         },
         // 清空楼栋
         clearLayer(state) {
@@ -156,6 +156,8 @@ export default {
                 back: true,
                 successTips: '更新成功'
               });
+              // 标记楼栋资产刷新
+              KND.Session.set('refreshAssets', true);
             }
           });
         },
@@ -190,6 +192,8 @@ export default {
               tools.success(data, {
                 successTips: '添加成功'
               });
+              // 标记楼栋资产刷新
+              KND.Session.set('refreshAssets', true);
             }
           });
         },
@@ -219,6 +223,8 @@ export default {
               tools.success(data, {
                 successTips: '更新成功'
               });
+              // 标记楼栋资产刷新
+              KND.Session.set('refreshAssets', true);
             };
           };
           run(upArr.pop());
@@ -242,13 +248,21 @@ export default {
          */
         queryOrderLines({state}, setting) {
           setting.key = 'queryOrderLines';
-          api.get(setting);
+          cache.invoke(setting);
         },
         /**
          * 绑定资产条码型号等
          */
         installOrderAssets({state}, setting) {
           setting.key = 'installOrderAssets';
+          setting.success = data => {
+            tools.success(data, {
+              back: true,
+              successTips: '绑定成功'
+            });
+            // 标记楼栋资产刷新
+            KND.Session.set('refreshAssets', true);
+          };
           api.get(setting);
         }
       }

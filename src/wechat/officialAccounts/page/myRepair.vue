@@ -14,7 +14,7 @@
                   v-for="(item, index) in serviceList"
                   :key="item.Id"
                   :title="'服务单编号:'+ item['SR Number']"
-                  @click.native="toDetail(item['SR Number'])"
+                  @click.native="toDetail(item['SR Number'], item['Id'])"
                   is-link>
           <div slot="after" style="color: #A2BBFC">{{item['Status']}}</div>
           <div class="mint-cell-sub-title" slot="title">申请日期：{{item['Created']}}</div>
@@ -51,12 +51,13 @@
       ...mapActions(NameSpace, ['getServiceList']),
       ...mapActions('address', ['getContact']),
       ...mapMutations(NameSpace, ['']),
-      toDetail(srNumber) {
+      toDetail(srNumber, Id) {
         let me = this;
         me.$router.push({
           name: 'repairDetail',
           query: {
-            srNumber: srNumber
+            srNumber: srNumber,
+            srId: Id
           }
         });
       }
