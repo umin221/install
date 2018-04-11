@@ -6,6 +6,7 @@
  */
 import 'public/config'; // Loader Config
 import './util'; // Global Util
+import './session'; // Global Session
 import '../native'; // Register Native API
 // import './filters'; // Global Vue Filter
 // import './mixin'; // Global Mixin
