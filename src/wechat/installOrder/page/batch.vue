@@ -19,17 +19,36 @@
           <mt-cell-swipe v-for="(line, index) in planList" class="lock-line-cell enable" ref="body"
                          @click.native="addPlanFn(line)"
                          :key=index
+                         :right="getSwipeBtn(line, index)"
                          is-link>
             <div class="co-flex co-jc" slot="title">
-            <span class="co-f1">{{line.Description}}</span>
-            <span class="co-f1">{{line['KL Detail Type']}}</span>
-          </div>
+              <span class="co-f1">{{line.Description}}</span>
+              <span class="co-f1">{{line['KL Detail Type']}}</span>
+            </div>
             <div class="co-flex co-jc" slot="title">
               <span class="co-f1" >{{new Date(line.Planned).format('yyyy-MM-dd hh:mm:ss')}}</span>
               <span class="co-f1">{{new Date(line['Planned Completion']).format('yyyy-MM-dd hh:mm:ss')}}</span>
             </div>
           </mt-cell-swipe>
         </lock-line>
+
+
+        <lock-line title="锁体" @click="toLineFn(undefined, 'Lock Body')">
+          <mt-cell-swipe v-for="(line, index) in lines" class="lock-line-cell enable" ref="body"
+                         v-if="line['KL Product Type LIC']==='Lock Body'"
+                         @click.native="toLineFn(line)"
+                         :key="line['Id']"
+                         :right="getSwipeBtn(line, index)"
+                         is-link>
+            <div class="co-flex co-jc" slot="title">
+              <span v-show="editable" class="co-f1 icon-copy" @click.stop="copyFn(line)"></span>
+              <span class="co-f2">{{line['KL Product Model No']}}</span>
+              <span class="co-f2">开向:{{line['KL Hole Direction']}}</span>
+              <span class="co-f2">数量:{{line['Quantity Requested']}}</span>
+            </div>
+          </mt-cell-swipe>
+        </lock-line>
+
       </div>
       <button-group>
         <mt-button class="single"
@@ -177,6 +196,13 @@
     methods: {
       ...mapActions('app', ['getLov']),
       ...mapActions(NameSpace, ['getPcObj']),
+      getSwipeBtn(line, index) {
+        return this.editable ? [{
+          content: '删除',
+          style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
+          handler: () => this.deleteFn(line, index)
+        }] : [];
+      },
       open(picker) {
         var self = this;
         self.eDate = new Date(self.start_Date);

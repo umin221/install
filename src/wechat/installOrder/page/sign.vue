@@ -27,7 +27,7 @@
       <attach ioName="KL Action Attachment" ref="attach"
               :attach="attach.list"
               :edit="!read"
-              :title="title"
+              :title="attach.title"
               v-show="box1">
       </attach>
       <div :class="{'readonly':read}" v-show="box1">
@@ -61,7 +61,7 @@
     // 成功回调
     let callback = data => {
       tools.success(data, {
-        back: true,
+        back: false,
         successTips: '提交成功'
       });
     };
@@ -195,7 +195,9 @@
               // 新增签收
               self.getUPData(data => {
                 console.dir(data.items.Id);
-                uploadAttach(data.items.Id);
+                if (self.attach.list.length > 0) {
+                  uploadAttach(data.items.Id);
+                }
                 self.getTpye();
               });
             } else {

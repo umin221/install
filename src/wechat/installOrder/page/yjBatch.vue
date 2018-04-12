@@ -26,9 +26,10 @@
                   v-model="Contact_Name"
                   class="textRight require"></mt-field>
       </div>
-      <attach :attach="attach.list"
+      <attach ioName="KL Action Attachment" ref="attach"
+              :attach="attach.list"
               :edit="!read"
-              :title="title">
+              :title="attach.title">
       </attach>
       <div :class="{'readonly':read}">
         <mt-field label="备注说明" type="textarea" v-model="Description"></mt-field>
@@ -91,6 +92,29 @@
   import {mapState, mapActions, mapMutations} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
   import api from '../api/api';
+  /**
+   * 附件上传
+   * @param {Array} serverIds 企业微信临时素材id => mediaId
+   * @param {String} id 业务id
+   */
+  let _upload = function(serverIds, id) {
+    // 成功回调
+    let callback = data => {
+      tools.success(data, {
+        back: false,
+        successTips: '提交成功'
+      });
+    };
+    // 上传附件
+    serverIds ? this.upload({
+      data: {
+        MediaId: serverIds,
+        Id: id,
+        IOName: 'KL Action Attachment'
+      },
+      success: callback
+    }) : callback(id);
+  };
   const NameSpace = 'yjBatch';
   const delay = (function() {
     let timer = 0;
@@ -140,6 +164,11 @@
         isCall: {},
         orderID: '', // 订单id
         titleVal: '真锁移交',
+        attach: { // 附件
+          list: [],
+          edit: false,
+          title: '附件'
+        },
         active: 'tab-container'
       };
     },
@@ -150,7 +179,7 @@
       });
     },
     computed: {
-      ...mapState('yjBatch', ['attach', 'search']),
+      ...mapState('yjBatch', ['search']),
       ...mapState('detail', ['itemTask']),
       // 表单只读
       read() {
@@ -181,7 +210,7 @@
       }
     },
     methods: {
-      ...mapActions('app', ['getLov']),
+      ...mapActions('app', ['getLov', 'upload']),
       ...mapActions(NameSpace, ['getSearch']),
       ...mapMutations(NameSpace, ['removeSearch']),
       open(picker) {
@@ -299,6 +328,13 @@
           },
           success: function(data) {
             if (!data.ERROR) {
+              // 提交图片
+              let uploadAttach = id => {
+                _upload.call(self, self.$refs.attach.getServerIds(), id);
+              };
+              if (self.attach.list.length > 0) {
+                uploadAttach(self.itemTask.Id);
+              }
               // 更新状态
               var Status = '';
               self.getLov({ // 取类型值

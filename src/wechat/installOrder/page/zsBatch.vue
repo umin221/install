@@ -48,12 +48,12 @@
           </mt-cell-swipe>
         </lock-line>
       </div>
-      <div v-show="box1">
-        <attach :attach="attach.list"
-                :edit="!read"
-                :title="title">
-        </attach>
-      </div>
+      <attach ioName="KL Action Attachment" ref="attach"
+              :attach="attach.list"
+              :edit="!read"
+              :title="attach.title"
+              v-show="box1">
+      </attach>
       <button-group>
         <mt-button class="single"
                    v-show="showZs"
@@ -134,8 +134,31 @@
   import api from '../api/api';
   const NameSpace = 'zsBatch';
   let today = new Date();
+  /**
+   * 附件上传
+   * @param {Array} serverIds 企业微信临时素材id => mediaId
+   * @param {String} id 业务id
+   */
+  let _upload = function(serverIds, id) {
+    // 成功回调
+    let callback = data => {
+      tools.success(data, {
+        back: false,
+        successTips: '提交成功'
+      });
+    };
+    // 上传附件
+    serverIds ? this.upload({
+      data: {
+        MediaId: serverIds,
+        Id: id,
+        IOName: 'KL Action Attachment'
+      },
+      success: callback
+    }) : callback(id);
+  };
   export default {
-    name: 'zsBatch',
+    name: NameSpace,
     created() {
       var self = this;
       let param = this.$route.query;
@@ -160,6 +183,8 @@
           self.companyName = self.pcObj['KL Partner Name'];
           self.getPlanList(self.batchCode); // 详细计划
           self.getInstallerList(self.batchCode); // 委外联系人
+          self.getQueryMedias(self.batchCode); // 附件
+
         }
       } else if (self.type === 'edit') {
         if (self.pcObj.Id) { // 批次页面新增保存有数据
@@ -176,12 +201,15 @@
           self.companyName = self.pcObj['KL Partner Name'];
           self.getPlanList(self.batchCode); // 详细计划
           self.getInstallerList(self.batchCode); // 委外联系人
+          self.getQueryMedias(self.batchCode); // 附件
+
         } else {
           self.getBatch(self.item.Id);
           self.id = self.item.Id;
           self.batchCode = self.item.Id; // 详情的ID
           self.getPlanList(self.item.Id); // 详细计划
-          self.getInstallerList(self.item.Id); // 委外联系人
+          self.getQueryMedias(self.item.Id); // 附件
+
         }
       }
     },
@@ -211,6 +239,11 @@
         type: 'edit', // add 新增 / edit 编辑 / read 只读
         editable: true,
         titleVal: '新建批次',
+        attach: { // 附件
+          list: [],
+          edit: false,
+          title: '附件'
+        },
         active: 'tab-container'
       };
     },
@@ -222,7 +255,6 @@
       });
     },
     computed: {
-      ...mapState(NameSpace, ['attach']),
       ...mapState('detail', ['itemTask', 'showZs']),
       ...mapState('batch', ['pcObj']),
       // 表单只读
@@ -237,7 +269,7 @@
       }
     },
     methods: {
-      ...mapActions('app', ['getLov']),
+      ...mapActions('app', ['getLov', 'upload', 'queryMedias']),
       ...mapActions('batch', ['getPcObj']),
       open(picker) {
         var self = this;
@@ -284,6 +316,13 @@
         if (!self.id) {
           Toast('请先保存批次信息！');
           return;
+        }
+        // 提交图片
+        let uploadAttach = id => {
+          _upload.call(self, self.$refs.attach.getServerIds(), id);
+        };
+        if (self.attach.list.length > 0) {
+          uploadAttach(self.id);
         }
         /* if (self.box1) {
           if (!self.companyId) {
@@ -340,6 +379,19 @@
           },
           success: function(data) {
             self.installerList = KND.Util.toArray(data.SiebelMessage['KL Installation Task']['Contact']);
+          }
+        });
+      },
+      getQueryMedias(id) {
+        this.queryMedias({
+          data: {
+            'IOName': 'KL Action Attachment',
+            'SearchSpec': {
+              'Action Attachment.Activity Id': id
+            }
+          },
+          success: data => {
+            this.attach.list = KND.Util.toArray(data['SiebelMessage']['Action Attachment']);
           }
         });
       },
@@ -446,6 +498,11 @@
                   self.id = data.items.Id; // 新增批次返回的ID
                   self.batchCode = data.items.Id; // 新增批次返回的ID
                   self.getPcObj(data.items); // 保存store
+                  // 提交图片
+                  let uploadAttach = id => {
+                    _upload.call(self, self.$refs.attach.getServerIds(), id);
+                  };
+                  uploadAttach(self.id);
                   if (num === '1') {
                     let planType = self.itemTask['KL Detail Type']; // 取统一批次
                     self.$router.push({
@@ -549,6 +606,13 @@
         if (self.planList.length === 0) {
           Toast('详细计划不能为空！');
           return;
+        }
+        // 提交图片
+        let uploadAttach = id => {
+          _upload.call(self, self.$refs.attach.getServerIds(), id);
+        };
+        if (self.attach.list.length > 0) {
+          uploadAttach(self.id);
         }
         MessageBox({
           title: '提示',

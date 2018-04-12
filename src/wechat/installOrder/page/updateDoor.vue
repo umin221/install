@@ -100,15 +100,15 @@
       title() {
         let item = this.item;
         var val = '';
-        if (item['KL Detail Type LIC'] === 'Trompil Batch Summary') {
+        if (item['KL Detail Type LIC'] === 'Trompil Batch') {
           val = '开孔进度更新';
-        } else if (item['KL Detail Type LIC'] === 'Lock Body Install Summary') {
+        } else if (item['KL Detail Type LIC'] === 'Lock Body Install') {
           val = '锁体进度更新';
         } else if (item['KL Detail Type LIC'] === 'Door Hanging Acc Batch') {
           val = '挂门进度更新';
-        } else if (item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary') {
+        } else if (item['KL Detail Type LIC'] === 'Substitution Lock Inst Batch') {
           val = '替代锁进度更新';
-        } else if (item['KL Detail Type LIC'] === 'Check Before Trans Summary') {
+        } else if (item['KL Detail Type LIC'] === 'Check Before Transfer Batch') {
           val = '全检进度更新';
         }
         return val;

@@ -1079,7 +1079,7 @@
                   name: 'updateDoorNext',
                   query: {
                     type: 'add',
-                    id: item.Id
+                    item: item
                   }
                 });
               } else {
@@ -1162,7 +1162,7 @@
                     name: 'updateDoorNext',
                     query: {
                       type: 'add',
-                      id: item.Id
+                      item: item
                     }
                   });
                 } else if (fItem['KL Detail Type LIC'] === 'Transfer Summary') { // 真锁移交更新

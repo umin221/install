@@ -51,6 +51,12 @@
           </mt-cell-swipe>
         </lock-line>
       </div>
+      <attach ioName="KL Action Attachment" ref="attach"
+              :attach="attach.list"
+              :edit="!read"
+              :title="attach.title"
+              v-show="is_installer">
+      </attach>
       <button-group v-show="is_option && is_but">
         <mt-button class="single"
                    @click.native="submitFn('Rejected')">驳回</mt-button>
@@ -141,7 +147,12 @@
         id: '',
         item: '',
         editable: false,
-        active: 'tab-container'
+        active: 'tab-container',
+        attach: { // 附件
+          list: [],
+          edit: false,
+          title: '附件'
+        }
       };
     },
     beforeRouteEnter(to, from, next) {
@@ -152,13 +163,17 @@
       });
     },
     computed: {
+      // 表单只读
+      read() {
+        return true;
+      },
       // * 是否显示
       heartVisible() {
         return this.type === 'read' ? '' : 'require';
       }
     },
     methods: {
-      ...mapActions('app', ['getLov']),
+      ...mapActions('app', ['getLov', 'queryMedias']),
       approvalFn() {
         var self = this;
         this.$router.push({
@@ -203,6 +218,17 @@
                   data['KL Detail Type LIC'] === 'Lock Installation Batch') { // 替代锁批次=Substitution Lock Inst Batch、真锁=Lock Installation Batch获取为外人员 显示合作伙伴
                   self.is_installer = true;
                   self.getInstallerList(id);
+                  self.queryMedias({ // 附件查询
+                    data: {
+                      'IOName': 'KL Action Attachment',
+                      'SearchSpec': {
+                        'Action Attachment.Activity Id': id
+                      }
+                    },
+                    success: data => {
+                      this.attach.list = KND.Util.toArray(data['SiebelMessage']['Action Attachment']);
+                    }
+                  });
                   self.companyName = data['KL Partner Name'];
                   if (data['KL Detail Type LIC'] === 'Lock Installation Batch') { // 真锁
                     self.is_zs = true;

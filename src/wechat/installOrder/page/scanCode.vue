@@ -24,8 +24,6 @@
                :class="heartVisible" v-model="SerialNumber" is-link>
         <i class="xs-icon icon-scan" @click="scan"></i>
       </mt-field>
-      <mt-cell title="产品型号" placeholder="请输入"
-               :class="heartVisible" v-model="productCode" is-link></mt-cell>
       <mt-cell title="面板型号" placeholder="请输入"
                :class="heartVisible" v-model="productCode" is-link></mt-cell>
       <mt-cell title="锁体型号" placeholder="请输入"
