@@ -145,7 +145,7 @@
           // 房号
           let room = this.markFn(layer[i]);
           // 楼层
-          let floor = parseInt(room['Integration Id 3'], 10);
+          let floor = parseInt(room['KL Floor Number'], 10);
           // 楼层分组
           layers[floor] = layers[floor] || [];
           layers[floor].push(room);
@@ -193,7 +193,7 @@
         this.getLayer({
           'Original Order Id': OrderId,
           'KL Activity Id': TaskId,
-          'Integration Id 2': code
+          'KL Building Number': code
         });
       },
       /**
@@ -211,7 +211,7 @@
           // 楼层编码自增
           let floorCode = maxFloor + 1;
           // 楼层编码自增
-          room['Integration Id 3'] = floorCode;
+          room['KL Floor Number'] = floorCode;
           // 楼层自增
           room['Street Address 3'] = room['Street Address 3'].replace(maxFloor, floorCode);
           // 房号楼层自增
@@ -245,8 +245,8 @@
        */
       deleteBuildingFn(floor) {
         MessageBox.confirm('是否删除整层？', '请确认').then(() => {
-          let buildingNum = floor[0]['Integration Id 2'];
-          let floorNum = floor[0]['Integration Id 3'];
+          let buildingNum = floor[0]['KL Building Number'];
+          let floorNum = floor[0]['KL Floor Number'];
           // 只批次编辑楼栋
           this.removeBuilding({
             data: {
@@ -258,7 +258,7 @@
               this.getLayer({
                 'Original Order Id': OrderId,
                 'KL Activity Id': TaskId,
-                'Integration Id 2': buildingNum
+                'KL Building Number': buildingNum
               });
             }
           });

@@ -8,7 +8,7 @@
       <mt-field label="楼层名称" v-model="floorName"></mt-field>
       <div style="height: 5px"></div>
       <mt-cell-swipe v-for="(room, index) in floor"
-                     :title="'房号'+ room['Integration Id']"
+                     :title="'房号'+ room['KL Room Number']"
                      :right="[{
                         content: '删除',
                         style: { background: 'red', color: '#fff' },
@@ -50,9 +50,9 @@
         'Province': item['Province'],
         'Country': item['Country'],
         'Street Address 2': item['Street Address 2'],
-        'Integration Id': item['Integration Id'],
-        'Integration Id 3': item['Integration Id 3'],
-        'Integration Id 2': item['Integration Id 2'],
+        'KL Building Number': item['KL Building Number'],
+        'KL Room Number': item['KL Room Number'],
+        'KL Floor Number': item['KL Floor Number'],
         'City': item['City'],
         'Street Address': item['Street Address'],
         'Id': item['Personal Address Id'],
@@ -74,7 +74,7 @@
       // 楼层名字
       this.floorName = this.floor[0]['Street Address 3'];
       // 按编号排序
-      // floor.sort((a, b) => a['Integration Id'] > b['Integration Id']);
+      // floor.sort((a, b) => a['KL Building Number'] > b['KL Building Number']);
     },
     data: () => {
       return {
@@ -95,7 +95,7 @@
         // 构造新房号
         let room = Object.assign({}, floor[floor.length - 1]);
         // 房号编码自增
-        room['Integration Id'] = parseInt(room['Integration Id'], 10) + 1;
+        room['KL Room Number'] = parseInt(room['KL Room Number'], 10) + 1;
         // 房号自增
         room['Street Address 4'] = parseInt(room['Street Address 4'], 10) + 1;
         // 房号id 唯一即可

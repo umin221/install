@@ -26,7 +26,7 @@ let apiList = {
    * 获取楼栋下所有楼层和房间
    * @param {Object} option.data 必填，过滤条件
    * @param {String} option.data['KL Activity Id'] 必填，批次id 1-2BSEB2Z2
-   * @param {String} option.data['Integration Id 2'] 必填，楼栋编号 1
+   * @param {String} option.data['KL Building Number'] 必填，楼栋编号 1
    * @returns {{method: string, url: string, data: {}}}
    */
   getLayer: option => {
@@ -35,7 +35,7 @@ let apiList = {
       data: {
         'body': {
           'OutputIntObjectName': 'Base KL Install Order Asset',
-          'SearchSpec': KND.Util.condition(option.data, 'Asset Room') // '[Asset Room.KL Activity Id]="1-2BSEB2Z2" AND [Asset Room.Integration Id 2]="1"'
+          'SearchSpec': KND.Util.condition(option.data, 'Asset Room') // '[Asset Room.KL Activity Id]="1-2BSEB2Z2" AND [Asset Room.KL Building Number]="1"'
         }
       }
     };
@@ -45,7 +45,7 @@ let apiList = {
    * 获取楼栋下所有楼层和房间
    * @param {Object} option.data 必填，过滤条件
    * @param {String} option.data['KL Activity Id'] 必填，批次id 1-2BSEB2Z2
-   * @param {String} option.data['Integration Id 2'] 必填，楼栋编号 1
+   * @param {String} option.data['KL Building Number'] 必填，楼栋编号 1
    * @returns {{method: string, url: string, data: {}}}
    */
   getLayerSort: option => {
@@ -54,7 +54,7 @@ let apiList = {
       data: {
         'body': {
           'OutputIntObjectName': 'Base KL Install Order Asset',
-          'SearchSpec': KND.Util.condition(option.data, 'Asset Room'), // '[Asset Room.KL Activity Id]="1-2BSEB2Z2" AND [Asset Room.Integration Id 2]="1"'
+          'SearchSpec': KND.Util.condition(option.data, 'Asset Room'), // '[Asset Room.KL Activity Id]="1-2BSEB2Z2" AND [Asset Room.KL Building Number]="1"'
           'SortSpec': 'KL Room Number(ASCENDING)', // 'KL Floor Number(ASCENDING),KL Room Number(ASCENDING)',
           'StartRowNum': 0,
           'PageSize': 100

@@ -110,7 +110,7 @@ export default {
                 dispatch('getLayer', {
                   'Original Order Id': option.data.OrderId,
                   'KL Activity Id': option.data.TaskId,
-                  'Integration Id 2': building[0].BuildingNum
+                  'KL Building Number': building[0].BuildingNum
                 });
               };
               commit('setBuilding', building);

@@ -156,7 +156,8 @@ class Cache {
    */
   invoke(setting) {
     console.log(setting);
-    if (config.offline) {
+    let localMethod = {'queryLocalInstallRecord': 1};
+    if (config.offline || localMethod[setting.key]) {
       let method = this[setting.key];
       method ? method.call(this, setting) : console.error(`${setting.key} is not a function`);
     } else {
