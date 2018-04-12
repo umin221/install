@@ -73,40 +73,42 @@
   let layers = {};
   // 当前最高楼层
   let maxFloor = 0;
+  // 本地扫码记录
+  let installRecords = {};
 
   const NAMESPACE = 'assets';
   export default {
     name: NAMESPACE,
     activated() {
+      let me = this;
       // 刷新当前页
       let refresh = KND.Session.get('refreshAssets');
-      let param = this.$route.query;
+      let param = me.$route.query;
       // 订单id & 批次id 2填1
       OrderId = param.OrderId;
       // 批次id & 订单id 2填1
       TaskId = param.TaskId;
       // 页面交互模式
-      this.mode = param.mode;
+      me.mode = param.mode;
       // 不同批次或订单，清除楼栋
       if (refresh) {
         KND.Session.remove('refreshAssets');
-        if (this.$parent.transitionName === 'turn-on') this.editable = false;
+        if (me.$parent.transitionName === 'turn-on') me.editable = false;
         // 清空楼栋
-        this.clearLayer();
+        me.clearLayer();
         // 清空选中房号
-        this.selectRooms = {};
-        // 重置tab选择
-        this.selected = 0;
+        me.selectRooms = {};
         // 查询所有楼栋
-        this.queryBuilding({
+        me.queryBuilding({
           data: {
             OrderId: OrderId,
             TaskId: TaskId
-          }
+          },
+          selected: me.selected
         });
         // 查询本地缓存安装记录
-        this.queryLocalInstallRecord(result => {
-          console.log(result);
+        me.queryLocalInstallRecord(result => {
+          installRecords = result;
         });
       }
     },
@@ -144,8 +146,12 @@
         for (let i = 0, len = layer.length; i < len; i++) {
           // 房号
           let room = this.markFn(layer[i]);
+          // 本地扫码记录
+          let record = installRecords[room.Id];
           // 楼层
           let floor = parseInt(room['KL Floor Number'], 10);
+          // 扫码标记
+          if (record) room['Serial Number'] = KND.Util.parse(record.data)['Serial Number'];
           // 楼层分组
           layers[floor] = layers[floor] || [];
           layers[floor].push(room);

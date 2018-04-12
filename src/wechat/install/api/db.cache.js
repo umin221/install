@@ -60,10 +60,10 @@ class Helper {
 
   /**
    * 更新或插入数据，id存在记录则更新，否则插入记录
-   * @param table 表名
-   * @param data 更新或插入数据
-   * @param condition 查询条件
-   * @param callback
+   * @param {String} table 必填 表名
+   * @param {Object} data 必填 更新或插入数据
+   * @param {Object} condition 必填 查询条件
+   * @param {Function} callback
    */
   upsert(table, data, condition, callback) {
     this.query(table, condition, result => {
@@ -73,10 +73,10 @@ class Helper {
 
   /**
    * 清除缓存
-   * @param data
+   * @param {Boolean} clearAll 选填 清空所有数据
    * @returns {Promise}
    */
-  clear(data) {
+  clear(clearAll) {
     console.log(this);
     let me = this;
     return new Promise((resolve, reject) => {
@@ -87,7 +87,7 @@ class Helper {
         result = util.toArray(result);
         for (let i = 0, len = result.length; i < len; i++) {
           let table = result[i];
-          if (table === 'install_record') {
+          if (clearAll && table === 'install_record') {
             me.hasRecord = true;
             continue;
           };
@@ -104,10 +104,9 @@ class Helper {
 
   /**
    * 初始化数据库表
-   * @param data
    * @returns {Promise}
    */
-  create(data) {
+  create() {
     let me = this;
     return new Promise((resolve, reject) => {
       console.log('初始化数据库表...');
@@ -139,7 +138,59 @@ class Helper {
 }; let helper = new Helper();
 
 /**
- * 数据缓存
+ * data handle
+ */
+class DataHandle {
+
+  /**
+   * 构造函数
+   */
+  constructor() {
+    util.log('DataHandle init...');
+  };
+
+  /**
+   * 检测当前网络环境
+   */
+  checkNetwork() {
+    console.log('check network...');
+    // if (true) this.submit();
+  };
+
+  /**
+   * 提交本地安装信息
+   */
+  submit() {
+    helper.query('install_record', {}, data => {
+      let tasks = [];
+      // 记录提交结果
+      let result = [];
+      for (let i = 0, len = data.length; i < len; i++) {
+        let item = data[i];
+        tasks.push(new Promise((resolve, reject) => {
+          api.get({
+            key: 'installOrderAssets',
+            data: util.parse(item.data),
+            success: data => {
+              result.push(item);
+              resolve(result);
+            }
+          });
+        }));
+      };
+      Promise.all(tasks).then(result => {
+        console.log(result);
+        MessageBox.alert(`成功提交${result.length}条安装记录！`, '恭喜');
+      }).catch(err => {
+        console.error(err);
+      });
+    });
+  };
+
+}; let handle = new DataHandle();
+
+/**
+ * cache 数据缓存
  */
 class Cache {
 
@@ -160,6 +211,8 @@ class Cache {
     if (config.offline || localMethod[setting.key]) {
       let method = this[setting.key];
       method ? method.call(this, setting) : console.error(`${setting.key} is not a function`);
+      // 检测当前网络并提交数据
+      handle.checkNetwork();
     } else {
       api.get(setting);
     }
@@ -189,11 +242,12 @@ class Cache {
    * 1. 删除数据表
    * 2. 创建数据表
    * 3. 缓存数据
-   * @param {Object} setting 接口参数配置
+   * @param {Object} data 必填 批次汇总
+   * @param {Boolean} clearAll 选填 清空所有
    */
-  init(data) {
+  init(data, clearAll = true) {
     let me = this;
-    helper.clear.call(me).then(result => helper.create.call(me)).then(result => me.reCache(data)).catch(err => console.error(err));
+    helper.clear.call(me, clearAll).then(result => helper.create.call(me)).then(result => me.reCache(data)).catch(err => console.error(err));
   };
 
   /**
@@ -307,7 +361,7 @@ class Cache {
                 data: {
                   'Original Order Id': batch['Order Id'],
                   'KL Activity Id': batch.Id,
-                  'Integration Id 2': building[i].BuildingNum
+                  'KL Building Number': building[i].BuildingNum
                 },
                 success: data => {
                   console.log(data);
@@ -337,7 +391,7 @@ class Cache {
   };
 
   /**
-   * 获取批次列表
+   * 获取批次列表 <查询本地 & 远程>
    * @param {Object} setting 接口参数配置
    */
   queryInstallTask(setting) {
@@ -364,7 +418,7 @@ class Cache {
   };
 
   /**
-   * 查询楼栋信息
+   * 查询楼栋信息 <查询本地>
    * @param setting
    */
   queryBuilding(setting) {
@@ -376,21 +430,21 @@ class Cache {
   };
 
   /**
-   * 查询房号资产
+   * 查询房号资产 <查询本地>
    * @param setting
    */
   getLayer(setting) {
     let param = setting.data;
     helper.query('assets', {
       task_id: param['KL Activity Id'],
-      building_num: param['Integration Id 2']
+      building_num: param['KL Building Number']
     }, result => {
       setting.success(filter(result));
     });
   };
 
   /**
-   * 查询订单行
+   * 查询订单行 <查询本地>
    * @param setting
    */
   queryOrderLines(setting) {
@@ -403,7 +457,7 @@ class Cache {
   };
 
   /**
-   * 绑定资产条码信息
+   * 绑定资产条码信息 <保存本地>
    * @param setting
    */
   installOrderAssets(setting) {
@@ -419,12 +473,14 @@ class Cache {
   };
 
   /**
-   * 查询本地扫码安装记录
+   * 查询本地扫码安装记录 <查询本地>
    * @param setting
    */
   queryLocalInstallRecord(setting) {
     helper.query('install_record', {}, result => {
-      setting.success(result);
+      let data = {};
+      for (let i = 0, len = result.length; i < len; i++) data[result[i].id] = result[i];
+      setting.success(data);
     });
   };
 

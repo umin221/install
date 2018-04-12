@@ -106,11 +106,12 @@ export default {
                 });
               } else {
                 building = KND.Util.toArray(data.SiebelMessage.Building);
+                let index = option.selected || 0;
                 // 默认获取第一栋信息
                 dispatch('getLayer', {
                   'Original Order Id': option.data.OrderId,
                   'KL Activity Id': option.data.TaskId,
-                  'KL Building Number': building[0].BuildingNum
+                  'KL Building Number': building[index].BuildingNum
                 });
               };
               commit('setBuilding', building);
