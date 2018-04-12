@@ -174,11 +174,11 @@
           data: {
             'body': {
               'OutputIntObjectName': 'Base KL Installation Detail',
-              'SearchSpec': '[Base KL Installation Detail.Id]=' + '"' + self.id + '"'
+              'SearchSpec': '[KL Installation Detail.Activity Id]=' + '"' + self.id + '"'
             }
           },
           success: function(data) {
-            self.processDate = KND.Util.toArray(data.SiebelMessage['KL Installation Task Detail Plan']);
+            self.processDate = KND.Util.toArray(data.SiebelMessage['KL Installation Detail']);
             console.dir(self.processDate);
           }
         });
