@@ -93,18 +93,21 @@ export default new Vuex.Store({
             data: {
               num
             },
-            success: function(data) {                                       // HBS1803014006
-              console.log(data);
-              if (data.items) {
-                console.log(111);
-                let datas = KND.Util.toArray(data.items);
-                commit('addressBack', datas[0]);
-                callback(data[0]);
+            success: function(data) {
+              let datas = [];
+              if (data) {
+                if (data.items) {
+                  datas = KND.Util.toArray(data.items);
+                } else {
+                  datas = KND.Util.toArray(data);
+                }
+                console.log(datas);
+                // commit('addressBack', datas[0]);
+                callback(datas[0]);
               }
             },
             error: function(data) {
               Toast('该码未录入系统');
-              commit('errorTips', data);
             }
           });
         }
@@ -460,8 +463,13 @@ export default new Vuex.Store({
               value: klsn
             },
             success: data => {
-              if (data.items) {
-                let datas = KND.Util.toArray(data.items);
+              let datas = [];
+              if (data) {
+                if (data.items) {
+                  datas = KND.Util.toArray(data.items);
+                } else {
+                  datas = KND.Util.toArray(data);
+                }
                 commit('getAsset', datas[0]);
                 callback(datas[0]);
               }
