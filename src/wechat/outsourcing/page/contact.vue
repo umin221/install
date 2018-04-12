@@ -15,6 +15,8 @@
                   v-model="contact['Last Name']"></mt-field>
         <mt-field label="登陆账号" class="readonly"
                   :value="contact['Phone #']"></mt-field>
+        <mt-field label="登陆密码"
+                  :value="contact['KL Outsource Password']"></mt-field>
         <!--<mt-field label="登陆密码" placeholder="请输入密码"-->
           <!--v-model="contact['KL Outsource Password']"></mt-field>-->
       </div>
@@ -48,10 +50,11 @@
         title: '新建委外联系人',
         contact: {
           'Id': KND.Util.now(),
-          'First Name': '.',
-          'KL Type': '委外人员', // 联系人类型
-          'User Type': '委外人员', // 用户类型
-          'Login Name': ''
+          'Phone #': '', // 电话号码
+          'First Name': '.', // 固定
+          'KL Type': '委外人员', // 固定 联系人类型
+          'User Type': '委外人员', // 固定 用户类型
+          'KL Outsource Password': '' // 密码
         }
       };
     },

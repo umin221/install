@@ -43,10 +43,10 @@
         <title-group>审批记录</title-group>
         <empty v-show="!record"></empty>
         <mt-cell class="multiple"
-                       v-for="item in record"
+                       v-for="item in records"
                        :key="item.state">
-          <div class="mint-cell-title" slot="title">{{item['state']}}</div>
-          <div class="mint-cell-sub-title" slot="title">{{item['time']}}</div>
+          <div class="mint-cell-title" slot="title">{{item['Party Name'] +' '+ item['Action']}}</div>
+          <div class="mint-cell-sub-title" slot="title">{{item['Created']}}</div>
         </mt-cell>
       </div>
 
@@ -133,6 +133,12 @@
       // 获取详情
       if (param.id) {
         me.findPartnerById(param.id);
+        me.queryApprovalList({
+          data: {id: param.id},
+          success: data => {
+            this.records = KND.Util.toArray(data.SiebelMessage['UInbox Item']);
+          }
+        });
         me.queryMedias({
           data: {
             'IOName': 'KL Channel Partner Attachments',
@@ -160,12 +166,13 @@
         attach: { // 附件
           list: [],
           edit: false
-        }
+        },
+        records: '' // 审批记录
       };
     },
     computed: {
       ...mapState('index', ['isManager']),
-      ...mapState(NAMESPACE, ['form', 'record']),
+      ...mapState(NAMESPACE, ['form']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -195,7 +202,7 @@
     methods: {
       ...mapMutations(NAMESPACE, ['clear']),
       ...mapActions('app', ['upload', 'queryMedias']),
-      ...mapActions(NAMESPACE, ['findPartnerById', 'findPartner', 'addPartner', 'update', 'pushMedia']),
+      ...mapActions(NAMESPACE, ['findPartnerById', 'findPartner', 'addPartner', 'update', 'pushMedia', 'queryApprovalList']),
       toContact(contact) {
         this.$router.push({
           name: 'contact',
@@ -231,22 +238,18 @@
           };
           // 重新启用委外团队
           if (me.state === 'invalid') {
-            me.update({
-              data: {
-                'KL Partner Status': '待审批'
-              },
-              success: data => {
-                uploadAttach(data.items.Id);
-                // 标记列表刷新
-                KND.Session.set('refresh', 'pending,valid');
-              }
-            });
+            // me.update({
+            //  data: {
+            //    'KL Partner Status': '待审批'
+            //  },
+            //  success: data => {
+            //    uploadAttach(data.items.Id);
+            //  }
+            // });
           } else {
             // 创建委外团队
             me.addPartner(data => {
               uploadAttach(data.PrimaryRowId);
-              // 标记列表刷新
-              KND.Session.set('refresh', 'pending');
             });
           }
         });
@@ -293,5 +296,9 @@
         font-size: $font-size-small;
       }
     }
+  }
+
+  .records .mint-cell:before {
+    background-color: $theme-color;
   }
 </style>

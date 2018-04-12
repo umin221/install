@@ -15,12 +15,12 @@
 
     <div class="mint-content">
 
-      <mt-navbar v-model="selected">
+      <mt-navbar v-show="navs['valid']" v-model="selected">
         <mt-tab-item v-for="(value, key) in navs"
                      v-text="value.label"
                      :id="key"
                      :key="key"
-                     @click.native="loadBottomFn(key)"></mt-tab-item>
+                     @click.native="!rows.length && loadBottomFn(key)"></mt-tab-item>
       </mt-navbar>
 
       <!-- tab-container -->
@@ -87,7 +87,7 @@
       // 是否主管 非安装工程师，都是主管权限
       me.setManager(info['KL Primary Position Type LIC'] !== 'Field Service Engineer');
       // 获取数据
-      for (var i in list) me.loadBottomFn(list[i]);
+      for (var i in list) me.loadTopFn(list[i]);
       KND.Session.remove('refresh');
     });
   };

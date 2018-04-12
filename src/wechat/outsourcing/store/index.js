@@ -84,9 +84,7 @@ export default new Vuex.Store({
     detail: {
       namespaced: true,
       state: {
-        form: '',
-        record: [{state: '已提交', time: '2017-02-01 18:00'},
-          {state: '总部安装主管xx审批中', time: '2017-02-01 19:00'}]
+        form: ''
       },
       mutations: {
         setPartner(state, form) {
@@ -146,7 +144,7 @@ export default new Vuex.Store({
             partner.state = '待审批';
           };
           api.get({
-            key: 'addPartner',
+            key: 'submitPartner',
             data: {
               partner: partner
             },
@@ -168,10 +166,11 @@ export default new Vuex.Store({
                 back: true,
                 successTips: '更新成功'
               });
+              // 标记列表刷新
+              KND.Session.set('refresh', 'valid');
             }
           }, setting));
         },
-
         /**
          * 批量上传附件
          * @param {Array} mediaId 必填 附件mediaId数组
@@ -197,6 +196,8 @@ export default new Vuex.Store({
             if (media) {
               push(media);
             } else {
+              // 标记列表刷新
+              KND.Session.set('refresh', 'valid');
               tools.success(result, {
                 back: true,
                 successTips: '提交成功'
@@ -204,6 +205,14 @@ export default new Vuex.Store({
             };
           };
           run(mediaId.pop());
+        },
+        /**
+         * 查询委外审批记录
+         * @param {String} setting.data.id 必填 主键id
+         */
+        queryApprovalList({state}, setting) {
+          setting.key = 'queryApprovalList';
+          api.get(setting);
         }
       }
     },

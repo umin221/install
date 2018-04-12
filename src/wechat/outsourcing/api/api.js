@@ -78,7 +78,7 @@ let apiList = {
   },
 
   /**
-   * 添加委外团队
+   * 添加委外团队 <废弃>
    * @param {Object} option.data[partner] 必填 委外厂商信息 键值对
    * @returns {{method: string, url: string}}
    */
@@ -88,6 +88,32 @@ let apiList = {
       url: 'service/EAI Siebel Adapter/Upsert',
       data: {
         'body': {
+          'SiebelMessage': {
+            'MessageId': '',
+            'MessageType': 'Integration Object',
+            'IntObjectName': 'Base Channel Partner',
+            'IntObjectFormat': 'Siebel Hierarchical',
+            'ListOfBase Channel Partner': {
+              'Channel Partner': option.data.partner
+            }
+          }
+        }
+      }
+    };
+  },
+
+  /**
+   * 提交委外团队
+   * @param {Object} option.data[partner] 必填 委外厂商信息 键值对
+   * @returns {{method: string, url: string}}
+   */
+  submitPartner: option => {
+    return {
+      method: 'post',
+      url: 'service/Workflow Process Manager/RunProcess/',
+      data: {
+        'body': {
+          'ProcessName': 'KL Channel Partner Upsert Process',
           'SiebelMessage': {
             'MessageId': '',
             'MessageType': 'Integration Object',
@@ -150,6 +176,12 @@ let apiList = {
     };
   },
 
+  /**
+   * 委外保存附件
+   * @param {Object} option.data['MediaId'] 必填 腾讯附件id
+   * @param {Object} option.data['Object Id'] 必填 业务主键id
+   * @returns {{method: string, url: string}}
+   */
   pushMedia: option => {
     return {
       url: 'service/Workflow Process Manager/RunProcess',
@@ -159,6 +191,24 @@ let apiList = {
           'Type': 'Partner',
           'MediaId': option.data.mediaId,
           'Object Id': option.data.id
+        }
+      }
+    };
+  },
+
+  /**
+   * 获取审批记录
+   * @param {Object} option.data['MediaId'] 必填 腾讯附件id
+   * @param {Object} option.data['Object Id'] 必填 业务主键id
+   * @returns {{method: string, url: string}}
+   */
+  queryApprovalList: option => {
+    return {
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base UInbox Item History',
+          'SearchSpec': `[UInbox Item.Item Object Id]="${option.data.id}"`
         }
       }
     };

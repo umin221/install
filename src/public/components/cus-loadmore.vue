@@ -63,8 +63,9 @@
       handleBottomChange(status) {
         this.bottomStatus = status;
       },
-      onTopLoaded() {
+      onTopLoaded(len = 10) {
         this.$refs.loadmore.onTopLoaded();
+        this.allLoaded = len < pageSize;
       },
       onBottomLoaded(len = 10) {
         this.$refs.loadmore.onBottomLoaded();
