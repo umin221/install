@@ -223,11 +223,11 @@
             self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
             /*
             * 根据类型判断是否可以审批
-            * 审批中=Approved
+            * 审批中=Approval in Process
             * 关闭中=Closing
             * 可以审批
             * */
-            if (data['Calculated Activity Status'] === 'Approved' || data['Calculated Activity Status'] === 'Closing') {
+            if (data['Calculated Activity Status'] === 'Approval in Process' || data['Calculated Activity Status'] === 'Closing') {
               self.is_but = true;
             } else {
               self.is_but = false;

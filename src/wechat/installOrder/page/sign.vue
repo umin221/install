@@ -16,7 +16,7 @@
                 <mt-switch v-model="box1"></mt-switch>
         </mt-cell>
         <div v-show="box1" :class="{disable: !editable}">
-          <mt-field label="签收数量"
+          <mt-field v-if="item['KL Detail Type LIC'] !== 'Working Drawing Sign'" label="签收数量"
                     placeholder="请输入签收数量"
                     :class="heartVisible"
                     v-model="form['KL Signed Amount']">
@@ -190,7 +190,7 @@
         };
         if (self.type === 'add') { // 新增
           if (self.box1) { // 涉及签收 才提交数据  不涉及只更新状态
-            if (self.form['KL Signed Amount']) {
+            if (self.form['KL Signed Amount'] || item['KL Detail Type LIC'] === 'Working Drawing Sign') {
               // self.getUPData(item);
               // 新增签收
               self.getUPData(data => {
