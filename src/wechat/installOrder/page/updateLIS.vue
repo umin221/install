@@ -17,9 +17,9 @@
         <cus-field label="合格数量"
                    type="number"
                    v-model="line['Qualified Amount']"></cus-field>
-        <cus-field label="异常数量"
+        <!--<cus-field label="异常数量"
                    type="number"
-                   v-model="line['Unqualified Amount']"></cus-field>
+                   v-model="line['Unqualified Amount']"></cus-field>-->
         <cus-field label="异常处理数量"
                    type="number"
                    v-model="line['Unqualified Solve Amount']"></cus-field>
@@ -112,7 +112,6 @@
             'Completed Install Amount': lineObj['Completed Install Amount'], // 新增批次返回的ID
             'Spot Check Amount': lineObj['Spot Check Amount'], // 新增批次返回的ID
             'Qualified Amount': lineObj['Qualified Amount'], // 新增批次返回的ID
-            'Unqualified Amount': lineObj['Unqualified Amount'], // 新增批次返回的ID
             'Unqualified Solve Amount': lineObj['Unqualified Solve Amount'], // 新增批次返回的ID
             'Unqualified Desc': lineObj['Unqualified Desc'], // 新增批次返回的ID
             'Unqualified Solve Desc': lineObj['Unqualified Solve Desc'] // 新增批次返回的ID
@@ -123,7 +122,6 @@
               lineObj['Completed Install Amount'] = '';
               lineObj['Spot Check Amount'] = '';
               lineObj['Qualified Amount'] = '';
-              lineObj['Unqualified Amount'] = '';
               lineObj['Unqualified Solve Amount'] = '';
               lineObj['Unqualified Desc'] = '';
               lineObj['Unqualified Solve Desc'] = '';

@@ -15,6 +15,9 @@
                 <span class="journalName">{{new Date(itemTask['End Working Time']).format('yyyy-MM-dd')}}</span>
               </li>
               <div class="content-div">
+                <div>审批状态：{{itemTask['Action']}}</div>
+              </div>
+              <div class="content-div">
                 <div>审批意见：{{itemTask['KL Request Description']}}</div>
               </div>
             </ul>

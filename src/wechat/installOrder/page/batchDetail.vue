@@ -125,7 +125,7 @@
         option: '', // 区分从哪跳转到详情页
         is_plan: true, // 是否显示详细计划
         is_option: false, // 是否审批
-        is_but: true, // 判断是否显示按钮   1.审批时 2.没有审批过
+        is_but: false, // 判断是否显示按钮   1.审批时 2.没有审批过
         is_show: false, // 是否显示委外、附件    只有替代锁 真锁 才会显示
         start_Date: '',        // 开始时间
         end_Date: '',        // 结束时间
@@ -227,7 +227,9 @@
             * 关闭中=Closing
             * 可以审批
             * */
-            if (data['Calculated Activity Status'] === 'Approved' || data['Calculated Activity Status'] === 'Closing' || data['Calculated Activity Status'] === 'Planning') {
+            if (data['Calculated Activity Status'] === 'Approved' || data['Calculated Activity Status'] === 'Closing') {
+              self.is_but = true;
+            } else {
               self.is_but = false;
             }
           }

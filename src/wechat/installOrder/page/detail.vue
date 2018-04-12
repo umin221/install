@@ -143,6 +143,7 @@
                     v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
                     taskData['KL Detail Type LIC'] === 'Check Before Trans Summary'"
                     :value="taskData['KL Qualified Amount']+'/'+taskData['KL Spot Check Amount']">
+                    <span v-if="taskData['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
                   </mt-field>
                   <mt-field label="时间" :value="new Date(itemTask['Planned Completion']).format('yyyy-MM-dd')"></mt-field>
                   <mt-field label="状态" :value="itemTask.Status"></mt-field>
@@ -874,7 +875,7 @@
               }
             });
           } else if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Completed' || self.pStatus === 'In Progress')) { // 判断是否有权限编辑   登陆者信息与任务负责人匹配 并且状态在进行中已完成则可以编辑
-            if ((item['KL Detail Type LIC'] === 'Trompil Lock Sign' || item['KL Detail Type LIC'] === 'Working Drawing Sign') && !item['KL Signed Amount']) { // 开孔签收与图纸签证 不涉及签收不需要查看详情
+            if ((item['KL Detail Type LIC'] === 'Trompil Lock Sign' || item['KL Detail Type LIC'] === 'Working Drawing Sign') && item['Calculated Activity Status'] === 'Ignore') { // 开孔签收与图纸签证 不涉及签收不需要查看详情 不签收状态为已忽略=Ignore
               console.dir('===');
             } else {
               var is_edit = true;
@@ -894,7 +895,7 @@
               });
             }
           } else if (item['Calculated Activity Status'] !== 'Not Started') {
-            if ((item['KL Detail Type LIC'] === 'Trompil Lock Sign' || item['KL Detail Type LIC'] === 'Working Drawing Sign') && !item['KL Signed Amount']) { // 开孔签收与图纸签证 不涉及签收不需要查看详情
+            if ((item['KL Detail Type LIC'] === 'Trompil Lock Sign' || item['KL Detail Type LIC'] === 'Working Drawing Sign') && item['Calculated Activity Status'] === 'Ignore') { // 开孔签收与图纸签证 不涉及签收不需要查看详情
               console.dir('===');
             } else {
               this.$router.push({ // 只读
