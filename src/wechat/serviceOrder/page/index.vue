@@ -30,7 +30,7 @@
                     @loadBottom="loadBottomFn"
                     :param="{status:'待处理', list:'pending'}"
                     :topStatus="topStatus" :allLoaded="true">
-            <div class="list-content" v-for="(item,index) in pending" @click="toDetail(item['SR Number'])" :key="index">
+            <div class="list-content" v-for="(item,index) in pending" @click="toDetail(item['SR Number'],item['Id'])" :key="index">
               <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}
                 <mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge>
               </div>
@@ -55,7 +55,7 @@
                     :param="{status:'处理中', list:'process'}"
                     :topStatus="topStatus"
                     :allLoaded="true">
-            <div class="list-content" v-for="(item,index) in process" @click="toDetail(item['SR Number'])" :key="index">
+            <div class="list-content" v-for="(item,index) in process" @click="toDetail(item['SR Number'],item['Id'])" :key="index">
               <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}
                 <mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge>
               </div>
@@ -81,7 +81,7 @@
                     :param="{status:'已完成', list:'completed'}"
                     :topStatus="topStatus"
                     :allLoaded="true">
-            <div class="list-content" v-for="(item,index) in completed" @click="toDetail(item['SR Number'])" :key="index">
+            <div class="list-content" v-for="(item,index) in completed" @click="toDetail(item['SR Number'], item['Id'])" :key="index">
               <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}
                 <mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge>
               </div>
@@ -116,7 +116,7 @@
                     ref="cusPending">
             <div class="list-content"
                  v-for="(item,index) in cusPending"
-                 @click="toDetail(item['SR Number'],item['Contact Id'])"
+                 @click="toDetail(item['SR Number'],item['Id'])"
                  :key="index">
               <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}
                 <mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge>
@@ -142,7 +142,7 @@
                     ref="cusProcess">
             <div class="list-content"
                  v-for="(item,index) in cusProcess"
-                 @click="toDetail(item['SR Number'],item['Contact Id'])"
+                 @click="toDetail(item['SR Number'],item['Id'])"
                  :key="index">
               <div class="my-title" slot="title">服务单编号:{{item['SR Number']}}
                 <mt-badge class="badge-status" size="small">{{item.Status}}</mt-badge>
@@ -268,12 +268,12 @@
       clickAdd() {
 //        this.$router.push({path: '/addService'});
       },
-      toDetail(type, name) {
+      toDetail(type, srId) {
         this.$router.push({
           name: 'serviceDetail',
           query: {
             type: type,
-            id: name
+            srId: srId
           }
         });
       }

@@ -94,8 +94,13 @@ export default new Vuex.Store({
               num
             },
             success: function(data) {                                       // HBS1803014006
-              commit('addressBack', data);
-              callback(data);
+              console.log(data);
+              if (data.items) {
+                console.log(111);
+                let datas = KND.Util.toArray(data.items);
+                commit('addressBack', datas[0]);
+                callback(data[0]);
+              }
             },
             error: function(data) {
               Toast('该码未录入系统');
@@ -456,8 +461,9 @@ export default new Vuex.Store({
             },
             success: data => {
               if (data.items) {
-                commit('getAsset', data.items);
-                callback(data.items);
+                let datas = KND.Util.toArray(data.items);
+                commit('getAsset', datas[0]);
+                callback(datas[0]);
               }
             },
             error: data => {
