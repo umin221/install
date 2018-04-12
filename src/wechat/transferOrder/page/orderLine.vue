@@ -17,7 +17,7 @@
                    v-model="line['KL Hole Direction']"
                    v-valid.require
                    is-link></cus-field>
-        <mt-cell title="是否带天地" v-show="!isPanel">
+        <mt-cell title="是否带天地" v-if="!isPanel">
           <mt-switch v-model="flag"></mt-switch>
         </mt-cell>
         <!--<cus-field label="交货日期"-->
@@ -28,23 +28,29 @@
                    type="number"
                    v-valid.require.number
                    v-model="line['Quantity Requested']"></cus-field>
-        <cus-field label="颜色" v-show="isPanel"
+        <cus-field label="颜色" tag="颜色"
+                   v-if="isPanel"
                    v-valid.require
                    v-model="line['KL Gate Plate Specification']"></cus-field>
         <cus-field label="门材质"
                    @click.native="showLovFn('KL Door Material Quality')"
                    v-model="line['KL Door Material Quality']"
                    is-link></cus-field>
-        <cus-field label="门厚" v-show="!isPanel"
+        <cus-field label="门厚"
+                   v-if="!isPanel"
                    v-model="line['KL Door Thickness']"></cus-field>
-        <cus-field label="锁舌导向板规格" v-show="!isPanel"
+        <cus-field label="锁舌导向板规格" tag="锁舌导向板规格"
+                   v-if="!isPanel"
                    v-valid.require
                    v-model="line['KL Guide Plate Specification']"></cus-field>
-        <cus-field label="门扣板规格" v-show="!isPanel"
+        <cus-field label="门扣板规格"
+                   v-if="!isPanel"
                    v-model="line['KL Gate Plate Specification']"></cus-field>
-        <cus-field label="滑盖丝印" v-show="isPanel"
+        <cus-field label="滑盖丝印"
+                   v-if="isPanel"
                    v-model="line['KL Slippery Screen Printing']"></cus-field>
-        <cus-field label="彩卡丝印" v-show="isPanel"
+        <cus-field label="彩卡丝印"
+                   v-if="isPanel"
                    v-model="line['KL Color Card Screen Printing']"></cus-field>
         <cus-field label="配件要求"
                    v-model="line['KL Parts Requirement']"></cus-field>

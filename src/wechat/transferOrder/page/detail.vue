@@ -60,7 +60,7 @@
     <!--buttons-->
     <button-group v-show="!isTeam && !isCompleted">
       <mt-button v-show="isPending" @click.native="$router.push('reject')">驳回</mt-button>
-      <mt-button v-show="isPending" @click.native="assignFn">确认分配</mt-button>
+      <mt-button type="primary" v-show="isPending"  @click.native="assignFn">确认分配</mt-button>
       <mt-button v-show="!isPending" @click.native="toOrderFn">新增安装订单</mt-button>
     </button-group>
   </div>

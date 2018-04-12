@@ -74,7 +74,7 @@
       ...mapActions(NAMESPACE, ['getProduct']),
       ...mapMutations(NAMESPACE, ['count', 'saveModelData', 'initSelected']),
       ...mapMutations('saveFault', ['selectProduct']),
-      ...mapMutations('comEnter', ['successCall']),
+//      ...mapMutations('comEnter', ['successCall']),
       searchFn(val) {
         this.getProduct({value: val, type: this.type});
       },
@@ -85,7 +85,7 @@
           this.count({index, isShow});
         } else {
           this.$router.back();
-          this.successCall({item: index, type: ' No'});
+//          this.successCall({item: index, type: ' No'});
         }
       },
       selectEnter() {

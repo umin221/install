@@ -93,7 +93,7 @@
     // 成功回调
     let callback = data => {
       tools.success(data, {
-        back: true,
+        back: false,
         successTips: '提交成功'
       });
     };
@@ -126,7 +126,6 @@
         me.getServiceR({
           Id: serviceId,
           callback: function(data) {
-            console.log(data);
             me.SerialNumber = data['Serial Number'];
             me.SR_ROOTCAUSE = data['SR Rootcause'];
             me.AssetNumber = data['Asset Number'];
@@ -135,7 +134,9 @@
             me.KL_LOCK_BODY_MODEL = data['KL Lock Body Model'];
             me.KL_LOCK_MODEL = data['KL Lock Model'];
             me.status = data['Status'];
-            me.sarech();
+            if (me.SerialNumber) {
+              me.sarech();
+            }
           }
         });
       }
@@ -181,7 +182,7 @@
       return {
         showBox: false,
         showBox1: false,
-        value: '维修工单',
+        value: '故障问题记录',
         slots2: [
           {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
         ],
@@ -233,8 +234,6 @@
                 me.building = data['KL Personal Address Building'];
                 me.floor = data['KL Personal Address Floor'];
                 me.room = data['KL Personal Address Room'];
-                me.KL_LOCK_BODY_MODEL = data['KL Lock Body Model'];
-                me.KL_LOCK_MODEL = data['KL Lock Model'];
               }
             });
           }
@@ -319,6 +318,7 @@
             let serviceId = me.$route.query.id;
             if (data) {
               uploadAttach(serviceId);
+              this.$router.back();
             }
           }
         };
