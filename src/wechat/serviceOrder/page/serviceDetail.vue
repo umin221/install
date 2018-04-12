@@ -236,16 +236,16 @@
       me.srNumber = me.$route.query.type;
       me.getDetail(me.srNumber);
       me.setRole({meg: me.loginMeg, role: me.role});
-      console.log(me.$route.query.srId);
       me.queryMedias({
         data: {
           'IOName': 'KL Service Request Attachment IO',
           'SearchSpec': {
             'Service Request Attachment.Activity Id': me.$route.query.srId
+//            'Service Request Attachment.KL SR Att Type': 'LookupValue("KL_SR_ATT_TYPE","Customer Upload File")'
+          },
+          success: data => {
+            me.attach.list = KND.Util.toArray(data['SiebelMessage']['Service Request Attachment']);
           }
-        },
-        success: data => {
-          me.attach.list = KND.Util.toArray(data['SiebelMessage']['Service Request Attachment']);
         }
       });
     },

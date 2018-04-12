@@ -596,10 +596,10 @@ export default new Vuex.Store({
         ]
       },
       mutations: {
-        successCall(state, data) {
-          data.type = data.type || '';
-          state.ProductModel = data.item['KL Product Model' + data.type];
-        },
+        // successCall(state, data) {
+        //   data.type = data.type || '';
+        //   state.ProductModel = data.item['KL Product Model' + data.type];
+        // },
         errorTips(state) {
           Toast(state.tips);
         },
@@ -640,8 +640,9 @@ export default new Vuex.Store({
               num
             },
             success: function(data) {
-              commit('successCall', {item: data});
-              callback(data);
+              let datas = KND.Util.toArray(data.items);
+              // commit('successCall', {item: data});
+              callback(datas[0]);
             },
             error: function(data) {
               console.log(data);

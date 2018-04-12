@@ -9,7 +9,7 @@
       <div class="saveFault">
         <mt-cell title="单据编号：" >{{ServiceRequest['SR Number']}}</mt-cell>
         <mt-cell title="移交日期：">{{ServiceRequest['KL Cutoff Date']}}</mt-cell>
-        <mt-cell class="require" title="是否保修范围" @click.native="getLov('bn')" is-link>{{isBn}}</mt-cell>
+        <mt-cell class="require" title="是否保修范围" @click.native="getLov1('bn')" is-link>{{isBn}}</mt-cell>
         <mt-cell title="维修配件"><i class="xs-icon icon-arrow-down"></i></mt-cell>
         <div class="servesParts">
           <div class="Parts" v-for="(item, index) in returnSelect">
@@ -33,7 +33,7 @@
           </div>
           <div class="addBtn">
             <mt-button type="primary" @click.native="toTranslated"><i class="xs-icon icon-add"></i>添加配件</mt-button>
-            <mt-button type="primary" v-show="isBn === '保外'" @click.native="getLov('wm')"><i class="xs-icon icon-add" ></i>添加上门费</mt-button>
+            <mt-button type="primary" v-show="isBn === '保外'" @click.native="getLov1('wm')"><i class="xs-icon icon-add" ></i>添加上门费</mt-button>
           </div>
         </div>
         <mt-cell class="require" title="总费用">￥{{Product}}</mt-cell>
@@ -57,6 +57,23 @@ import {mapState, mapActions, mapMutations} from 'vuex';
 import menuBox from '../../../public/components/cus-menu';
 import numBox from '../components/number-box';
 const NAMESPACE = 'saveFault';
+let _upload = function(serverIds, id) {
+  let callback = data => {
+    tools.success(data, {
+      back: true,
+      successTips: '提交成功'
+    });
+  };
+  serverIds ? this.upload({
+    data: {
+      MediaId: serverIds,
+      Id: id,
+      IOName: 'KL Service Request Attachment IO',
+      Comment: this.value
+    },
+    success: callback
+  }) : callback(id);
+};
 export default {
   name: NAMESPACE,
   created() {
@@ -82,11 +99,25 @@ export default {
         me.switchStatus.push(false);
       }
     }
+    me.getLov({
+      type: 'KL_SR_ATT_TYPE',
+      parent: '',
+      success: function(data) {
+        console.log(data);
+        let items = data.items;
+        for (let i = 0; i < items.length;i++) {
+          if (items[i].Name === 'Problem Record') {
+            me.val = items[i].Value;
+          }
+        }
+      }
+    });
   },
   data: () => {
     return {
       isSwitch: false,
       value: '',
+      val: '维修单据',
       showBox: false,
       slots: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
       productData: [],
@@ -128,6 +159,7 @@ export default {
   methods: {
     ...mapActions(NAMESPACE, ['addServiceOrder', 'getServiceR']),
     ...mapMutations(NAMESPACE, ['setIsBn', 'ProductNum', 'deleteProduct']),
+    ...mapActions('app', ['getLov', 'upload']),
     ...mapMutations('searchTrans', ['initSelect']),
     ...mapMutations('detail', ['setPartner']),
     productNumber(val, num, type) {
@@ -169,10 +201,14 @@ export default {
         srNum: me['ServiceRequest']['SR Number'],
         callBack: function(data) {
           me.setPartner(data);
-          me.$router.go(-1);
           me.initSelect();
+          me.$router.go(-1);
         }
       };
+      let uploadAttach = id => {
+        _upload.call(me, me.$refs.attach.getServerIds(), id);
+      };
+      uploadAttach(me['ServiceRequest'].Id);
       me.addServiceOrder(obj);
     },
     toTranslated() {
@@ -195,7 +231,7 @@ export default {
         me.fee = val[0] === '工作时间' ? 100 : 150;
       }
     },
-    getLov(type) {
+    getLov1(type) {
       let me = this;
       me.showBox = true;
       me.lovType = type;
