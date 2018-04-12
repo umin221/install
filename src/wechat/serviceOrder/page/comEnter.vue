@@ -292,6 +292,7 @@
       },
       submit() {
         let me = this;
+        let serviceId = me.$route.query.id;
         for (let i = 0; i < me.mustForm.length; i++) {
           if (!me[me.mustForm[i].key]) {
             MessageBox({
@@ -315,9 +316,7 @@
           'KL Lock Body Model': me['KL_LOCK_BODY_MODEL'],
           'KL Lock Model': me['KL_LOCK_MODEL'],
           callback: function(data) {
-            let serviceId = me.$route.query.id;
             if (data) {
-              uploadAttach(serviceId);
               me.$router.back();
             }
           }
@@ -326,6 +325,7 @@
           delete form['Asset Number'];
         }
         me.upDateService(form);
+        uploadAttach(serviceId);
       }
     },
     components: {menuBox, MessageBox}
