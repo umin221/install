@@ -60,7 +60,7 @@ const NAMESPACE = 'saveFault';
 let _upload = function(serverIds, id) {
   let callback = data => {
     tools.success(data, {
-      back: true,
+      back: false,
       successTips: '提交成功'
     });
   };

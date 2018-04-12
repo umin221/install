@@ -318,7 +318,7 @@
             let serviceId = me.$route.query.id;
             if (data) {
               uploadAttach(serviceId);
-              this.$router.back();
+              me.$router.back();
             }
           }
         };
