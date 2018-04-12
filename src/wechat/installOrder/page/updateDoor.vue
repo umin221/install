@@ -1,6 +1,6 @@
 <template>
   <div>
-    <mt-header fixed :title="titleVal">
+    <mt-header fixed :title="title">
       <fallback slot="left"></fallback>
       <mt-button slot="right"
                  @click="journalFn()">日志</mt-button>
@@ -63,13 +63,14 @@
     name: 'updateDoor',
     created() {
       let param = this.$route.query;
-      this.id = param.id;
+      this.item = param.item;
+      this.id = param.item.Id;
     },
     data: () => {
       return {
         id: '',
+        item: '',
         type: 'add', // add 新增 / edit 编辑 / read 只读
-        titleVal: '挂门进度更新',
         line: {},
         active: 'tab-container'
       };
@@ -97,8 +98,20 @@
        * 查看&编辑标题一致
        */
       title() {
-        let type = this.type;
-        return type === 'add' ? '挂门进度更新' : '挂门进度更新详情';
+        let item = this.item;
+        var val = '';
+        if (item['KL Detail Type LIC'] === 'Trompil Batch Summary') {
+          val = '开孔进度更新';
+        } else if (item['KL Detail Type LIC'] === 'Lock Body Install Summary') {
+          val = '锁体进度更新';
+        } else if (item['KL Detail Type LIC'] === 'Door Hanging Acc Batch') {
+          val = '挂门进度更新';
+        } else if (item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary') {
+          val = '替代锁进度更新';
+        } else if (item['KL Detail Type LIC'] === 'Check Before Trans Summary') {
+          val = '全检进度更新';
+        }
+        return val;
       }
     },
     methods: {

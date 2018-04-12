@@ -61,7 +61,7 @@
             <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 72px;">
               <div class="mui-scroll" style="height: 65px;overflow: -webkit-paged-x;">
                 <a v-for="(item, index) in taskData"  :key="index">
-                  <div class="icon" @click="updateState(item['Calculated Activity Status'], item.Id, index)">
+                  <div class="icon" @click="updateState(item, item['Calculated Activity Status'], item.Id, index)">
                     <span v-show="index!=0"  class="left line" :class="colorClass(item['Calculated Activity Status'])"></span>
                     <span class="point mui-icon" :class="colorClass(item['Calculated Activity Status'])"><span></span></span>
                     <span  class="right line" :class="colorClass(item['Calculated Activity Status'])"></span>
@@ -106,7 +106,7 @@
               <div class="butLi"
                    v-if="taskData['KL Detail Type LIC']==='Trompil Batch Summary' ||
                   taskData['KL Detail Type LIC']==='Lock Body Install Summary' ||
-                  taskData['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
+                  taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
                   taskData['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
                   taskData['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
                   taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
@@ -119,7 +119,7 @@
               <div class="content-div"
                 v-if="taskData['KL Detail Type LIC']==='Trompil Batch Summary' ||
                 taskData['KL Detail Type LIC']==='Lock Body Install Summary' ||
-                taskData['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
+                taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
                 taskData['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
                 taskData['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
                 taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
@@ -140,7 +140,7 @@
                     <span v-if="taskData['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
                   </mt-field>
                   <mt-field label="合格/计划数量"
-                    v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Batch' ||
+                    v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
                     taskData['KL Detail Type LIC'] === 'Check Before Trans Summary'"
                     :value="taskData['KL Qualified Amount']+'/'+taskData['KL Spot Check Amount']">
                     <span v-if="taskData['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
@@ -554,7 +554,7 @@
               self.taskData = KND.Util.toArray(taskData);
               console.dir(self.taskData);
               self.pStatus = self.taskData[0]['Calculated Activity Status'];
-              if (self.pStatus !== 'Not Started') { // 未开始时不获取子任务数据
+              if (self.pStatus !== 'Not Started' || self.taskData[0]['KL Detail Type LIC'] === 'Substitution Lock Trans Return') { // 未开始时不获取子任务数据  替代锁状态不需要更改只是未开始
                 self.taskDataList = KND.Util.toArray(self.taskData[0]['KL Installation Task']);
               }
             }
@@ -592,7 +592,7 @@
         me.selectName = selName;
         me.taskDataList = [];
         me.pStatus = me.taskData[index]['Calculated Activity Status'];
-        if (me.pStatus !== 'Not Started') { // 未开始时不获取子任务数据
+        if (me.pStatus !== 'Not Started' || me.taskData[index]['KL Detail Type LIC'] === 'Substitution Lock Trans Return') { // 未开始时不获取子任务数据
           me.taskDataList = KND.Util.toArray(me.taskData[index]['KL Installation Task']);
           console.dir(me.taskDataList);
           if (me.taskDataList.length === 0) {
@@ -713,47 +713,49 @@
           }
         });
       },
-      updateState(status, id, index) { // 任务事件 ；1.还没开始先开始 ； 2.已开始就跳转关闭页面
+      updateState(item, status, id, index) { // 任务事件 ；1.还没开始先开始 ； 2.已开始就跳转关闭页面
         var self = this;
-        if (status === 'Not Started') {
-        // if (index === 0) {
-          console.dir('===');
-          MessageBox({
-            title: '提示',
-            message: ' 确认开始进行?',
-            showCancelButton: true
-          }).then(action => {
-            if (action === 'confirm') {
-              console.log('abc');
-              api.get({
-                key: 'getTaskAdd',
-                method: 'POST',
-                data: {
-                  'body': {
-                    'ProcessName': 'KL Install Task Start Action Workflow',
-                    'RowId': id
-                  }
+        if (item['KL Detail Type LIC'] !== 'Substitution Lock Trans Return') {
+          if (status === 'Not Started') {
+            // if (index === 0) {
+            console.dir('===');
+            MessageBox({
+              title: '提示',
+              message: ' 确认开始进行?',
+              showCancelButton: true
+            }).then(action => {
+              if (action === 'confirm') {
+                console.log('abc');
+                api.get({
+                  key: 'getTaskAdd',
+                  method: 'POST',
+                  data: {
+                    'body': {
+                      'ProcessName': 'KL Install Task Start Action Workflow',
+                      'RowId': id
+                    }
 
-                },
-                success: function(data) {
-                  self.detail();
-                  Toast({
-                    message: '已发起安装替代锁申请，销售审批通过后进行安装。',
-                    duration: 5000
-                  });
-                }
-              });
-            }
-          });
-        } else {
-          self.$router.push('updateState');
-          // 跳转关闭页面更新状态
-          this.$router.push({
-            name: 'updateState',
-            query: {
-              id: id
-            }
-          });
+                  },
+                  success: function(data) {
+                    self.detail();
+                    Toast({
+                      message: '已发起安装替代锁申请，销售审批通过后进行安装。',
+                      duration: 5000
+                    });
+                  }
+                });
+              }
+            });
+          } else {
+            self.$router.push('updateState');
+            // 跳转关闭页面更新状态
+            this.$router.push({
+              name: 'updateState',
+              query: {
+                id: id
+              }
+            });
+          }
         }
       },
       /*
@@ -914,7 +916,7 @@
           }*/
         } else if (item['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
           item['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
-          item['KL Detail Type LIC'] === 'Door Hanging Acc Batch' ||
+          item['KL Detail Type LIC'] === 'Door Hanging Acc Summary' ||
           item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
           item['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
           item['KL Detail Type LIC'] === 'Lock Installation Summary' ||
@@ -923,7 +925,7 @@
           /*
           * Trompil Batch Summary 开孔锁批次
           * Lock Body Install Summary 锁体安装汇总
-          * Door Hanging Acc Batch 挂门验收批次
+          * Door Hanging Acc Summary 挂门验收批次
           * Substitution Lock Inst Summary  替代锁安装汇总
           * Subst Lock Trans Summary 替代锁移交
           * Lock Installation Summary 真锁安装汇总
@@ -1061,8 +1063,7 @@
                   name: 'updateDoor',
                   query: {
                     type: 'add',
-                    fItem: fItem,
-                    id: item.Id
+                    item: item
                   }
                 });
               } else {
@@ -1181,8 +1182,7 @@
                     name: 'updateDoor',
                     query: {
                       type: 'add',
-                      fItem: fItem,
-                      id: item.Id
+                      item: item
                     }
                   });
                 }
