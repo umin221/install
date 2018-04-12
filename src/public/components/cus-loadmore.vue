@@ -1,7 +1,7 @@
 <template>
   <mt-loadmore :bottom-method="loadBottom"
                :bottom-all-loaded="allLoaded"
-               :top-method="loadTop"
+               :top-method="refresh && loadTop"
                :autoFill="false"
                @bottom-status-change="handleBottomChange"
                @top-status-change="handleTopChange"
@@ -42,6 +42,10 @@
     props: {
       param: '',
       emptyTips: {
+        type: Boolean,
+        default: true
+      },
+      refresh: {
         type: Boolean,
         default: true
       }

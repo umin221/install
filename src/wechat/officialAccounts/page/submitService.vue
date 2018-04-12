@@ -161,6 +161,8 @@
         let me = this;
         if (me.form.Id) {
           return me.form.Province + me.form.City + me.form.County + me.form['Street Address'];
+        } else {
+          return '';
         }
       }
     },
@@ -271,16 +273,17 @@
             me.getAsset({
               num: resultStr,
               callback: function(data) {
+                let datas = KND.Util.toArray(data);
                 let form = {
-                  Province: data['KL Personal Province'],
-                  City: data['Personal City'],
-                  County: data['KL Personal Town'],
-                  'Street Address': data['Personal Address'],
+                  Province: datas[0]['KL Personal Province'],
+                  City: datas[0]['Personal City'],
+                  County: datas[0]['KL Personal Town'],
+                  'Street Address': datas[0]['Personal Address'],
                   Id: 'Asset'
                 };
                 me.KLSN = resultStr;
                 me.addressBack(form);
-                me.AssetId = data['Id'];  // 产品ID
+                me.AssetId = datas[0]['Id'];  // 产品ID
               }
             });
           }

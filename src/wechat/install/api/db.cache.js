@@ -7,6 +7,11 @@
 import api from './api';
 
 let db = require('public/js/lib/db.sqlit');
+//
+let util = KND.Util;
+// 获取当前时间戳
+let now = util.now;
+
 /**
  * 构造创建字段
  * @param {Array} field 表字段数组
@@ -25,86 +30,113 @@ let buildCreateField = field => {
  * @param data
  */
 let filter = data => {
-  return data.length ? KND.Util.parse(data[0].data) : data;
+  return data.length ? util.parse(data[0].data) : data;
 };
 
 /**
- * 查询数据
- * @param {String} table 表名
- * @param {Object} condition 查询条件
- * @param callback
+ * helper
  */
-let query = (table, condition, callback) => {
-  var sql = `select * from ${table} where 1 = 1`;
-  for (var i in condition) {
-    sql += ` and ${i}="${condition[i]}"`;
+class Helper {
+
+  /**
+   * 查询数据
+   * @param {String} table 表名
+   * @param {Object} condition 查询条件
+   * @param callback
+   */
+  query(table, condition, callback) {
+    var sql = `select * from ${table} where 1 = 1`;
+    for (var i in condition) {
+      sql += ` and ${i}="${condition[i]}"`;
+    };
+    db.query(sql, data => {
+      var arr = [];
+      for (var i = 0; i < data.rows.length; i++) {
+        arr.push(data.rows.item(i));
+      }
+      callback(arr);
+    });
   };
-  db.query(sql, data => {
-    var arr = [];
-    for (var i = 0; i < data.rows.length; i++) {
-      arr.push(data.rows.item(i));
-    }
-    callback(arr);
-  });
-};
 
-/**
- * 清除缓存
- * @param data
- * @returns {Promise}
- */
-let clear = data => {
-  let me = this.a;
-  return new Promise((resolve, reject) => {
-    console.log('------------ 获取最新数据 start ------------');
-    console.log('清除历史数据...');
-    me.invokeSQL('gt').then(result => {
-      let tasks = [];
-      result = KND.Util.toArray(result);
-      for (let i = 0, len = result.length; i < len; i++) {
-        let table = result[i];
-        console.log(`清除数据库表 ${table}...`);
-        tasks.push(me.invokeSQL('dt', table));
-      };
+  /**
+   * 更新或插入数据，id存在记录则更新，否则插入记录
+   * @param table 表名
+   * @param data 更新或插入数据
+   * @param condition 查询条件
+   * @param callback
+   */
+  upsert(table, data, condition, callback) {
+    this.query(table, condition, result => {
+      result.length ? db.updateByCondition(table, data, condition, callback) : db.insert(table, data, callback);
+    });
+  };
+
+  /**
+   * 清除缓存
+   * @param data
+   * @returns {Promise}
+   */
+  clear(data) {
+    console.log(this);
+    let me = this;
+    return new Promise((resolve, reject) => {
+      console.log('------------ 获取最新数据 start ------------');
+      console.log('清除历史数据...');
+      me.invokeSQL('gt').then(result => {
+        let tasks = [];
+        result = util.toArray(result);
+        for (let i = 0, len = result.length; i < len; i++) {
+          let table = result[i];
+          if (table === 'install_record') {
+            me.hasRecord = true;
+            continue;
+          };
+          console.log(`清除数据库表 ${table}...`);
+          tasks.push(me.invokeSQL('dt', table));
+        };
+        Promise.all(tasks).then(() => {
+          console.log('clear ok...');
+          resolve();
+        });
+      });
+    });
+  };
+
+  /**
+   * 初始化数据库表
+   * @param data
+   * @returns {Promise}
+   */
+  create(data) {
+    let me = this;
+    return new Promise((resolve, reject) => {
+      console.log('初始化数据库表...');
+      let tasks = [
+        me.invokeSQL('ct', 'batch', buildCreateField({data: 'VARCHAR(20000)', state: null, create_date: null})).then(result => {
+          console.log('创建数据库表 batch...');
+        }),
+        me.invokeSQL('ct', 'building', buildCreateField({order_id: null, task_id: null, data: 'VARCHAR(2000)', state: null, create_date: null})).then(result => {
+          console.log('创建数据库表 building...');
+        }),
+        me.invokeSQL('ct', 'assets', buildCreateField({order_id: null, task_id: null, building_num: null, data: 'VARCHAR(20000)', state: null, create_date: null})).then(result => {
+          console.log('创建数据库表 assets...');
+        }),
+        me.invokeSQL('ct', 'order_line', buildCreateField({order_id: null, data: 'VARCHAR(2000)', state: null, create_date: null})).then(result => {
+          console.log('创建数据库表 order_line...');
+        }),
+        me.invokeSQL('ct', 'install_record', buildCreateField({id: null, data: null, state: null, create_date: null})).then(result => {
+          console.log('创建数据库表 install_record...');
+        })
+      ];
+      // 存在记录表
+      if (me.hasRecord) tasks.pop();
       Promise.all(tasks).then(() => {
-        console.log('clear ok...');
+        console.log('init ok...');
         resolve();
       });
     });
-  });
-};
-
-/**
- * 初始化数据库表
- * @param data
- * @returns {Promise}
- */
-let create = data => {
-  let me = this.a;
-  return new Promise((resolve, reject) => {
-    console.log('初始化数据库表...');
-    Promise.all([
-      me.invokeSQL('ct', 'batch', buildCreateField({data: 'VARCHAR(20000)', state: null, create_date: null})).then(result => {
-        console.log('创建数据库表 batch...');
-      }),
-      me.invokeSQL('ct', 'building', buildCreateField({order_id: null, task_id: null, data: 'VARCHAR(2000)', state: null, create_date: null})).then(result => {
-        console.log('创建数据库表 building...');
-      }),
-      me.invokeSQL('ct', 'assets', buildCreateField({order_id: null, task_id: null, building_num: null, data: 'VARCHAR(20000)', state: null, create_date: null})).then(result => {
-        console.log('创建数据库表 assets...');
-      }),
-      me.invokeSQL('ct', 'order_line', buildCreateField({order_id: null, data: 'VARCHAR(2000)', state: null, create_date: null})).then(result => {
-        console.log('创建数据库表 order_line...');
-      }),
-      me.invokeSQL('ct', 'install', buildCreateField({order_id: null, task_id: null, data: null, state: null, create_date: null})).then(result => {
-        console.log('创建数据库表 install...');
-      })
-    ]).then(() => {
-      console.log('init ok...');
-      resolve();
-    });
-  });
-};
+  };
+}; let helper = new Helper();
 
 /**
  * 数据缓存
@@ -115,7 +147,7 @@ class Cache {
    * 构造函数
    */
   constructor() {
-    KND.Util.log('Cache init...');
+    util.log('Cache init...');
   };
 
   /**
@@ -160,7 +192,7 @@ class Cache {
    */
   init(data) {
     let me = this;
-    clear().then(result => create()).then(result => me.reCache(data)).catch(err => console.error(err));
+    helper.clear.call(me).then(result => helper.create.call(me)).then(result => me.reCache(data)).catch(err => console.error(err));
   };
 
   /**
@@ -188,9 +220,9 @@ class Cache {
         console.log('开始缓存批次...');
         invokeSQL('insert', 'batch', {
           data: JSON.stringify(data),
-          create_date: KND.Util.now()
+          create_date: now()
         }).then(result => {
-          let installTask = KND.Util.toArray(data.SiebelMessage && data.SiebelMessage.Contact['KL Installation Task']);
+          let installTask = util.toArray(data.SiebelMessage && data.SiebelMessage.Contact['KL Installation Task']);
           console.log('批次缓存完成...');
           resolve(installTask);
         });
@@ -213,7 +245,7 @@ class Cache {
                 invokeSQL('insert', 'order_line', {
                   order_id: batch['Order Id'],
                   data: JSON.stringify(data),
-                  create_date: KND.Util.now()
+                  create_date: now()
                 }).then(resolve);
               }
             });
@@ -244,7 +276,7 @@ class Cache {
                   order_id: batch['Order Id'],
                   task_id: batch.Id,
                   data: JSON.stringify(data),
-                  create_date: KND.Util.now()
+                  create_date: now()
                 }).then(resolve);
               }
             });
@@ -283,7 +315,7 @@ class Cache {
                     task_id: batch.Id,
                     building_num: building[i].BuildingNum,
                     data: JSON.stringify(data),
-                    create_date: KND.Util.now()
+                    create_date: now()
                   }).then(resolve);
                 }
               });
@@ -325,7 +357,7 @@ class Cache {
      *  or
      * 2. 获取本地批次无数据时回到第一步
      */
-    setting.mode === 'refresh' ? getRemoteData() : query('batch', {}, result => {
+    setting.mode === 'refresh' ? getRemoteData() : helper.query('batch', {}, result => {
       result.length ? setting.success(filter(result)) : getRemoteData();
     });
   };
@@ -335,7 +367,7 @@ class Cache {
    * @param setting
    */
   queryBuilding(setting) {
-    query('building', {
+    helper.query('building', {
       task_id: setting.data.TaskId
     }, result => {
       setting.success(filter(result));
@@ -348,7 +380,7 @@ class Cache {
    */
   getLayer(setting) {
     let param = setting.data;
-    query('assets', {
+    helper.query('assets', {
       task_id: param['KL Activity Id'],
       building_num: param['Integration Id 2']
     }, result => {
@@ -356,15 +388,44 @@ class Cache {
     });
   };
 
+  /**
+   * 查询订单行
+   * @param setting
+   */
   queryOrderLines(setting) {
-    console.log(setting);
-    query('order_line', {
+    helper.query('order_line', {
       order_id: setting.data['Order Header Id']
     }, result => {
       console.log(result);
       setting.success(filter(result));
     });
-  }
+  };
+
+  /**
+   * 绑定资产条码信息
+   * @param setting
+   */
+  installOrderAssets(setting) {
+    let data = setting.data;
+    let Id = data.Id;
+    helper.upsert('install_record', {
+      Id: Id,
+      data: JSON.stringify(data),
+      create_date: now()
+    }, {Id: Id}, result => {
+      setting.success(result);
+    });
+  };
+
+  /**
+   * 查询本地扫码安装记录
+   * @param setting
+   */
+  queryLocalInstallRecord(setting) {
+    helper.query('install_record', {}, result => {
+      setting.success(result);
+    });
+  };
 
 };
 

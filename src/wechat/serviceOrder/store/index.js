@@ -587,9 +587,11 @@ export default new Vuex.Store({
         ProductModel: '',  // 产品型号
         mustForm: [
           // {name: '产品条形码', key: 'SerialNumber'},
-          {name: '产品型号', key: 'ProductModel'},
-          {name: '故障现象', key: 'rootcause'},
-          {name: '责任划分', key: 'Responsbility'},
+          // {name: '产品型号', key: 'ProductModel'},
+          {name: '面板型号', key: 'KL_LOCK_BODY_MODEL'},
+          {name: '锁体型号', key: 'KL_LOCK_MODEL'},
+          {name: '故障现象', key: 'SR_ROOTCAUSE'},
+          {name: '责任划分', key: 'KL_SR_RESP'},
           {name: '解决方法', key: 'repairDetails'}
         ]
       },

@@ -72,6 +72,11 @@
                     <div  v-for="(item, index) in orderEntry">
                       <div v-if="item['Order Entry - Line Items']">
                         <div class="enter-order">
+                          <div>保修期</div>
+                          <div>产品名称</div>
+                          <div>数量</div>
+                        </div>
+                        <div class="enter-order">
                           <div>{{item['Order Entry - Line Items']['KL Warranty Flag'] === "N" ? '保内': '保外'}}</div>
                           <div>{{item['Order Entry - Line Items']['KL Product Name Join']}}</div>
                           <div>{{item['Order Entry - Line Items']['Quantity Requested']}}</div>
@@ -97,11 +102,11 @@
                       <li>产品类型：{{item['KL Product Model']}}</li>
                       <li>故障描述：{{item['Sub-Area']}}</li>
                       <li>故障现象：{{item['Area']}}</li>
-                      <attach1 ioName="KL Service Request Attachment IO" ref="attach"
+                      <attach ioName="KL Service Request Attachment IO" ref="attach"
                               :attach="attach.list"
                               :edit="attach.edit"
                               :title="attach.title">
-                      </attach1>
+                      </attach>
                     </ul>
                   </toggle>
                   <toggle :title="false" label="完工确认单">
@@ -229,9 +234,20 @@
     created() {
       let me = this;
       me.srNumber = me.$route.query.type;
-      me.contactId = me.$route.query.id;
       me.getDetail(me.srNumber);
       me.setRole({meg: me.loginMeg, role: me.role});
+      console.log(me.$route.query.srId);
+      me.queryMedias({
+        data: {
+          'IOName': 'KL Service Request Attachment IO',
+          'SearchSpec': {
+            'Service Request Attachment.Activity Id': me.$route.query.srId
+          }
+        },
+        success: data => {
+          me.attach.list = KND.Util.toArray(data['SiebelMessage']['Service Request Attachment']);
+        }
+      });
     },
     data: () => {
       return {
@@ -254,14 +270,14 @@
         AppointEnd: false,
         call: false,
         phoneNum: '',
-        attach: { // 附件
+        attach: { // 客户上传的 附件
           list: [],
-          edit: true,
+          edit: false,
           title: '相关照片'
         },
-        attach1: { // 附件
+        attach1: { // 故障记录 附件
           list: [],
-          edit: true,
+          edit: false,
           title: '附件：维修单据存档'
         }
       };
@@ -271,6 +287,7 @@
       ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress', 'orderEntry', 'childService', 'allChildService'])
     },
     methods: {
+      ...mapActions('app', ['upload', 'queryMedias']),
       ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress', 'addChildService']),
       ...mapMutations(NameSpace, ['setRole']),
       boxClose(msg) {               // 关闭取消事件

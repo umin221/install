@@ -194,6 +194,21 @@ function sqlite(database, version, note, size) {
   };
 
   /**
+   * 条件属性更新数据
+   * @param {String} table 表名
+   * @param {Object} kv 属性键值对
+   * @param {Object} condition 过滤条件
+   * @param {Function} callback
+   */
+  r.updateByCondition = function (table, kv, condition, callback) {
+    var object = this;
+    var tmp = make_update(kv);
+    var arr = make_update(condition).split(',');
+    var sql = "update " + table + " set " + tmp + " where " + arr.join(' and ');
+    object.query(sql, callback);
+  };
+
+  /**
    * 执行sql
    * @param {String} sql
    * @param {Function} callback

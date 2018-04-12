@@ -47,7 +47,7 @@ let ApiList = {
           parmer = parmer + 'OR [Service Request.Status] = LookupValue("SR_STATUS",' + '"' + condition['Status'][i] + '"' + ')';
         }
       }
-      SearchSpec = '([Service Request.Owner] = "' + option.data.owner + '" OR [Service Request.Owner] IS NULL) AND ' + parmer + 'AND [Service Request.Parent Service Request Id] IS NULL';
+      SearchSpec = '([Service Request.Owner] = "' + option.data.owner + '" OR [Service Request.Owner] IS NULL) AND (' + parmer + ') AND [Service Request.Parent Service Request Id] IS NULL';
     } else {
       SearchSpec = '[Service Request.KL Dispatcher Login] = ' + option.data.owner + ' AND [Service Request.Parent Service Request Id] IS NULL';
     }

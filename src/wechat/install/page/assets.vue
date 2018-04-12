@@ -104,6 +104,10 @@
             TaskId: TaskId
           }
         });
+        // 查询本地缓存安装记录
+        this.queryLocalInstallRecord(result => {
+          console.log(result);
+        });
       }
     },
     data: () => {
@@ -155,7 +159,7 @@
     },
     methods: {
       ...mapMutations(NAMESPACE, ['clearLayer']),
-      ...mapActions(NAMESPACE, ['queryBuilding', 'getLayer', 'removeBuilding']),
+      ...mapActions(NAMESPACE, ['queryBuilding', 'getLayer', 'removeBuilding', 'queryLocalInstallRecord']),
       /**
        * 编辑楼栋信息
        * 只编辑批次楼栋

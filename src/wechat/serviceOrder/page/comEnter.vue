@@ -89,6 +89,25 @@
       timer = setTimeout(callback, ms);
     };
   })();
+  let _upload = function(serverIds, id) {
+    // 成功回调
+    let callback = data => {
+      tools.success(data, {
+        back: true,
+        successTips: '提交成功'
+      });
+    };
+    // 上传附件
+    serverIds ? this.upload({
+      data: {
+        MediaId: serverIds,
+        Id: id,
+        IOName: 'KL Service Request Attachment IO',
+        Comment: this.value
+      },
+      success: callback
+    }) : callback(id);
+  };
   const NameSpace = 'comEnter';
   export default {
     name: NameSpace,
@@ -107,11 +126,14 @@
         me.getServiceR({
           Id: serviceId,
           callback: function(data) {
+            console.log(data);
             me.SerialNumber = data['Serial Number'];
             me.SR_ROOTCAUSE = data['SR Rootcause'];
             me.AssetNumber = data['Asset Number'];
             me.KL_SR_RESP = data['KL Responsbility'];
             me.repairDetails = data['Repair Details'];
+            me.KL_LOCK_BODY_MODEL = data['KL Lock Body Model'];
+            me.KL_LOCK_MODEL = data['KL Lock Model'];
             me.status = data['Status'];
             me.sarech();
           }
@@ -141,11 +163,25 @@
           mapp.option['SR_ROOTCAUSE'] = data.items;
         }
       });
+      me.getLov({
+        type: 'KL_SR_ATT_TYPE',
+        parent: '',
+        success: function(data) {
+          console.log(data);
+          let items = data.items;
+          for (let i = 0; i < items.length;i++) {
+            if (items[i].Name === 'Job Sheet') {
+              me.value = items[i].Value;
+            }
+          }
+        }
+      });
     },
     data: () => {
       return {
         showBox: false,
         showBox1: false,
+        value: '维修工单',
         slots2: [
           {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
         ],
@@ -178,7 +214,7 @@
     },
     methods: {
       ...mapActions(NameSpace, ['getAsset', 'getLov1', 'valueChange1', 'upDateService', 'getServiceR']),
-      ...mapActions('app', ['getLov']),
+      ...mapActions('app', ['getLov', 'upload']),
       ...mapMutations(NameSpace, ['errorTips', 'setProductModel']),
       ...mapMutations('detail', ['setPartner']),
       sarech() {
@@ -266,6 +302,9 @@
             return;
           }
         }
+        let uploadAttach = id => {
+          _upload.call(me, me.$refs.attach.getServerIds(), id);
+        };
         let form = {
           'Id': me.childId || me.ServiceRequest['Id'],
           'Asset Number': me.AssetNumber, // 产品ID
@@ -277,13 +316,9 @@
           'KL Lock Body Model': me['KL_LOCK_BODY_MODEL'],
           'KL Lock Model': me['KL_LOCK_MODEL'],
           callback: function(data) {
+            let serviceId = me.$route.query.id;
             if (data) {
-              let name = me.$router.currentRoute.name;
-              if (name === 'comEnter') {
-                me.$router.go(-1);
-              } else {
-                me.$router.go(-1);
-              }
+              uploadAttach(serviceId);
             }
           }
         };
