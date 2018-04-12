@@ -42,7 +42,7 @@
         <mt-cell-swipe class="multiple"
                        @click.native="toOrderFn(item)"
                        v-for="(item, index) in orders"
-                       :right="isTeam ? [] : [{
+                       :right="isTeam || isCompleted ? [] : [{
                                  content: '删除',
                                  style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
                                  handler: () => deleteFn(item, index)
@@ -61,7 +61,7 @@
     <button-group v-show="!isTeam && !isCompleted">
       <mt-button v-show="isPending" @click.native="$router.push('reject')">驳回</mt-button>
       <mt-button type="primary" v-show="isPending"  @click.native="assignFn">确认分配</mt-button>
-      <mt-button v-show="!isPending" @click.native="toOrderFn">新增安装订单</mt-button>
+      <mt-button v-show="!isPending" @click.native="generateOrderFn">生成安装订单</mt-button>
     </button-group>
   </div>
 </template>
@@ -101,7 +101,7 @@
       }
     },
     methods: {
-      ...mapActions(NAMESPACE, ['findTransferOrderById', 'queryOrdersById', 'addPartner', 'assign', 'delete']),
+      ...mapActions(NAMESPACE, ['generateOrder', 'findTransferOrderById', 'queryOrdersById', 'addPartner', 'assign', 'delete']),
       toEngineer() {
         this.$router.push('engineer');
       },
@@ -114,7 +114,18 @@
           Toast('请选择安装工程师');
         }
       },
-      // Add Install Order
+      // generate order
+      generateOrderFn(item) {
+        let me = this;
+        let id = me.form.Id;
+        me.generateOrder({
+          data: {'Object Id': id},
+          success: data => {
+            me.queryOrdersById(id);
+          }
+        });
+      },
+      // todo edit
       toOrderFn(item) {
         let status = item['Calculated Order Status'];
         // 无状态 或者 状态 为 草稿，已驳回时
@@ -122,16 +133,6 @@
           // 安装订单编辑
           let me = this;
           delete item['Link'];
-          // 构造默认参数
-          if (!item.Id) {
-            let form = me.form;
-            item = {
-              'Project Id': form.Id,
-              'KL Hole Type': form['Hole Type'],
-              'KL Delivery Check Box 1': form['HBS Check Box 1'],
-              'KL Delivery Check Box 2': form['HBS Check Box 2']
-            };
-          };
           me.$router.push({
             path: 'order',
             query: {

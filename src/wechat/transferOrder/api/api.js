@@ -180,7 +180,7 @@ let apiList = {
   },
 
   /**
-   * 创建订单
+   * 创建订单 <废弃>
    * @param {String} option.data.body['ProcessName'] 固定 KL Install Order Create Process
    * @param {String} option.data.body['Project Id'] 必填 交接单id
    * @param {String} option.data.body['KL Hole Type'] 必填 开孔方式
@@ -191,6 +191,26 @@ let apiList = {
   saveOrder: option => {
     return {
       url: 'service/Workflow Process Manager/RunProcess'
+    };
+  },
+
+  /**
+   * SIEBEL生成安装订单
+   * @param {String} option.data.body['ProcessName'] 固定 KL Project Generate Order Process 安装交接单自动生成订单流程
+   * @param {String} option.data.body['Object Id'] 必填 交接单id
+   * @returns {{url: string, data: {body: {Object Id: string, ProcessName: string}}}}
+   */
+  generateOrder: option => {
+    let id = option.data['Object Id'];
+    delete option.data;
+    return {
+      url: 'service/Workflow Process Manager/RunProcess',
+      data: {
+        'body': {
+          'ProcessName': 'KL Project Generate Order Process', // 安装交接单自动生成订单流程
+          'Object Id': id // 安装交接单Id
+        }
+      }
     };
   },
 

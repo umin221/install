@@ -116,6 +116,10 @@ export default new Vuex.Store({
         }
       },
       actions: {
+        generateOrder({state}, setting) {
+          setting.key = 'generateOrder';
+          api.get(setting);
+        },
         /**
          * 通过id获取安装交接单信息
          * @param {String} id 必填 id
