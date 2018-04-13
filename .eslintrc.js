@@ -28,7 +28,8 @@ module.exports = {
     'Toast': true,
     'MessageBox': true,
     'tools': true,
-    'wx': true
+    'wx': true,
+    'qq': true
   },
   rules: {
     'accessor-pairs': 2,

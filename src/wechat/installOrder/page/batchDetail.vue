@@ -288,7 +288,7 @@
           data: {
             'body': {
               'OutputIntObjectName': 'Base KL Installation Task',
-              'PrimaryRowId': '1-2BSH0TBL'
+              'PrimaryRowId': id
             }
           },
           success: function(data) {

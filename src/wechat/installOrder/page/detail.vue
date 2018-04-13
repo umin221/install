@@ -486,6 +486,8 @@
   import toggle from 'public/components/cus-toggle';
   import lockLine from '../../transferOrder/components/cusLockLine';
   let userInfo = {};
+  let geocoder = '';
+
   const NameSpace = 'detail';
   export default {
     name: 'detail',
@@ -624,9 +626,7 @@
         }
       },*/
       punchClock() { // 安装打卡
-        var self = this;
-        var url = 'http://restapi.amap.com/v3/geocode/regeo?key=5b5046542494d008341eaf5b62a95109&location=22.615108,114.035529&poitype=&radius=&extensions=base&batch=false&roadlevel=0';
-        console.dir(url);
+        // var self = this;
         // 获取订单经纬度
         api.get({
           key: 'getLatLong',
@@ -645,10 +645,26 @@
                   console.log(dataList);
                   var newLatitude = dataList.latitude;
                   var newLongitude = dataList.longitude;
+                  // 获取经纬度数值   按照,分割字符串 取出前两位 解析成浮点数
+                  var init = function() {
+                    geocoder = new qq.maps.Geocoder({
+                      complete: function(result) {
+                        console.dir('=======');
+                        console.dir(result.detail.address);
+                        Toast(result.detail.address);
+                      }
+                    });
+                  };
+                  init();
+                  var lat = parseFloat(newLatitude);
+                  var lng = parseFloat(newLongitude);
+                  var latLng = new qq.maps.LatLng(lat, lng);
+                  // 调用获取位置方法
+                  geocoder.getAddress(latLng);
                   var dis1 = getDisance(obj['KL Lead Address Latitude'], obj['KL Lead Address Longitude'], newLatitude, newLongitude);
-                  MessageBox('联想到深圳北的直线距离(公里)', dis1.toFixed(2));
+                  // MessageBox('联想到深圳北的直线距离(公里)', dis1.toFixed(2));
                   // 查询限制的范围距离
-                  var lov = '';
+                  /* var lov = '';
                   self.getLov({ // 取类型值
                     data: {
                       'Type': 'KL_DISTANCE'
@@ -684,7 +700,7 @@
                         });
                       }
                     }
-                  });
+                  });*/
                 }
               });
             } else {
