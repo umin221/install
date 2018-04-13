@@ -11,7 +11,7 @@
         </mt-cell>
         <mt-cell title="计划开始日期" @click.native="open('picker')" :value="start_Date" is-link></mt-cell>
         <mt-cell title="计划完成日期" @click.native="open('pickerEnd')" :value="end_Date" is-link></mt-cell>
-        <mt-field v-show="!showZs" label="安装数量" placeholder="请输入"
+        <mt-field label="安装数量" placeholder="请输入"
                  v-model="batchNum"></mt-field>
         <mt-cell title="是否委外" :class="heartVisible">
           <mt-switch v-model="box1"></mt-switch>
@@ -208,6 +208,7 @@
           self.id = self.item.Id;
           self.batchCode = self.item.Id; // 详情的ID
           self.getPlanList(self.item.Id); // 详细计划
+          self.getInstallerList(self.item.Id); // 委外联系人
           self.getQueryMedias(self.item.Id); // 附件
 
         }
