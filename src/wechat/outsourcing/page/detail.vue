@@ -41,7 +41,7 @@
       <div class="records"
            v-show="state === 'pending'">
         <title-group>审批记录</title-group>
-        <empty v-show="!record"></empty>
+        <empty v-show="!records"></empty>
         <mt-cell class="multiple"
                        v-for="item in records"
                        :key="item.state">
@@ -133,12 +133,16 @@
       // 获取详情
       if (param.id) {
         me.findPartnerById(param.id);
-        me.queryApprovalList({
-          data: {id: param.id},
-          success: data => {
-            this.records = KND.Util.toArray(data.SiebelMessage['UInbox Item']);
-          }
-        });
+        // 已生效不抓去审批流程
+        if (!this.isValid) {
+          me.queryApprovalList({
+            data: {id: param.id},
+            success: data => {
+              this.records = KND.Util.toArray(data.SiebelMessage['UInbox Item']);
+            }
+          });
+        };
+        // 查询附件列表
         me.queryMedias({
           data: {
             'IOName': 'KL Channel Partner Attachments',

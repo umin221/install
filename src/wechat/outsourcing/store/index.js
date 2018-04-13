@@ -228,13 +228,9 @@ export default new Vuex.Store({
          * 查找委外联系人
          * @param {Object} data 必填 查询条件 键值对
          */
-        findContact({commit}, data) {
-          api.get({
-            key: 'findContact',
-            data: data,
-            success: data => {
-            }
-          });
+        findContact({commit}, setting) {
+          setting.key = 'findContact';
+          api.get(setting);
         },
         /**
          * 创建&更新联系人信息
