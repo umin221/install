@@ -33,9 +33,9 @@
             <div>已全检数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
             <div>备注说明：{{item['Unqualified Solve Desc']}}</div>
           </div>
-          <attach :attach="attach.list"
-                  :edit="read"
-                  :title="title">
+          <attach ioName="KL Installation Log Attachment"
+                  :attach="upList(item['KL Installation Log Attachment'])"
+                  :edit="read">
           </attach>
         </ul>
       </div>
@@ -121,7 +121,12 @@
         value: '',
         journalVal: true, // journalVal==true 显示updateDoor的日志  ，否则显示updateDoorNext的日志
         processDate: [],
-        titleVal: '日志'
+        titleVal: '日志',
+        attach: { // 附件
+          list: [],
+          edit: false,
+          title: '附件'
+        }
       };
     },
     beforeRouteEnter(to, from, next) {
@@ -132,7 +137,7 @@
       });
     },
     computed: {
-      ...mapState(NameSpace, ['form', 'attach']),
+      ...mapState(NameSpace, ['form']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -153,6 +158,9 @@
       }
     },
     methods: {
+      upList(obj) {
+        return KND.Util.toArray(obj);
+      },
       getJournal() {
         var self = this;
         /* api.get({
@@ -169,11 +177,13 @@
           }
         });*/
         api.get({ // 获取日志
-          key: 'getDetail',
+          key: 'getJournal',
           method: 'POST',
           data: {
             'body': {
               'OutputIntObjectName': 'Base KL Installation Detail',
+              'SortSpec': 'Created (DESCENDING)',
+              'PageSize': '100',
               'SearchSpec': '[KL Installation Detail.Activity Id]=' + '"' + self.id + '"'
             }
           },

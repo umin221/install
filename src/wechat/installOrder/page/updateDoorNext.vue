@@ -3,6 +3,7 @@
     <mt-header fixed :title="title">
       <fallback slot="left"></fallback>
       <mt-button slot="right"
+                 v-show="is_show"
                  @click="journalFn()">日志</mt-button>
     </mt-header>
     <div class="mint-content zsBatch">
@@ -15,7 +16,7 @@
                    type="textarea"
                    v-model="line['Description']"></cus-field>
       </div>
-      <attach ioName="KL Action Attachment" ref="attach"
+      <attach ioName="KL Installation Log Attachment" ref="attach"
               :attach="attach.list"
               :edit="!read"
               :title="attach.title">
@@ -72,7 +73,7 @@
       data: {
         MediaId: serverIds,
         Id: id,
-        IOName: 'KL Action Attachment'
+        IOName: 'KL Installation Log Attachment'
       },
       success: callback
     }) : callback(id);
@@ -90,6 +91,7 @@
       return {
         id: '',
         item: '',
+        is_show: false,
         type: 'add', // add 新增 / edit 编辑 / read 只读
         titleVal: '',
         line: {},
@@ -128,9 +130,13 @@
        */
       title() {
         let item = this.item;
+        var self = this;
         var val = '';
         if (item['KL Detail Type LIC'] === 'Substitution Lock Trans Batch') {
           val = '移交进度更新';
+          self.is_show = true;
+        } else if (item['KL Detail Type LIC'] === 'Transfer Batch') {
+          val = '真锁移交';
         } else {
           val = '替代锁回收';
         }
@@ -176,6 +182,49 @@
               Toast('提交成功');
               lineObj['Completed Install Amount'] = '';
               lineObj.Description = '';
+              // 更新状态
+              if (self.item['KL Detail Type LIC'] === 'Transfer Batch') { // 零星真锁移交时更新完成
+                api.get({ // 更改按钮状态
+                  key: 'getUPStatus',
+                  method: 'POST',
+                  data: {
+                    'body': {
+                      'ProcessName': 'KL Install Task Complete Action Workflow',
+                      'RowId': self.id
+                    }
+                  },
+                  success: function(data) {
+                    if (!data.ERROR) {
+                      Toast('提交成功');
+                      KND.Util.back();
+                    }
+                  }
+                });
+              } else {
+                var Status = '';
+                self.getLov({ // 取类型值
+                  data: {
+                    'Type': 'EVENT_STATUS',
+                    'Name': 'In Progress'
+                  },
+                  success: data => {
+                    Status = KND.Util.toArray(data.items)[0].Value;
+                    var parma = {};
+                    parma.Status = Status;
+                    parma.Id = self.id;
+                    api.get({ // 提交数据
+                      key: 'getUPData',
+                      method: 'PUT',
+                      data: parma,
+                      success: function(data) {
+                        if (!data.ERROR) {
+                          Toast('提交成功');
+                        }
+                      }
+                    });
+                  }
+                });
+              }
             }
           }
         });

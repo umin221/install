@@ -35,6 +35,7 @@
         <lock-line title="详细计划" @click="addPlanFn('')">
           <mt-cell-swipe v-for="(line, index) in planList" class="lock-line-cell enable" ref="body"
                          @click.native="addPlanFn(line)"
+                         :right="getSwipeBtn(line, index)"
                          :key=index
                          is-link>
             <div class="co-flex co-jc" slot="title">
@@ -271,7 +272,20 @@
     },
     methods: {
       ...mapActions('app', ['getLov', 'upload', 'queryMedias']),
-      ...mapActions('batch', ['getPcObj']),
+      ...mapActions('batch', ['getPcObj', 'delete']),
+      getSwipeBtn(line, index) {
+        return this.editable ? [{
+          content: '删除',
+          style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
+          handler: () => this.deleteFn(line, index)
+        }] : [];
+      },
+      deleteFn(line, index) {
+        this.delete({
+          id: line.Id,
+          index: index
+        });
+      },
       open(picker) {
         var self = this;
         self.eDate = new Date(self.start_Date);

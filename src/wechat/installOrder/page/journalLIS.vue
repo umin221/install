@@ -158,11 +158,13 @@
       getJournal() {
         var self = this;
         api.get({ // 获取日志
-          key: 'getDetail',
+          key: 'getJournal',
           method: 'POST',
           data: {
             'body': {
               'OutputIntObjectName': 'Base KL Installation Detail',
+              'SortSpec': 'Created (DESCENDING)',
+              'PageSize': '100',
               'SearchSpec': '[KL Installation Detail.Activity Id]=' + '"' + self.id + '"'
             }
           },

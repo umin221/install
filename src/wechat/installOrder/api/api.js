@@ -51,6 +51,17 @@ let apiList = {
       }
     };
   },
+  deletePlan: option => {
+    return {
+      method: 'delete',
+      url: 'data/KL Installation Task Detail Plan/KL Installation Task Detail Plan/' + option.data.id
+    };
+  },
+  getJournal: option => {
+    return {
+      url: 'service/EAI Siebel Adapter/QueryPage'
+    };
+  },
   getDetail: option => { // 详情
     return {
       url: 'service/EAI Siebel Adapter/Query'

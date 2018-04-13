@@ -447,6 +447,21 @@ export default new Vuex.Store(Object.extend(true, sto, {
         }
       },
       actions: {
+        /**
+         * 删除详细计划
+         */
+        delete({commit}, setting) {
+          api.get({
+            key: 'deletePlan',
+            data: {
+              id: setting.id
+            },
+            success: data => {
+              commit('removeLine', setting.index);
+              tools.success(data);
+            }
+          });
+        },
         getPcObj({state}, obj) {
           if (obj.is_company) {
             state.pcObj['KL Partner Id'] = obj.Id;

@@ -99,10 +99,11 @@
                 taskData['KL Detail Type LIC'] === 'Substitution Lock Trans Return'">
                 <span>{{taskData['Planned Completion']}}</span>
                 <span>{{taskData.Status}}</span>
-              </li>
+              </li><!--签收-->
               <li style="margin-right: 8px" v-if="taskData['KL Detail Type LIC'] === 'Ship From Door Factory' && taskData['Calculated Activity Status'] === 'Not Started'">
                 <span class="mt-switch"><mt-switch v-model="shipmentVal"  @click.native.stop="shipment(taskData)"></mt-switch></span>
-              </li>
+              </li><!--发运-->
+              <!--批次-----开始-->
               <div class="butLi"
                    v-if="taskData['KL Detail Type LIC']==='Trompil Batch Summary' ||
                   taskData['KL Detail Type LIC']==='Lock Body Install Summary' ||
@@ -112,8 +113,8 @@
                   taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
                   taskData['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
                   taskData['KL Detail Type LIC'] === 'Transfer Summary'" >
-                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(taskData)" class="batchClose"></span>
-                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" @click.stop="addTask(taskData)" class="batchAdd"></span>
+                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="closeTask(taskData)" class="batchClose"></span>
+                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="addTask(taskData)" class="batchAdd"></span>
                   <span>{{taskData.Status}}</span>
               </div>
               <div class="content-div"
@@ -137,7 +138,7 @@
                     taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
                     taskData['KL Detail Type LIC'] === 'Transfer Summary'"
                     :value="taskData['KL Completed Install Amount']+'/'+taskData['KL Install Amount Requested']">
-                    <span v-if="taskData['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
+                    <span v-if="taskData['Calculated Activity Status'] === 'In Progress' && taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
                   </mt-field>
                   <mt-field label="合格/计划数量"
                     v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
@@ -149,6 +150,7 @@
                   <mt-field label="状态" :value="itemTask.Status"></mt-field>
                 </div>
               </div>
+              <!--批次-----结束-->
             </ul>
           </div>
         </div>
@@ -677,7 +679,10 @@
                                     key: 'setPunchClock',
                                     method: 'PUT',
                                     data: {
-                                      'Id': self.id,
+                                      'Id': '0005',
+                                      'Parent Row Id': self.id,
+                                      'Address Latitude': newLatitude,
+                                      'Address Longitude': newLongitude,
                                       'Employee Full Name': userInfo['KL Employee Full Name'],
                                       'Time': newDate,
                                       'Address': address
@@ -951,11 +956,11 @@
           * */
          // self.$router.push('batch');
           /*
-          *零星工程的移交前自检汇总、移交汇总 不走批次
+          *零星工程的移交汇总 不走批次
           * */
-          if ((item['KL Detail Type LIC'] === 'Check Before Trans Summary' || item['KL Detail Type LIC'] === 'Transfer Summary') && self.detailData['KL Delivery Sales Type'] !== '工程') {
+          /* if ((item['KL Detail Type LIC'] === 'Transfer Summary') && self.detailData['KL Delivery Sales Type'] !== '工程') {
             return;
-          }
+          }*/
           if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Rejected')) { // 汇总节点未开始、已驳回的时候 开启节点
             /*
             * 批次汇总开启节点
@@ -1006,7 +1011,7 @@
          * 零星工程移交批次
          * 没有详情
          * */
-        if ((fItem['KL Detail Type LIC'] === 'Check Before Trans Summary' || fItem['KL Detail Type LIC'] === 'Transfer Summary') && self.detailData['KL Delivery Sales Type'] !== '工程') {
+        if ((fItem['KL Detail Type LIC'] === 'Transfer Summary') && self.detailData['KL Delivery Sales Type'] !== '工程') {
           return;
         }
           // 跳转批次详情、编辑
@@ -1063,47 +1068,21 @@
          * 零星工程移交批次
          * */
         var self = this;
-        if ((fItem['KL Detail Type LIC'] === 'Check Before Trans Summary' || fItem['KL Detail Type LIC'] === 'Transfer Summary') && self.detailData['KL Delivery Sales Type'] !== '工程') {
-          if (fItem['KL Detail Type LIC'] === 'Check Before Trans Summary') { // 移交全检
-            if (item['Calculated Activity Status'] === 'Completed') { // 已完成=Completed 跳转看日志
+        if ((fItem['KL Detail Type LIC'] === 'Transfer Summary') && self.detailData['KL Delivery Sales Type'] !== '工程') {
+          if (item['Calculated Activity Status'] === 'Completed') { // 已完成=Completed 跳转看日志
+            console.dir('零星移交完成状态');
+          } else {
+            if (userInfo['Person UId'] === item['Primary Owner Id']) { // 有权限更新
               self.$router.push({
-                name: 'journal',
+                name: 'updateDoorNext',
                 query: {
-                  id: item.Id,
-                  fItem: fItem,
-                  type: 'updateDoorNext'
+                  type: 'add',
+                  item: item
                 }
               });
             } else {
-              if (userInfo['Person UId'] === item['Primary Owner Id']) { // 有权限更新
-                self.$router.push({
-                  name: 'updateDoor',
-                  query: {
-                    type: 'add',
-                    item: item
-                  }
-                });
-              } else {
-                Toast('当前状态不可查看！');
-              }
+              Toast('当前状态不可查看！');
             }
-          } else { // 零星移交
-            if (item['Calculated Activity Status'] === 'Completed') { // 已完成=Completed 跳转看日志
-              console.dir('零星移交完成状态');
-            } else {
-              if (userInfo['Person UId'] === item['Primary Owner Id']) { // 有权限更新
-                self.$router.push({
-                  name: 'updateDoorNext',
-                  query: {
-                    type: 'add',
-                    item: item
-                  }
-                });
-              } else {
-                Toast('当前状态不可查看！');
-              }
-            }
-
           }
         } else {
           var typePage = ''; // 区分跳转什么更新页面 updateDoor/updateDoorNext
