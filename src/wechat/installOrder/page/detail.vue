@@ -626,7 +626,7 @@
         }
       },*/
       punchClock() { // 安装打卡
-        // var self = this;
+        var self = this;
         // 获取订单经纬度
         api.get({
           key: 'getLatLong',
@@ -645,27 +645,10 @@
                   console.log(dataList);
                   var newLatitude = dataList.latitude;
                   var newLongitude = dataList.longitude;
-                  // 获取经纬度数值   按照,分割字符串 取出前两位 解析成浮点数
-                  var init = function() {
-                    geocoder = new qq.maps.Geocoder({
-                      complete: function(result) {
-                        console.dir('=======');
-                        console.dir(result.detail.address);
-                        Toast(result.detail.address);
-                      }
-                    });
-                  };
-                  init();
-                  var lat = parseFloat(newLatitude);
-                  var lng = parseFloat(newLongitude);
-                  var latLng = new qq.maps.LatLng(lat, lng);
-                  // 调用获取位置方法
-                  geocoder.getAddress(latLng);
                   var dis1 = getDisance(obj['KL Lead Address Latitude'], obj['KL Lead Address Longitude'], newLatitude, newLongitude);
-                  console.dir(dis1.toFixed(2));
-                  // MessageBox('联想到深圳北的直线距离(公里)', dis1.toFixed(2));
+                  // MessageBox('项目距离的公里有：', dis1.toFixed(2));
                   // 查询限制的范围距离
-                  /* var lov = '';
+                  var lov = '';
                   self.getLov({ // 取类型值
                     data: {
                       'Type': 'KL_DISTANCE'
@@ -676,32 +659,49 @@
                       if (dis1.toFixed(2) > lov) {
                         Toast('不在范围内不能打卡！');
                       } else {
-                        MessageBox({
-                          message: '',
-                          showCancelButton: true
-                        }).then(action => {
-                          if (action === 'confirm') {
-                            var newDate = new Date().format('MM/dd/yyyy hh:mm:ss');
-                            api.get({ // 提交打卡
-                              key: 'setPunchClock',
-                              method: 'PUT',
-                              data: {
-                                'Id': self.id,
-                                'Employee Full Name': userInfo['KL Employee Full Name'],
-                                'Time': newDate,
-                                'Address': '东莞'
-                              },
-                              success: function(data) {
-                                if (!data.ERROR) {
-                                  Toast('打卡成功');
+                        var init = function() {
+                          geocoder = new qq.maps.Geocoder({
+                            complete: function(result) {
+                              console.dir('=======');
+                              var address = result.detail.addressComponents.province + result.detail.addressComponents.city + result.detail.addressComponents.district + result.detail.addressComponents.town + result.detail.addressComponents.street + result.detail.addressComponents.streetNumber;
+                              console.dir(address);
+                              // Toast(address);
+                              MessageBox({
+                                message: address,
+                                confirmButtonText: '确认打卡',
+                                showCancelButton: true
+                              }).then(action => {
+                                if (action === 'confirm') {
+                                  var newDate = new Date().format('MM/dd/yyyy hh:mm:ss');
+                                  api.get({ // 提交打卡
+                                    key: 'setPunchClock',
+                                    method: 'PUT',
+                                    data: {
+                                      'Id': self.id,
+                                      'Employee Full Name': userInfo['KL Employee Full Name'],
+                                      'Time': newDate,
+                                      'Address': address
+                                    },
+                                    success: function(data) {
+                                      if (!data.ERROR) {
+                                        Toast('打卡成功');
+                                      }
+                                    }
+                                  });
                                 }
-                              }
-                            });
-                          }
-                        });
+                              });
+                            }
+                          });
+                        };
+                        init();
+                        var lat = parseFloat(newLatitude);
+                        var lng = parseFloat(newLongitude);
+                        var latLng = new qq.maps.LatLng(lat, lng);
+                        // 调用获取位置方法
+                        geocoder.getAddress(latLng);
                       }
                     }
-                  });*/
+                  });
                 }
               });
             } else {
