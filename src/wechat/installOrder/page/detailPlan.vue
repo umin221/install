@@ -5,12 +5,21 @@
     </mt-header>
     <div class="mint-content batch">
       <div :class="{disable: !editable}">
-        <cus-field label="计划类型"
+        <cus-field label="计划类型" tag="计划类型"
                    @click.native="showLovFn('KL Detail Type')"
-                   v-model="planObj['KL Detail Type']"
+                   :value="planObj['KL Detail Type']"
+                   v-valid.require
                    is-link></cus-field>
-        <mt-cell title="计划开始日期" @click.native="open('picker','Planned')" :value="Planned" is-link></mt-cell>
-        <mt-cell title="计划完成日期" @click.native="open('picker', 'PlannedCompletion')" :value="PlannedCompletion" is-link></mt-cell>
+        <cus-field label="计划开始日期" tag="计划开始日期"
+                   @click.native="open('picker','Planned')"
+                   :value="Planned"
+                   v-valid.require
+                   is-link></cus-field>
+        <cus-field label="计划完成日期" tag="计划完成日期"
+                   @click.native="open('picker', 'PlannedCompletion')"
+                   :value="PlannedCompletion"
+                   v-valid.require
+                   is-link></cus-field>
         <mt-cell v-show="type==='edit'" title="实际开始日期" @click.native="open('picker', 'Started')" :value="Started" is-link></mt-cell>
         <mt-cell v-show="type==='edit'" title="实际结束日期" @click.native="open('pickerEnd', 'Done')" :value="Done" is-link></mt-cell>
         <cus-field label="备注"
@@ -71,6 +80,8 @@
 </style>
 <script type="application/javascript">
   import {mapActions} from 'vuex';
+  import Vue from 'vue';
+  import vp from 'public/plugin/validator';
   import buttonGroup from 'public/components/cus-button-group';
   import lockLine from '../components/cusLockLine';
   import cusField from 'public/components/cus-field';
@@ -78,6 +89,7 @@
   import api from '../api/api';
   // const NameSpace = 'detailPlan';
   // mapp
+  Vue.use(vp);
   let mapp = config.mapp;
   let today = new Date();
   export default {
@@ -228,24 +240,26 @@
       },
       submitFn() {
         var self = this;
-        api.get({ // 提交详细计划数据
-          key: 'setPlan',
-          method: 'PUT',
-          data: {
-            'Id': self.planObj['Id'], // 新增批次返回的ID
-            'Parent Activity Id': self.id,
-            'Planned': self.planObj.Planned,
-            'KL Detail Type': self.planObj['KL Detail Type'],
-            'Planned Completion': self.planObj['Planned Completion'],
-            'Started': '',
-            'Done': '',
-            'Description': self.planObj.Description
-          },
-          success: function(data) {
-            Toast('保存成功');
-            console.log('保存详细计划');
-            KND.Util.back();
-          }
+        tools.valid.call(this, () => {
+          api.get({ // 提交详细计划数据
+            key: 'setPlan',
+            method: 'PUT',
+            data: {
+              'Id': self.planObj['Id'], // 新增批次返回的ID
+              'Parent Activity Id': self.id,
+              'Planned': self.planObj.Planned,
+              'KL Detail Type': self.planObj['KL Detail Type'],
+              'Planned Completion': self.planObj['Planned Completion'],
+              'Started': '',
+              'Done': '',
+              'Description': self.planObj.Description
+            },
+            success: function(data) {
+              Toast('保存成功');
+              console.log('保存详细计划');
+              KND.Util.back();
+            }
+          });
         });
       }
     },

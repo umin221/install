@@ -9,16 +9,35 @@
         <mt-cell title="批次">
           <span>{{batchCode}}</span>
         </mt-cell>
-        <mt-cell title="计划开始日期" @click.native="open('picker')" :value="start_Date" is-link></mt-cell>
-        <mt-cell title="计划完成日期" @click.native="open('pickerEnd')" :value="end_Date" is-link></mt-cell>
-        <mt-field label="安装数量" placeholder="请输入"
-                 v-model="batchNum"></mt-field>
+        <cus-field label="计划开始日期" tag="计划开始日期"
+                   @click.native="open('picker')"
+                   v-model="start_Date"
+                   v-valid.require
+                   is-link></cus-field>
+        <cus-field label="计划完成日期" tag="计划完成日期"
+                  @click.native="open('pickerEnd')"
+                  v-model="end_Date"
+                  v-valid.require
+                  is-link></cus-field>
+        <cus-field label="安装数量" tag="安装数量"
+                   placeholder="请输入"
+                   v-valid.require
+                  v-model="batchNum"></cus-field>
         <mt-cell title="是否委外" :class="heartVisible">
           <mt-switch v-model="box1"></mt-switch>
         </mt-cell>
-        <mt-cell v-show="box1" title="合作伙伴" @click.native="selectCompany" :value="companyName" is-link></mt-cell>
-        <div v-show="box1">
-          <mt-cell v-show="showZs" title="真锁交接日期" @click.native="open('deliveryTime')" :value="delivery_Time" is-link></mt-cell>
+        <cus-field label="合作伙伴" tag="合作伙伴"
+                    v-if="box1"
+                    @click.native="selectCompany"
+                    v-model="companyName"
+                    is-link></cus-field>
+        <div v-if="box1">
+          <cus-field label="真锁交接日期" tag="真锁交接日期"
+                      v-if="showZs"
+                      @click.native="open('deliveryTime')"
+                      v-model="delivery_Time"
+                      v-valid.require
+                      is-link></cus-field>
         </div>
       </div>
       <div class="lock-line" v-show="box1">
@@ -129,11 +148,15 @@
   }
 </style>
 <script type="application/javascript">
+  import Vue from 'vue';
+  import vp from 'public/plugin/validator';
+  import cusField from 'public/components/cus-field';
   import {mapState, mapActions} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
   import lockLine from '../components/cusLockLine';
   import api from '../api/api';
   const NameSpace = 'zsBatch';
+  Vue.use(vp);
   let today = new Date();
   /**
    * 附件上传
@@ -472,134 +495,157 @@
           this.toSaveFn('1');
         }
       },
-      toSaveFn(num) { // num=1 保存并跳转详细计划  num = 2 只是保存 不跳转 num=3 保存跳转选择委外安装员  num=4 合作公司
+      toSaveFn(num) { // num=1 保存并跳转详细计划  num = 2 只是保存 不跳转 num=3 保存跳转选择委外安装员  num=4 合作公司 num=5 提交
         var self = this;
-        var aId = '';
-        if (self.type === 'add') {
-          aId = self.item.Id;
-        } else if (self.type === 'edit') {
-          aId = self.item['Parent Activity Id'];
-        }
-        if (self.deliveryTime === 'aN/aN/NaN') {
-          self.deliveryTime = '';
-        }
-        var parma = {
-          'Planned': self.startDate,
-          'Planned Completion': self.endDate,
-          'KL Delivery Time': self.deliveryTime,
-          'KL Install Amount Requested': self.batchNum,
-          'Id': self.batchCode || '10001',
-          'KL Detail Type': self.item['KL Detail Type'],
-          'Parent Activity Id': aId
-        };
-        var Status = '';
-        self.getLov({ // 取类型值
-          data: {
-            'Type': 'EVENT_STATUS',
-            'Name': 'Planning'
-          },
-          success: data => {
-            Status = KND.Util.toArray(data.items)[0].Value;
-            parma.Status = Status;
-            parma['KL Detail Type'] = self.itemTask['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
-            parma['Template Id'] = self.itemTask['Template Id'];
-            parma['Order Id'] = self.itemTask['Order Id'];
-            api.get({ // 提交数据
-              key: 'getUPData',
-              method: 'PUT',
-              data: parma,
-              success: function(data) {
-                if (!data.ERROR) {
-                  self.id = data.items.Id; // 新增批次返回的ID
-                  self.batchCode = data.items.Id; // 新增批次返回的ID
-                  self.getPcObj(data.items); // 保存store
-                  // 提交图片
-                  let uploadAttach = id => {
-                    _upload.call(self, self.$refs.attach.getServerIds(), id);
-                  };
-                  uploadAttach(self.id);
-                  if (num === '1') {
-                    let planType = self.itemTask['KL Detail Type']; // 取统一批次
-                    self.$router.push({
-                      name: 'detailPlan',
-                      query: {
-                        type: 'add',
-                        planType: planType,
-                        id: self.batchCode,
-                        item: ''
-                      }
-                    });
-                  } else if (num === 2) {
-                    // 判断是否选择委外
-                    var insId = '';
-                    if (self.installerList.length > 0) {
-                      insId = self.installerList[0].Id;
+        tools.valid.call(this, () => {
+          var aId = '';
+          if (self.type === 'add') {
+            aId = self.item.Id;
+          } else if (self.type === 'edit') {
+            aId = self.item['Parent Activity Id'];
+          }
+          if (self.deliveryTime === 'aN/aN/NaN') {
+            self.deliveryTime = '';
+          }
+          var parma = {
+            'Planned': self.startDate,
+            'Planned Completion': self.endDate,
+            'KL Delivery Time': self.deliveryTime,
+            'KL Install Amount Requested': self.batchNum,
+            'Id': self.batchCode || '10001',
+            'KL Detail Type': self.item['KL Detail Type'],
+            'Parent Activity Id': aId
+          };
+          var Status = '';
+          self.getLov({ // 取类型值
+            data: {
+              'Type': 'EVENT_STATUS',
+              'Name': 'Planning'
+            },
+            success: data => {
+              Status = KND.Util.toArray(data.items)[0].Value;
+              parma.Status = Status;
+              parma['KL Detail Type'] = self.itemTask['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
+              parma['Template Id'] = self.itemTask['Template Id'];
+              parma['Order Id'] = self.itemTask['Order Id'];
+              api.get({ // 提交数据
+                key: 'getUPData',
+                method: 'PUT',
+                data: parma,
+                success: function(data) {
+                  if (!data.ERROR) {
+                    self.id = data.items.Id; // 新增批次返回的ID
+                    self.batchCode = data.items.Id; // 新增批次返回的ID
+                    self.getPcObj(data.items); // 保存store
+                    // 提交图片
+                    let uploadAttach = id => {
+                      _upload.call(self, self.$refs.attach.getServerIds(), id);
                     };
-                    if (!self.box1) {
-                      if (self.companyId) { // 清空合作伙伴
-                        self.companyId = '';
-                        self.companyName = '';
-                        var parma = {
-                          'Id': self.id,
-                          'KL Partner Id': ''
-                        };
-                        api.get({ // 提交数据
-                          key: 'getUPData',
-                          method: 'PUT',
-                          data: parma,
-                          success: function(data) {
-                          }
-                        });
-                      }
-                      if (insId) { // 清空联系人
-                        api.get({
-                          key: 'selIntaller',
-                          method: 'POST',
-                          data: {
-                            'body': {
-                              'SiebelMessage': {
-                                'MessageId': '',
-                                'MessageType': 'Integration Object',
-                                'IntObjectFormat': 'Siebel Hierarchical',
-                                'ListOfBase KL Installation Task': {
-                                  'KL Installation Task': {
-                                    'Id': self.batchCode,
-                                    'ListOfContact': {}
+                    uploadAttach(self.id);
+                    if (num === '1' || num === 2 || num === '5') { // 保存或者详细计划时不选择委外 则把之前的数据清空
+                      // 判断是否选择委外
+                      var insId = ''; // 判断是否有委外联系人  有则清空
+                      if (self.installerList.length > 0) {
+                        insId = self.installerList[0]['Party UId'];
+                      };
+                      if (!self.box1) {
+                        if (self.companyId) { // 清空合作伙伴
+                          self.companyId = '';
+                          self.companyName = '';
+                          var parma = {
+                            'Id': self.id,
+                            'KL Partner Id': ''
+                          };
+                          api.get({ // 提交数据
+                            key: 'getUPData',
+                            method: 'PUT',
+                            data: parma,
+                            success: function(data) {
+                            }
+                          });
+                        }
+                        if (insId) { // 清空联系人
+                          api.get({
+                            key: 'selIntaller',
+                            method: 'POST',
+                            data: {
+                              'body': {
+                                'SiebelMessage': {
+                                  'MessageId': '',
+                                  'MessageType': 'Integration Object',
+                                  'IntObjectFormat': 'Siebel Hierarchical',
+                                  'ListOfBase KL Installation Task': {
+                                    'KL Installation Task': {
+                                      'Id': self.batchCode,
+                                      'ListOfContact': {}
+                                    }
                                   }
                                 }
                               }
+                            },
+                            success: function(data) {
+                              if (!data.ERROR) {
+                                self.installerList = [];
+                              }
+                            }
+                          });
+                        }
+                      }
+                      if (num === '1') {
+                        let planType = self.itemTask['KL Detail Type']; // 取统一批次
+                        self.$router.push({
+                          name: 'detailPlan',
+                          query: {
+                            type: 'add',
+                            planType: planType,
+                            id: self.batchCode,
+                            item: ''
+                          }
+                        });
+                      } else if (num === '5') {
+                        api.get({ // 更改按钮状态
+                          key: 'getUPStatus',
+                          method: 'POST',
+                          data: {
+                            'body': {
+                              'ProcessName': 'KL Install Task Submit For Approval Workflow',
+                              'RowId': self.id
                             }
                           },
                           success: function(data) {
+                            if (!data.ERROR) {
+                              Toast('提交成功');
+                              KND.Util.back();
+                            }
                           }
                         });
                       }
+                    } else if (num === '3') {
+                      this.$router.push({
+                        name: 'installer',
+                        query: {
+                          type: 'add',
+                          id: self.id,
+                          item: ''
+                        }
+                      });
+                    } else if (num === '4') {
+                      self.$router.push({
+                        name: 'company',
+                        query: {
+                          type: 'add',
+                          id: self.id,
+                          item: ''
+                        }
+                      });
+                    } else {
+                      Toast('保存成功');
                     }
-                  } else if (num === '3') {
-                    this.$router.push({
-                      name: 'installer',
-                      query: {
-                        type: 'add',
-                        id: self.id,
-                        item: ''
-                      }
-                    });
-                  } else if (num === '4') {
-                    self.$router.push({
-                      name: 'company',
-                      query: {
-                        type: 'add',
-                        id: self.id,
-                        item: ''
-                      }
-                    });
-                  } else {
-                    Toast('保存成功');
                   }
                 }
-              }
-            });
-          }
+              });
+            }
+          });
         });
       },
       submitFn() {
@@ -617,6 +663,10 @@
             Toast('委外联系人不能为空，请选择！');
             return;
           }
+          if (self.attach.list.length > 0) {
+            Toast('附件不能为空，请上传！');
+            return;
+          }
         }
         if (self.planList.length === 0) {
           Toast('详细计划不能为空！');
@@ -626,7 +676,7 @@
         let uploadAttach = id => {
           _upload.call(self, self.$refs.attach.getServerIds(), id);
         };
-        if (self.attach.list.length > 0) {
+        if (self.attach.list.length === 0) {
           uploadAttach(self.id);
         }
         MessageBox({
@@ -635,26 +685,11 @@
           showCancelButton: true
         }).then(action => {
           if (action === 'confirm') {
-            api.get({ // 更改按钮状态
-              key: 'getUPStatus',
-              method: 'POST',
-              data: {
-                'body': {
-                  'ProcessName': 'KL Install Task Submit For Approval Workflow',
-                  'RowId': self.id
-                }
-              },
-              success: function(data) {
-                if (!data.ERROR) {
-                  Toast('提交成功');
-                  KND.Util.back();
-                }
-              }
-            });
+            self.toSaveFn(5);
           }
         });
       }
     },
-    components: {buttonGroup, lockLine}
+    components: {buttonGroup, lockLine, cusField}
   };
 </script>

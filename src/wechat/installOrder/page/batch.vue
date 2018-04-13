@@ -9,10 +9,20 @@
         <mt-cell title="批次">
           <span>{{batchCode}}</span>
         </mt-cell>
-        <mt-cell title="计划开始日期"  @click.native="open('picker')" :value="start_Date" is-link></mt-cell>
-        <mt-cell title="计划完成日期"  @click.native="open('pickerEnd')" :value="end_Date" is-link></mt-cell>
-        <mt-field label="计划数量" placeholder="请输入"
-                  :class="heartVisible" v-model="batchNum"></mt-field>
+        <cus-field label="计划开始日期" tag="计划开始日期"
+                   @click.native="open('picker')"
+                   v-model="start_Date"
+                   v-valid.require
+                   is-link></cus-field>
+        <cus-field label="计划完成日期" tag="计划完成日期"
+                   @click.native="open('pickerEnd')"
+                   v-model="end_Date"
+                   v-valid.require
+                   is-link></cus-field>
+        <cus-field label="计划数量" tag="计划数量"
+                   placeholder="请输入"
+                   v-valid.require
+                   v-model="batchNum"></cus-field>
       </div>
       <div class="lock-line">
         <lock-line title="详细计划" @click="addPlanFn('')">
@@ -93,10 +103,14 @@
 </style>
 <script type="application/javascript">
   import {mapState, mapActions} from 'vuex';
+  import Vue from 'vue';
   import buttonGroup from 'public/components/cus-button-group';
+  import cusField from 'public/components/cus-field';
   import lockLine from '../components/cusLockLine';
+  import vp from 'public/plugin/validator';
   import api from '../api/api';
   const NameSpace = 'batch';
+  Vue.use(vp);
   let today = new Date();
   export default {
     name: 'batch',
@@ -114,7 +128,7 @@
           self.end_Date = new Date(self.pcObj['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
           self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
           self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
-          self.batchNum = self.pcObj['KL Install Amount Requested'] || 0; // 数量
+          self.batchNum = self.pcObj['KL Install Amount Requested']; // 数量
           self.getPlanList(self.batchCode);
         }
       } else if (self.type === 'edit') {
@@ -125,7 +139,7 @@
           self.end_Date = new Date(self.pcObj['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
           self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
           self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
-          self.batchNum = self.pcObj['KL Install Amount Requested'] || 0; // 数量
+          self.batchNum = self.pcObj['KL Install Amount Requested']; // 数量
           self.getPlanList(self.batchCode);
         } else {
           self.getBatch(self.item.Id);
@@ -249,11 +263,15 @@
             if (!data.ERROR) {
               console.dir(data);
               self.batchCode = data.Id; // 批次
-              self.start_Date = new Date(data.Planned).format('yyyy-MM-dd'); // 开始时间
-              self.end_Date = new Date(data['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
-              self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
-              self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
-              self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
+              if (data.Planned) {
+                self.start_Date = new Date(data.Planned).format('yyyy-MM-dd'); // 开始时间
+                self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
+              }
+              if (data['Planned Completion']) {
+                self.end_Date = new Date(data['Planned Completion']).format('yyyy-MM-dd'); // 结束时间
+                self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
+              }
+              self.batchNum = data['KL Install Amount Requested']; // 数量
               self.getPcObj(data); // 保存store
             }
           }
@@ -261,7 +279,7 @@
       },
       addPlanFn(obj) {
         var self = this;
-        if (self.id) { // 有批次直接跳转
+        /* if (self.id) { // 有批次直接跳转
           let planType = self.itemTask['KL Detail Type']; // 取统一批次
           this.$router.push({
             name: 'detailPlan',
@@ -272,99 +290,105 @@
               item: obj
             }
           });
-        } else {  // 先保存批次
-          this.toSaveFn('1');
-        }
+        } else {  // 先保存批次*/
+        self.toSaveFn('1');  // 有没有批次都保存
+       // }
       },
       toSaveFn(num) { // num=1 保存并跳转详细计划  num = 2 只是保存 不跳转
         var self = this;
-        var aId = '';
-        if (self.type === 'add') {
-          aId = self.item.Id;
-        } else if (self.type === 'edit') {
-          aId = self.item['Parent Activity Id'];
-        }
-        var parma = {
-          'Planned': self.startDate,
-          'Planned Completion': self.endDate,
-          'KL Install Amount Requested': self.batchNum,
-          'Id': self.batchCode || '10001',
-          'KL Detail Type': self.item['KL Detail Type'],
-          'Parent Activity Id': aId
-        };
-        var Status = '';
-        self.getLov({ // 取类型值
-          data: {
-            'Type': 'EVENT_STATUS',
-            'Name': 'Planning'
-          },
-          success: data => {
-            Status = KND.Util.toArray(data.items)[0].Value;
-            parma.Status = Status;
-            parma['KL Detail Type'] = self.itemTask['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
-            parma['Template Id'] = self.itemTask['Template Id'];
-            parma['Order Id'] = self.itemTask['Order Id'];
-            api.get({ // 提交数据
-              key: 'getUPData',
-              method: 'PUT',
-              data: parma,
-              success: function(data) {
-                if (!data.ERROR) {
-                  self.id = data.items.Id; // 新增批次返回的ID
-                  self.batchCode = data.items.Id; // 新增批次返回的ID
-                  self.getPcObj(data.items); // 保存store
-                  if (num === '1') {
-                    let planType = self.itemTask['KL Detail Type']; // 取统一批次
-                    self.$router.push({
-                      name: 'detailPlan',
-                      query: {
-                        type: 'add',
-                        planType: planType,
-                        id: self.batchCode,
-                        item: ''
-                      }
-                    });
-                  } else {
-                    Toast('保存成功');
+        tools.valid.call(this, () => {
+          var aId = '';
+          if (self.type === 'add') {
+            aId = self.item.Id;
+          } else if (self.type === 'edit') {
+            aId = self.item['Parent Activity Id'];
+          }
+          var parma = {
+            'Planned': self.startDate,
+            'Planned Completion': self.endDate,
+            'KL Install Amount Requested': self.batchNum,
+            'Id': self.batchCode || '10001',
+            'KL Detail Type': self.item['KL Detail Type'],
+            'Parent Activity Id': aId
+          };
+          var Status = '';
+          self.getLov({ // 取类型值
+            data: {
+              'Type': 'EVENT_STATUS',
+              'Name': 'Planning'
+            },
+            success: data => {
+              Status = KND.Util.toArray(data.items)[0].Value;
+              parma.Status = Status;
+              parma['KL Detail Type'] = self.itemTask['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
+              parma['Template Id'] = self.itemTask['Template Id'];
+              parma['Order Id'] = self.itemTask['Order Id'];
+              api.get({ // 提交数据
+                key: 'getUPData',
+                method: 'PUT',
+                data: parma,
+                success: function(data) {
+                  if (!data.ERROR) {
+                    self.id = data.items.Id; // 新增批次返回的ID
+                    self.batchCode = data.items.Id; // 新增批次返回的ID
+                    self.getPcObj(data.items); // 保存store
+                    if (num === '1') {
+                      let planType = self.itemTask['KL Detail Type']; // 取统一批次
+                      self.$router.push({
+                        name: 'detailPlan',
+                        query: {
+                          type: 'add',
+                          planType: planType,
+                          id: self.batchCode,
+                          item: ''
+                        }
+                      });
+                    } else if (num === '2') {
+                      api.get({ // 更改按钮状态
+                        key: 'getUPStatus',
+                        method: 'POST',
+                        data: {
+                          'body': {
+                            'ProcessName': 'KL Install Task Submit For Approval Workflow',
+                            'RowId': self.id
+                          }
+                        },
+                        success: function(data) {
+                          if (!data.ERROR) {
+                            Toast('提交成功');
+                            KND.Util.back();
+                          }
+                        }
+                      });
+                    } else {
+                      Toast('保存成功');
+                    }
                   }
                 }
-              }
-            });
-          }
+              });
+            }
+          });
         });
       },
       submitFn() {
         var self = this;
-        if (self.planList.length === 0) {
-          Toast('详细计划不能为空！');
-          return;
-        }
-        MessageBox({
-          title: '提示',
-          message: ' 确认提交？一经提交不可修改',
-          showCancelButton: true
-        }).then(action => {
-          if (action === 'confirm') {
-            api.get({ // 更改按钮状态
-              key: 'getUPStatus',
-              method: 'POST',
-              data: {
-                'body': {
-                  'ProcessName': 'KL Install Task Submit For Approval Workflow',
-                  'RowId': self.id
-                }
-              },
-              success: function(data) {
-                if (!data.ERROR) {
-                  Toast('提交成功');
-                  KND.Util.back();
-                }
-              }
-            });
+        tools.valid.call(this, () => {
+          if (self.planList.length === 0) {
+            Toast('详细计划不能为空！');
+            return;
           }
+          MessageBox({
+            title: '提示',
+            message: ' 确认提交？一经提交不可修改',
+            showCancelButton: true
+          }).then(action => {
+            if (action === 'confirm') {
+              self.toSaveFn('2');  // 批次保存
+            }
+          });
         });
       }
     },
-    components: {buttonGroup, lockLine}
+    components: {buttonGroup, lockLine, cusField}
   };
 </script>
