@@ -226,7 +226,7 @@ function sqlite(database, version, note, size) {
    */
   r.delete = function (table, id, callback) {
     var object = this;
-    var sql = "delete from " + table + " where id in (" + id + ")";
+    var sql = "delete from " + table + " where id = '"+ id +"'";
     object.query(sql, callback);
   };
 

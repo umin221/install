@@ -181,6 +181,15 @@ import cache from '../lib/cache';
           console.log(res);
         }
       }, option));
+      // 本地调试
+      if (debug) {
+        util.invoke(option.success, {
+          latitude: '36.308466',
+          longitude: '119.399331',
+          speed: '',
+          accuracy: ''
+        });
+      }
     };
 
     /**
