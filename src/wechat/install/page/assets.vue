@@ -372,8 +372,9 @@
     .assets-div span{
       border: 1px solid #eaeaea;
       border-radius: 10px;
-      margin: 5px 6px;
-      width: 65px;
+      margin: 5px 0;
+      margin-left: 1%;
+      width: 23%;
       line-height: 22px;
       text-align: center;
       color: #777;

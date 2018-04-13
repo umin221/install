@@ -45,16 +45,28 @@ class Helper {
    * @param callback
    */
   query(table, condition, callback) {
-    var sql = `select * from ${table} where 1 = 1`;
-    for (var i in condition) {
-      sql += ` and ${i}="${condition[i]}"`;
-    };
-    db.query(sql, data => {
+    let conditionArr = ['1=1'];
+    for (var i in condition) conditionArr.push(`${i}='${condition[i]}'`);
+    db.query((`select * from ${table} where ${conditionArr.join(' and ')}`), data => {
       var arr = [];
       for (var i = 0; i < data.rows.length; i++) {
         arr.push(data.rows.item(i));
       }
       callback(arr);
+    });
+  };
+
+  /**
+   * 删除记录
+   * @param {String} table 必填 表名
+   * @param {Object} condition 必填 查询条件
+   * @param {Function} callback
+   */
+  delete(table, condition, callback) {
+    let conditionArr = ['1=1'];
+    for (let i in condition) conditionArr.push(`${i}=${condition[i]}`);
+    db.query((`delete * from ${table} where ${conditionArr.join(' and ')}}`), data => {
+      console.log(data);
     });
   };
 
@@ -154,7 +166,7 @@ class DataHandle {
    */
   checkNetwork() {
     console.log('check network...');
-    // if (true) this.submit();
+    if (false) this.submit();
   };
 
   /**
@@ -162,6 +174,8 @@ class DataHandle {
    */
   submit() {
     helper.query('install_record', {}, data => {
+      // 本地没有记录
+      if (!data.length) return;
       let tasks = [];
       // 记录提交结果
       let result = [];
@@ -173,7 +187,10 @@ class DataHandle {
             data: util.parse(item.data),
             success: data => {
               result.push(item);
-              resolve(result);
+              // 清空成功记录
+              db.delete('install_record', item.id, data => {
+                resolve(result);
+              });
             }
           });
         }));

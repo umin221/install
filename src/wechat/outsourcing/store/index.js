@@ -84,10 +84,11 @@ export default new Vuex.Store({
     detail: {
       namespaced: true,
       state: {
-        form: ''
+        form: {'CUT Address': {Province: ''}}
       },
       mutations: {
         setPartner(state, form) {
+          form['CUT Address'] = form['CUT Address'] || {Country: '中国', Province: '', City: '', County: ''};
           state.form = form;
           state.form.User = KND.Util.toArray(form.User);
         },
@@ -98,7 +99,8 @@ export default new Vuex.Store({
             'Alias': '',
             'KL Partner Owner Name': '',
             'Main Phone Number': '',
-            'Primary Address Street': ''
+            'Primary Address Street': '',
+            'CUT Address': {Province: ''}
           };
         }
       },
@@ -163,11 +165,8 @@ export default new Vuex.Store({
             data: state.form,
             success: data => {
               tools.success(data, {
-                back: true,
                 successTips: '更新成功'
               });
-              // 标记列表刷新
-              KND.Session.set('refresh', 'valid');
             }
           }, setting));
         },
@@ -196,12 +195,12 @@ export default new Vuex.Store({
             if (media) {
               push(media);
             } else {
-              // 标记列表刷新
-              KND.Session.set('refresh', 'valid');
               tools.success(result, {
                 back: true,
                 successTips: '提交成功'
               });
+              // 标记列表刷新
+              KND.Session.set('refresh', 'pending,valid');
             };
           };
           run(mediaId.pop());

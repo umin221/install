@@ -26,10 +26,16 @@
                    :edit=!read
                    v-valid.require.phone
                    v-model="form['Main Phone Number']"></cus-field>
+        <cus-field label="省市区" tag="省市区"
+                   @click.native="showCity++"
+                   placeholder="请选择"
+                   :value="city"
+                   v-valid.require
+                   is-link></cus-field>
         <cus-field label="详细地址" placeholder="请输入地址" tag="地址"
                    :edit=!read
                    v-valid.require
-                   v-model="form['Primary Address Street']"></cus-field>
+                   v-model="form['CUT Address']['Street Address']"></cus-field>
       </div>
 
       <attach ioName="KL Channel Partner Attachments" title="合同附件" ref="attach"
@@ -64,18 +70,21 @@
           <div class="mint-cell-sub-title" slot="title">登录账号: {{item['Login Name']}}</div>
         </mt-cell-swipe>
       </div>
+
+      <!--buttons-->
+      <button-group>
+        <mt-button v-show="isSubmit"
+                   @click.native="submitFn">提交</mt-button>
+        <mt-button v-show="isValid"
+                   v-text="read ? '新增联系人' : '失效'"
+                   @click.native="multipleFn"></mt-button>
+        <mt-button v-show="read && state === 'invalid'"
+                   @click="type = 'edit'">重新启用</mt-button>
+      </button-group>
     </div>
 
-    <!--buttons-->
-    <button-group>
-      <mt-button v-show="isSubmit"
-        @click.native="submitFn">提交</mt-button>
-      <mt-button v-show="isValid"
-        v-text="read ? '新增联系人' : '失效'"
-        @click.native="multipleFn"></mt-button>
-      <mt-button v-show="read && state === 'invalid'"
-        @click="type = 'edit'">重新启用</mt-button>
-    </button-group>
+    <cus-city :showCity="showCity" @input="setCityFn"></cus-city>
+
   </div>
 </template>
 
@@ -86,6 +95,7 @@
   import titleGroup from 'public/components/cus-title-group';
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
+  import cusCity from 'public/components/cus-select-city';
   // use plugin
   Vue.use(vp);
 
@@ -108,6 +118,8 @@
         back: true,
         successTips: '提交成功'
       });
+      // 标记列表刷新
+      KND.Session.set('refresh', 'pending,valid');
     };
     // 上传附件
     serverIds ? this.upload({
@@ -123,7 +135,6 @@
   const NAMESPACE = 'detail';
   export default {
     name: NAMESPACE,
-    components: {titleGroup, buttonGroup, cusField},
     // 初始化
     created() {
       let me = this;
@@ -160,6 +171,7 @@
     },
     data: () => {
       return {
+        showCity: 1,
         type: 'add', // add 新增 / edit 编辑 / read 只读
         state: 'pending', // pending 待审批 / valid 已生效 / invalid 未生效
         button: {
@@ -201,6 +213,11 @@
       title() {
         return this.type === 'add' ? '创建委外团队'
           : this.type === 'edit' && this.state === 'invalid' ? '补充委外合约' : '委外团队详情';
+      },
+      // 省市区
+      city() {
+        let add = this.form['CUT Address'] || {};
+        return `${add['Province']} ${add['City']} ${add['County']}`.replace(/undefined/g, '');
       }
     },
     methods: {
@@ -239,6 +256,8 @@
           // 提交图片
           let uploadAttach = id => {
             _upload.call(me, me.$refs.attach.getServerIds(), id);
+            // 标记列表刷新
+            KND.Session.set('refresh', 'pending');
           };
           // 重新启用委外团队
           if (me.state === 'invalid') {
@@ -253,7 +272,7 @@
           } else {
             // 创建委外团队
             me.addPartner(data => {
-              uploadAttach(data.PrimaryRowId);
+              uploadAttach(data['Object Id']);
             });
           }
         });
@@ -284,8 +303,17 @@
             }
           });
         }
+      },
+      // Set city
+      setCityFn(value) {
+        let address = this.form['CUT Address'];
+        address['Id'] = address.Id || KND.Util.now();
+        address['Province'] = value.KL_PROVINCE;
+        address['City'] = value.KL_CITY;
+        address['County'] = value.KL_TOWN;
       }
-    }
+    },
+    components: {titleGroup, buttonGroup, cusField, cusCity}
   };
 </script>
 
