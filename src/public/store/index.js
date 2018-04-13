@@ -21,7 +21,7 @@ export const app = {
   actions: {
     /**
      * 获取 siebel lov，类似平台数据字典
-     * @param {String} option['type'] 必填 lov type
+     * @param {String} option['type'] 必填 lov type 或者 option['data'] lov type and parent
      */
     getLov({state}, option) {
       let data = option.data || {Type: option.type};

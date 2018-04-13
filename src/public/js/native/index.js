@@ -97,13 +97,6 @@ import cache from '../lib/cache';
           console.log(localIds);
         }
       }, option));
-      // 本地调试
-      if (debug) {
-        util.invoke(option.success, {
-          localIds: ['img:///storage/emulated/0/Tencent/WeixinWork/tempimagecache/1688852028455906/b4bc209fa2f44c64a57c159645330240.jpg'],
-          errMsg: 'chooseImage:ok'
-        });
-      }
     };
 
     /**
@@ -122,13 +115,6 @@ import cache from '../lib/cache';
           console.log(serverId);
         }
       }, option));
-      // 本地调试
-      if (debug) {
-        util.invoke(option.success, {
-          serverId: '1sb9A-V1qJt4tcfiKMM4UzpjMHuBHMMIIgYKl96OQ1_pBe8h0xte9G6aTPNjEQaYI',
-          errMsg: 'uploadImage:ok'
-        });
-      }
     };
 
     /**
@@ -181,15 +167,6 @@ import cache from '../lib/cache';
           console.log(res);
         }
       }, option));
-      // 本地调试
-      if (debug) {
-        util.invoke(option.success, {
-          latitude: '36.308466',
-          longitude: '119.399331',
-          speed: '',
-          accuracy: ''
-        });
-      }
     };
 
     /**
@@ -276,8 +253,35 @@ import cache from '../lib/cache';
       this[option.cache ? 'cache' : 'online'](option);
     }
 
-  };
+  }; let native = context['Native'] = new Native();
 
-  context['Native'] = new Native();
+  /**
+   * 本地调试
+   */
+  if (debug) {
+    // 选图
+    native.chooseImage = option => {
+      util.invoke(option.success, {
+        localIds: ['img:///storage/emulated/0/Tencent/WeixinWork/tempimagecache/1688852028455906/b4bc209fa2f44c64a57c159645330240.jpg'],
+        errMsg: 'chooseImage:ok'
+      });
+    };
+    // 上传
+    native.uploadImage = option => {
+      util.invoke(option.success, {
+        serverId: '1sb9A-V1qJt4tcfiKMM4UzpjMHuBHMMIIgYKl96OQ1_pBe8h0xte9G6aTPNjEQaYI',
+        errMsg: 'uploadImage:ok'
+      });
+    };
+    // 定位
+    native.getLocation = option => {
+      util.invoke(option.success, {
+        latitude: '36.308466',
+        longitude: '119.399331',
+        speed: '',
+        accuracy: ''
+      });
+    };
+  };
 
 })(global[global['context']]);

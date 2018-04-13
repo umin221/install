@@ -51,10 +51,18 @@
         input {
           text-align: left;
         }
+
+        &.is-link {
+          margin-right: 0;
+        }
       }
 
       ::-webkit-input-placeholder {
         font-size: 0;
+      }
+
+      .mint-cell-allow-right::after {
+        border: none;
       }
     }
   }
