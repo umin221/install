@@ -662,6 +662,7 @@
                   // 调用获取位置方法
                   geocoder.getAddress(latLng);
                   var dis1 = getDisance(obj['KL Lead Address Latitude'], obj['KL Lead Address Longitude'], newLatitude, newLongitude);
+                  console.dir(dis1.toFixed(2));
                   // MessageBox('联想到深圳北的直线距离(公里)', dis1.toFixed(2));
                   // 查询限制的范围距离
                   /* var lov = '';
