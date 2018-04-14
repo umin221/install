@@ -129,8 +129,8 @@
                 taskData['KL Detail Type LIC'] === 'Transfer Summary'"
                  v-for="(itemTask, index) in upList(taskData['KL Installation Task'])" :key="index"
                  @click.stop="updateDoor(itemTask,taskData)">
-                <div class="readonly">
-                  <mt-field label="批次" class="itemTaskId enable" :value="itemTask.Id"  @click.native.stop="taskClick(itemTask,taskData)"></mt-field>
+                <div class="readonly enable">
+                  <mt-field label="批次" class="itemTaskId" :value="itemTask.Id"  @click.native.stop="taskClick(itemTask,taskData)"></mt-field>
                   <mt-field label="已完成/计划数量"  class="itemTask"
                     v-if="taskData['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
                     taskData['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
