@@ -112,9 +112,11 @@
                   taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
                   taskData['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
                   taskData['KL Detail Type LIC'] === 'Transfer Summary'" >
-                 <!-- <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="closeTask(taskData)" class="batchClose"></span>
+                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="closeTask(taskData)" class="batchClose"></span>
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="addTask(taskData)" class="batchAdd"></span>
-                  --><span>{{taskData.Status}}</span>
+                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(taskData)" class="batchClose"></span>
+                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="addTask(taskData)" class="batchAdd"></span>
+                  <span>{{taskData.Status}}</span>
               </div>
               <div class="content-div"
                 v-if="taskData['KL Detail Type LIC']==='Trompil Batch Summary' ||
@@ -137,9 +139,8 @@
                     taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
                     taskData['KL Detail Type LIC'] === 'Transfer Summary'"
                     :value="taskData['KL Completed Install Amount']+'/'+taskData['KL Install Amount Requested']">
-<!--
                     <span v-if="taskData['Calculated Activity Status'] === 'In Progress' && taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
--->
+                    <span v-if="taskData['Calculated Activity Status'] === 'In Progress' && taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
                   </mt-field>
                   <mt-field label="合格/计划数量"
                     v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
@@ -190,6 +191,7 @@
       width: 98%;
       height: 30px;
       margin-top: 5px;
+      margin-bottom: 10px;
       text-align: right;
     }
     .mint-content-xt {
