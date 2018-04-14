@@ -522,7 +522,7 @@
       };
     },
     computed: {
-      ...mapState(NameSpace, ['taskDataST']),
+      ...mapState(NameSpace, ['orderId', 'taskDataST']),
       isConfirming() {
         let status = this.detailData.Status;
         return !status || status === '门厂工程师确认中';
@@ -538,7 +538,8 @@
     methods: {
       ...mapActions('app', ['getLov']),
       ...mapMutations('batch', ['clear']),
-      ...mapMutations(NameSpace, ['setTaskDataST']),
+      ...mapMutations('engineer', ['delEngineer']),
+      ...mapMutations(NameSpace, ['setOrderId', 'setTaskDataST']),
       ...mapActions(NameSpace, ['getTaskType', 'deleteOrderLine', 'setShowZs']),
       detail() {
         var self = this;
@@ -566,6 +567,7 @@
                 self.taskDataList = KND.Util.toArray(self.taskData[0]['KL Installation Task']);
               }
             }
+            self.setOrderId(self.id);
             self.setTaskDataST(KND.Util.toArray(self.detailData['Order Entry - Line Items']));
             console.dir(self.taskDataST);
           }
@@ -731,6 +733,7 @@
       },
       butXttd() { // 跳转协同团队
         let me = this;
+        me.delEngineer(); // 清除store存的安装工程师
         this.$router.push({
           name: 'xttd',
           query: {
@@ -1095,6 +1098,7 @@
             if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次 完成状态先跳转日志   日志页面与其他日志页面不共用
               if (self.detailData['KL Delivery Sales Type'] !== '工程') { // 零星
                 // 跳转真锁安装批次新增页面
+                self.getTaskType(item);
                 this.$router.push({
                   name: 'sporadic',
                   query: {
@@ -1137,6 +1141,7 @@
               }
               if (self.detailData['KL Delivery Sales Type'] !== '工程') { // 零星
                 // 跳转真锁安装批次新增页面
+                self.getTaskType(item);
                 this.$router.push({
                   name: 'sporadic',
                   query: {

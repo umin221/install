@@ -94,12 +94,16 @@ export default new Vuex.Store(Object.extend(true, sto, {
       namespaced: true,
       state: {
         showZs: false,
+        orderId: '',
         itemTask: [],
         taskDataST: '' // 面板锁体
       },
       mutations: {
         removeTaskDataST(state, index) {
           state.taskDataST.splice(index, 1);
+        },
+        setOrderId(state, id) {
+          state.orderId = id;
         },
         setTaskDataST(state, data) {
           state.taskDataST = data;
@@ -168,6 +172,11 @@ export default new Vuex.Store(Object.extend(true, sto, {
         },
         selEngineer(state, engineer) {
           state.select = engineer;
+        },
+        delEngineer(state, engineer) {
+          state.select = {
+            'Last Name': '请选择'
+          };
         }
       },
       actions: {
@@ -469,6 +478,47 @@ export default new Vuex.Store(Object.extend(true, sto, {
           } else {
             state.pcObj = obj;
           }
+        }
+      }
+    },
+    sporadic: {
+      namespaced: true,
+      state: {
+        objList: []
+      },
+      mutations: {
+        removeLine(state, index) {
+          state.objList.splice(index, 1);
+        }
+      },
+      actions: {
+        getSporadic({state}, id) {
+          api.get({ // 获取零星列表数据
+            key: 'getSporadic',
+            data: {
+              id: id
+            },
+            success: function(data) {
+              if (data.items) {
+                state.objList = data.items;
+              }
+            }
+          });
+        },
+        /**
+         * 删除详细计划
+         */
+        delete({commit}, setting) {
+          api.get({
+            key: 'deletePlan',
+            data: {
+              id: setting.id
+            },
+            success: data => {
+              commit('removeLine', setting.index);
+              tools.success(data);
+            }
+          });
         }
       }
     },

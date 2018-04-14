@@ -144,7 +144,7 @@
       }
     },
     methods: {
-      ...mapActions('app', ['upload', 'queryMedias']),
+      ...mapActions('app', ['getLov', 'upload', 'queryMedias']),
       journalFn() {
         var self = this;
         self.$router.push({

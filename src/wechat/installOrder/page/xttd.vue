@@ -26,7 +26,7 @@
   import api from '../api/api';
   import {mapState} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
-  const NAMESPACE = 'engineer';
+  const NAMESPACE = 'xttd';
   let userInfo = {};
   export default {
     name: NAMESPACE,
@@ -90,7 +90,7 @@
       });
     },
     computed: {
-      ...mapState(NAMESPACE, ['select'])
+      ...mapState('engineer', ['select'])
     },
     components: {buttonGroup},
     methods: {
@@ -101,23 +101,24 @@
       submitFn() {
         var self = this;
         if (self.select.Id) { // 是否修改过安装工程师
-          var list = []; // 构造数据  后台需要把所有人员传后台而不是只传修改的那个人ID
+          var obj = {}; // 取原来负责人
           for (var i = 0; i < self.xttdDetailData.length; i++) {
-            if (self.xttdDetailData[i]['SSA Primary Field'] === 'N') { // ['SSA Primary Field']==Y 表示责任人
-              var obj = {};
+            if (self.xttdDetailData[i]['SSA Primary Field'] === 'Y') { // ['SSA Primary Field']==Y 表示责任人
               obj.Id = self.xttdDetailData[i].Id;
-              list.push(obj);
             }
           }
           var perObj = {};
-          perObj.Id = self.select['Primary Position Id']; // 取职位ID
-          list.push(perObj);
+          perObj.Id = self.select['Primary Position Id']; // 现在负责人ID
           api.get({
             key: 'upPerson',
             method: 'POST',
             data: {
-              'Id': self.id,
-              'personList': list
+              'body': {
+                'ProcessName': 'KL Update Installation Task Owner Workflow',
+                'Object Id': self.id,
+                'Pre Position Id': obj.Id,
+                'New Position Id': perObj.Id
+              }
             },
             success: function(data) {
               if (!data.ERROR) {

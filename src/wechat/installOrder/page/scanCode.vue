@@ -14,20 +14,34 @@
                  v-model= 'detailAddress'
                  type="textarea"
                  placeholder="请输入详细地址"></cus-field>-->
-      <mt-field label="楼栋名" placeholder="请输入"
-               :class="heartVisible" v-model="BuilingName" is-link></mt-field>
-      <mt-field label="楼层" placeholder="请输入"
-               :class="heartVisible" v-model="FloorName" is-link></mt-field>
-      <mt-field label="房间号" placeholder="请输入"
-               :class="heartVisible" v-model="RoomName" is-link></mt-field>
-      <mt-field label="产品条形码" placeholder="请输入"
-               :class="heartVisible" v-model="SerialNumber" is-link>
+      <cus-field label="楼栋名" tag="楼栋名"
+                placeholder="请输入"
+                 v-model="BuilingName"
+                v-valid.require></cus-field>
+      <cus-field label="楼层" tag="楼层"
+                placeholder="请输入"
+                 v-model="FloorName"
+                v-valid.require></cus-field>
+      <cus-field label="房间号" tag="房间号"
+                placeholder="请输入"
+                 v-model="RoomName"
+                v-valid.require></cus-field>
+      <cus-field label="产品条形码" tag="产品条形码"
+                placeholder="请输入"
+                 v-model="SerialNumber"
+                v-valid.require>
         <i class="xs-icon icon-scan" @click="scan"></i>
-      </mt-field>
-      <mt-cell title="面板型号" placeholder="请输入"
-               :class="heartVisible" v-model="productCode" is-link></mt-cell>
-      <mt-cell title="锁体型号" placeholder="请输入"
-               :class="heartVisible" v-model="productCode" is-link></mt-cell>
+      </cus-field>
+      <cus-field label="面板型号"  tag="面板型号"
+               placeholder="请输入"
+                 v-model="panel"
+               v-valid.require
+               is-link></cus-field>
+      <cus-field label="锁体型号" tag="锁体型号"
+               placeholder="请输入"
+                 v-model="lockBody"
+               v-valid.require
+               is-link></cus-field>
       <!--下拉菜单-->
       <mt-popup v-model="showBox" position="bottom">
         <menu-box @my-enter="enter"
@@ -74,7 +88,9 @@
   import cusField from 'public/components/cus-field';
   import menuBox from '../components/cus-menu';
   import api from '../api/api';
-
+  import Vue from 'vue';
+  import vp from 'public/plugin/validator';
+  Vue.use(vp);
   let isMunicipality = function(...args) {
     let me = this;
     let city = args.pop();
@@ -111,12 +127,14 @@
         this.RoomName = this.item['Street Address 4'];
         this.productId = this.item['Product Id'];
         this.productCode = this.item['Product Model No'];
+        this.lockBody = this.item['KL Product Model No Lock Body'];
+        this.panel = this.item['KL Product Model No Panel'];
       }
     },
     data: () => {
       return {
         id: '',
-        type: false,
+        type: true,
         copy: '', // 是否复制
         orderID: '',
         titleVal: '扫码录入',
@@ -135,6 +153,8 @@
         detailAddress: '',
         productId: '',
         productCode: '',
+        panel: '',
+        lockBody: '',
         active: 'tab-container'
       };
     },
@@ -230,52 +250,55 @@
       scavenging() {
         console.dir('保存');
         var self = this;
-        api.get({
-          key: 'setBuild',
-          method: 'POST',
-          data: {
-            'body': {
-              'ProcessName': 'KL Install Order Asset Room Upsert Process', // 详情ID
-              'SiebelMessage': {
-                'MessageId': '',
-                'MessageType': 'Integration Object',
-                'IntObjectName': 'Base KL Install Order Asset Address',
-                'IntObjectFormat': 'Siebel Hierarchical',
-                'ListOfBase KL Install Order Asset Address': {
-                  'Base KL Install Order Asset Address': {
-                    'Country': '中国',
-                    'Province': self.KL_PROVINCE,
-                    'City': self.KL_CITY,
-                    'Street Address': self.detailAddress,
-                    'Street Address 2': self.BuilingName,
-                    'Street Address 3': self.FloorName,
-                    'Street Address 4': self.RoomName,
-                    'Integration Id 2': '',
-                    'Integration Id 3': '',
-                    'Integration Id': '',
-                    'Id': self.item['Personal Address Id'] || '00009',
-                    'ListOfKL Install Order Asset': {
-                      'KL Install Order Asset': {
-                        'Original Order Id': self.orderID,
-                        'KL Activity Id': self.id,
-                        'Serial Number': self.SerialNumber,
-                        'Product Id': self.productId,
-                        'Id': self.item.Id || '0000'
+        tools.valid.call(this, () => {
+          api.get({
+            key: 'setBuild',
+            method: 'POST',
+            data: {
+              'body': {
+                'ProcessName': 'KL Install Order Asset Room Upsert Process', // 详情ID
+                'SiebelMessage': {
+                  'MessageId': '',
+                  'MessageType': 'Integration Object',
+                  'IntObjectName': 'Base KL Install Order Asset Address',
+                  'IntObjectFormat': 'Siebel Hierarchical',
+                  'ListOfBase KL Install Order Asset Address': {
+                    'Base KL Install Order Asset Address': {
+                      'Country': '中国',
+                      'Province': self.KL_PROVINCE,
+                      'City': self.KL_CITY,
+                      'Street Address': self.detailAddress,
+                      'Street Address 2': self.BuilingName,
+                      'Street Address 3': self.FloorName,
+                      'Street Address 4': self.RoomName,
+                      'KL Building Number': '1',
+                      'KL Floor Number': '1',
+                      'KL Room Number': '1',
+                      'Id': self.item['Personal Address Id'] || '00009',
+                      'ListOfKL Install Order Asset': {
+                        'KL Install Order Asset': {
+                          'Original Order Id': self.orderID,
+                          'KL Activity Id': self.id,
+                          'Serial Number': self.SerialNumber,
+                          'Product Id': self.productId,
+                          /* 'KL Product Model No Panel': self.panel,
+                          'KL Product Model No Lock Body': self.lockBody,*/
+                          'Id': self.item.Id || '0000'
+                        }
                       }
                     }
                   }
                 }
               }
+            },
+            success: function(data) {
+              if (!data.ERROR) {
+                Toast('保存成功');
+                KND.Util.back();
+              }
             }
-          },
-          success: function(data) {
-            if (!data.ERROR) {
-              Toast('保存成功');
-              KND.Util.back();
-            }
-          }
+          });
         });
-
       }
     }
   };

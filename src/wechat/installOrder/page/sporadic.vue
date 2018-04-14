@@ -5,14 +5,19 @@
       <mt-button slot="right" @click.native="submit"  v-show="type">提交</mt-button>
     </mt-header>
     <div class="mint-content">
-      <mt-cell v-for="item in objList" :key="item.id" is-link @click.native="scavenging(item, '')">
+      <mt-cell-swipe
+        v-for="(item, index) in objList"
+        :key="item.id"
+        :right="getSwipeBtn(item, index)"
+        is-link ref="body"
+        @click.native="scavenging(item, '')">
         <div slot="title" class="list-text"><span>产品型号:</span><span>{{item['Product Model No']}}</span></div>
         <div slot="title" class="list-text">
           <span v-show="type" class="icon-copy" @click.stop="scavenging(item,'copy')"></span>
           <span>产品条形码:</span><span>{{item['Serial Number']}}</span>
         </div>
         <div slot="title" class="list-text"><span></span><span>{{item.Province}}{{item.City}}{{item['Street Address']}}{{item['Street Address 2']}}{{item['Street Address 3']}}{{item['Street Address 4']}}</span></div>
-      </mt-cell>
+      </mt-cell-swipe>
       <button-group>
         <mt-button class="single"
                    v-show="type"
@@ -27,16 +32,21 @@
   import {mapState, mapActions} from 'vuex';
   import { Toast } from 'mint-ui';
   import api from '../api/api';
-
+  let userInfo = {};
   const NameSpace = 'sporadic';
   export default {
     name: NameSpace,
     created() {
-      let param = this.$route.query;
-      this.type = param.type;
-      this.id = param.item.Id;
-      this.orderID = param.orderID;
-      this.getSporadic();
+      this.id = this.itemTask.Id;
+      this.orderID = this.orderId;
+      this.getSporadic(this.id);
+      KND.Native.getUserInfo((info) => {
+        userInfo = info;
+        console.log(userInfo);
+      });
+      if (userInfo['Person UId'] === this.itemTask['Primary Owner Id'] && (this.itemTask['Calculated Activity Status'] === 'In Progress' || this.itemTask['Calculated Activity Status'] === 'Approved')) {
+        this.type = true;
+      }
     },
     data: () => {
       return {
@@ -45,19 +55,28 @@
         searchValue: '',
         selected: '1',
         allLoaded: '',
-        topStatus: '',
-        objList: [
-          {id: '1', code: 'SZ100', savrsNo: 'AZ201706010001001', name: 'XXXXXXX'},
-          {id: '2', code: 'SZ200', savrsNo: 'AZ201706010001002', name: 'ZZZZZZ'},
-          {id: '3', code: 'SZ300', savrsNo: 'AZ201706010001003', name: 'QQQQQQQ'}
-        ]
+        topStatus: ''
       };
     },
     computed: {
-      ...mapState(NameSpace, ['value'])
+      ...mapState(NameSpace, ['objList']),
+      ...mapState('detail', ['orderId', 'itemTask'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getList']),
+      ...mapActions(NameSpace, ['getSporadic', 'deleteFn']),
+      getSwipeBtn(line, index) {
+        return this.type ? [{
+          content: '删除',
+          style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
+          handler: () => this.deleteFn(line, index)
+        }] : [];
+      },
+      deleteFn(line, index) {
+        this.delete({
+          id: line.Id,
+          index: index
+        });
+      },
       submit() {
         var self = this;
         if (self.objList.length === 0) {
@@ -99,20 +118,6 @@
             id: self.id,
             copy: copy,
             orderID: self.orderID
-          }
-        });
-      },
-      getSporadic() {
-        var self = this;
-        api.get({ // 获取零星列表数据
-          key: 'getSporadic',
-          data: {
-            id: self.id
-          },
-          success: function(data) {
-            if (data.items) {
-              self.objList = data.items;
-            }
           }
         });
       }

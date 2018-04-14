@@ -177,25 +177,7 @@ let apiList = {
   * */
   upPerson: option => {
     return {
-      url: 'service/EAI Siebel Adapter/Synchronize',
-      data: {
-        'body': {
-          'SiebelMessage': {
-            'MessageId': '',
-            'MessageType': 'Integration Object',
-            'IntObjectName': 'KL Install Order Sales Team',
-            'IntObjectFormat': 'Siebel Hierarchical',
-            'ListOfKL Install Order Sales Team': {
-              'Order Entry - Orders': {
-                'Id': option.data.Id,
-                'ListOfPosition': {
-                  'Position': option.data.personList
-                }
-              }
-            }
-          }
-        }
-      }
+      url: 'service/Workflow Process Manager/RunProcess'
     };
   },
   getUPStatus: option => {

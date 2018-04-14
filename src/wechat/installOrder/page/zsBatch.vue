@@ -573,10 +573,12 @@
                                 'SiebelMessage': {
                                   'MessageId': '',
                                   'MessageType': 'Integration Object',
+                                  'IntObjectName': 'Base KL Installation Task',
                                   'IntObjectFormat': 'Siebel Hierarchical',
+                                  'ViewMode': 'AllView',
                                   'ListOfBase KL Installation Task': {
                                     'KL Installation Task': {
-                                      'Id': self.batchCode,
+                                      'Id': self.id,
                                       'ListOfContact': {}
                                     }
                                   }
