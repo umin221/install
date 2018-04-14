@@ -10,7 +10,7 @@
         <mt-field label="销售类型" :value="detailData['KL Delivery Sales Type']"></mt-field>
         <mt-field label="安装数量" :value="detailData['KL Install Amount'] || 0"></mt-field>
         <mt-field label="地址" :value="detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery Country'] + detailData['KL Delivery Address']"></mt-field>
-        <div slot="title" class="mint-content-div">
+        <div slot="title" class="mint-content-div enable">
           <div class="mint-content-xt" @click="punchClock">安装打卡</div>
           <div class="mint-content-xt" @click="butXttd">协同团队</div>
         </div>
@@ -130,7 +130,7 @@
                  v-for="(itemTask, index) in upList(taskData['KL Installation Task'])" :key="index"
                  @click.stop="updateDoor(itemTask,taskData)">
                 <div class="readonly">
-                  <mt-field label="批次" class="itemTaskId" :value="itemTask.Id"  @click.native.stop="taskClick(itemTask,taskData)"></mt-field>
+                  <mt-field label="批次" class="itemTaskId enable" :value="itemTask.Id"  @click.native.stop="taskClick(itemTask,taskData)"></mt-field>
                   <mt-field label="已完成/计划数量"  class="itemTask"
                     v-if="taskData['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
                     taskData['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
@@ -167,9 +167,9 @@
     /*.mint-cell-wrapper {
       font-size: 0.7rem!important;
     }*/
-    .readonly {
+    /*.readonly {
       pointer-events: initial!important;
-    }
+    }*/
     background: white;
     .mint-cell-title {
     }
