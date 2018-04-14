@@ -108,7 +108,10 @@ let apiList = {
    * @returns {{method: string, url: string}}
    */
   submitPartner: option => {
-    let address = option.data.partner['CUT Address'];
+    let partner = option.data.partner;
+    partner['ListOfCUT Address'] = {
+      'CUT Address': partner['CUT Address']
+    };
     return {
       method: 'post',
       url: 'service/Workflow Process Manager/RunProcess/',
@@ -121,8 +124,7 @@ let apiList = {
             'IntObjectName': 'Base Channel Partner',
             'IntObjectFormat': 'Siebel Hierarchical',
             'ListOfBase Channel Partner': {
-              'Channel Partner': option.data.partner,
-              'ListOfCUT Address': address
+              'Channel Partner': partner
             }
           }
         }
