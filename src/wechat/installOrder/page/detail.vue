@@ -4,16 +4,16 @@
       <fallback slot="left"></fallback>
     </mt-header>
     <div class="mint-content mint-content-datail">
-        <div class="readonly">
-          <mt-field label="订单编码" :value="detailData['Order Number']"></mt-field>
-          <mt-field label="项目名称" :value="detailData['KL Agreement Opportunity Name']"></mt-field>
-          <mt-field label="销售类型" :value="detailData['KL Delivery Sales Type']"></mt-field>
-          <mt-field label="安装数量" :value="detailData['KL Install Amount'] || 0"></mt-field>
-          <mt-field label="地址" :value="detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery Country'] + detailData['KL Delivery Address']"></mt-field>
-          <div slot="title" class="mint-content-div">
-            <div class="mint-content-xt" @click="punchClock">安装打卡</div>
-            <div class="mint-content-xt" @click="butXttd">协同团队</div>
-          </div>
+      <div class="readonly">
+        <mt-field label="订单编码" :value="detailData['Order Number']"></mt-field>
+        <mt-field label="项目名称" :value="detailData['KL Agreement Opportunity Name']"></mt-field>
+        <mt-field label="销售类型" :value="detailData['KL Delivery Sales Type']"></mt-field>
+        <mt-field label="安装数量" :value="detailData['KL Install Amount'] || 0"></mt-field>
+        <mt-field label="地址" :value="detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery Country'] + detailData['KL Delivery Address']"></mt-field>
+        <div slot="title" class="mint-content-div">
+          <div class="mint-content-xt" @click="punchClock">安装打卡</div>
+          <div class="mint-content-xt" @click="butXttd">协同团队</div>
+        </div>
       </div>
       <toggle :show="isConfirming">
         <div style="height: 0.5rem;background: #eaeaea;"></div>
@@ -60,7 +60,7 @@
           <div class="stage_li">
             <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 72px;">
               <div class="mui-scroll" style="height: 65px;overflow: -webkit-paged-x;">
-                <a v-for="(item, index) in taskData"  :key="index">
+                <a v-for="(item, index) in taskData" :key="index">
                   <div class="icon" @click="updateState(item, item['Calculated Activity Status'], item.Id, index)">
                     <span v-show="index!=0"  class="left line" :class="colorClass(item['Calculated Activity Status'])"></span>
                     <span class="point mui-icon" :class="colorClass(item['Calculated Activity Status'])"><span></span></span>
@@ -84,7 +84,7 @@
         <div class="mint-content-info">
           <empty v-show="!taskDataList.length"></empty>
           <div class="crm-zyList" v-for="(taskData, index) in taskDataList" :key="index">
-            <ul class="content" @click="routerPage(index, taskData, '')">
+            <ul class="content" @click.shop="routerPage(index, taskData, '')">
               <li class="bd-radius">
                 <span class="icon"></span>
               </li>
@@ -99,11 +99,10 @@
                 taskData['KL Detail Type LIC'] === 'Substitution Lock Trans Return'">
                 <span>{{taskData['Planned Completion']}}</span>
                 <span>{{taskData.Status}}</span>
-              </li><!--签收-->
+              </li>
               <li style="margin-right: 8px" v-if="taskData['KL Detail Type LIC'] === 'Ship From Door Factory' && taskData['Calculated Activity Status'] === 'Not Started'">
                 <span class="mt-switch"><mt-switch v-model="shipmentVal"  @click.native.stop="shipment(taskData)"></mt-switch></span>
-              </li><!--发运-->
-              <!--批次-----开始-->
+              </li>
               <div class="butLi"
                    v-if="taskData['KL Detail Type LIC']==='Trompil Batch Summary' ||
                   taskData['KL Detail Type LIC']==='Lock Body Install Summary' ||
@@ -113,9 +112,9 @@
                   taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
                   taskData['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
                   taskData['KL Detail Type LIC'] === 'Transfer Summary'" >
-                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="closeTask(taskData)" class="batchClose"></span>
+                 <!-- <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="closeTask(taskData)" class="batchClose"></span>
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="addTask(taskData)" class="batchAdd"></span>
-                  <span>{{taskData.Status}}</span>
+                  --><span>{{taskData.Status}}</span>
               </div>
               <div class="content-div"
                 v-if="taskData['KL Detail Type LIC']==='Trompil Batch Summary' ||
@@ -138,7 +137,9 @@
                     taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
                     taskData['KL Detail Type LIC'] === 'Transfer Summary'"
                     :value="taskData['KL Completed Install Amount']+'/'+taskData['KL Install Amount Requested']">
+<!--
                     <span v-if="taskData['Calculated Activity Status'] === 'In Progress' && taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
+-->
                   </mt-field>
                   <mt-field label="合格/计划数量"
                     v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
@@ -150,12 +151,10 @@
                   <mt-field label="状态" :value="itemTask.Status"></mt-field>
                 </div>
               </div>
-              <!--批次-----结束-->
             </ul>
           </div>
         </div>
       </div>
-
       <button-group v-show="isConfirming">
         <mt-button @click.native="submitFn">确认提交</mt-button>
       </button-group>
@@ -167,6 +166,9 @@
     /*.mint-cell-wrapper {
       font-size: 0.7rem!important;
     }*/
+    .readonly {
+      pointer-events: initial!important;
+    }
     background: white;
     .mint-cell-title {
     }

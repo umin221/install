@@ -663,7 +663,7 @@
             Toast('委外联系人不能为空，请选择！');
             return;
           }
-          if (self.attach.list.length > 0) {
+          if (self.attach.list.length === 0) {
             Toast('附件不能为空，请上传！');
             return;
           }
@@ -676,7 +676,7 @@
         let uploadAttach = id => {
           _upload.call(self, self.$refs.attach.getServerIds(), id);
         };
-        if (self.attach.list.length === 0) {
+        if (self.attach.list.length > 0) {
           uploadAttach(self.id);
         }
         MessageBox({
