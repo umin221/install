@@ -94,6 +94,9 @@ class Helper {
     return new Promise((resolve, reject) => {
       console.log('------------ 获取最新数据 start ------------');
       console.log('清除历史数据...');
+      Indicator.process({
+        text: '正在清除历史数据...'
+      });
       me.invokeSQL('gt').then(result => {
         let tasks = [];
         result = util.toArray(result);
@@ -122,6 +125,9 @@ class Helper {
     let me = this;
     return new Promise((resolve, reject) => {
       console.log('初始化数据库表...');
+      Indicator.process({
+        text: '正在初始化数据...'
+      });
       let tasks = [
         me.invokeSQL('ct', 'batch', buildCreateField({data: 'VARCHAR(20000)', state: null, create_date: null})).then(result => {
           console.log('创建数据库表 batch...');
@@ -159,6 +165,10 @@ class DataHandle {
    */
   constructor() {
     util.log('DataHandle init...');
+    let me = this;
+    document.addEventListener('online', function() {
+      me.checkNetwork();
+    }, false);
   };
 
   /**
@@ -166,7 +176,14 @@ class DataHandle {
    */
   checkNetwork() {
     console.log('check network...');
-    if (false) this.submit();
+    let me = this;
+    let state = tools.cordova.checkNetwork();
+    if (state !== 'none') {
+      // 检测4g确认后提交
+      state !== 'wifi' ? tools.cordova.confirm('当前非wifi环境，确认是否提交？', result => {
+        if (result === 1) me.submit();
+      }) : me.submit();;
+    }
   };
 
   /**
@@ -176,6 +193,9 @@ class DataHandle {
     helper.query('install_record', {}, data => {
       // 本地没有记录
       if (!data.length) return;
+      Indicator.process({
+        text: '正在提交本地数据...'
+      });
       let tasks = [];
       // 记录提交结果
       let result = [];
@@ -198,8 +218,10 @@ class DataHandle {
       Promise.all(tasks).then(result => {
         console.log(result);
         MessageBox.alert(`成功提交${result.length}条安装记录！`, '恭喜');
+        Indicator.process(false);
       }).catch(err => {
         console.error(err);
+        Indicator.process(false);
       });
     });
   };
@@ -228,8 +250,6 @@ class Cache {
     if (config.offline || localMethod[setting.key]) {
       let method = this[setting.key];
       method ? method.call(this, setting) : console.error(`${setting.key} is not a function`);
-      // 检测当前网络并提交数据
-      handle.checkNetwork();
     } else {
       api.get(setting);
     }
@@ -264,6 +284,9 @@ class Cache {
    */
   init(data, clearAll = true) {
     let me = this;
+    Indicator.process({
+      text: '正在下载最新数据...'
+    });
     helper.clear.call(me, clearAll).then(result => helper.create.call(me)).then(result => me.reCache(data)).catch(err => console.error(err));
   };
 
@@ -280,16 +303,15 @@ class Cache {
     let me = this;
     let invokeSQL = me.invokeSQL;
     return new Promise((resolve, reject) => {
-      Indicator.open({
-        text: '获取最新数据...',
-        spinnerType: 'fading-circle'
-      });
       resolve(data);
     }).then(data => {
       // 1. 缓存批次数据
       return new Promise((resolve, reject) => {
         console.log(data);
         console.log('开始缓存批次...');
+        Indicator.process({
+          text: '正在缓存批次数据...'
+        });
         invokeSQL('insert', 'batch', {
           data: JSON.stringify(data),
           create_date: now()
@@ -303,6 +325,9 @@ class Cache {
       // 2. 缓存订单行
       return new Promise((resolve, reject) => {
         console.log('开始缓存订单行...');
+        Indicator.process({
+          text: '正在缓存订单数据...'
+        });
         let tasks = [];
         for (let i = 0, len = batchs.length; i < len; i++) {
           tasks.push(new Promise((resolve, reject) => {
@@ -332,6 +357,9 @@ class Cache {
       // 3. 缓存楼栋数据
       return new Promise((resolve, reject) => {
         console.log('开始缓存楼栋...');
+        Indicator.process({
+          text: '正在缓存楼栋数据...'
+        });
         let tasks = [];
         for (let i = 0, len = batchs.length; i < len; i++) {
           tasks.push(new Promise((resolve, reject) => {
@@ -364,6 +392,9 @@ class Cache {
       return new Promise((resolve, reject) => {
         console.log(result);
         console.log('开始缓存资产...');
+        Indicator.process({
+          text: '正在缓存资产数据...'
+        });
         let tasks = [];
         for (let i = 0, len = result.length; i < len; i++) {
           let building = [];
@@ -396,10 +427,14 @@ class Cache {
         };
         Promise.all(tasks).then(result => {
           console.log('资产缓存完成...');
+          Indicator.process({
+            text: '数据缓存成功...'
+          });
           resolve(result);
         });
       });
     }).then(result => {
+      Indicator.process(false);
       console.log(result);
       console.log('------------ 获取最新数据 end ------------');
     }).catch(err => {
@@ -425,12 +460,13 @@ class Cache {
     };
 
     /**
-     * 1. 主动获取最新批次并缓存
-     *  or
-     * 2. 获取本地批次无数据时回到第一步
+     * 默认优先获取本地数据
+     * 否则获取在线数据并缓存
      */
-    setting.mode === 'refresh' ? getRemoteData() : helper.query('batch', {}, result => {
-      result.length ? setting.success(filter(result)) : getRemoteData();
+    setting.mode === 'refresh' ? getRemoteData() : me.invokeSQL('gts', 'batch').then(hasTable => {
+      hasTable ? helper.query('batch', {}, result => {
+        result.length ? setting.success(filter(result)) : getRemoteData();
+      }) : getRemoteData();
     });
   };
 
@@ -486,6 +522,7 @@ class Cache {
       create_date: now()
     }, {Id: Id}, result => {
       setting.success(result);
+      handle.checkNetwork();
     });
   };
 
@@ -500,6 +537,13 @@ class Cache {
       setting.success(data);
     });
   };
+
+  /**
+   * 检测网络并提交数据
+   */
+  checkAndSubmit() {
+    handle.checkNetwork();
+  }
 
 };
 

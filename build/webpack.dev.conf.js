@@ -56,11 +56,12 @@ const devWebpackConfig = merge(baseWebpackConfig, {
   ]
 })
 
+let moduleMapp = {'install': 'install.html'};
 for (var key in devWebpackConfig.entry) {
   devWebpackConfig.plugins.push(
     new HtmlWebpackPlugin({
       filename: key + '/index.html',
-      template: 'index.html',
+      template: moduleMapp[key] || 'index.html',
       chunks: [key],
       inject: true
     })

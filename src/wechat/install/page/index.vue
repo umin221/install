@@ -8,6 +8,7 @@
       </mt-button>
     </mt-header>
 
+    <indicator></indicator>
     <div class="tips">下拉更新数据</div>
     <div class="mint-content install">
 
@@ -85,7 +86,6 @@
 
   export default {
     name: NAMESPACE,
-    components: {cusLoadmore, cusCell},
     // 数据初始化
     created() {
       let me = this;
@@ -141,7 +141,8 @@
         // 标记楼栋资产刷新
         KND.Session.set('refreshAssets', true);
       }
-    }
+    },
+    components: {cusLoadmore, cusCell}
   };
 </script>
 

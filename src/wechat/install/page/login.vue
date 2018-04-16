@@ -26,7 +26,6 @@
 </template>
 
 <script type="es6">
-  import {mapActions} from 'vuex';
   import cusField from 'public/components/cus-field';
   import buttonGroup from 'public/components/cus-button-group';
   import Vue from 'vue';
@@ -37,9 +36,6 @@
   let NAMESPACE = 'login';
   export default {
     name: NAMESPACE,
-    created() {
-      this.getAddress();
-    },
     data() {
       return {
         remember: [],
@@ -48,7 +44,6 @@
       };
     },
     methods: {
-      ...mapActions(NAMESPACE, ['getAddress']),
       loginFn() {
         let me = this;
         console.log(`username=${this.username},password${this.password}`);

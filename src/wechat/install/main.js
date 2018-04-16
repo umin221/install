@@ -13,9 +13,10 @@ import './mapp'; // Status Mapp
 import fallback from 'public/components/cus-fallback';
 import attach from 'public/components/cus-attach';
 import empty from 'public/components/cus-empty';
+import indicator from './components/indicator';
 import App from '../../App';
 import sto from './store';
-import './update';
+import './js/tools.cordova'; // cordova tools
 
 // For back
 Vue.component('fallback', fallback);
@@ -23,6 +24,8 @@ Vue.component('fallback', fallback);
 Vue.component('attach', attach);
 // For Empty
 Vue.component('empty', empty);
+// For Indicator
+Vue.component('indicator', indicator);
 
 Vue.config.productionTip = false;
 

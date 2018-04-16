@@ -155,11 +155,12 @@ if (config.build.bundleAnalyzerReport) {
 // generate dist index.html with correct asset hash for caching.
 // you can customize output by editing /index.html
 // see https://github.com/ampedandwired/html-webpack-plugin
+let moduleMapp = {'install': 'install.html'};
 for (var key in webpackConfig.entry) {
   webpackConfig.plugins.push(
     new HtmlWebpackPlugin({
       filename: key + '/index.html',
-      template: 'index.html',
+      template: moduleMapp[key] || 'index.html',
       chunks: [key],
       inject: true,
       minify: {

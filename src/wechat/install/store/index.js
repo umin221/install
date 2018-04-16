@@ -12,13 +12,7 @@ export default {
       namespaced: true,
       state: {},
       mutations: {},
-      actions: {
-        getAddress() {
-          KND.Native.ajax({
-            url: 'http://apis.map.qq.com/ws/geocoder/v1/?location=39.984154,116.307490&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77'
-          });
-        }
-      }
+      actions: {}
     },
     /**
      * 安装批次列表
@@ -145,6 +139,14 @@ export default {
           cache.invoke({
             key: 'queryLocalInstallRecord',
             success: callback
+          });
+        },
+        /**
+         * 检测网络并提交数据
+         */
+        checkAndSubmit() {
+          cache.invoke({
+            key: 'checkAndSubmit'
           });
         }
       }

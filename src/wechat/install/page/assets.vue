@@ -9,7 +9,10 @@
       <mt-button slot="right"
                  v-show="isSelect"
                  @click.native="selectAll = true;">全选</mt-button>
+      <mt-button v-show="!isEdit && !isSelect" @click.native="submitFn" slot="right" >提交</mt-button>
     </mt-header>
+
+    <indicator></indicator>
     <div class="mint-content assets" :class="{read: !editable}">
       <mt-navbar v-model="selected">
         <mt-tab-item class="xs-icon"
@@ -165,7 +168,7 @@
     },
     methods: {
       ...mapMutations(NAMESPACE, ['clearLayer']),
-      ...mapActions(NAMESPACE, ['queryBuilding', 'getLayer', 'removeBuilding', 'queryLocalInstallRecord']),
+      ...mapActions(NAMESPACE, ['queryBuilding', 'getLayer', 'removeBuilding', 'queryLocalInstallRecord', 'checkAndSubmit']),
       /**
        * 编辑楼栋信息
        * 只编辑批次楼栋
@@ -335,6 +338,12 @@
             room: JSON.stringify(this.sheetObject)
           }
         });
+      },
+      /**
+       * 提交本地数据
+       */
+      submitFn() {
+        this.checkAndSubmit();
       }
     },
     components: {buttonGroup}
