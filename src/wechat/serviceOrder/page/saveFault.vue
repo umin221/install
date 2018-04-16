@@ -185,6 +185,7 @@ export default {
       let me = this;
       let lineItems = [];
       let obj = {};
+      let isBn = me.isBn === '保内' ? 'Y' : 'N';
       let uploadAttach = id => {
         _upload.call(me, me.$refs.attach.getServerIds(), id);
       };
@@ -215,7 +216,15 @@ export default {
           me.$router.go(-1);
         }
       };
-      me.addServiceOrder(obj);
+      if (me.Service['Product Warranty Flag'] !== isBn && !lineItems.length) {
+        me.upDateOrderStatu({
+          Id: me.ServiceRequest.Id,
+          type: isBn,
+          callback: obj.callBack
+        });
+      } else {
+        me.addServiceOrder(obj);
+      }
       uploadAttach(me['Service'].Id);
     },
     toTranslated() {

@@ -320,7 +320,7 @@
             if (data) {
               let name = me.$router.currentRoute.name;
               console.log(name);
-              if (name === 'comEnter') {
+              if (me.childId) {
                 me.$router.go(-2);
               } else {
                 me.$router.go(-1);

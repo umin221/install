@@ -926,7 +926,7 @@ export default new Vuex.Store({
         }
       },
       actions: {
-        addServiceOrder({state, commit}, form) {
+        addServiceOrder({state, commit, dispatch}, form) {
           api.get({
             key: 'addServiceOrder',
             data: {
@@ -947,19 +947,30 @@ export default new Vuex.Store({
                   }
                 });
               } else {
-                api.get({
-                  key: 'upDateOrderStatu',
-                  data: {
-                    parentId: form.parentId
-                  },
-                  success: function(data) {
-                    form.callBack(data);
-                  },
-                  error: function(data) {
-                    console.log(data);
-                  }
+                dispatch('upDateOrderStatu', {
+                  Id: form.parentId,
+                  callback: form.callBack
                 });
               }
+            },
+            error: function(data) {
+              console.log(data);
+            }
+          });
+        },
+        upDateOrderStatu({commit}, {Id, type, callback}) {
+          let datas = {Id: Id};
+          if (!type) {
+            datas['KL Parent SR Complete Flag'] = 'Y';
+          } else {
+            datas['Product Warranty Flag'] = type;
+          }
+          api.get({
+            key: 'upDateOrderStatu',
+            data: datas,
+            success: function(data) {
+              // form.callBack(data);
+              callback(data);
             },
             error: function(data) {
               console.log(data);

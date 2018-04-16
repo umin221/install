@@ -298,7 +298,7 @@ let ApiList = {
   upDateService: option => {
     return {
       method: 'PUT',
-      url: 'data/KL Service Request Interface BO/Service Request/1-2BSB0DZ1',
+      url: 'data/KL Service Request Interface BO/Service Request',
       data: {
         'Id': option.data.form['Id'],
         'Asset Number': option.data.form['Asset Number'], // 产品ID
@@ -459,13 +459,11 @@ let ApiList = {
     };
   },
   upDateOrderStatu: option => {
+
     return {
       method: 'PUT',
       url: 'data/KL Service Request Interface BO/Service Request',
-      data: {
-        'Id': option.data.parentId,
-        'KL Parent SR Complete Flag': 'Y'
-      }
+      data: option.data
     };
     // 更新服务请求
   },
