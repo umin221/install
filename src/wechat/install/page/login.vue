@@ -1,14 +1,14 @@
 <template>
   <div class="login-container">
     <div class="logo">
-      <img src="xxx.png" />
+      <img src="../assets/bg_login.png" />
     </div>
 
-    <div class="login-form">
-      <cus-field label="账号" tag="账号"
+    <div class="login-form xs-icon">
+      <cus-field class="account" label="账号" tag="账号"
                  v-model="username"
-                 v-valid.require.phone></cus-field>
-      <cus-field label="密码" tag="密码" type="password"
+                 v-valid.require></cus-field>
+      <cus-field class="password" label="密码" tag="密码" type="password"
                  v-model="password"
                  v-valid.require></cus-field>
 
@@ -52,7 +52,7 @@
       loginFn() {
         let me = this;
         console.log(`username=${this.username},password${this.password}`);
-        me.$router.push('/');
+        me.$router.push('index');
       }
     },
     components: {cusField, buttonGroup}
@@ -67,11 +67,32 @@
 
     .logo {
       width: 100%;
-      height: 40%;
+      height: 44%;
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
     }
 
     .login-form {
-      padding: 0 20px;
+      position: relative;
+      padding: 0 20px 20px;
+      z-index: 1;
+
+      .account {
+        .mint-cell-wrapper:before {
+          color: $theme-color;
+          content: '\A186';
+        }
+      }
+
+      .password {
+        .mint-cell-wrapper:before {
+          color: $theme-color;
+          content: '\A187';
+        }
+      }
 
       .mint-button {
         width: 100%;
@@ -81,7 +102,8 @@
       }
 
       .mint-field .mint-cell-title {
-        width: 60px;
+        padding-left: 10px;
+        width: 50px;
 
         &:before {
           content: '';

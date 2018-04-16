@@ -75,12 +75,16 @@
     .mint-cell {
       background-image: none;
 
-      .mint-cell-title {
-        color: $gray-minor;
-      }
+      .mint-cell-wrapper {
+        padding: 6px 10px;
 
-      .mint-cell-value {
-        color: $black-base;
+        .mint-cell-title {
+          color: $gray-minor;
+        }
+
+        .mint-cell-value {
+          color: $black-base;
+        }
       }
     }
   }

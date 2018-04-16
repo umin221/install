@@ -15,7 +15,7 @@ import attach from 'public/components/cus-attach';
 import empty from 'public/components/cus-empty';
 import App from '../../App';
 import sto from './store';
-import './filters'; // Vue Filter
+import './update';
 
 // For back
 Vue.component('fallback', fallback);
@@ -39,7 +39,7 @@ config.offline = true;
  * 如果匹配到正确跳转
  */
 router.beforeEach((to, from, next) => {
-  to.matched.length === 0 ? from.name ? next({ name: from.name }) : next('/login') : next();
+  to.matched.length === 0 ? from.name ? next({ name: from.name }) : next('/index') : next();
 });
 
 /* eslint-disable no-new */

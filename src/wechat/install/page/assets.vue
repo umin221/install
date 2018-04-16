@@ -10,7 +10,7 @@
                  v-show="isSelect"
                  @click.native="selectAll = true;">全选</mt-button>
     </mt-header>
-    <div class="mint-content assets" :class="{readonly: !editable}">
+    <div class="mint-content assets" :class="{read: !editable}">
       <mt-navbar v-model="selected">
         <mt-tab-item class="xs-icon"
                      v-for="(item, index) in building"
@@ -407,12 +407,16 @@
 
   }
 
-  .readonly {
+  .read {
     &.mint-content {
       padding-bottom: 2rem;
     }
 
     span.edit-class {
+      display: none;
+    }
+
+    button {
       display: none;
     }
   }

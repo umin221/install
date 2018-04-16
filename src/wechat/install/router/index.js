@@ -11,13 +11,13 @@ Vue.use(Router);
 
 export default new Router({
   routes: [{ // 登录页
-    path: '/login',
+    path: '/',
     name: 'login',
     component(resolve) {
       require(['../page/login'], resolve);
     }
   }, { // 首页
-    path: '/',
+    path: '/index',
     name: 'index',
     component(resolve) {
       require(['../page/index'], resolve);
