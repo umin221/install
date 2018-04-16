@@ -58,11 +58,17 @@ export default new Router({
     component(resolve) {
       require(['../page/order'], resolve);
     }
-  }, { // 订单行
+  }, { // 订单行 面板、锁体、假锁
     path: '/orderLine',
     name: 'orderLine',
     component(resolve) {
       require(['../page/orderLine'], resolve);
+    }
+  }, { // 订单行 其他配件
+    path: '/fitting',
+    name: 'fitting',
+    component(resolve) {
+      require(['../page/fitting'], resolve);
     }
   }]
 });

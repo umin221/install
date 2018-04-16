@@ -9,8 +9,8 @@
       </mt-header>
 
       <!--detail-->
-      <div class="mint-content" :class="{'disable': !editable}">
-        <div class="order">
+      <div class="mint-content order" :class="{'disable': !editable}" :data-len="len">
+        <div>
           <mt-cell title="开孔方式"
                    @click.native="showLovFn('KL Hole Type')"
                    :value="order['KL Hole Type']"
@@ -24,9 +24,12 @@
         </div>
 
         <div class="lock-line">
-          <lock-line title="锁体" @click="toLineFn(undefined, 'Lock Body')">
-            <mt-cell-swipe v-for="(line, index) in lines" class="lock-line-cell enable" ref="body"
-                     v-if="line['KL Product Type LIC']==='Lock Body'"
+          <lock-line v-for="(g, key) in group"
+                     :title="g.label"
+                     :key="key"
+                     :add="g.add"
+                     @click="toLineFn(undefined, key)">
+            <mt-cell-swipe v-for="(line, index) in getRows(g.group)" class="lock-line-cell enable"
                      @click.native="toLineFn(line)"
                      :key="line['Id']"
                      :right="getSwipeBtn(line, index)"
@@ -34,22 +37,7 @@
               <div class="co-flex co-jc" slot="title">
                 <span v-show="editable" class="co-f1 icon-copy" @click.stop="copyFn(line)"></span>
                 <span class="co-f2">{{line['KL Product Model No']}}</span>
-                <span class="co-f2">开向:{{line['KL Hole Direction']}}</span>
-                <span class="co-f2">数量:{{line['Quantity Requested']}}</span>
-              </div>
-            </mt-cell-swipe>
-          </lock-line>
-          <lock-line title="面板" @click="toLineFn(undefined, 'Panel')">
-            <mt-cell-swipe v-for="(line, index) in lines" class="lock-line-cell enable" ref="panel"
-                     v-if="line['KL Product Type LIC'] === 'Panel'"
-                     @click.native="toLineFn(line)"
-                     :key="line['Id']"
-                     :right="getSwipeBtn(line, index)"
-                     is-link>
-              <div class="co-flex co-jc" slot="title">
-                <span v-show="editable" class="co-f1 icon-copy" @click.stop="copyFn(line)"></span>
-                <span class="co-f2">{{line['KL Product Model No']}}</span>
-                <span class="co-f2">开向:{{line['KL Hole Direction']}}</span>
+                <span class="co-f2" v-show="line['KL Hole Direction']">开向:{{line['KL Hole Direction']}}</span>
                 <span class="co-f2">数量:{{line['Quantity Requested']}}</span>
               </div>
             </mt-cell-swipe>
@@ -118,7 +106,17 @@
         lovType: '',
         value: false,
         transferAble: true,
-        submitAble: true
+        submitAble: true,
+        // 锁体
+        lockBody: [],
+        // 面板
+        panels: [],
+        // vp
+        vp003: [],
+        // 假锁
+        falseLock: [],
+        // 其他配件
+        others: []
       };
     },
     computed: {
@@ -155,24 +153,32 @@
       },
       // 行是否完成
       lineComplete() {
-        let panel = false;
-        let body = false;
-        let type;
-        return Array.prototype.some.call(this.lines, function(l) {
-          type = l['KL Product Type LIC'];
-          if (type === 'Lock Body') body = true;
-          if (type === 'Panel') panel = true;
-          return panel && body;
-        });
+        return this.panels.length && this.lockBody.length;
       },
-      swiperRight() {
-
+      // 订单行
+      group() {
+        return mapp.code2group;
+      },
+      len() {
+        let me = this;
+        let lines = me.lines;
+        let c2g = mapp.code2group;
+        for (let i = 0, len = lines.length; i < len; i++) {
+          let line = lines[i];
+          // 无分类 默认配件
+          let g = c2g[line['KL Product Type LIC']] || c2g['Other'];
+          me[g.group].push(line);
+        };
+        return lines.length;
       }
     },
     methods: {
       ...mapActions(NAMESPACE, ['save', 'update', 'queryLines', 'runProcess', 'delete']),
       ...mapActions('app', ['getLov']),
       ...mapMutations(NAMESPACE, ['setOrder']),
+      getRows(type) {
+        return this[type];
+      },
       getSwipeBtn(line, index) {
         return this.editable ? [{
           content: '删除',
@@ -184,18 +190,18 @@
       toLineFn(line = {}, type) {
         let me = this;
         let order = me.order;
-        // 是否面板
-        let isPanel = (line['KL Product Type LIC'] || type) === 'Panel';
         // 填充订单id，保存编辑行时需要
         line['Order Header Id'] = order.Id;
 
         // 跳转订单行
         let toLine = () => {
+          // 跳转配件 或 其他订单行(面板、锁体、假锁)
+          let path = line['KL Product Type LIC'] === 'Other' ? 'fitting' : 'orderLine';
           me.$router.push({
-            path: 'orderLine',
+            path: path,
             query: {
               line: JSON.stringify(line),
-              isPanel: isPanel,
+              type: line['KL Product Type LIC'] || type,
               editable: this.editable
             }
           });
@@ -229,7 +235,9 @@
         let order = me.order;
         if (order.Id) {
           delete order['Link'];
-          me.update(order);
+          me.update({
+            data: order
+          });
         } else {
           me.save({data: order});
         }
@@ -243,18 +251,28 @@
       },
       // 转发门厂技术
       transferFn() {
+        let me = this;
         MessageBox.confirm('是否转发门厂确认？', '请确认').then(action => {
-          this.runProcess({
-            data: {
-              body: {
-                'ProcessName': 'KL Install Order Transfer Process',
-                'Object Id': this.order.Id
-              }
-            },
+          let order = me.order;
+          delete order['Link'];
+          // 保存订单
+          me.update({
+            data: order,
             success: data => {
-              tools.success(data, {
-                back: true,
-                successTips: '转发成功'
+              // 转发门厂
+              me.runProcess({
+                data: {
+                  body: {
+                    'ProcessName': 'KL Install Order Transfer Process',
+                    'Object Id': order.Id
+                  }
+                },
+                success: data => {
+                  tools.success(data, {
+                    back: true,
+                    successTips: '转发成功'
+                  });
+                }
               });
             }
           });
@@ -262,18 +280,28 @@
       },
       // 提交安装订单
       submitFn() {
+        let me = this;
         MessageBox.confirm('是否确认提交审批？', '请确认').then(action => {
-          this.runProcess({
-            data: {
-              body: {
-                'ProcessName': 'KL Install Order Submit Process',
-                'Object Id': this.order.Id
-              }
-            },
+          let order = me.order;
+          delete order['Link'];
+          // 保存订单
+          me.update({
+            data: order,
             success: data => {
-              tools.success(data, {
-                back: true,
-                successTips: '提交成功'
+              // 提交订单
+              me.runProcess({
+                data: {
+                  body: {
+                    'ProcessName': 'KL Install Order Submit Process',
+                    'Object Id': order.Id
+                  }
+                },
+                success: data => {
+                  tools.success(data, {
+                    back: true,
+                    successTips: '提交成功'
+                  });
+                }
               });
             }
           });
@@ -289,13 +317,14 @@
       // Copy line
       copyFn(line) {
         MessageBox.confirm('复制此订单行记录？', '请确认').then(action => {
-          let isPanel = line['KL Product Type LIC'] === 'Panel';
           delete line.Id;
+          // 跳转配件 或 其他订单行(面板、锁体、假锁)
+          let path = line['KL Product Type LIC'] === 'Other' ? 'fitting' : 'orderLine';
           this.$router.push({
-            path: 'orderLine',
+            path: path,
             query: {
               line: JSON.stringify(line),
-              isPanel: isPanel,
+              type: line['KL Product Type LIC'],
               editable: this.editable
             }
           });
@@ -317,6 +346,10 @@
         color: $black-base;
       }
     }
+
+    .cus-group-button {
+      z-index: 2;
+    }
   }
 
   .lock-line {
@@ -325,10 +358,6 @@
     .lock-line-cell {
       background-color: $bg-light;
     }
-  }
-
-  .mint-content {
-    margin-bottom: 2.8rem;
   }
 
   .disable {

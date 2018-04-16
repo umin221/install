@@ -79,6 +79,7 @@
         padding: 6px 10px;
 
         .mint-cell-title {
+          min-width: 80px;
           color: $gray-minor;
         }
 

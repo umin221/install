@@ -342,14 +342,12 @@ export default new Vuex.Store({
         /**
          * 更新安装订单
          */
-        update({state}, order) {
-          api.get({
-            key: 'updateOrder',
-            data: order,
-            success: data => {
-              tools.success(data);
-            }
+        update({state}, setting) {
+          setting.key = 'updateOrder';
+          setting.success = setting.success || (data => {
+            tools.success(data);
           });
+          api.get(setting);
         },
         /**
          * 获取订单行

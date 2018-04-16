@@ -1,7 +1,7 @@
 <template>
-  <div class="cus-lock icon-add-circle xs-icon">
+  <div class="cus-lock xs-icon" :class="{'icon-add-circle': add}">
     <mt-cell :title="title"
-              @click.native="clickFn(title)">
+              @click.native="add && clickFn(title)">
     </mt-cell>
     <slot></slot>
   </div>
@@ -15,7 +15,8 @@
       return {};
     },
     props: {
-      title: String
+      title: String,
+      add: Boolean
     },
     methods: {
       clickFn() {
