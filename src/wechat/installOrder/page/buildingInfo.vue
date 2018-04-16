@@ -19,22 +19,22 @@
         <mt-cell>
           <div slot="title" class="list-text"><span class="list-text-span">楼层信息</span></div>
         </mt-cell>
-        <div class="cus-cell">
+        <div class="cus-cell-call">
             <div class="cus-title">楼栋数<span class="cus-title-span">默认栋，如1栋</span></div>
             <div class="cus-title" style="text-align: right;margin-bottom: 10px;">
-              <div class="cus-title-div" ><span @click="reduceVal('buildingNum')">-</span><input v-model="buildingNum"/><span @click="plusVal('buildingNum')">+</span></div><span>栋</span>
+              <div class="cus-title-div" ><span @click="reduceVal('buildingNum')">-</span><input type="number" :value="buildingNum"/><span @click="plusVal('buildingNum')">+</span></div><span>栋</span>
             </div>
         </div>
-        <div class="cus-cell">
+        <div class="cus-cell-call">
           <div class="cus-title">楼层数/栋<span class="cus-title-span">默认F，如1F</span></div>
           <div class="cus-title" style="text-align: right;margin-bottom: 10px;">
-            <div class="cus-title-div" ><span  @click="reduceVal('layerNum')">-</span><input v-model="layerNum"/><span @click="plusVal('layerNum')">+</span></div><span>F</span>
+            <div class="cus-title-div" ><span  @click="reduceVal('layerNum')">-</span><input :value="layerNum" type="number"/><span @click="plusVal('layerNum')">+</span></div><span>F</span>
           </div>
         </div>
-        <div class="cus-cell">
+        <div class="cus-cell-call">
           <div class="cus-title">房间数/层<span class="cus-title-span">房号，楼层号+001，如1001</span></div>
           <div class="cus-title" style="text-align: right;margin-bottom: 10px;">
-            <div class="cus-title-div" ><span  @click="reduceVal('roomNum')">-</span><input v-model="roomNum"/><span @click="plusVal('roomNum')">+</span></div><span>&nbsp;</span>
+            <div class="cus-title-div" ><span  @click="reduceVal('roomNum')">-</span><input :value="roomNum" type="number"/><span @click="plusVal('roomNum')">+</span></div><span>&nbsp;</span>
           </div>
         </div>
       </div>
@@ -58,7 +58,7 @@
 </template>
 <style lang="scss">
   .buildingInfo{
-    .cus-cell {
+    .cus-cell-call {
       position: relative;
       margin: 10px;
       padding: 10px;

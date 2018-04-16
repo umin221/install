@@ -13,6 +13,8 @@ config.mapp = {
     'Closed,Cancelled': 'completed'
   },
   'option': {
-    'KL Detail Type': 'Value'
+    'KL Detail Type': 'Value',
+    'panel': [], // 合同行
+    'lockBody': [] // 合同行
   }
 };

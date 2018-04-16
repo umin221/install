@@ -4,16 +4,6 @@
       <fallback slot="left"></fallback>
     </mt-header>
     <div class="mint-content scanCode" :class="{'disable': !type}">
-      <!--<mt-cell title="省市区"
-               @click.native="showLovFn('KL_PROVINCE')"
-               placeholder="请选择"
-               is-link
-               v-model="provinces"></mt-cell>
-      <cus-field class="block"
-                 label="详细地址"
-                 v-model= 'detailAddress'
-                 type="textarea"
-                 placeholder="请输入详细地址"></cus-field>-->
       <cus-field label="楼栋名" tag="楼栋名"
                 placeholder="请输入"
                  v-model="BuilingName"
@@ -35,22 +25,22 @@
       <cus-field label="面板型号"  tag="面板型号"
                placeholder="请输入"
                  v-model="panel"
+                 @click.native="showLovFn('panel')"
                v-valid.require
                is-link></cus-field>
       <cus-field label="锁体型号" tag="锁体型号"
                placeholder="请输入"
                  v-model="lockBody"
+                 @click.native="showLovFn('lockBody')"
                v-valid.require
                is-link></cus-field>
       <!--下拉菜单-->
       <mt-popup v-model="showBox" position="bottom">
-        <menu-box @my-enter="enter"
-                  @my-cancel="showBox = false"
-                  @my-change="onValuesChange"
-                  @my-change1="onValuesChange1"
-                  :slots="slots"
-                  :slots1="slots1"
-                  :slots2="slots2"></menu-box>
+        <menu-box @my-enter="enterFn"
+                  @my-cancel="showBox=false"
+                  :vk="vk"
+                  :type="lovType"
+                  :slots="slots"></menu-box>
       </mt-popup>
       <button-group>
         <mt-button class="single"
@@ -83,7 +73,6 @@
   }
 </style>
 <script type="application/javascript">
-  import {mapState, mapActions} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
   import menuBox from '../components/cus-menu';
@@ -91,21 +80,13 @@
   import Vue from 'vue';
   import vp from 'public/plugin/validator';
   Vue.use(vp);
-  let isMunicipality = function(...args) {
-    let me = this;
-    let city = args.pop();
-    let isMun = true;
-    for (let i = 0;i < me.Municipality.length; i++) {
-      if (city === me.Municipality[i]) {
-        isMun = false;
-      }
-    }
-    return isMun;
-  };
   const NameSpace = 'scanCode';
+  let mapp = config.mapp;
+
   export default {
     name: NameSpace,
     created() {
+      var self = this;
       let param = this.$route.query;
       this.id = param.id;
       this.type = param.type;
@@ -130,6 +111,9 @@
         this.lockBody = this.item['KL Product Model No Lock Body'];
         this.panel = this.item['KL Product Model No Panel'];
       }
+      mapp.option['panel'] = KND.Util.toArray(self.panelList);
+      mapp.option['lockBody'] = KND.Util.toArray(self.lockBodyList);
+
     },
     data: () => {
       return {
@@ -138,10 +122,24 @@
         copy: '', // 是否复制
         orderID: '',
         titleVal: '扫码录入',
-        slots: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
-        slots1: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
-        slots2: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
+        vk: 'Value',
+        slots: [
+          {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
+        ],
+        panelList: [
+          {
+            'code': '0001',
+            'Value': '0001'
+          }
+        ],
+        lockBodyList: [
+          {
+            'code': '0002',
+            'Value': '0002'
+          }
+        ],
         showBox: false,
+        lovType: '',
         provinces: '',
         BuilingName: '',
         FloorName: '',
@@ -167,7 +165,6 @@
     },
     components: {buttonGroup, menuBox, cusField},
     computed: {
-      ...mapState('buildingInfo', ['Municipality']),
       // 表单只读
       read() {
         return !this.type;
@@ -178,7 +175,6 @@
       }
     },
     methods: {
-      ...mapActions('buildingInfo', ['reduceValFn', 'plusValFn', 'getLov']),
       scan() {
         let me = this;
         KND.Native.scanQRCode({
@@ -187,64 +183,23 @@
           }
         });
       },
+      // 选择对话框
       showLovFn(type) {
-        let me = this;
-        me.slots[0].values = [];
-        me.showBox = true;
-        me.getLov({
-          type: 'KL_PROVINCE',
-          parent: '中国',
-          success: data => {
-            let datas = KND.Util.toArray(data.items) ;
-            for (let i = 0;i < datas.length; i++) {
-              me.slots[0].values.push(datas[i].Value);
-            }
-          }
-        });
+        var self = this;
+        self.lovType = type;
+        self.showBox = true;
+        self.slots[0].values = mapp.option[type];
       },
-      enter(values) {
+      // 选择确认
+      enterFn(values, type) {
+        console.log(values, type);
         let me = this;
-        let isMun = isMunicipality.call(this, values['KL_PROVINCE']);
         me.showBox = false;
-        me.KL_PROVINCE = values['KL_PROVINCE'];
-        me.KL_CITY = values['KL_CITY'];
-        me.KL_TOWN = values['KL_TOWN'];
-        if (isMun) {
-          me.provinces = values['KL_PROVINCE'] + values['KL_CITY'] + values['KL_TOWN'];
+        // 选择填充
+        if (type === 'lockBody') {
+          me.lockBody = values[0]['Value'];
         } else {
-          me.provinces = values['KL_CITY'] + values['KL_TOWN'];
-        }
-      },
-      onValuesChange(value) {
-        let me = this;
-        me.slots1[0].values = [];
-        if (value[0]) {
-          me.getLov({
-            type: 'KL_CITY',
-            parent: value[0],
-            success: data => {
-              let datas = KND.Util.toArray(data.items) ;
-              for (let i = 0;i < datas.length; i++) {
-                me.slots1[0].values.push(datas[i].Value);
-              }
-            }
-          });
-        }
-      },
-      onValuesChange1(value) {
-        let me = this;
-        me.slots2[0].values = [];
-        if (value[0]) {
-          me.getLov({
-            type: 'KL_TOWN',
-            parent: value[0],
-            success: data => {
-              let datas = KND.Util.toArray(data.items) ;
-              for (let i = 0;i < datas.length; i++) {
-                me.slots2[0].values.push(datas[i].Value);
-              }
-            }
-          });
+          me.panel = values[0]['Value'];
         }
       },
       scavenging() {

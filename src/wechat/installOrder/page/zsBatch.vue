@@ -16,26 +16,26 @@
                    is-link></cus-field>
         <cus-field label="计划完成日期" tag="计划完成日期"
                   @click.native="open('pickerEnd')"
-                  v-model="end_Date"
+                   v-model="end_Date"
                   v-valid.require
                   is-link></cus-field>
         <cus-field label="安装数量" tag="安装数量"
                    placeholder="请输入"
                    v-valid.require
-                  v-model="batchNum"></cus-field>
+                   v-model="batchNum"></cus-field>
         <mt-cell title="是否委外" :class="heartVisible">
           <mt-switch v-model="box1"></mt-switch>
         </mt-cell>
         <cus-field label="合作伙伴" tag="合作伙伴"
                     v-if="box1"
                     @click.native="selectCompany"
-                    v-model="companyName"
+                   v-model="companyName"
                     is-link></cus-field>
         <div v-if="box1">
           <cus-field label="真锁交接日期" tag="真锁交接日期"
                       v-if="showZs"
                       @click.native="open('deliveryTime')"
-                      v-model="delivery_Time"
+                     v-model="delivery_Time"
                       v-valid.require
                       is-link></cus-field>
         </div>
@@ -335,19 +335,16 @@
         if (self.installerList.length > 0) {
           insId = self.installerList[0].Id;
         };
-        if (self.id) { // 有批次直接跳转
-          self.$router.push({
-            name: 'company',
-            query: {
-              type: 'add',
-              id: self.id,
-              insId: insId,
-              item: ''
-            }
-          });
-        } else {
-          this.toSaveFn('4');
-        }
+        this.toSaveFn('4');
+        self.$router.push({
+          name: 'company',
+          query: {
+            type: 'add',
+            id: self.id,
+            insId: insId,
+            item: ''
+          }
+        });
       },
       nextPageFn() {
         var self = this;
@@ -450,7 +447,7 @@
               self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
               self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
               self.deliveryTime = new Date(self.delivery_Time).format('MM/dd/yyyy') || '';
-              self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
+              self.batchNum = data['KL Install Amount Requested']; // 数量
               self.companyId = data['KL Partner Id'];
               self.companyName = data['KL Partner Name'];
               self.getPcObj(data); // 保存store
@@ -461,28 +458,16 @@
       addInstaller() { // 选择委外安装员
         var self = this;
         if (self.companyId) {
-          if (self.id) { // 有批次直接跳转
-            self.$router.push({
-              name: 'installer',
-              query: {
-                type: 'add',
-                id: self.id,
-                companyId: self.companyId,
-                item: ''
-              }
-            });
-          } else {
-            this.toSaveFn('3');
-          }
+          this.toSaveFn('3');
         } else {
           Toast('请先选择合作伙伴');
         }
       },
       addPlanFn(obj) {
         var self = this;
-        if (self.id) { // 有批次直接跳转
+        if (obj.Id) { // 计划详情
           let planType = self.itemTask['KL Detail Type']; // 取统一批次
-          this.$router.push({
+          self.$router.push({
             name: 'detailPlan',
             query: {
               type: 'add',
@@ -491,8 +476,8 @@
               item: obj
             }
           });
-        } else {  // 先保存批次
-          this.toSaveFn('1');
+        } else {
+          self.toSaveFn('1');
         }
       },
       toSaveFn(num) { // num=1 保存并跳转详细计划  num = 2 只是保存 不跳转 num=3 保存跳转选择委外安装员  num=4 合作公司 num=5 提交
@@ -541,7 +526,9 @@
                     let uploadAttach = id => {
                       _upload.call(self, self.$refs.attach.getServerIds(), id);
                     };
-                    uploadAttach(self.id);
+                    if (self.attach.list.length > 0) {
+                      uploadAttach(self.id);
+                    }
                     if (num === '1' || num === 2 || num === 5) { // 保存或者详细计划时不选择委外 则把之前的数据清空
                       // 判断是否选择委外
                       var insId = ''; // 判断是否有委外联系人  有则清空
@@ -625,11 +612,12 @@
                         });
                       }
                     } else if (num === '3') {
-                      this.$router.push({
+                      self.$router.push({
                         name: 'installer',
                         query: {
                           type: 'add',
                           id: self.id,
+                          companyId: self.companyId,
                           item: ''
                         }
                       });

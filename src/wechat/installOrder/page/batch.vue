@@ -279,7 +279,7 @@
       },
       addPlanFn(obj) {
         var self = this;
-        /* if (self.id) { // 有批次直接跳转
+        if (obj.Id) { // 计划详情
           let planType = self.itemTask['KL Detail Type']; // 取统一批次
           this.$router.push({
             name: 'detailPlan',
@@ -290,9 +290,9 @@
               item: obj
             }
           });
-        } else {  // 先保存批次*/
-        self.toSaveFn('1');  // 有没有批次都保存
-       // }
+        } else {
+          self.toSaveFn('1');  // 有没有批次都保存
+        }
       },
       toSaveFn(num) { // num=1 保存并跳转详细计划  num = 2 只是保存 不跳转
         var self = this;
