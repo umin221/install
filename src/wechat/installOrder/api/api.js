@@ -253,6 +253,19 @@ let apiList = {
       url: 'service/Workflow Process Manager/RunProcess/'
     };
   },
+  /**
+   * 真锁零星安装删除
+   * @param option
+   * @param {String} option.data.id 房间ID
+   * @returns {{url: string, data: {}}}
+   */
+  setDelete: option => {
+    return {
+      url: 'data/KL Install Order Asset/KL Install Order Asset/' + option.data.id,
+      // url: 'data/KL Install Order Asset/Base KL Install Order Asset/' + option.data.id,
+      data: {}
+    };
+  },
   /*
   * 获取零星房屋信息
   * */

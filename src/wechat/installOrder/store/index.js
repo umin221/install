@@ -506,13 +506,15 @@ export default new Vuex.Store(Object.extend(true, sto, {
           });
         },
         /**
-         * 删除详细计划
+         * 删除资产
          */
         delete({commit}, setting) {
+          var line = setting.line;
           api.get({
-            key: 'deletePlan',
+            key: 'setDelete',
+            method: 'DELETE',
             data: {
-              id: setting.id
+              id: line.Id
             },
             success: data => {
               commit('removeLine', setting.index);

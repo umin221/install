@@ -855,9 +855,8 @@
       closeTask(item) { // 关闭当前批次
         console.dir(item);
         var self = this;
-        self.$router.push('updateState');
         // 跳转关闭页面更新状态
-        this.$router.push({
+        self.$router.push({
           name: 'updateState',
           query: {
             id: item.Id

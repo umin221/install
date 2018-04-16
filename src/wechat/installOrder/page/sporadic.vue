@@ -51,10 +51,6 @@
     data: () => {
       return {
         type: false, // 是否可以编辑
-        searchKey: false,
-        searchValue: '',
-        selected: '1',
-        allLoaded: '',
         topStatus: ''
       };
     },
@@ -63,7 +59,7 @@
       ...mapState('detail', ['orderId', 'itemTask'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getSporadic', 'deleteFn']),
+      ...mapActions(NameSpace, ['getSporadic', 'delete']),
       getSwipeBtn(line, index) {
         return this.type ? [{
           content: '删除',
@@ -72,8 +68,9 @@
         }] : [];
       },
       deleteFn(line, index) {
-        this.delete({
-          id: line.Id,
+        var self = this;
+        self.delete({
+          line: line,
           index: index
         });
       },

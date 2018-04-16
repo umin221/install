@@ -542,7 +542,7 @@
                       _upload.call(self, self.$refs.attach.getServerIds(), id);
                     };
                     uploadAttach(self.id);
-                    if (num === '1' || num === 2 || num === '5') { // 保存或者详细计划时不选择委外 则把之前的数据清空
+                    if (num === '1' || num === 2 || num === 5) { // 保存或者详细计划时不选择委外 则把之前的数据清空
                       // 判断是否选择委外
                       var insId = ''; // 判断是否有委外联系人  有则清空
                       if (self.installerList.length > 0) {
@@ -604,7 +604,9 @@
                             item: ''
                           }
                         });
-                      } else if (num === '5') {
+                      } else if (num === 2) {
+                        Toast('保存成功');
+                      } else if (num === 5) {
                         api.get({ // 更改按钮状态
                           key: 'getUPStatus',
                           method: 'POST',
@@ -640,8 +642,6 @@
                           item: ''
                         }
                       });
-                    } else {
-                      Toast('保存成功');
                     }
                   }
                 }
