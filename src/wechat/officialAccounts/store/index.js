@@ -358,7 +358,7 @@ export default new Vuex.Store({
         }
       },
       actions: {
-        getServiceDetail({commit}, {search, value}) {
+        getServiceDetail({commit}, {search, value, callback}) {
           api.get({
             key: 'getServiceList',
             data: {
@@ -527,6 +527,24 @@ export default new Vuex.Store({
             type: type,
             success: data => {
               callback(data);
+            },
+            error: data => {
+              console.log(data);
+            }
+          });
+        },
+        getService({commit}, {search, value, callback}) {
+          api.get({
+            key: 'getServiceList',
+            data: {
+              search: search,
+              value: value
+            },
+            success: data => {
+              let Survey = data.SiebelMessage['Service Request']['Customer Survey'];
+              if (callback) {
+                callback(Survey);
+              }
             },
             error: data => {
               console.log(data);

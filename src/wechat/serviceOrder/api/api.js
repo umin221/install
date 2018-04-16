@@ -459,7 +459,6 @@ let ApiList = {
     };
   },
   upDateOrderStatu: option => {
-
     return {
       method: 'PUT',
       url: 'data/KL Service Request Interface BO/Service Request',

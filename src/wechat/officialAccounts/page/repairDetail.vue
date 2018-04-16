@@ -57,8 +57,11 @@
     </div>
     <button-group v-if="serviceDetail.Action">
       <mt-button class="single"
-                 @click.native="toComment"
+                 @click.native="toComment(false)"
                   v-if="action['Status'] === '完成' && survey">点评</mt-button>
+      <mt-button class="single"
+                 @click.native="toComment(true)"
+                 v-if="action['Status'] === '完成' && !survey">已点评</mt-button>
     </button-group>
   </div>
 </template>
@@ -102,12 +105,14 @@
     methods: {
       ...mapActions('app', ['queryMedias']),
       ...mapActions(NameSpace, ['getServiceDetail']),
-      toComment() {
+      toComment(type) {
         let me = this;
         me.$router.push({
           name: 'commentOn',
           query: {
-            id: me.serviceDetail.Id
+            id: me.serviceDetail.Id,
+            isDisable: type,
+            srNum: me.serviceDetail['SR Number']
           }
         });
       }

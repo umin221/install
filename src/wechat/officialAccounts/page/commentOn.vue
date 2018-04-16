@@ -7,7 +7,7 @@
           <i :class="[xs,attitudeIs[index] ? starY:starN]"
              style="margin-left: 5px"
              v-for="(item, index) in attitudeData"
-             @click="changeStar(index+1, 'attitudeIs', item.Value)"></i>
+             @click="(!type && changeStar(index+1, 'attitudeIs', item.Value))"></i>
         </div>
       </div>
       <div class="service-attitude" >
@@ -16,26 +16,48 @@
           <i :class="[xs,technologyIs[index] ? starY:starN]"
              style="margin-left: 5px"
              v-for="(item, index) in technologyData"
-             @click="changeStar(index+1, 'technologyIs', item.Value)"></i>
+             @click="(!type && changeStar(index+1, 'technologyIs', item.Value))"></i>
         </div>
       </div>
       <mt-radio
         title="维修工程师是否有预约"
         v-model="box1"
-        :options="['是', '否']">
+        :options="[
+          {
+            label: '是',
+            value: '是',
+            disabled: this.type
+          },
+          {
+            label: '否',
+            value: '否',
+            disabled: this.type
+          }
+        ]">
       </mt-radio>
       <mt-radio
         title="是否维修完成？"
         v-model="box2"
-        :options="['是', '否']">
+        :options="[
+          {
+            label: '是',
+            value: '是',
+            disabled: this.type
+          },
+          {
+            label: '否',
+            value: '否',
+            disabled: this.type
+          }
+        ]">
       </mt-radio>
       <cus-field class="block"
                  label="建议与反馈"
+                 id="comments"
                  type="textarea"
                  v-model="comments"
                  placeholder="请输入意见与反馈"></cus-field>
-
-      <button-group>
+      <button-group v-if="!type">
         <mt-button class="single" @click.native="submit">提交</mt-button>
       </button-group>
     </div>
@@ -50,11 +72,34 @@
       return b['Order By'] - a['Order By'];
     });
   };
+  const setAttrButt = (function() {
+    return function(id, type) {
+      let parent = document.getElementById(id);
+      let child = parent.getElementsByTagName(type);
+      child[0].setAttribute('disabled', true);
+    };
+  })();
 //  let mapp = config.mapp;
   export default {
     name: NameSpace,
     created() {
       let me = this;
+      let parmer = me.$route.query;
+      me.type = parmer.isDisable;
+      if (me.type) {
+        me.getService({
+          search: 'SR Number',
+          value: parmer.srNum,
+          callback: data => {
+            console.log(data);
+            if (data) {
+              me.comments = data.Comments;
+              setAttrButt('comments', 'textarea');
+            }
+          }
+        });
+        me.changeStar();
+      }
       for (let i = 0; i < 5; i++) {
         me.attitudeIs.push(false);
         me.technologyIs.push(false);
@@ -86,14 +131,14 @@
         starY: 'icon-starY',
         box1: '是',
         box2: '是',
-        comments: ''
+        comments: '',
+        type: false
       };
     },
     computed: {
     },
     methods: {
-      ...mapActions(NameSpace, ['customerSurvey', 'commentLov']),
-//      ...mapMutations(NameSpace, []),
+      ...mapActions(NameSpace, ['customerSurvey', 'commentLov', 'getService']),
       submit() {
         let me = this;
         let form = {
