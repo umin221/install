@@ -42,9 +42,8 @@
           {'id': 'installOrder', 'vul': '安装订单', 'icon': 'install'},
           {'id': 'serviceOrder', 'vul': '维修工单', 'icon': 'service'},
           {'id': 'orderForms', 'vul': '维修订单', 'icon': 'forms'},
-          /*
-          {'id': 1, 'vul': '我的配件'},
-          {'id': 1, 'vul': '配件领用'},
+          {'id': 'myProduct', 'vul': '我的配件'},
+/*          {'id': 1, 'vul': '配件领用'},
           {'id': 1, 'vul': '配件退入'},*/
           {'id': 'outsourcing', 'vul': '委外人员管理', 'icon': 'out'}
         ]

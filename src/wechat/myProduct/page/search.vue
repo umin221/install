@@ -1,21 +1,25 @@
+<!--搜索交接单-->
 <template>
   <div class="search">
     <cus-search v-model="value"
-                placeholder="请输入配件名称">
+                :show="true"
+                placeholder="请输入配件名称或负责人">
 
-        <cus-loadmore ref="result"
-                      :loadBottom="loadBottomFn"
-                      :topStatus="topStatus">
-          <cus-cell class="multiple"
-                    :key="item.id"
-                    :title="'合作伙伴名称:'+ item.Name"
-                    v-for="item in result"
-                    is-link>
-            <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: </div>
-            <div class="mint-cell-sub-title" slot="title">联系电话: </div>
-          </cus-cell>
-          <empty v-show="!result"></empty>
-        </cus-loadmore>
+      <cus-loadmore ref="result"
+                    @loadBottom="loadBottomFn"
+                    :emptyTips="false"
+                    :topStatus="topStatus">
+        <cus-cell class="multiple"
+                  :key="item.id"
+                  :title="'配件型号:'+ item['KL Prod Model No']"
+                  @click.native="toDetailFn(item)"
+                  v-for="item in result">
+          <div slot="after" style="color: #A2BBFC">{{item.Type}}</div>
+          <div class="mint-cell-sub-title" slot="title">配件名称：{{item['KL Product Name Join']}}</div>
+          <div class="mint-cell-sub-title" slot="title">库存量：{{item['KL Inventory Qty']}}</div>
+          <div class="mint-cell-sub-title" slot="title">负责人：{{item['KL Primary Employee Full Name']}}</div>
+        </cus-cell>
+      </cus-loadmore>
 
     </cus-search>
   </div>
@@ -27,9 +31,27 @@
   import cusSearch from 'public/components/cus-search';
   import cusCell from 'public/components/cus-cell';
   //
-  const NAMESPACE = 'searchTrans';
+  let loader = function(...args) {
+    let me = this;
+    let event = args.pop();
+    let name = me.value;
+    let param = {
+      data: {
+        'KL Product Name Join': '*' + name + '*',
+        'KL Primary Employee Full Name': '*' + name + '*'
+      },
+      more: args.pop(),
+      callback: (data) => {
+        me.$refs.result[event](data.length);
+      }
+    };
+    // 获取团队列表
+    me.getList(param);
+  };
+
+  const NAMESPACE = 'index';
   export default {
-    name: NAMESPACE,
+    name: 'search',
     components: {cusLoadmore, cusSearch, cusCell},
     data: () => {
       return {
@@ -41,13 +63,33 @@
       ...mapState(NAMESPACE, ['result'])
     },
     methods: {
-      ...mapActions(NAMESPACE, ['getData']),
-      // 点击搜索
+      ...mapActions(NAMESPACE, ['getList']),
+      /**
+       * 搜索回调
+       * @param {String} val 搜索值
+       */
       searchFn(val) {
-        this.value = val;
-        this.getData(val);
+        loader.call(this, 'onBottomLoaded');
       },
+      /**
+       * To detail
+       * @param {Object} item 行内容
+       */
+      toDetailFn(item) {
+        this.$router.push({
+          name: 'detail',
+          query: {
+            id: item.Id
+          }
+        });
+      },
+      /**
+       * Load more
+       */
       loadBottomFn() {
+        loader.call(this, {
+          more: true
+        }, 'onBottomLoaded');
       }
     }
   };
