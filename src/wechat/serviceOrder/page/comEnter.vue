@@ -89,8 +89,8 @@
       timer = setTimeout(callback, ms);
     };
   })();
+
   let _upload = function(serverIds, id) {
-    // 成功回调
     let callback = data => {
       tools.success(data, {
         back: false,
@@ -105,7 +105,9 @@
         IOName: 'KL Service Request Attachment IO',
         Comment: this.value
       },
-      success: callback
+      success: data => {
+        console.log(data);
+      }
     }) : callback(id);
   };
   const NameSpace = 'comEnter';
@@ -166,12 +168,11 @@
       });
       me.getLov({
         type: 'KL_SR_ATT_TYPE',
-        parent: '',
-        success: function(data) {
+        success: data => {
           console.log(data);
           let items = data.items;
           for (let i = 0; i < items.length;i++) {
-            if (items[i].Name === 'Job Sheet') {
+            if (items[i].Name === 'Problem Record') {
               me.value = items[i].Value;
             }
           }
@@ -317,7 +318,13 @@
           'KL Lock Model': me['KL_LOCK_MODEL'],
           callback: function(data) {
             if (data) {
-              me.$router.back();
+              let name = me.$router.currentRoute.name;
+              console.log(name);
+              if (name === 'comEnter') {
+                me.$router.go(-2);
+              } else {
+                me.$router.go(-1);
+              }
             }
           }
         };

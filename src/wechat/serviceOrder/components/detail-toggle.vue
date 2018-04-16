@@ -1,7 +1,7 @@
 <template>
     <div>
       <div :class="{visible:visible, child: !type}" class="cus-toggle-btn"
-        @click="visible=!visible">{{type?title:''}}{{label1}}</div>
+            @click="ck">{{type?title:''}}{{label1}}</div>
       <div class="toggle-content" v-show="visible">
         <slot></slot>
       </div>
@@ -11,7 +11,7 @@
 <script type="es6">
   export default {
     name: 'cus-toggle',
-    props: ['label', 'type'],
+    props: ['label', 'type', 'index'],
     data() {
       return {
         visible: false,
@@ -23,6 +23,15 @@
       label1() {
         return this.label;
       }
+    },
+    methods: {
+      ck() {
+        let me = this;
+        me.visible = !me.visible;
+        if (me.visible) {
+          me.$emit('ck');
+        }
+      }
     }
   };
 
@@ -33,7 +42,7 @@
     position: relative;
     line-height: 2rem;
     color: #000000;
-    font-size: $font-size-large;
+    font-size: 0.8rem;
     background-color: aliceblue;
     margin-top: 10px;
     border-radius: 5px;

@@ -458,6 +458,17 @@ let ApiList = {
       }
     };
   },
+  upDateOrderStatu: option => {
+    return {
+      method: 'PUT',
+      url: 'data/KL Service Request Interface BO/Service Request',
+      data: {
+        'Id': option.data.parentId,
+        'KL Parent SR Complete Flag': 'Y'
+      }
+    };
+    // 更新服务请求
+  },
   addChildService: option => {          // 创建子服务请求再记一单
     return {
       method: 'PUT',

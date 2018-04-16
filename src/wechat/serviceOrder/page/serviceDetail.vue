@@ -5,9 +5,8 @@
         <fallback slot="left"></fallback>
         <mt-button  slot="right"
                      @click.native="openConfirm"
-                     v-if="role === 'install'&& BtnStatu !== 'status5' && BtnStatu ">关闭</mt-button>
+                     v-if="role === 'install'&&BtnStatu ">关闭</mt-button>
       </mt-header>
-
 
       <div class="mint-content service-detail">
         <div class="detail-title">
@@ -53,7 +52,8 @@
               <empty v-show="!ServiceRequest['Action'] && !allChildService.length"></empty>
               <toggle v-if="ServiceRequest['Action']" :type="true" :label="ServiceRequest['SR Number']">
                 <div>
-                  <toggle :title="false" label="故障记录">
+                  <toggle :title="false"
+                          label="故障记录">
                     <ul class="failure-record">
                       <li>产品序列号：{{ServiceRequest['KL SN']}}</li>
                       <li>详细地址：{{ServiceRequest['Personal Street Address']}}</li>
@@ -69,23 +69,28 @@
                   </toggle>
                   <toggle :title="false" label="完工确认单">
                     <empty v-show="!orderEntry.length"></empty>
+                    <div class="enter-order">
+                      <div>保修期</div>
+                      <div>产品名称</div>
+                      <div>数量</div>
+                    </div>
                     <div  v-for="(item, index) in orderEntry">
                       <div v-if="item['Order Entry - Line Items']">
-                        <div class="enter-order">
-                          <div>保修期</div>
-                          <div>产品名称</div>
-                          <div>数量</div>
-                        </div>
                         <div class="enter-order">
                           <div>{{item['Order Entry - Line Items']['KL Warranty Flag'] === "N" ? '保内': '保外'}}</div>
                           <div>{{item['Order Entry - Line Items']['KL Product Name Join']}}</div>
                           <div>{{item['Order Entry - Line Items']['Quantity Requested']}}</div>
                         </div>
-                        <div class="enter-order">
-                          <div>总金额：{{item['Order Total']}}</div>
-                        </div>
                       </div>
                     </div>
+                    <div class="enter-order">
+                      <div>总金额：{{orderEntry['Order Total']}}</div>
+                    </div>
+                    <attach ioName="KL Service Request Attachment IO" ref="attach"
+                            :attach="attach2.list"
+                            :edit="attach2.edit"
+                            :title="attach2.title">
+                    </attach>
                   </toggle>
                 </div>
               </toggle>
@@ -95,7 +100,9 @@
                       :key="item.Id"
                       :label="item['SR Number']">
                 <div>
-                  <toggle :title="false" label="故障记录">
+                  <toggle :title="false"
+                          label="故障记录"
+                          @ck="showAttach(item.Id, index, 'Problem Record',ProblemRecord[index].list.length)">
                     <ul class="failure-record">
                       <li>产品序列号：{{item['KL SN']}}</li>
                       <li>详细地址：{{item['Personal Street Address']}}</li>
@@ -103,13 +110,15 @@
                       <li>故障描述：{{item['Sub-Area']}}</li>
                       <li>故障现象：{{item['Area']}}</li>
                       <attach ioName="KL Service Request Attachment IO" ref="attach"
-                              :attach="attach.list"
-                              :edit="attach.edit"
-                              :title="attach.title">
+                              :attach="ProblemRecord[index].list"
+                              :edit="ProblemRecord[index].edit"
+                              :title="ProblemRecord[index].title">
                       </attach>
                     </ul>
                   </toggle>
-                  <toggle :title="false" label="完工确认单">
+                  <toggle :title="false"
+                          label="完工确认单"
+                          @ck="showAttach(item.Id, index, 'Job Sheet',JobSheet[index].list.length)">
                     <div v-if="item['KL Child SR Order']">
                       <div class="enter-order">
                         <div>保修期</div>
@@ -124,6 +133,11 @@
                       <div class="enter-order">
                         <div>总金额：{{item['KL Child SR Order']['Order Total']}}</div>
                       </div>
+                      <attach ioName="KL Service Request Attachment IO" ref="attach"
+                              :attach="JobSheet[index].list"
+                              :edit="JobSheet[index].edit"
+                              :title="JobSheet[index].title">
+                      </attach>
                     </div>
                   </toggle>
                 </div>
@@ -145,45 +159,56 @@
           </mt-tab-container>
         </div>
       </div>
+
+      <!--客服派单按钮-->
       <button-group v-if="role === 'custom'&& BtnStatu === 'status4'">
-        <mt-button class="single" @click.native="toContact" >派单</mt-button>
+        <mt-button class="single"
+                   @click.native="toContact" >派单</mt-button>
       </button-group>
+
+      <!--工程师接单按钮-->
       <button-group v-if="role === 'install'">
-        <div v-show="BtnStatu === 'status5'" class="callPlan">
-          <mt-button  class="single flax"  @click.native="changeMy" >接单</mt-button>
-          <mt-button type="primary" class="single flax" @click.native="toContact">派单</mt-button>
-        </div>
-        <mt-button v-show="BtnStatu === 'status1'&& !callEnd"  class="single" @click.native="changeBtnStote"  >电话联系客户</mt-button>
-        <div v-show="BtnStatu === 'status2' || callEnd" class="callPlan">
-          <mt-button   class="single flax" type="primary"  @click.native="callSolve" >电话已解决</mt-button>
-          <mt-button  class="single flax" @click.native="clickShow"  >预约维修计划</mt-button>
-        </div>
+        <mt-button v-show="BtnStatu === 'status1'&& !callEnd"
+                   class="single"
+                   @click.native="changeBtnStote">电话联系客户</mt-button>
+        <div v-show="BtnStatu === 'status2' || callEnd"
+             class="callPlan">
+          <mt-button   class="single flax" type="primary"
+                       @click.native="callSolve" >电话已解决</mt-button>
+          <mt-button  class="single flax"
+                      @click.native="clickShow"  >预约维修计划</mt-button></div>
         <mt-button v-show="BtnStatu === 'status3'"  class="single" @click="popupVisible1 = !popupVisible1" >工单操作</mt-button>
       </button-group>
+
       <!--弹出日历-->
       <div v-if="showBox2">
         <mt-popup v-model="showBox2"  position="bottom" popup-transition="popup-fade" class="mint-popup-1">
           <dateControl @my-cancel="cancel" @my-enter="enter"></dateControl>
         </mt-popup>
       </div>
+
       <!--关闭盒子-->
       <close :showBox1="showBox" @my-enter="boxEnter" @my-close="boxClose"></close>
+
       <!--打电话-->
       <cus-call :number="ServiceRequest['Contact Business Phone']" v-model="call"></cus-call>
+
       <!--工单操作-->
       <mt-popup v-model="popupVisible1" position="bottom" popup-transition="popup-fade" class="mint-popup-2">
-        <mt-cell class="setOut" title="出发" :value="Action['KL Departure Location']" >
-          <mt-button v-if="Action['Status']==='已预约'" @click="clickPosition('setOut')">签到</mt-button>
+        <mt-cell class="setOut xs-icon icon-setout" title="出发" :value="Action['KL Departure Location']" >
+          <mt-button v-if="Action['Status INT']==='Appointed'" @click="clickPosition('setOut')">签到</mt-button>
         </mt-cell>
-        <mt-cell title="到达" :value="Action['MeetingLocation']">
-          <mt-button v-if="Action['Status']==='已出发'" @click="clickPosition('reach')">签到</mt-button>
-          <mt-button v-else-if="Action['Status']==='已预约'" style="background: gainsboro">签到</mt-button>
+        <mt-cell class="xs-icon icon-reach" title="到达" :value="Action['MeetingLocation']">
+          <mt-button v-if="Action['Status INT']==='Departed'" @click="clickPosition('reach')">签到</mt-button>
+          <mt-button v-else-if="Action['Status INT']==='Appointed'" style="background: gainsboro">签到</mt-button>
         </mt-cell>
-        <mt-cell title="记录故障">
+
+        <!--工单操作 记录故障-->
+        <mt-cell class="xs-icon icon-saver" title="记录故障">
           <div v-if="!ServiceRequest['KL Child Service Request']">
-            <mt-button v-if="Action['Status']==='已上门'&& ServiceRequest['SR Rootcause']"
+            <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause']"
                        @click="fillIn('ServiceRequest')">已填写</mt-button>
-            <mt-button v-else-if="Action['Status']==='已上门' && !ServiceRequest['SR Rootcause']"
+            <mt-button v-else-if="Action['Status INT']==='Arrived' && !ServiceRequest['SR Rootcause']"
                        @click="clickPosition('comEnter')">填写</mt-button>
             <mt-button v-else style="background: gainsboro">填写</mt-button>
           </div>
@@ -194,27 +219,34 @@
               @click.native="childCom(childService)">填写</mt-button>
           </div>
         </mt-cell>
-        <mt-cell title="完工确认">
+
+        <!--工单操作 完工确认-->
+        <mt-cell class="xs-icon icon-finish" title="完工确认">
           <div v-if="!ServiceRequest['KL Child Service Request']">
-            <mt-button v-if="Action['Status']==='已上门'&& ServiceRequest['SR Rootcause'] && ServiceRequest['Status'] !== '已完成'"
+            <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause'] && !ServiceRequest['KL Parent SR Complete Flag']"
                        @click.native="clickPosition('failureRecord')">填写</mt-button>
-            <mt-button v-else-if="ServiceRequest['Status'] === '已完成'"
+            <mt-button v-else-if="ServiceRequest['KL Parent SR Complete Flag']"
                        @click.native="moreOrder">再记一单</mt-button>
             <mt-button v-else style="background: gainsboro">填写</mt-button>
           </div>
           <div v-else>
-            <mt-button v-if="childService['SR Rootcause'] && childService['Status'] !== '已完成'"
+            <mt-button v-if="childService['SR Rootcause'] && childService['KL Status LIC'] !== 'Completed'"
                        @click.native="childRecord(childService)">填写</mt-button>
-            <mt-button v-else-if="childService['Status'] === '已完成'"
+            <mt-button v-else-if="childService['KL Status LIC'] === 'Completed'"
                        @click.native="moreOrder">再记一单</mt-button>
             <mt-button v-else style="background: gainsboro">填写</mt-button>
           </div>
         </mt-cell>
-        <mt-cell class="completeEnd" title="结束">
-          <mt-button v-if="ServiceRequest['Status'] === '已完成'" @click.native="clickPosition('end')">确认</mt-button>
+
+        <!--工单操作 结束-->
+        <mt-cell class="completeEnd xs-icon icon-ending" title="结束">
+          <mt-button v-if="childService['KL Status LIC'] === 'Completed'"
+                     @click.native="clickPosition('end')">确认</mt-button>
           <mt-button v-else style="background: gainsboro">确认</mt-button>
         </mt-cell>
-        <div class="cancelHandle" @click="popupVisible1 = !popupVisible1">取消</div>
+        <div class="cancelHandle"
+             style="color: red;"
+             @click="popupVisible1 = !popupVisible1">取消</div>
       </mt-popup>
     </div>
   </div>
@@ -241,10 +273,22 @@
           'IOName': 'KL Service Request Attachment IO',
           'SearchSpec': {
             'Service Request Attachment.Activity Id': me.$route.query.srId
-//            'Service Request Attachment.KL SR Att Type': 'LookupValue("KL_SR_ATT_TYPE","Customer Upload File")'
-          },
-          success: data => {
-            me.attach.list = KND.Util.toArray(data['SiebelMessage']['Service Request Attachment']);
+          }
+        },
+        success: data => {
+          let attach = KND.Util.toArray(data['SiebelMessage']['Service Request Attachment']);
+          if (attach) {
+            for (let i = 0; i < attach.length; i++) {
+              if (attach[i]['KL SR Att Type'] === '客户上传附件') {
+                me.attach.list = attach;
+              }
+              if (attach[i]['KL SR Att Type'] === '故障问题记录') {
+                me.attach1.list = attach;
+              }
+              if (attach[i]['KL SR Att Type'] === '维修单据') {
+                me.attach2.list = attach;
+              }
+            }
           }
         }
       });
@@ -279,17 +323,22 @@
           list: [],
           edit: false,
           title: '附件：维修单据存档'
+        },
+        attach2: { // 故障记录 附件
+          list: [],
+          edit: false,
+          title: '附件：维修单据存档'
         }
       };
     },
     computed: {
       ...mapState('index', ['loginMeg', 'role']),
-      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'tabList', 'starAddress', 'visitAddress', 'endAddress', 'orderEntry', 'childService', 'allChildService'])
+      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'ProblemRecord', 'JobSheet', 'tabList', 'starAddress', 'visitAddress', 'endAddress', 'orderEntry', 'childService', 'allChildService'])
     },
     methods: {
       ...mapActions('app', ['upload', 'queryMedias']),
       ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress', 'addChildService']),
-      ...mapMutations(NameSpace, ['setRole']),
+      ...mapMutations(NameSpace, ['setRole', 'setAttachs']),
       boxClose(msg) {               // 关闭取消事件
         this.showBox = false;
       },
@@ -382,7 +431,7 @@
       clickPosition(value1) {
         let me = this;
         let parms = {};
-        let statu = me.Action['Status'];
+        let statu = me.Action['Status INT'];
         if (value1 === 'setOut') {
           KND.Native.getLocation({
             success(data) {
@@ -434,14 +483,15 @@
           };
           me.popupVisible1 = !me.popupVisible1;
         }
-        if ((value1 === 'setOut' && statu === '已预约') || (value1 === 'reach' && statu === '已出发') || (value1 === 'end' && statu === '已上门')) {
+        if ((value1 === 'setOut' && statu === 'Appointed') || (value1 === 'reach' && statu === 'Departed') || (value1 === 'end' && statu === 'Arrived')) {
           me.setStatus({parms: parms, srNum: me.srNumber});
         }
         if (value1 === 'failureRecord') {
           this.$router.push({
             name: 'saveFault',
             query: {
-              id: this.ServiceRequest['Id']
+              id: this.ServiceRequest['Id'],
+              type: 'parent'
             }
           });
         }
@@ -491,7 +541,8 @@
         me.$router.push({
           name: 'saveFault',
           query: {
-            id: child['Id']
+            id: child['Id'],
+            type: 'child'
           }
         });
       },
@@ -521,6 +572,27 @@
             id: this.ServiceRequest['Id']
           }
         });
+      },
+      showAttach(Id, index, type, len) {
+        if (!len) {
+          let me = this;
+          me.queryMedias({
+            data: {
+              'IOName': 'KL Service Request Attachment IO',
+              'SearchSpec': {
+                'Service Request Attachment.Activity Id': Id,
+                'Service Request Attachment.KL SR Att Type': 'LookupValue("KL_SR_ATT_TYPE", "' + type + '")'
+              }
+            },
+            success: data => {
+              let arr = KND.Util.toArray(data['SiebelMessage']['Service Request Attachment']);
+              type = type.replace(/\s+/g, '');
+              console.log(type);
+              me.setAttachs({index: index, data: arr, type});
+            }
+          });
+        }
+
       }
     },
     components: {close, dateControl, toggle, cusCall}
@@ -542,6 +614,7 @@
   }
   .marginB{
     margin-bottom: 40px;
+    padding: 0!important;
   }
   .service-continer{
     position: relative;
@@ -695,5 +768,34 @@
      width: 25%;
       text-align: center;
     }
+  }
+  .icon-setout>.mint-cell-wrapper:before{
+    content: '\A159';
+    margin-right: 10px;
+    color: $theme-color;
+  }
+  .icon-reach>.mint-cell-wrapper:before{
+    content: '\A160';
+    margin-right: 12px;
+    color: $theme-color;
+    font-size: 25px;
+  }
+  .icon-saver>.mint-cell-wrapper:before{
+    content: '\A161';
+    margin-right: 10px;
+    color: $theme-color;
+    font-size: 22px;
+  }
+  .icon-finish>.mint-cell-wrapper:before{
+    content: '\A162';
+    margin-right: 10px;
+    color: $theme-color;
+    font-size: 24px;
+  }
+  .icon-ending>.mint-cell-wrapper:before{
+    content: '\A163';
+    margin-right: 11px;
+    color: $theme-color;
+    font-size: 24px;
   }
 </style>

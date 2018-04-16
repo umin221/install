@@ -7,8 +7,8 @@
 
     <div class="mint-content">
       <div class="saveFault">
-        <mt-cell title="单据编号：" >{{ServiceRequest['SR Number']}}</mt-cell>
-        <mt-cell title="移交日期：">{{ServiceRequest['KL Cutoff Date']}}</mt-cell>
+        <mt-cell title="单据编号：" >{{Service['SR Number']}}</mt-cell>
+        <mt-cell title="移交日期：">{{Service['KL Cutoff Date']}}</mt-cell>
         <mt-cell class="require" title="是否保修范围" @click.native="getLov1('bn')" is-link>{{isBn}}</mt-cell>
         <mt-cell title="维修配件"><i class="xs-icon icon-arrow-down"></i></mt-cell>
         <div class="servesParts">
@@ -69,23 +69,27 @@ let _upload = function(serverIds, id) {
       MediaId: serverIds,
       Id: id,
       IOName: 'KL Service Request Attachment IO',
-      Comment: this.value
+      Comment: this.val
     },
-    success: callback
+    success: data => {
+      console.log(data);
+    }
   }) : callback(id);
 };
 export default {
   name: NAMESPACE,
   created() {
     let me = this;
-    let serviceId = me.$route.query.id;
+    let service = me.$route.query;
+    let serviceId = service.id;
+    me.serviceType = service.type;
     if (serviceId) {
       me.getServiceR({
         Id: serviceId,
         callback: function(data) {
-          me.ServiceRequest = data;
+          me.Service = data;
           if (!me.isBn) {
-            let isBn = me.ServiceRequest['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
+            let isBn = me.Service['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
             me.setIsBn(isBn);
           }
         }
@@ -106,7 +110,7 @@ export default {
         console.log(data);
         let items = data.items;
         for (let i = 0; i < items.length;i++) {
-          if (items[i].Name === 'Problem Record') {
+          if (items[i].Name === 'Job Sheet') {
             me.val = items[i].Value;
           }
         }
@@ -120,12 +124,13 @@ export default {
       val: '维修单据',
       showBox: false,
       slots: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
+      serviceType: '',
       productData: [],
       switchStatus: [],
       fee: 0,
       allFee: 0,
       one: 1,
-      ServiceRequest: {},
+      Service: {},
       attach: { // 附件
         list: [],
         edit: true,
@@ -136,7 +141,7 @@ export default {
   computed: {
     ...mapState(NAMESPACE, ['isBn', 'returnSelect']),
     ...mapState('searchTrans', ['priceId']),
-//    ...mapState('detail', ['ServiceRequest']),
+    ...mapState('detail', ['ServiceRequest']),
     Product() {
       let me = this;
       let len = me.returnSelect.length;
@@ -160,7 +165,7 @@ export default {
     ...mapActions(NAMESPACE, ['addServiceOrder', 'getServiceR']),
     ...mapMutations(NAMESPACE, ['setIsBn', 'ProductNum', 'deleteProduct']),
     ...mapActions('app', ['getLov', 'upload']),
-    ...mapMutations('searchTrans', ['initSelect']),
+    ...mapMutations('searchTrans', ['initSelected']),
     ...mapMutations('detail', ['setPartner']),
     productNumber(val, num, type) {
       let me = this;
@@ -180,6 +185,9 @@ export default {
       let me = this;
       let lineItems = [];
       let obj = {};
+      let uploadAttach = id => {
+        _upload.call(me, me.$refs.attach.getServerIds(), id);
+      };
       for (let i = 0;i < me.returnSelect.length; i++) {
         obj = {
           'Id': '1',
@@ -193,23 +201,22 @@ export default {
         // 订单行
         lineItems: lineItems,
         // 订单头
-        ServiceRequestId: me['ServiceRequest'].Id,   // 服务请求ID
+        ServiceRequestId: me['Service'].Id,   // 服务请求ID
         priceId: me.priceId,      // 价格列表ID
         warrantyFlag: me.isBn === '保内' ? 'Y' : 'N',    // 订单头是否保内
-        contactId: me['ServiceRequest']['Contact Id'], // 联系人Id
-        assetId: me['ServiceRequest']['Asset Id'], // 资产Id
-        srNum: me['ServiceRequest']['SR Number'],
+        contactId: me['Service']['Contact Id'], // 联系人Id
+        assetId: me['Service']['Asset Id'], // 资产Id
+        srNum: me['Service']['SR Number'],
+        parentId: me.ServiceRequest.Id,
+        type: me.serviceType,
         callBack: function(data) {
           me.setPartner(data);
-          me.initSelect();
+          me.initSelected();
           me.$router.go(-1);
         }
       };
-      let uploadAttach = id => {
-        _upload.call(me, me.$refs.attach.getServerIds(), id);
-      };
-      uploadAttach(me['ServiceRequest'].Id);
       me.addServiceOrder(obj);
+      uploadAttach(me['Service'].Id);
     },
     toTranslated() {
       this.$router.push('searchTrans');
@@ -240,20 +247,6 @@ export default {
       } else {
         me.slots[0].values = ['工作时间', '其他时间'];
       }
-    },
-    change(index, type) {
-      console.log(index);
-//      let me = this;
-//      me.one = me.one + 1;
-//      if (me.one === 2) {
-//        if (!me.switchStatus[index]) {
-//          me.allFee = me.allFee - me.productData[index].num * parseInt(me.productData[index]['List Price'], 0);
-//        } else {
-//          me.allFee = me.allFee + me.productData[index].num * parseInt(me.productData[index]['List Price'], 0);
-//        }
-//      } else {
-//        me.one = 1;
-//      }
     }
   },
   components: {menuBox, numBox}

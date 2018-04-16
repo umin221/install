@@ -18,7 +18,6 @@ app.state.alive = ['index', 'close'];
 // 每页加载条数
 const PAGESIZE = config.pageSize;
 let mapps;
-
 // tipBox
 const systemSort = function(array, type) {
   return array.sort(function(a, b) {
@@ -362,6 +361,8 @@ export default new Vuex.Store({
         visitAddress: '',
         endAddress: '',
         orderEntry: [],
+        ProblemRecord: [],
+        JobSheet: [],
         meg: ''
       },
       mutations: {
@@ -381,30 +382,26 @@ export default new Vuex.Store({
             state.processDate = [{Note: '暂无数据'}];
           }
           if (state.role === 'custom') {
-            console.log(state.meg['Emp #']);
-            console.log(form.Owner);
             if (form.Owner === state.meg['Emp #'] || !form.Owner) {
-              if ((form.Status === '未开始' || form.Status === '待分配') && form['SR Type'] === '上门维修') {
+              if ((form['KL Status LIC'] === 'Not Started' || form['KL Status LIC'] === 'To Be Assigned') && form['SR Type'] === '上门维修') {
                 state.BtnStatu = 'status4';
               }
             }
           } else {
             if (form.Action) {
               let Action = KND.Util.isArray(form.Action) ? form.Action[0] : form.Action;
-              if (Action.Status === '已派工' || Action.Status === '未开始') {
+              if (Action['Status INT'] === 'Not Started') {
                 state.BtnStatu = 'status1';
-              } else if (Action.Status === '已接单') {
+              } else if (Action['Status INT'] === 'Accepted') {
                 state.BtnStatu = 'status2';
-              } else if (Action.Status === '已预约' || Action.Status === '已出发' || Action.Status === '已上门') {
+              } else if (Action['Status INT'] === 'Appointed' || Action['Status INT'] === 'Departed' || Action['Status INT'] === 'Arrived') {
                 state.BtnStatu = 'status3';
-              } else if (Action.Status === '已完成') {
+              } else if (Action['Status INT'] === 'Done') {
                 state.BtnStatu = 'status6';
               }
               state.Action = Action;
             } else {
-              if (form.Status === '待分配') {
-                state.BtnStatu = 'status5';
-              }
+              state.BtnStatu = '';
             }
           }
           if (form['Order Entry - Orders']) {
@@ -412,7 +409,18 @@ export default new Vuex.Store({
           }
           if (form['KL Child Service Request']) {
             let childService = KND.Util.toArray(form['KL Child Service Request']);
+            let attrch = { // 故障记录 附件
+              list: [],
+              edit: false,
+              title: '附件'
+            };
             childService = systemSort(childService, 'Opened Date');
+            state.ProblemRecord = [];
+            state.JobSheet = [];
+            for (let i = 0; i < childService.length;i++) {
+              state.ProblemRecord.push(attrch);
+              state.JobSheet.push(attrch);
+            }
             state.allChildService = childService;
             state.childService = childService[0];
           } else {
@@ -426,6 +434,9 @@ export default new Vuex.Store({
         setRole(state, {meg, role}) {
           state.role = role;
           state.meg = meg;
+        },
+        setAttachs(state, {index, data, type}) {
+          state[type][index].list = data;
         }
       },
       actions: {
@@ -693,6 +704,7 @@ export default new Vuex.Store({
             },
             success: function(data) {
               form.callback(data);
+              // callback(data);
             },
             error: function(data) {
               console.log(data);
@@ -921,7 +933,7 @@ export default new Vuex.Store({
               form
             },
             success: function(data) {
-              if (data) {
+              if (form.type === 'child') {
                 api.get({
                   key: 'serviceDone',
                   data: {
@@ -934,7 +946,23 @@ export default new Vuex.Store({
                     console.log(data);
                   }
                 });
+              } else {
+                api.get({
+                  key: 'upDateOrderStatu',
+                  data: {
+                    parentId: form.parentId
+                  },
+                  success: function(data) {
+                    form.callBack(data);
+                  },
+                  error: function(data) {
+                    console.log(data);
+                  }
+                });
               }
+            },
+            error: function(data) {
+              console.log(data);
             }
           });
         },
