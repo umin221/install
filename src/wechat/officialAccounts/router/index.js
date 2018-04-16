@@ -82,5 +82,17 @@ export default new Router({
     component(resolve) {
       require(['../page/hotTelephone'], resolve);
     }
+  }, {
+    path: '/repairPolicy', // 报修政策
+    name: 'repairPolicy',
+    component(resolve) {
+      require(['../page/repairPolicy'], resolve);
+    }
+  }, {
+    path: '/engineer', // 工程师通道
+    name: 'engineer',
+    component(resolve) {
+      require(['../page/engineer'], resolve);
+    }
   }]
 });

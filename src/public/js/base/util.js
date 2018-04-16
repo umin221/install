@@ -182,9 +182,9 @@
       let arr = [];
       entity = entity ? entity + '.' : '';
       for (let i in obj) {
-        if (obj[i]) {
-          arr.push('[' + entity + i + ']' + operator + '"' + obj[i] + '"');
-        }
+        let val = obj[i];
+        val && val.indexOf('LookupValue') === -1 ? arr.push('[' + entity + i + ']' + operator + '"' + obj[i] + '"')
+          : arr.push('[' + entity + i + ']' + operator + obj[i]);
       }
       return arr.join(join);
     };

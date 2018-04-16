@@ -21,7 +21,6 @@
 
 <script type="es6">
   import {mapState} from 'vuex';
-  import { Toast } from 'mint-ui';
   const NameSpace = 'index';
   export default {
     name: NameSpace,
@@ -49,11 +48,7 @@
     },
     methods: {
       getUrl(id) {
-        if (id === 'repairPolicy' || id === 'engineer') {
-          Toast('别看啦！还没开发完呢');
-        } else {
-          this.$router.push(id);
-        }
+        this.$router.push(id);
       }
     }
   };

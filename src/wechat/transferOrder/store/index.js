@@ -65,6 +65,7 @@ export default new Vuex.Store({
         getTransferOrder({state, commit, dispatch}, {data, more, callback, error}) {
           let status = data['Status'];
           let mapp = mapps[status] || {};
+          console.log(mapp);
           // 搜索时，没有状态
           let list = mapp['list'] || 'result';
 
