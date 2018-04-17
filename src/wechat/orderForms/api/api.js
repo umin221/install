@@ -1,13 +1,14 @@
 let ApiList = {
   getList: option => {
-    option.data.team = option.data.team ? '?ViewMode=Manager' : '';
+    option.data.team = option.data.team ? 'Manager' : 'Personal';
     return {
       method: 'post',
-      url: 'service/EAI Siebel Adapter/QueryPage' + option.data.team,
+      url: 'service/EAI Siebel Adapter/QueryPage',
       data: {
         'body': {
           'OutputIntObjectName': 'Base Order Entry',
-          'SearchSpec': '[Order Entry - Orders.KL Primary Owner]= "' + option.data.Owner + '" AND [Order Entry - Orders.Order Type]= "服务订单"',
+          'SearchSpec': '[Order Entry - Orders.Order Type]= "服务订单"',
+          'ViewMode': option.data.team,
           'StartRowNum': option.paging.StartRowNum,
           'PageSize': option.paging.PageSize
         }
