@@ -272,7 +272,7 @@
                 success: function(dataObj) {
                   if (!dataObj.ERROR) {
                     Toast('提交成功');
-                    KND.Util.back(2);
+                    self.$router.go(-2);
                   }
                 }
               });

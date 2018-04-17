@@ -9,7 +9,7 @@
         <mt-field label="申请人" :value="appData['Party Name']"></mt-field>
         <mt-field label="类型" :value="appData['Item Type Display Name']"></mt-field>
         <mt-field label="提交日期" :value="new Date(appDataTask['Start Time']).format('yyyy-MM-dd')"></mt-field>
-        <mt-field label="订单详情" @click.native="toDetailFn" :value="orderId"></mt-field>
+        <mt-field label="订单详情" class="enable" @click.native="toDetailFn" :value="orderId"></mt-field>
       </div>
       <div class="readonly" style="margin-top: 10px">
         <mt-field label="批次">
@@ -17,7 +17,7 @@
         </mt-field>
         <mt-field label="计划开始日期"  :value="start_Date"></mt-field>
         <mt-field label="计划完成日期" :value="end_Date"></mt-field>
-        <mt-field label="计划数量"
+        <mt-field label="计划数量" class="enable"
                   :value="batchNum"
                   @click.native="editBuildingFn"
                   is-link></mt-field>

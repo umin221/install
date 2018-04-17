@@ -356,6 +356,7 @@
                         Toast('提交成功');
                         // 标记楼栋资产刷新
                         KND.Session.set('refreshAssets', true);
+                        self.$router.go(-2);
                       }
                     }
                   });

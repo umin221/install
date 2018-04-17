@@ -104,10 +104,10 @@
 <script type="application/javascript">
   import {mapState, mapActions} from 'vuex';
   import Vue from 'vue';
+  import vp from 'public/plugin/validator';
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
   import lockLine from '../components/cusLockLine';
-  import vp from 'public/plugin/validator';
   import api from '../api/api';
   const NameSpace = 'batch';
   Vue.use(vp);

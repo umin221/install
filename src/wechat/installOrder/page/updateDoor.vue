@@ -7,9 +7,9 @@
     </mt-header>
     <div class="mint-content zsBatch">
       <div :class="{'readonly':read}">
-        <cus-field label="完成数量"
+        <cus-field label="完成数量" tag="完成数量"
                    type="number"
-                   :class="heartVisible"
+                   v-valid.require
                    v-model="line['Completed Install Amount']"></cus-field>
         <cus-field label="抽查数量"
                    type="number"
@@ -55,10 +55,13 @@
   }
 </style>
 <script type="application/javascript">
+  import Vue from 'vue';
+  import vp from 'public/plugin/validator';
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
   import api from '../api/api';
   import {mapState, mapActions} from 'vuex';
+  Vue.use(vp);
   export default {
     name: 'updateDoor',
     created() {
@@ -128,58 +131,75 @@
       },
       submitFn() {
         var self = this;
-        var lineObj = self.line;
-        if (!lineObj['Completed Install Amount']) {
-          Toast('完成数量不能为空！');
-          return;
-        }
-        api.get({ // 提交详细计划数据
-          key: 'setJourna',
-          method: 'PUT',
-          data: {
-            'Id': '0001', // 默认ID
-            'Activity Id': self.id,
-            'Completed Install Amount': lineObj['Completed Install Amount'], // 新增批次返回的ID
-            'Spot Check Amount': lineObj['Spot Check Amount'], // 新增批次返回的ID
-            'Qualified Amount': lineObj['Qualified Amount'], // 新增批次返回的ID
-            'Unqualified Solve Amount': lineObj['Unqualified Solve Amount'], // 新增批次返回的ID
-            'Unqualified Desc': lineObj['Unqualified Desc'], // 新增批次返回的ID
-            'Unqualified Solve Desc': lineObj['Unqualified Solve Desc'] // 新增批次返回的ID
-          },
-          success: function(data) {
-            if (!data.ERROR) {
-              lineObj['Completed Install Amount'] = '';
-              lineObj['Spot Check Amount'] = '';
-              lineObj['Qualified Amount'] = '';
-              lineObj['Unqualified Solve Amount'] = '';
-              lineObj['Unqualified Desc'] = '';
-              lineObj['Unqualified Solve Desc'] = '';
-              // 更新状态
-              var Status = '';
-              self.getLov({ // 取类型值
-                data: {
-                  'Type': 'EVENT_STATUS',
-                  'Name': 'In Progress'
-                },
-                success: data => {
-                  Status = KND.Util.toArray(data.items)[0].Value;
-                  var parma = {};
-                  parma.Status = Status;
-                  parma.Id = self.id;
-                  api.get({ // 提交数据
-                    key: 'getUPData',
-                    method: 'PUT',
-                    data: parma,
-                    success: function(data) {
-                      if (!data.ERROR) {
-                        Toast('提交成功');
-                      }
-                    }
-                  });
-                }
-              });
+        tools.valid.call(this, () => {
+          var lineObj = self.line;
+          if (lineObj['Spot Check Amount']) { // 抽查数量有值 判断不能大于完成数量
+            if (parseInt(lineObj['Spot Check Amount'], 10) > parseInt(lineObj['Completed Install Amount'], 10)) {
+              Toast('抽查数量不能大于完成数量！');
+              return;
             }
           }
+          if (lineObj['Qualified Amount']) {
+            if (parseInt(lineObj['Qualified Amount'], 10) > parseInt(lineObj['Spot Check Amount'], 10)) {
+              Toast('合格数量不能大于抽查数量！');
+              return;
+            }
+          }
+          if (lineObj['Unqualified Solve Amount']) {
+            var numC = parseInt(lineObj['Completed Install Amount'], 10) - parseInt(lineObj['Qualified Amount'], 10);
+            if (parseInt(lineObj['Unqualified Solve Amount'], 10) > numC) {
+              Toast('异常处理数量不合理，不能大于完成数量与合格数量的差值！');
+              return;
+            }
+          }
+          api.get({ // 提交详细计划数据
+            key: 'setJourna',
+            method: 'PUT',
+            data: {
+              'Id': '0001', // 默认ID
+              'Activity Id': self.id,
+              'Completed Install Amount': lineObj['Completed Install Amount'], // 新增批次返回的ID
+              'Spot Check Amount': lineObj['Spot Check Amount'], // 新增批次返回的ID
+              'Qualified Amount': lineObj['Qualified Amount'], // 新增批次返回的ID
+              'Unqualified Solve Amount': lineObj['Unqualified Solve Amount'], // 新增批次返回的ID
+              'Unqualified Desc': lineObj['Unqualified Desc'], // 新增批次返回的ID
+              'Unqualified Solve Desc': lineObj['Unqualified Solve Desc'] // 新增批次返回的ID
+            },
+            success: function(data) {
+              if (!data.ERROR) {
+                lineObj['Completed Install Amount'] = '';
+                lineObj['Spot Check Amount'] = '';
+                lineObj['Qualified Amount'] = '';
+                lineObj['Unqualified Solve Amount'] = '';
+                lineObj['Unqualified Desc'] = '';
+                lineObj['Unqualified Solve Desc'] = '';
+                // 更新状态
+                var Status = '';
+                self.getLov({ // 取类型值
+                  data: {
+                    'Type': 'EVENT_STATUS',
+                    'Name': 'In Progress'
+                  },
+                  success: data => {
+                    Status = KND.Util.toArray(data.items)[0].Value;
+                    var parma = {};
+                    parma.Status = Status;
+                    parma.Id = self.id;
+                    api.get({ // 提交数据
+                      key: 'getUPData',
+                      method: 'PUT',
+                      data: parma,
+                      success: function(data) {
+                        if (!data.ERROR) {
+                          Toast('提交成功');
+                        }
+                      }
+                    });
+                  }
+                });
+              }
+            }
+          });
         });
       }
     },

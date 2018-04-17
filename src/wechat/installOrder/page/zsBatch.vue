@@ -282,6 +282,7 @@
     computed: {
       ...mapState('detail', ['itemTask', 'showZs']),
       ...mapState('batch', ['pcObj']),
+
       // 表单只读
       read() {
         return this.type === 'read';
@@ -330,21 +331,7 @@
         me.deliveryTime = value.format('MM/dd/yyyy');
       },
       selectCompany() {
-        var self = this;
-        var insId = '';
-        if (self.installerList.length > 0) {
-          insId = self.installerList[0].Id;
-        };
         this.toSaveFn('4');
-        self.$router.push({
-          name: 'company',
-          query: {
-            type: 'add',
-            id: self.id,
-            insId: insId,
-            item: ''
-          }
-        });
       },
       nextPageFn() {
         var self = this;
@@ -499,6 +486,7 @@
             'KL Install Amount Requested': self.batchNum,
             'Id': self.batchCode || '10001',
             'KL Detail Type': self.item['KL Detail Type'],
+            'KL Partner Id': self.pcObj['KL Partner Id'] || '',
             'Parent Activity Id': aId
           };
           var Status = '';
@@ -521,6 +509,9 @@
                   if (!data.ERROR) {
                     self.id = data.items.Id; // 新增批次返回的ID
                     self.batchCode = data.items.Id; // 新增批次返回的ID
+                    if (self.pcObj['KL Partner Name']) { // 返回数据中没有公司名字 有值就添加
+                      data.items['KL Partner Name'] = self.pcObj['KL Partner Name'];
+                    }
                     self.getPcObj(data.items); // 保存store
                     // 提交图片
                     let uploadAttach = id => {
@@ -622,11 +613,16 @@
                         }
                       });
                     } else if (num === '4') {
+                      var insIds = '';
+                      if (self.installerList.length > 0) {
+                        insIds = self.installerList[0].Id;
+                      };
                       self.$router.push({
                         name: 'company',
                         query: {
                           type: 'add',
                           id: self.id,
+                          insId: insIds,
                           item: ''
                         }
                       });
