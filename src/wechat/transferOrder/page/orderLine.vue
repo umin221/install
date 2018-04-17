@@ -41,7 +41,7 @@
         <cus-field label="锁芯中心距门内距" tag="锁芯中心距门内距"
                    v-if="isVP || isPanel"
                    v-valid.require
-                   v-model="line['KL Guide Plate Specification']"></cus-field>
+                   v-model="line['KL Lock Core Distance']"></cus-field>
         <cus-field label="锁舌导向板规格" tag="锁舌导向板规格"
                    v-if="isVP || isPanel"
                    v-valid.require
