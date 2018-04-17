@@ -296,7 +296,7 @@
     },
     methods: {
       ...mapActions('app', ['getLov', 'upload', 'queryMedias']),
-      ...mapActions('batch', ['getPcObj', 'delete']),
+      ...mapActions('batch', ['getPcObj']),
       getSwipeBtn(line, index) {
         return this.editable ? [{
           content: '删除',
@@ -305,9 +305,16 @@
         }] : [];
       },
       deleteFn(line, index) {
-        this.delete({
-          id: line.Id,
-          index: index
+        var self = this;
+        api.get({
+          key: 'deletePlan',
+          data: {
+            id: line.Id
+          },
+          success: data => {
+            self.planList.splice(index, 1);
+            tools.success(data);
+          }
         });
       },
       open(picker) {

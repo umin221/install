@@ -2,6 +2,11 @@
   <div>
     <mt-header fixed title="安装订单详情">
       <fallback slot="left"></fallback>
+      <mt-button
+        @click.native="toClockFn"
+        slot="right">
+        <i class="xs-icon icon-clock"></i>
+      </mt-button>
     </mt-header>
     <div class="mint-content mint-content-datail">
       <div class="readonly">
@@ -11,7 +16,7 @@
         <mt-field label="安装数量" :value="detailData['KL Install Amount'] || 0"></mt-field>
         <mt-field label="地址" :value="detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery Country'] + detailData['KL Delivery Address']"></mt-field>
         <div slot="title" class="mint-content-div enable">
-          <div class="mint-content-xt" @click="punchClock">安装打卡</div>
+          <div class="mint-content-xt" @click="punchClock">打卡</div>
           <div class="mint-content-xt" @click="butXttd">协同团队</div>
         </div>
       </div>
@@ -163,6 +168,9 @@
   </div>
 </template>
 <style lang="scss">
+  .icon-clock:before {
+    content: '\A130';
+  }
   .mint-content-datail {
     /*.mint-cell-wrapper {
       font-size: 0.7rem!important;
@@ -594,6 +602,15 @@
         }
         return colorCla;
       },
+      toClockFn() {
+        let me = this;
+        this.$router.push({
+          name: 'clock',
+          query: {
+            id: me.id
+          }
+        });
+      },
       upList(obj) {
         return KND.Util.toArray(obj);
       },
@@ -625,14 +642,6 @@
           }
         });
       },
-      /* is_show_fun() { // 是否显示锁体面板
-        var self = this;
-        if (self.is_show_sx) {
-          self.is_show_sx = false;
-        } else {
-          self.is_show_sx = true;
-        }
-      },*/
       punchClock() { // 安装打卡
         var self = this;
         // 获取订单经纬度
@@ -643,6 +652,7 @@
             'body': {
               'OutputIntObjectName': 'KL App Lead List IO',
               'PrimaryRowId': '1-103TCKOJ'
+              // 'PrimaryRowId': self.id
             }
           },
           success: function(data) {

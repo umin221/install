@@ -3,7 +3,7 @@
   <div>
     <mt-header fixed :title="title">
       <fallback slot="left"></fallback>
-      <mt-button v-if="form['KL Signed Amount'] && is_edit" slot="right"
+      <mt-button v-if="is_edit" slot="right"
                  @click="type = 'edit'">编辑</mt-button>
     </mt-header>
 
@@ -31,7 +31,7 @@
               v-show="box1">
       </attach>
       <div :class="{'readonly':read}" v-show="box1">
-        <mt-field label="备注说明" type="textarea" v-model="form['Description']"></mt-field>
+        <mt-field label="备注说明" type="textarea" v-model="Description"></mt-field>
       </div>
     </div>
     <button-group>
@@ -58,6 +58,7 @@
    * @param {String} id 业务id
    */
   let _upload = function(serverIds, id) {
+    var self = this;
     // 成功回调
     let callback = data => {
       tools.success(data, {
@@ -70,6 +71,7 @@
       data: {
         MediaId: serverIds,
         Id: id,
+        Comment: self.Description,
         IOName: 'KL Action Attachment'
       },
       success: callback
@@ -99,6 +101,9 @@
           },
           success: data => {
             this.attach.list = KND.Util.toArray(data['SiebelMessage']['Action Attachment']);
+            if (this.attach.list[0]) {
+              this.Description = this.attach.list[0].Comment;
+            }
           }
         });
         /* if (this.form['KL Signed Amount']) {
@@ -117,6 +122,7 @@
         item: '',
         is_edit: false,
         editable: false,
+        Description: '', // 附件备注
         box1: true,
         type: 'add', // add 新增 / edit 编辑 / read 只读
         button: {
@@ -207,13 +213,19 @@
             self.getTpye();
           }
         } else { // 编辑  提交后能编辑的只有附件可以修改  附件只能增加不能把原来的删除
-          uploadAttach(self.form.Id);
+          uploadAttach(self.id);
+          KND.Util.back();
         }
       },
       submitFn() {
+        var self = this;
         var item = this.item;
         if (item['KL Detail Type LIC'] === 'Trompil Lock Sign' ||
           item['KL Detail Type LIC'] === 'Working Drawing Sign') { // 提交后可编辑
+          if (self.type === 'edit' && !self.Description) {
+            Toast('重新编辑，备注不能为空！');
+            return;
+          }
           this.submit();
         } else { // 提交后不可编辑
           MessageBox({

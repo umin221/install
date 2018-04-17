@@ -32,6 +32,12 @@ export default new Router({
       require(['../page/detail'], resolve);
     }
   }, {
+    path: '/clock', // 打卡记录
+    name: 'clock',
+    component(resolve) {
+      require(['../page/clock'], resolve);
+    }
+  }, {
     path: '/xttd', // 协同页面页面
     name: 'xttd',
     component(resolve) {

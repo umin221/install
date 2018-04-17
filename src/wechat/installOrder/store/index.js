@@ -32,7 +32,9 @@ export default new Vuex.Store(Object.extend(true, sto, {
         // 是否主管
         isManager: false,
         // 查看团队
-        isTeam: false
+        isTeam: false,
+        // 详情安装任务索引标记
+        taskIndex: 0
       },
       mutations: {
         setTransferOrders(state, {TransferOrders, list}) {
@@ -43,6 +45,9 @@ export default new Vuex.Store(Object.extend(true, sto, {
         },
         setInfoUser(state, infoUser) {
           state.infoUser = infoUser;
+        },
+        setTaskIndex(state, index) {
+          state.taskIndex = index;
         },
         setManager(state, isManager) {
           state.isManager = isManager;
@@ -382,7 +387,6 @@ export default new Vuex.Store(Object.extend(true, sto, {
             method: 'PUT',
             data: {
               'KL Signed Amount': partner['KL Signed Amount'],
-              'Description': partner.Description,
               'Id': state.setItemObj.Id
             },
             success: success
@@ -456,21 +460,6 @@ export default new Vuex.Store(Object.extend(true, sto, {
         }
       },
       actions: {
-        /**
-         * 删除详细计划
-         */
-        delete({commit}, setting) {
-          api.get({
-            key: 'deletePlan',
-            data: {
-              id: setting.id
-            },
-            success: data => {
-              commit('removeLine', setting.index);
-              tools.success(data);
-            }
-          });
-        },
         getPcObj({state}, obj) {
           if (obj.is_company) {
             state.pcObj['KL Partner Id'] = obj.Id;

@@ -191,7 +191,7 @@
     },
     methods: {
       ...mapActions('app', ['getLov']),
-      ...mapActions(NameSpace, ['getPcObj', 'delete']),
+      ...mapActions(NameSpace, ['getPcObj']),
       getSwipeBtn(line, index) {
         return this.editable ? [{
           content: '删除',
@@ -199,10 +199,20 @@
           handler: () => this.deleteFn(line, index)
         }] : [];
       },
+      /**
+       * 删除详细计划
+       */
       deleteFn(line, index) {
-        this.delete({
-          id: line.Id,
-          index: index
+        var self = this;
+        api.get({
+          key: 'deletePlan',
+          data: {
+            id: line.Id
+          },
+          success: data => {
+            self.planList.splice(index, 1);
+            tools.success(data);
+          }
         });
       },
       open(picker) {
@@ -237,20 +247,6 @@
             self.planList = KND.Util.toArray(data.SiebelMessage['KL Installation Task Detail Plan']);
           }
         });
-        /* api.get({ // 提交数据
-          key: 'getPlan',
-          method: 'GET',
-          data: {
-            id: id
-          },
-          success: function(data) {
-            if (data.items) {
-              self.planList = data.items;
-            } else {
-              self.planList = KND.Util.toArray(data);
-            }
-          }
-        });*/
       },
       getBatch(id) {
         var self = this;

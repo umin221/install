@@ -233,6 +233,15 @@ let apiList = {
     };
   },
   /*
+  * 打开记录
+  * */
+  getClock: option => {
+    return {
+      url: 'data/KL Order Employee Clock/KL Order Employee Clock/?searchspec=[Parent Row Id] = \'1-2BSBJVLW\''
+      // url: 'data/KL Order Employee Clock/KL Order Employee Clock/?searchspec=[Parent Row Id] = ' + "'" + option.data.id + "'"
+    };
+  },
+  /*
   * 审批列表数据
   * */
   getApproval: option => {
