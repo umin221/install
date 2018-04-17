@@ -7,12 +7,14 @@
 
       <!--detail-->
       <div class="mint-content line" :data-date="date" :class="{disable: !editable}">
-        <cus-field label="产品型号" tag="产品型号" class="disable"
-                   @click.native="showLovFn('agreementItem')"
-                   :value="productName || line['KL Product Model No']"
+        <cus-field label="产品型号" tag="产品型号"
+                   :class="{disable: !isAdd}"
+                   @click.native="showLovFn('KL Product Model No')"
+                   v-model="line['KL Product Model No']"
                    v-valid.require
                    is-link></cus-field>
         <cus-field label="产品描述" tag="产品描述" class="disable"
+                   v-show="!isAdd"
                    :value="line['KL Product Description']"
                    is-link></cus-field>
         <cus-field label="开向" tag="开向"
@@ -71,9 +73,9 @@
 
       <!--popup-->
       <mt-popup v-model="showBox" position="bottom">
-        <menu-box @my-enter="enter"
+        <menu-box vk="Value"
+                  @my-enter="enter"
                   @my-cancel="showBox=false"
-                  :vk="vk"
                   :type="lovType"
                   :slots="slots"></menu-box>
       </mt-popup>
@@ -82,7 +84,7 @@
 </template>
 
 <script type="es6">
-  import {mapState, mapActions} from 'vuex';
+  import {mapActions} from 'vuex';
   import Vue from 'vue';
   import vp from 'public/plugin/validator';
   import menuBox from 'public/components/cus-menu.vue';
@@ -99,46 +101,35 @@
     components: {menuBox, cusField},
     created() {
       let me = this;
-      // 获取参数
+      // 页面参数
       let param = me.$route.query;
       let line = KND.Util.parse(param.line);
 
-      // 行默认参数
+      // 当前订单行类型 Panel、Lock Body、False Lock、Other、VP003
+      me.type = param.type;
+      // 当前页面是否可编辑
+      me.editable = param.editable;
+      // 标记状态是否为添加订单行
+      me.isAdd = !line.Id;
+
+      // 不可编辑状态下不需要后续操作
+      if (!me.editable) return;
+      // 订单行默认参数
       if (line) {
         me.line = line;
         me.line.Id = me.line.Id || KND.Util.now();
       };
-      // 是否面板
-      // me.isPanel = param.type === 'Panel';
-      me.type = param.type;
-      me.editable = param.editable;
-      if (!me.editable) return;
-
-      // 合同行
-      let agreementItems = me.form['MACD FS Agreement Item'];
-      // 合同下所有 海贝思 的行项目，作为产品选择
-      if (agreementItems) {
-        let items = {};
-        // 1. 去重 2. 过滤类型
-        mapp.option['agreementItem'] = agreementItems.filter(i => {
-          if (items[i['KL Product Model No']]) return false;
-          items[i['KL Product Model No']] = true;
-          return i['KL Product Type LIC'] === (me.isPanel ? 'Panel' : 'Lock Body');
+      // 仅标记为新增时可选择产品型号
+      if (me.isAdd) {
+        // 取 lov 产品型号
+        me.getLov({
+          type: 'KL_PRODUCT_MODEL',
+          success: data => {
+            mapp.option['KL Product Model No'] = data.items;
+            // 填充产品名称
+            me.line['KL Product Model No'] = data.items[0].Value;
+          }
         });
-      } else {
-        MessageBox({
-          closeOnClickModal: false,
-          title: '错误',
-          message: '没有找到合同行，无法创建订单'
-        }).then(action => {
-          this.$router.back();
-        });
-        return;
-      };
-
-      // 填充产品名称
-      if (!line['KL Product Model No']) {
-        this.agreementItem = mapp.option['agreementItem'][0] || {};
       };
 
       // 取 lov 开向
@@ -165,8 +156,7 @@
     data() {
       return {
         startDate: today,
-        agreementItem: {},
-        vk: 'Value',
+        isAdd: '', // 标记状态是否为添加订单行
         slots: [
           {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
         ],
@@ -184,7 +174,6 @@
       };
     },
     computed: {
-      ...mapState('detail', ['form']),
       // 日期
       date: {
         get() {
@@ -195,11 +184,6 @@
         set(val) {
           console.log(val);
         }
-      },
-      // 产品名称 menu box
-      productName() {
-        if (this.agreementItem['Id']) this.line['KL Agreement Item Id'] = this.agreementItem['Id']; // this.agreementItem['Id']; // 面板：1-DGFJM0  锁体：1-2BS58K4I
-        return this.agreementItem['KL Product Model No'];
       },
       // 是否带天地 switch
       flag: {
@@ -239,7 +223,6 @@
         this.lovType = type;
         this.showBox = true;
         // 选择产品的 value-key 为 KL Product Model No ， 其他为 Value
-        this.vk = type === 'agreementItem' ? 'KL Product Model No' : 'Value';
         this.slots[0].values = mapp.option[type];
       },
       // 选择日期
@@ -248,13 +231,10 @@
       },
       // 选择确认
       enter(values, type) {
-        console.log(values, type);
-        let me = this;
-        me.showBox = false;
+        this.showBox = false;
         // 选择填充
         this.line[type] = values[0]['Value'];
-        console.log(this[type]);
-        this[type] = values[0];
+        // this[type] = values[0];
       }
     }
   };
