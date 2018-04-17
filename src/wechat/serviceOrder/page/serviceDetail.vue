@@ -195,10 +195,10 @@
 
       <!--工单操作-->
       <mt-popup v-model="popupVisible1" position="bottom" popup-transition="popup-fade" class="mint-popup-2">
-        <mt-cell class="setOut xs-icon icon-setout" title="出发" :value="Action['KL Departure Location']" >
-          <mt-button v-if="Action['Status INT']==='Appointed'" @click="clickPosition('setOut')">签到</mt-button>
+        <mt-cell class="setOut xs-icon icon-setout addralgin" title="出发" :value="Action['KL Departure Location']" >
+          <mt-button v-if="Action['Status INT']==='Appointed'" @click.native="clickPosition('setOut')">签到</mt-button>
         </mt-cell>
-        <mt-cell class="xs-icon icon-reach" title="到达" :value="Action['MeetingLocation']">
+        <mt-cell class="xs-icon icon-reach addralgin" title="到达" :value="Action['MeetingLocation']">
           <mt-button v-if="Action['Status INT']==='Departed'" @click="clickPosition('reach')">签到</mt-button>
           <mt-button v-else-if="Action['Status INT']==='Appointed'" style="background: gainsboro">签到</mt-button>
         </mt-cell>
@@ -240,9 +240,16 @@
 
         <!--工单操作 结束-->
         <mt-cell class="completeEnd xs-icon icon-ending" title="结束">
-          <mt-button v-if="childService['KL Status LIC'] === 'Completed'"
-                     @click.native="clickPosition('end')">确认</mt-button>
-          <mt-button v-else style="background: gainsboro">确认</mt-button>
+          <div v-if="!ServiceRequest['KL Child Service Request']">
+            <mt-button v-if="ServiceRequest['KL Parent SR Complete Flag']"
+                       @click.native="clickPosition('end')">确认</mt-button>
+            <mt-button v-else style="background: gainsboro">确认</mt-button>
+          </div>
+          <div v-else>
+            <mt-button v-if="childService['KL Status LIC'] === 'Completed'"
+                       @click.native="clickPosition('end')">确认</mt-button>
+            <mt-button v-else style="background: gainsboro">确认</mt-button>
+          </div>
         </mt-cell>
         <div class="cancelHandle"
              style="color: red;"
@@ -258,12 +265,35 @@
   import cusCall from 'public/components/cus-call';
   import toggle from '../components/detail-toggle';
   import dateControl from '../components/dateControl';
-  //
+  // name
   const NameSpace = 'detail';
+  //
+  let geocoder = null;
+  // 经纬度转换地址
+  const getAaaress = (function() {
+    return function(callback) {
+      KND.Native.getLocation({
+        success(data) {
+          let newLatitude = data.latitude;
+          let newLongitude = data.longitude;
+          geocoder = new qq.maps.Geocoder({
+            complete: function(result) {
+              console.log(result);
+              let addtess = result.detail.address;
+              callback(addtess);
+            }
+          });
+          let latLng = new qq.maps.LatLng(newLatitude, newLongitude);
+          geocoder.getAddress(latLng);
+        }
+      });
+    };
+  })();
   //
   export default {
     name: NameSpace,
     created() {
+      // 调用获取位置方法
       let me = this;
       me.srNumber = me.$route.query.type;
       me.getDetail(me.srNumber);
@@ -324,7 +354,7 @@
           edit: false,
           title: '附件：维修单据存档'
         },
-        attach2: { // 故障记录 附件
+        attach2: { // 完工确认 附件
           list: [],
           edit: false,
           title: '附件：维修单据存档'
@@ -333,7 +363,7 @@
     },
     computed: {
       ...mapState('index', ['loginMeg', 'role']),
-      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'ProblemRecord', 'JobSheet', 'tabList', 'starAddress', 'visitAddress', 'endAddress', 'orderEntry', 'childService', 'allChildService'])
+      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'ProblemRecord', 'JobSheet', 'tabList', 'orderEntry', 'childService', 'allChildService'])
     },
     methods: {
       ...mapActions('app', ['upload', 'queryMedias']),
@@ -375,6 +405,7 @@
             'inStatus': me.Statu['接单'],
             'key': 'getAccept'
           };
+          console.log(parms);
           me.setStatus({parms: parms, srNum: me.srNumber});
         }
       },
@@ -405,6 +436,7 @@
               'endTime': me.endTime,
               'key': 'getAppoint'
             };
+            console.log(parms);
             me.setStatus({parms: parms, srNum: me.srNumber});
           }
           me.showBox2 = false;
@@ -431,60 +463,41 @@
       clickPosition(value1) {
         let me = this;
         let parms = {};
-        let statu = me.Action['Status INT'];
         if (value1 === 'setOut') {
-          KND.Native.getLocation({
-            success(data) {
-              me.getMapAddress({
-                LngLat: data,
-                type: 'starAddress'
-              });
-            }
+          getAaaress(function(data) {
+            parms = {
+              'Object Id': me.ServiceRequest.Id,
+              'ActivityId': me.Action.Id,
+              'key': 'getDepart',
+              'type': 'setOut',
+              'KL Departure Location': data || '出发地址'
+            };
+            me.setStatus({parms: parms, srNum: me.srNumber});
           });
-          parms = {
-            'Object Id': me.ServiceRequest.Id,
-            'ActivityId': me.Action.Id,
-            'key': 'getDepart',
-            'KL Departure Location': me.starAddress ? me.starAddress : '出发地址',
-            'type': 'setOut'
-          };
         } else if (value1 === 'reach') {
-          KND.Native.getLocation({
-            success(data) {
-              console.log(data);
-              me.getMapAddress({
-                LngLat: data,
-                type: 'visitAddress'
-              });
-            }
+          getAaaress(function(data) {
+            console.log(data);
+            parms = {
+              'Object Id': me.ServiceRequest.Id,
+              'ActivityId': me.Action.Id,
+              'key': 'getDepart',
+              'type': 'reach',
+              'MeetingLocation': data || '上门地址'
+            };
+            me.setStatus({parms: parms, srNum: me.srNumber});
           });
-          parms = {
-            'Object Id': me.ServiceRequest.Id,
-            'ActivityId': me.Action.Id,
-            'key': 'getDepart',
-            'MeetingLocation': me.visitAddress ? me.visitAddress : '上门地址',
-            'type': 'reach'
-          };
         } else if (value1 === 'end') {
-          KND.Native.getLocation({
-            success(data) {
-              console.log(data);
-              me.getMapAddress({
-                LngLat: data,
-                type: 'endAddress'
-              });
-            }
+          getAaaress(function(data) {
+            console.log(data);
+            parms = {
+              'Object Id': me.ServiceRequest.Id,
+              'ActivityId': me.Action.Id,
+              'key': 'getDone',
+              'DoneLoc': data || '完成地址'
+            };
+            me.setStatus({parms: parms, srNum: me.srNumber});
+            me.popupVisible1 = !me.popupVisible1;
           });
-          parms = {
-            'Object Id': me.ServiceRequest.Id,
-            'ActivityId': me.Action.Id,
-            'key': 'getDone',
-            'DoneLoc': me.endAddress ? me.endAddress : '完成地址'
-          };
-        }
-        if ((value1 === 'setOut' && statu === 'Appointed') || (value1 === 'reach' && statu === 'Departed') || (value1 === 'end' && statu === 'Arrived')) {
-          me.setStatus({parms: parms, srNum: me.srNumber});
-          me.popupVisible1 = !me.popupVisible1;
         }
         if (value1 === 'failureRecord') {
           this.$router.push({
@@ -546,19 +559,19 @@
           }
         });
       },
-      changeMy() {              // 主管接单
-        let me = this;
-        MessageBox.confirm('确认维修责任人更新为你吗？', '提示').then(action => {
-          let params = {
-            id: me.ServiceRequest['Id'],
-            empId: me.loginMeg['Id'],
-            empFullName: me.loginMeg['KL Employee Full Name'],
-            type: 'Dispatch',
-            srNum: me.ServiceRequest['SR Number']
-          };
-          me.setContact(params);
-        });
-      },
+//      changeMy() {              // 主管接单
+//        let me = this;
+//        MessageBox.confirm('确认维修责任人更新为你吗？', '提示').then(action => {
+//          let params = {
+//            id: me.ServiceRequest['Id'],
+//            empId: me.loginMeg['Id'],
+//            empFullName: me.loginMeg['KL Employee Full Name'],
+//            type: 'Dispatch',
+//            srNum: me.ServiceRequest['SR Number']
+//          };
+//          me.setContact(params);
+//        });
+//      },
       completeEnd() {
         MessageBox({
           title: '提示',
@@ -592,7 +605,6 @@
             }
           });
         }
-
       }
     },
     components: {close, dateControl, toggle, cusCall}
@@ -797,5 +809,12 @@
     margin-right: 11px;
     color: $theme-color;
     font-size: 24px;
+  }
+  .addralgin>.mint-cell-wrapper>.mint-cell-title>span{
+    display: block;
+    width: 60px;
+  }
+  .addralgin>.mint-cell-wrapper>.mint-cell-value>span{
+    line-height: 17px;
   }
 </style>

@@ -182,8 +182,8 @@ let ApiList = {
       url: 'service/Workflow Process Manager/RunProcess',
       data: {
         'body': {
-          'Object Id': option.data.obj['Object Id'],
-          'ActivityId': option.data.obj.ActivityId,
+          'Object Id': option.data.parms['Object Id'],
+          'ActivityId': option.data.parms.ActivityId,
           'inStatus': 'Accept',
           'ProcessName': 'KL SR Action Status Change Process'
         }
@@ -197,8 +197,8 @@ let ApiList = {
       url: 'service/Workflow Process Manager/RunProcess',
       data: {
         'body': {
-          'Object Id': option.data.obj['Object Id'],
-          'ActivityId': option.data.obj.ActivityId,
+          'Object Id': option.data.parms['Object Id'],
+          'ActivityId': option.data.parms.ActivityId,
           'inStatus': 'Accept',
           'ProcessName': 'KL SR Action Status Change Process'
         }
@@ -212,10 +212,10 @@ let ApiList = {
       url: 'service/Workflow Process Manager/RunProcess',
       data: {
         'body': {
-          'Object Id': option.data.obj['Object Id'],
-          'ActivityId': option.data.obj.ActivityId,
-          'ActionPlanned': option.data.obj.starTime,  // 计划开始时间
-          'ActionPlanEnd': option.data.obj.endTime,   // 计划完成时间
+          'Object Id': option.data.parms['Object Id'],
+          'ActivityId': option.data.parms.ActivityId,
+          'ActionPlanned': option.data.parms.starTime,  // 计划开始时间
+          'ActionPlanEnd': option.data.parms.endTime,   // 计划完成时间
           'inStatus': 'Appoint',
           'ProcessName': 'KL SR Action Status Change Process'
         }
@@ -225,15 +225,16 @@ let ApiList = {
   },
   getDepart: option => {
     let data = {};
-    if (option.data.obj.type === 'setOut') {
-      data['KL Departure Location'] = option.data.obj['KL Departure Location'];
+    if (option.data.parms.type === 'setOut') {
+      data['KL Departure Location'] = option.data.parms['KL Departure Location'];
     } else {
-      data['MeetingLocation'] = option.data.obj['MeetingLocation'];
+      data['MeetingLocation'] = option.data.parms['MeetingLocation'];
     }
-    data.Id = option.data.obj['ActivityId'];
+    data.Id = option.data.parms['ActivityId'];
+    console.log(data);
     return {
       method: 'put',
-      url: 'data/KL Service Request Interface BO/Service Request/' + option.data.obj['Object Id'] + '/Action',
+      url: 'data/KL Service Request Interface BO/Service Request/' + option.data.parms['Object Id'] + '/Action',
       data: data
     };
     // 出发 、 上门
@@ -244,10 +245,10 @@ let ApiList = {
       url: 'service/Workflow Process Manager/RunProcess',
       data: {
         'body': {
-          'Object Id': option.data.obj['Object Id'],
-          'ActivityId': option.data.obj.ActivityId,
+          'Object Id': option.data.parms['Object Id'],
+          'ActivityId': option.data.parms.ActivityId,
           'inStatus': 'Done',
-          'DoneLoc': option.data.obj.DoneLoc,
+          'DoneLoc': option.data.parms.DoneLoc,
           'ProcessName': 'KL SR Action Status Change Process'
         }
       }
@@ -459,6 +460,7 @@ let ApiList = {
     };
   },
   upDateOrderStatu: option => {
+
     return {
       method: 'PUT',
       url: 'data/KL Service Request Interface BO/Service Request',
@@ -492,32 +494,6 @@ let ApiList = {
       }
     };
     //  服务请求完成状态
-  },
-  // getMoreOrder: option => {
-  //   return {
-  //     method: 'put',
-  //     url: 'data/KL Service Request Interface BO/Service Request',
-  //     data: {
-  //       'Id': '1',
-  //       'Contact Id': option.data.ContactId,
-  //       'Contact Last Name': option.data.ContactName,
-  //       'Personal Location Id': option.data.LocationId
-  //     }
-  //   };
-  //   //  经纬度逆地理转换
-  // },
-  getMapAddress: option => {
-    console.log(option);
-    // let lat = option.data.LngLat.latitude;
-    // let lng = option.data.LngLat.longitude;
-    let lat = 22.777621;
-    let lng = 114.034378;
-    let showLocation = option.data.showLocation;
-    return {
-      method: 'GET',
-      url: 'http://api.map.baidu.com/geocoder/v2/?callback=' + showLocation + '&location=' + lat + ',' + lng + '&output=json&ak=ggrtlGUIUfci06YK9TNZfxLAOQblo3du'
-    };
-    //  经纬度逆地理转换
   }
 };
 // 16113009 袁静

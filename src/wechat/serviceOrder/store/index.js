@@ -463,19 +463,19 @@ export default new Vuex.Store({
             }
           });
         },
-        setStatus({commit}, obj) {          // 工单状态
+        setStatus({commit}, {parms, srNum}) {          // 工单状态
           // let key = obj.type ? obj.key : 'setStatus';
           api.get({
-            key: obj.parms.key,
+            key: parms.key,
             data: {
-              obj: obj.parms
+              parms
             },
             success: function(data) {
               if (data) {
                 api.get({
                   key: 'getDetail',
                   data: {
-                    srNumber: obj.srNum
+                    srNumber: srNum
                   },
                   success: function(data) {
                     commit('setPartner', data.SiebelMessage['Service Request']);
