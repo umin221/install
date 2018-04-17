@@ -43,13 +43,9 @@
 
 <script type="es6">
   import {mapActions} from 'vuex';
-  import Vue from 'vue';
-  import vp from 'public/plugin/validator';
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
   import menuBox from 'public/components/cus-menu.vue';
-  // use plugin
-  Vue.use(vp);
 
   const NAMESPACE = 'detail';
   export default {

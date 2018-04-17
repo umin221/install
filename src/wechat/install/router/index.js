@@ -16,7 +16,7 @@ export default new Router({
     component(resolve) {
       require(['../page/login'], resolve);
     }
-  }, { // 首页
+  }, { // 批次列表
     path: '/index',
     name: 'index',
     component(resolve) {

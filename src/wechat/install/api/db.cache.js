@@ -65,8 +65,8 @@ class Helper {
   delete(table, condition, callback) {
     let conditionArr = ['1=1'];
     for (let i in condition) conditionArr.push(`${i}=${condition[i]}`);
-    db.query((`delete * from ${table} where ${conditionArr.join(' and ')}}`), data => {
-      console.log(data);
+    db.query((`delete from ${table} where ${conditionArr.join(' and ')}`), data => {
+      callback(data);
     });
   };
 
@@ -129,6 +129,9 @@ class Helper {
         text: '正在初始化数据...'
       });
       let tasks = [
+        me.invokeSQL('ct', 'user', buildCreateField({user_id: null, data: null, state: null, create_date: null})).then(result => {
+          console.log('创建数据库表 user...');
+        }),
         me.invokeSQL('ct', 'batch', buildCreateField({data: 'VARCHAR(20000)', state: null, create_date: null})).then(result => {
           console.log('创建数据库表 batch...');
         }),
@@ -543,7 +546,40 @@ class Cache {
    */
   checkAndSubmit() {
     handle.checkNetwork();
-  }
+  };
+
+  /**
+   * 缓存用户信息
+   */
+  cacheUser(setting) {
+    let user = setting.data;
+    helper.upsert('user', {
+      user_id: user.Id,
+      data: JSON.stringify(user),
+      create_date: now()
+    }, {rowid: 1}, result => {
+      console.log(`缓存用户信息成功 ${user['Last Name']}`);
+    });
+  };
+
+  /**
+   * 获取最后登录用户的信息
+   */
+  getCacheUser(setting) {
+    helper.query('user', {rowid: 1}, result => {
+      setting.success(result);
+    });
+  };
+
+  /**
+   * 注销用户登录
+   * 清除本地用户信息
+   */
+  logout(setting) {
+    helper.delete('user', {rowid: 1}, result => {
+      setting.success(result);
+    });
+  };
 
 };
 

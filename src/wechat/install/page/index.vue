@@ -2,7 +2,8 @@
 <template>
   <div>
     <mt-header fixed title="安装批次列表">
-      <fallback slot="left"></fallback>
+      <mt-button class="logout" slot="left"
+        @click.native="logoutFn">注销</mt-button>
       <mt-button @click.native="toSearchFn" slot="right">
         <i class="xs-icon icon-search"></i>
       </mt-button>
@@ -64,7 +65,7 @@
 </template>
 
 <script type="es6">
-  import {mapState, mapActions, mapMutations} from 'vuex';
+  import {mapState, mapActions} from 'vuex';
   import cusLoadmore from 'public/components/cus-loadmore';
   import cusCell from 'public/components/cus-cell';
 
@@ -88,13 +89,10 @@
     name: NAMESPACE,
     // 数据初始化
     created() {
-      let me = this;
-      KND.Native.getUserInfo((info) => {
-        // 获取数据
-        me.loadBottomFn({
-          status: '待处理',
-          list: 'pending'
-        });
+      // 获取数据
+      this.loadBottomFn({
+        status: '待处理',
+        list: 'pending'
       });
     },
     data: () => {
@@ -109,8 +107,7 @@
       ...mapState(NAMESPACE, ['pending', 'completed', 'isManager'])
     },
     methods: {
-      ...mapActions(NAMESPACE, ['queryInstallTask']),
-      ...mapMutations(NAMESPACE, ['setManager']),
+      ...mapActions(NAMESPACE, ['queryInstallTask', 'logout']),
       // 已失效顶部加载
       loadTopFn(param) {
         loader.call(this, {
@@ -125,6 +122,23 @@
           },
           more: true
         }, param.list, 'onBottomLoaded');
+      },
+      // 注销登录
+      logoutFn() {
+        let me = this;
+        tools.cordova.confirm('注销将清除本地缓存数据，确定要注销登录吗？', mode => {
+          if (mode === 1) return;
+          // 注销用户登录
+          me.logout({
+            success: result => {
+              console.log(result);
+              me.$router.replace({
+                name: 'login',
+                query: {login: true} // 重定向登陆页必须携带此参数
+              });
+            }
+          });
+        });
       },
       // 跳转搜索
       toSearchFn() {
@@ -147,6 +161,10 @@
 </script>
 
 <style lang="scss">
+  .logout {
+    text-indent: 10px;
+  }
+
   .tips {
     position: fixed;
     top: 2.4rem;

@@ -1,9 +1,7 @@
 let apiList = {
   /**
    * 获取安装批次列表
-   * @param {String} option.data['Name'] 选填 厂商名称
-   * @param {Object} option.data 选填 查询条件
-   * @param {Object} option.paging 必填 翻页参数
+   * @param {String} option.data.body['PrimaryRowId'] 必填 当前委外人员id
    * @returns {{method: string, url: string}}
    */
   queryInstallTask: option => {
@@ -12,9 +10,9 @@ let apiList = {
       url: 'service/EAI Siebel Adapter/Query',
       data: {
         'body': {
-          'OutputIntObjectName': 'Base KL Contact - Installation Task',
+          'OutputIntObjectName': 'Base KL Contact - Installation Task', // 固定 io 名
           'PrimaryRowId': '1-2BSH6IWP',
-          'ViewMode': 'All',
+          'ViewMode': 'All', // 选填 固定 All
           'StartRowNum': '0',
           'PageSize': '50'
         }
@@ -223,6 +221,19 @@ let apiList = {
       //  'KL Product Model No Lock Body': '',
       //  'KL Product Model No Panel': ''
       // }
+    };
+  },
+
+  /**
+   * 获取账号密码匹配的委外联系人信息
+   * @param {String} option.data['LoginName'] 必填 登陆名
+   * @param {String} option.data['Password'] 必填 密码
+   * @returns {{method: string, url: string}}
+   */
+  queryUserInfo: option => {
+    return {
+      method: 'get',
+      url: `data/KL User/User/?searchspec=${KND.Util.condition(option.data)}&PageSize=2&StartRowNum=0`
     };
   }
 

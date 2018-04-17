@@ -12,7 +12,25 @@ export default {
       namespaced: true,
       state: {},
       mutations: {},
-      actions: {}
+      actions: {
+        // 查询用户信息，用户登陆使用
+        queryUserInfo({state}, setting) {
+          setting.key = 'queryUserInfo';
+          api.get(setting);
+        },
+        // 缓存用户信息
+        cacheUser({state}, user) {
+          cache.invoke({
+            key: 'cacheUser',
+            data: user
+          });
+        },
+        // 获取最后登录用户的信息
+        getCacheUser({state}, setting) {
+          setting.key = 'getCacheUser';
+          cache.invoke(setting);
+        }
+      }
     },
     /**
      * 安装批次列表
@@ -53,6 +71,13 @@ export default {
               if (callback) callback(installTask);
             }
           });
+        },
+        /**
+         * 注销登录
+         */
+        logout({state}, setting) {
+          setting.key = 'logout';
+          cache.invoke(setting);
         }
       }
     },

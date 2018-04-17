@@ -12,10 +12,10 @@
                  v-model="password"
                  v-valid.require></cus-field>
 
-      <mt-checklist
-        v-model="remember"
-        :options="['记住密码']">
-      </mt-checklist>
+      <!--<mt-checklist-->
+        <!--v-model="remember"-->
+        <!--:options="['记住密码']">-->
+      <!--</mt-checklist>-->
 
       <mt-button class="single"
                  @click.native="loginFn">登陆</mt-button>
@@ -26,28 +26,53 @@
 </template>
 
 <script type="es6">
+  import {mapActions} from 'vuex';
   import cusField from 'public/components/cus-field';
   import buttonGroup from 'public/components/cus-button-group';
-  import Vue from 'vue';
-  import vp from 'public/plugin/validator';
-  // use plugin
-  Vue.use(vp);
 
   let NAMESPACE = 'login';
   export default {
     name: NAMESPACE,
+    created() {
+      let me = this;
+      me.getCacheUser({
+        success: result => {
+          if (result.length) me.$router.push('index');
+        }
+      });
+    },
     data() {
       return {
         remember: [],
-        username: '',
-        password: ''
+        username: '13048225658',
+        password: '123'
       };
     },
     methods: {
+      ...mapActions(NAMESPACE, ['queryUserInfo', 'cacheUser', 'getCacheUser']),
       loginFn() {
         let me = this;
-        console.log(`username=${this.username},password${this.password}`);
-        me.$router.push('index');
+        tools.valid.call(me, () => {
+          me.queryUserInfo({
+            data: {
+              'Login Name': this.username,
+              'KL Outsource Password': this.password
+            },
+            success: result => {
+              // 缓存用户信息
+              me.cacheUser(result.items);
+              // 跳转首页
+              me.$router.push('index');
+            },
+            error: err => {
+              console.log(err);
+              Toast({
+                message: '用户名或密码错误',
+                position: 'bottom'
+              });
+            }
+          });
+        });
       }
     },
     components: {cusField, buttonGroup}
@@ -98,6 +123,7 @@
 
       .mint-field .mint-cell-title {
         padding-left: 10px;
+        min-width: 50px;
         width: 50px;
 
         &:before {
@@ -143,6 +169,16 @@
               font-size: $font-size-small;
             }
           }
+        }
+      }
+
+      .mint-button {
+        margin: 30px 0;
+
+        label {
+          display: inline-block;
+          letter-spacing: 20px;
+          text-indent: 20px;
         }
       }
     }

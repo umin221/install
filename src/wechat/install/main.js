@@ -9,15 +9,18 @@ import Vuex from 'vuex';
 import router from './router';
 import 'public/js/base/main';
 import 'public/js/base/mint';
-import './mapp'; // Status Mapp
 import fallback from 'public/components/cus-fallback';
 import attach from 'public/components/cus-attach';
 import empty from 'public/components/cus-empty';
 import indicator from './components/indicator';
 import App from '../../App';
 import sto from './store';
+import './mapp'; // Status Mapp
 import './js/tools.cordova'; // cordova tools
+import vp from 'public/plugin/validator';
 
+// use plugin
+Vue.use(vp);
 // For back
 Vue.component('fallback', fallback);
 // Attach
@@ -42,7 +45,15 @@ config.offline = true;
  * 如果匹配到正确跳转
  */
 router.beforeEach((to, from, next) => {
-  to.matched.length === 0 ? from.name ? next({ name: from.name }) : next('/index') : next();
+  // 物理返回直接返回系统桌面
+  if (from.name === 'index' && to.name === 'login') {
+    if (to.query.login !== true) {
+      next(false);
+      tools.cordova.goHome();
+      return;
+    }
+  };
+  to.matched.length === 0 ? from.name ? next({ name: from.name }) : next('/') : next();
 });
 
 /* eslint-disable no-new */
