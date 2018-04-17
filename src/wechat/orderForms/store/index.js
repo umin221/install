@@ -104,7 +104,6 @@ export default new Vuex.Store({
       },
       actions: {
         getSearchList({state, commit}, {orNumber, more, callback, error}) {
-          console.log(orNumber);
           api.get({
             key: 'getSearchList',
             data: {
@@ -115,7 +114,7 @@ export default new Vuex.Store({
               PageSize: PAGESIZE
             },
             success: function(data) {
-              let orderEntry = data.SiebelMessage['Order Entry - Orders'];
+              let orderEntry = KND.Util.toArray(data.SiebelMessage['Order Entry - Orders']);
               if (orderEntry) {
                 commit(more ? 'addSearchList' : 'setSearchList', orderEntry);
                 if (callback) {
