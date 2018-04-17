@@ -94,6 +94,15 @@
     };
 
     /**
+     * 是否无效值
+     * @param o
+     * @returns {*|boolean}
+     */
+    isInvalidValue(o) {
+      return this.isNull(o) || this.isUndefined(o);
+    };
+
+    /**
      * 判断是否方法
      * @param o
      * @returns {*|boolean}
@@ -183,8 +192,10 @@
       entity = entity ? entity + '.' : '';
       for (let i in obj) {
         let val = obj[i];
-        val && val.indexOf('LookupValue') === -1 ? arr.push('[' + entity + i + ']' + operator + '"' + obj[i] + '"')
-          : arr.push('[' + entity + i + ']' + operator + obj[i]);
+        if (!this.isInvalidValue(val)) {
+          val.indexOf('LookupValue') === -1 ? arr.push('[' + entity + i + ']' + operator + '"' + obj[i] + '"')
+            : arr.push('[' + entity + i + ']' + operator + obj[i]);
+        }
       }
       return arr.join(join);
     };
