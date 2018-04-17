@@ -24,34 +24,34 @@
     background-color: white!important;
 
     .kl-logo{
-      width: 110px;
-      height: 110px;
+      width: 100px;
+      height: 100px;
       border: 1px solid #00599f;
-      margin: 4rem auto;
+      margin: 3rem auto;
       border-radius: 10px;
       background-color: #00599f;
       box-sizing: border-box;
       padding-top: 20px;
 
       h3{
-        font-size: 20px;
+        font-size: 18px;
         text-align: center;
         color: #ffffff;
         line-height: 0;
       }
       .logoC{
-        font-size: 25px;
+        font-size: 24px;
       }
     }
     .center-text{
       text-align: center;
-      margin-top: -75px;
+      margin-top: -2.5rem;
     }
     .explain{
       font-size: 16px;
-      width: 64%;
+      width: 70%;
       color: grey;
-      margin: 2.5rem auto;
+      margin: 3.5rem auto;
     }
     .down-APP{
       position: absolute;

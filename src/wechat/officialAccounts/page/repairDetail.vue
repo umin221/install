@@ -58,10 +58,10 @@
     <button-group v-if="serviceDetail.Action">
       <mt-button class="single"
                  @click.native="toComment(false)"
-                  v-if="action['Status'] === '完成' && survey">点评</mt-button>
+                  v-if="action['Status INT'] === 'Done' && survey">点评</mt-button>
       <mt-button class="single"
                  @click.native="toComment(true)"
-                 v-if="action['Status'] === '完成' && !survey">已点评</mt-button>
+                 v-if="action['Status INT'] === 'Done' && !survey">已点评</mt-button>
     </button-group>
   </div>
 </template>

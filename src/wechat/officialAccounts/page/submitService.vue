@@ -7,9 +7,10 @@
                  :value="brand"></mt-cell>
         <mt-field label="产品条形码"
                   v-model="KLSN"
-                  class="klsn xs-icon"
+                  class="marginL"
                   @change.native="serchSn"
                   placeholder="请扫码或输入条形码">
+          <router-link class="xs-icon klsn" to="scanSn"></router-link>
           <i class="xs-icon icon-scan" @click="toScan"></i></mt-field>
         <mt-field label="联系人" tag="联系人"
                   type="text"
@@ -170,6 +171,9 @@
       ...mapActions('app', ['upload']),
       ...mapActions(NameSpace, ['getLov', 'submitService', 'getContact', 'getAsset']),
       ...mapMutations(NameSpace, ['addressBack']),
+      dd() {
+        console.log(111);
+      },
       submit() {
         let me = this;
         let uploadAttach = id => {
@@ -299,13 +303,24 @@
       background-color: #ffffff;
       margin-bottom: 2rem;
 
-      .klsn>.mint-cell-wrapper>.mint-cell-value>input{
+      .marginL>.mint-cell-wrapper>.mint-cell-value>input{
         margin-right: 0.5rem;
       }
-      .klsn>.mint-cell-wrapper>.mint-cell-title:before{
+      .marginL>.mint-cell-wrapper>.mint-cell-title{
+        margin-left: 20px;
+      }
+      .marginL>.mint-cell-wrapper>.mint-cell-value>.mint-field-other{
+        position: inherit !important;
+      }
+      .klsn{
+        position: absolute;
+        left: 5px;
+        top: 15px;
+      }
+      .klsn:before{
         content: '\A133';
         color: #000000;
-        font-size: 18px;
+        font-size: 20px;
       }
     }
     .datetime>.picker>.picker-items>.picker-slot:nth-child(5){

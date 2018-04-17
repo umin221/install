@@ -91,9 +91,10 @@
           search: 'SR Number',
           value: parmer.srNum,
           callback: data => {
-            console.log(data);
             if (data) {
               me.comments = data.Comments;
+              me.changeStar(data['KL Knowledgable Stars'], 'technologyIs', data['Knowledgable']);
+              me.changeStar(data['KL Overall Stars'], 'attitudeIs', data['Overall']);
               setAttrButt('comments', 'textarea');
             }
           }

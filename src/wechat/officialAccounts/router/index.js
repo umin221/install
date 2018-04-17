@@ -94,5 +94,11 @@ export default new Router({
     component(resolve) {
       require(['../page/engineer'], resolve);
     }
+  }, {
+    path: '/scanSn', // 扫码指引
+    name: 'scanSn',
+    component(resolve) {
+      require(['../page/scanSn'], resolve);
+    }
   }]
 });
