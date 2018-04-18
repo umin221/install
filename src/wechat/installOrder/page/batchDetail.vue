@@ -17,7 +17,7 @@
         </mt-field>
         <mt-field label="计划开始日期"  :value="start_Date"></mt-field>
         <mt-field label="计划完成日期" :value="end_Date"></mt-field>
-        <mt-field label="计划数量" class="enable"
+        <mt-field label="计划数量" class="enable numCla"
                   :value="batchNum"
                   @click.native="editBuildingFn"
                   is-link></mt-field>
@@ -73,6 +73,12 @@
       width: 100%;
       text-align: center;
     }
+    .numCla input {
+      color: #0772c1!important;
+    }
+    .icon-add-circle:before {
+      content: ''!important;
+    }
     .mint-button--normal {
       display: inline-block;
       padding: 0 12px;
@@ -92,9 +98,6 @@
         line-height: 30px;
       }
     }
-  }
-  .disable .cus-lock.icon-add-circle:before {
-    color: white!important;
   }
 </style>
 <script type="application/javascript">

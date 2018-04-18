@@ -154,7 +154,7 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['pending', 'process', 'completed', 'isManager', 'isTeam']),
+      ...mapState(NAMESPACE, ['pending', 'process', 'completed', 'isManager', 'isTeam', 'taskIndex']),
       isDoorManager() {
         let code = this.userInfo['KL Primary Position Type LIC'];
         return code === 'Door Factory Manager'; // code === 'Door Factory Engineer' || code === 'Door Factory Manager';
@@ -162,7 +162,7 @@
     },
     methods: {
       ...mapActions(NAMESPACE, ['getList']),
-      ...mapMutations(NAMESPACE, ['setInfoUser', 'setManager', 'setTeam']),
+      ...mapMutations(NAMESPACE, ['setInfoUser', 'setManager', 'setTeam', 'setTaskIndex']),
       // 标题栏菜单选择回调方法
       // 标题栏菜单选择回调方法
       menuFn(item) {
@@ -196,6 +196,7 @@
       },
       // To detail or create
       toDetailFn(id) {
+        this.setTaskIndex(0);
         let query = typeof id === 'string' ? {
           // detail
           type: 'read',

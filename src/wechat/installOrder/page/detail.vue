@@ -117,9 +117,8 @@
                   taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
                   taskData['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
                   taskData['KL Detail Type LIC'] === 'Transfer Summary'" >
-                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="closeTask(taskData)" class="batchClose"></span>
+                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(taskData)" class="batchClose"></span>
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="addTask(taskData)" class="batchAdd"></span>
-                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(taskData)" class="batchClose"></span>
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="addTask(taskData)" class="batchAdd"></span>
                   <span style="width:60px;">{{taskData.Status}}</span>
               </div>
@@ -528,6 +527,7 @@
     },
     computed: {
       ...mapState(NameSpace, ['orderId', 'taskDataST']),
+      ...mapState('index', ['taskIndex']),
       isConfirming() {
         let status = this.detailData.Status;
         return !status || status === '门厂工程师确认中';
@@ -542,6 +542,7 @@
     },
     methods: {
       ...mapActions('app', ['getLov']),
+      ...mapMutations('index', ['setTaskIndex']),
       ...mapMutations('batch', ['clear']),
       ...mapMutations('engineer', ['delEngineer']),
       ...mapMutations(NameSpace, ['setOrderId', 'setTaskDataST']),
@@ -561,15 +562,16 @@
           },
           success: function(data) {
             console.dir(data.SiebelMessage);
+            console.dir('=========' + self.taskIndex);
             self.detailData = data.SiebelMessage['Order Entry - Orders'];
             var taskData = self.detailData['KL Installation Task'];
             if (taskData) {
-              self.selectName = taskData[0]['KL Detail Type'];
+              self.selectName = taskData[self.taskIndex]['KL Detail Type'];
               self.taskData = KND.Util.toArray(taskData);
               console.dir(self.taskData);
-              self.pStatus = self.taskData[0]['Calculated Activity Status'];
-              if (self.pStatus !== 'Not Started' || self.taskData[0]['KL Detail Type LIC'] === 'Substitution Lock Trans Return') { // 未开始时不获取子任务数据  替代锁状态不需要更改只是未开始
-                self.taskDataList = KND.Util.toArray(self.taskData[0]['KL Installation Task']);
+              self.pStatus = self.taskData[self.taskIndex]['Calculated Activity Status'];
+              if (self.pStatus !== 'Not Started' || self.taskData[self.taskIndex]['KL Detail Type LIC'] === 'Substitution Lock Trans Return') { // 未开始时不获取子任务数据  替代锁状态不需要更改只是未开始
+                self.taskDataList = KND.Util.toArray(self.taskData[self.taskIndex]['KL Installation Task']);
               }
             }
             self.setOrderId(self.id);
@@ -615,6 +617,7 @@
         let me = this;
         me.selectName = selName;
         me.taskDataList = [];
+        me.setTaskIndex(index);
         me.pStatus = me.taskData[index]['Calculated Activity Status'];
         if (me.pStatus !== 'Not Started' || me.taskData[index]['KL Detail Type LIC'] === 'Substitution Lock Trans Return') { // 未开始时不获取子任务数据
           me.taskDataList = KND.Util.toArray(me.taskData[index]['KL Installation Task']);
