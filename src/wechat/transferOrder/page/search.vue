@@ -33,11 +33,12 @@
   let loader = function(...args) {
     let me = this;
     let event = args.pop();
-    let name = me.value;
+    let exp = `*${me.value}*`;
     let param = {
       data: {
-        'Opportunity Name': '*' + name + '*',
-        'Setter': '*' + name + '*'
+        'Agree Number': exp, // 项目编号
+        'Opportunity Name': exp, // 项目名称
+        'Setter': exp
       },
       more: args.pop(),
       callback: (data) => {

@@ -9,15 +9,14 @@
                     :loadBottom="loadBottomFn"
                     :emptyTips="false"
                     :topStatus="topStatus">
-          <cus-cell class="multiple"
-                    :key="item.Id"
-                    :title="'订单编码:'+ item['Order Number']"
-                    @click.native="toDetailFn(item.Id)"
-                    v-for="item in result"
-                    is-link>
-            <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
-            <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
-          </cus-cell>
+        <cus-cell class="multiple"
+                  :key="item.Id"
+                  :title="'订单编码:'+ item['Order Number']"
+                  @click.native="toDetailFn(item.Id)"
+                  v-for="item in result"
+                  is-link>
+          <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
+          <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
         </cus-cell>
       </cus-loadmore>
 
@@ -33,13 +32,14 @@
   //
   let loader = function(...args) {
     let me = this;
-    let name = me.value;
     let event = args.pop();
+    let exp = `*${me.value}*`;
     let param = Object.extend({
       data: {
         search: {
-          'KL Agreement Opportunity Name': '*' + name + '*',
-          'KL Delivery Setter Full Name': '*' + name + '*'
+          'Order Number': exp, // 订单编号
+          'KL Agreement Opportunity Name': exp,
+          'KL Delivery Setter Full Name': exp
         }
       },
       callback: (data) => {
