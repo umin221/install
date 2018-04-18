@@ -23,7 +23,7 @@ export default new Router({
       require(['../page/index'], resolve);
     },
     meta: {
-      transition: 'scale'
+      transition: 'fade'
     }
   }, { // 创建/编辑/查看 委外团队详情
     path: '/detail',

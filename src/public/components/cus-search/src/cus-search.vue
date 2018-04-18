@@ -5,7 +5,6 @@
     <search :value="currentValue"
                :result.sync="result"
                :placeholder="placeholder"
-               :autofocus="true"
                :show="show"
                @keyup.enter.native="searchFn"
                @search="searchFn"

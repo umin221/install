@@ -167,6 +167,11 @@
         };
         // 清空全选操作
         this.selectAll = false;
+        // 房号排序
+        for (let i in layers) {
+          let floor = layers[i];
+          floor.sort((a, b) => a['KL Room Number'] > b['KL Room Number']);
+        };
         return layers;
       }
     },
@@ -384,11 +389,11 @@
     }
     .assets-div span{
       border: 1px solid #eaeaea;
-      border-radius: 10px;
+      border-radius: 6px;
       margin: 5px 0;
-      margin-left: 1%;
-      width: 23%;
-      line-height: 22px;
+      margin-left: 3.5%;
+      width: 20%;
+      line-height: 25px;
       text-align: center;
       color: #777;
       font-size: $font-size-default;
@@ -414,8 +419,9 @@
       line-height: 36px;
     }
 
-    .mint-cell-swipe-button {
-      line-height: 34px;
+    .mint-cell-swipe, .mint-cell-swipe-button {
+      line-height: 36px;
+      min-height: 36px;
     }
 
   }

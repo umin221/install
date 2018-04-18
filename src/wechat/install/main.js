@@ -36,6 +36,7 @@ Vue.use(Vuex);
 
 let store = new Vuex.Store(sto);
 
+// 楼栋编辑不支持离线操作
 config.offline = true;
 
 /**

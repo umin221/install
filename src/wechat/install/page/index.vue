@@ -25,6 +25,7 @@
           <cus-loadmore ref="pending"
                         @loadTop="loadTopFn"
                         @loadBottom="loadBottomFn"
+                        :loadmore="false"
                         :param="{status: '待处理', list: 'pending'}"
                         :topStatus="topStatus">
             <cus-cell class="multiple"
@@ -81,7 +82,7 @@
         me.$refs[list][event](data.length);
       }
     }, args.pop());
-    // 获取团队列表
+    // 获取批次列表
     me.queryInstallTask(param);
   };
 
@@ -126,18 +127,14 @@
       // 注销登录
       logoutFn() {
         let me = this;
-        tools.cordova.confirm('注销将清除本地缓存数据，确定要注销登录吗？', mode => {
-          if (mode === 1) return;
-          // 注销用户登录
-          me.logout({
-            success: result => {
-              console.log(result);
-              me.$router.replace({
-                name: 'login',
-                query: {login: true} // 重定向登陆页必须携带此参数
-              });
-            }
-          });
+        // 注销用户登录
+        me.logout({
+          success: result => {
+            me.$router.replace({
+              name: 'login',
+              query: {login: true} // 重定向登陆页必须携带此参数
+            });
+          }
         });
       },
       // 跳转搜索

@@ -49,6 +49,7 @@ export const app = {
         },
         success: data => {
           // data.debug = true;
+          if (!window.wx) return;
           wx.config(data);
           wx.ready(() => {
             console.log('WeChatAPI success');

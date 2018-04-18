@@ -32,6 +32,11 @@
 
   export default {
     name: 'cus-loadmore',
+    created() {
+      let me = this;
+      me.loadTop = me.refresh ? () => this.$emit('loadTop', this.param) : undefined;
+      me.loadBottom = me.loadmore ? () => this.$emit('loadBottom', this.param) : undefined;
+    },
     data() {
       return {
         topStatus: '',
@@ -48,15 +53,13 @@
       refresh: {
         type: Boolean,
         default: true
+      },
+      loadmore: {
+        type: Boolean,
+        default: true
       }
     }, // ['loadTop', 'loadBottom'],
     methods: {
-      loadTop() {
-        this.$emit('loadTop', this.param);
-      },
-      loadBottom() {
-        this.$emit('loadBottom', this.param);
-      },
       handleTopChange(status) {
         this.topStatus = status;
       },

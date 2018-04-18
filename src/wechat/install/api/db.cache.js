@@ -39,6 +39,25 @@ let filter = data => {
 class Helper {
 
   /**
+   * 执行SQL
+   * @param method sql 方法
+   * @param callback
+   */
+  invokeSQL(...args) {
+    let method = args.shift();
+    if (!method) return;
+    // eslint-disable-next-line
+    return new Promise((resolve, reject) => {
+      try {
+        args.push(data => resolve(data));
+        db[method](...args);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  };
+
+  /**
    * 查询数据
    * @param {String} table 表名
    * @param {Object} condition 查询条件
@@ -53,6 +72,17 @@ class Helper {
         arr.push(data.rows.item(i));
       }
       callback(arr);
+    });
+  };
+
+  /**
+   * 严格模式查询
+   */
+  queryStrict(table, condition, callback) {
+    let me = this;
+    let arr = [];
+    me.invokeSQL('gts', table).then(result => {
+      result ? me.query(table, condition, callback) : callback(arr);
     });
   };
 
@@ -85,11 +115,9 @@ class Helper {
 
   /**
    * 清除缓存
-   * @param {Boolean} clearAll 选填 清空所有数据
    * @returns {Promise}
    */
-  clear(clearAll) {
-    console.log(this);
+  clear() {
     let me = this;
     return new Promise((resolve, reject) => {
       console.log('------------ 获取最新数据 start ------------');
@@ -102,10 +130,6 @@ class Helper {
         result = util.toArray(result);
         for (let i = 0, len = result.length; i < len; i++) {
           let table = result[i];
-          if (clearAll && table === 'install_record') {
-            me.hasRecord = true;
-            continue;
-          };
           console.log(`清除数据库表 ${table}...`);
           tasks.push(me.invokeSQL('dt', table));
         };
@@ -148,8 +172,6 @@ class Helper {
           console.log('创建数据库表 install_record...');
         })
       ];
-      // 存在记录表
-      if (me.hasRecord) tasks.pop();
       Promise.all(tasks).then(() => {
         console.log('init ok...');
         resolve();
@@ -170,7 +192,11 @@ class DataHandle {
     util.log('DataHandle init...');
     let me = this;
     document.addEventListener('online', function() {
-      me.checkNetwork();
+      helper.queryStrict('install_record', {}, result => {
+        if (result && result.length) {
+          me.checkNetwork();
+        };
+      });
     }, false);
   };
 
@@ -183,49 +209,64 @@ class DataHandle {
     let state = tools.cordova.checkNetwork();
     if (state !== 'none') {
       // 检测4g确认后提交
-      state !== 'wifi' ? tools.cordova.confirm('当前非wifi环境，确认是否提交？', result => {
-        if (result === 1) me.submit();
-      }) : me.submit();;
+      state !== 'wifi' ? tools.cordova.confirm('当前非wifi环境，是否确认提交？', result => {
+        if (result === 2) me.submit();
+      }) : me.submit();
     }
+  };
+
+  /**
+   * 查找本地未提交安装记录
+   * @param {Function} callback 必填 回调函数
+   */
+  getPendingInstallRecord(callback) {
+    helper.queryStrict('install_record', {state: 'pending'}, callback);
   };
 
   /**
    * 提交本地安装信息
    */
   submit() {
-    helper.query('install_record', {}, data => {
-      // 本地没有记录
-      if (!data.length) return;
-      Indicator.process({
-        text: '正在提交本地数据...'
-      });
-      let tasks = [];
-      // 记录提交结果
-      let result = [];
-      for (let i = 0, len = data.length; i < len; i++) {
-        let item = data[i];
-        tasks.push(new Promise((resolve, reject) => {
-          api.get({
-            key: 'installOrderAssets',
-            data: util.parse(item.data),
-            success: data => {
-              result.push(item);
-              // 清空成功记录
-              db.delete('install_record', item.id, data => {
-                resolve(result);
-              });
-            }
-          });
-        }));
+    this.getPendingInstallRecord(data => {
+      // 未提交数据
+      if (data.length) {
+        Indicator.process({
+          text: '正在提交本地数据...'
+        });
+        // 制定提交记录任务
+        let tasks = [];
+        let result = [];
+        for (let i = 0, len = data.length; i < len; i++) {
+          let item = data[i];
+          tasks.push(new Promise((resolve, reject) => {
+            api.get({
+              key: 'installOrderAssets',
+              data: util.parse(item.data),
+              success: data => {
+                result.push(item);
+                // 提交成功后修改数据状态
+                db.update('install_record', {state: 'finish'}, `'${item.id}'`, result => {
+                  resolve(result);
+                });
+              }
+            });
+          }));
+        };
+        Promise.all(tasks).then(result => {
+          console.log(result);
+          MessageBox.alert(`成功提交${result.length}条安装记录！`, '恭喜');
+          Indicator.process(false);
+        }).catch(err => {
+          console.error(err);
+          Indicator.process(false);
+        });
+      } else {
+        // 无数据提交
+        Toast({
+          message: '暂无本地记录',
+          position: 'bottom'
+        });
       };
-      Promise.all(tasks).then(result => {
-        console.log(result);
-        MessageBox.alert(`成功提交${result.length}条安装记录！`, '恭喜');
-        Indicator.process(false);
-      }).catch(err => {
-        console.error(err);
-        Indicator.process(false);
-      });
     });
   };
 
@@ -259,38 +300,24 @@ class Cache {
   };
 
   /**
-   * 执行SQL
-   * @param method sql 方法
-   * @param callback
-   */
-  invokeSQL(...args) {
-    let method = args.shift();
-    if (!method) return;
-    // eslint-disable-next-line
-    return new Promise((resolve, reject) => {
-      try {
-        args.push(data => resolve(data));
-        db[method](...args);
-      } catch (e) {
-        reject(e);
-      }
-    });
-  };
-
-  /**
    * 初始化数据库
    * 1. 删除数据表
    * 2. 创建数据表
    * 3. 缓存数据
    * @param {Object} data 必填 批次汇总
-   * @param {Boolean} clearAll 选填 清空所有
    */
-  init(data, clearAll = true) {
+  init(data) {
     let me = this;
-    Indicator.process({
-      text: '正在下载最新数据...'
+    handle.getPendingInstallRecord(result => {
+      if (result.length) {
+        tools.cordova.alert('发现本地有未提交的安装记录，请先提交本地记录！');
+      } else {
+        Indicator.process({
+          text: '正在下载最新数据...'
+        });
+        helper.clear().then(result => helper.create()).then(result => me.reCache(data)).catch(err => console.error(err));
+      }
     });
-    helper.clear.call(me, clearAll).then(result => helper.create.call(me)).then(result => me.reCache(data)).catch(err => console.error(err));
   };
 
   /**
@@ -303,8 +330,7 @@ class Cache {
      * 2. 缓存楼栋数据
      * 3. 缓存房号资产数据
      */
-    let me = this;
-    let invokeSQL = me.invokeSQL;
+    let invokeSQL = helper.invokeSQL;
     return new Promise((resolve, reject) => {
       resolve(data);
     }).then(data => {
@@ -466,10 +492,18 @@ class Cache {
      * 默认优先获取本地数据
      * 否则获取在线数据并缓存
      */
-    setting.mode === 'refresh' ? getRemoteData() : me.invokeSQL('gts', 'batch').then(hasTable => {
-      hasTable ? helper.query('batch', {}, result => {
-        result.length ? setting.success(filter(result)) : getRemoteData();
-      }) : getRemoteData();
+    setting.mode === 'refresh' ? getRemoteData() : helper.queryStrict('batch', {}, result => {
+      result.length ? setting.success(filter(result)) : getRemoteData();
+    });
+  };
+
+  /**
+   * 搜索本地安装批次
+   * @param {Object} setting.data.val 项目名称
+   */
+  searchInstallTask(setting) {
+    helper.query('batch', {}, result => {
+      setting.success(result);
     });
   };
 
@@ -518,14 +552,15 @@ class Cache {
    */
   installOrderAssets(setting) {
     let data = setting.data;
-    let Id = data.Id;
+    let id = data.Id;
     helper.upsert('install_record', {
-      Id: Id,
+      id: id,
       data: JSON.stringify(data),
+      state: 'pending',
       create_date: now()
-    }, {Id: Id}, result => {
+    }, {id: id}, result => {
       setting.success(result);
-      handle.checkNetwork();
+      // handle.checkNetwork();
     });
   };
 
@@ -564,10 +599,13 @@ class Cache {
 
   /**
    * 获取最后登录用户的信息
+   * 1. 查询本地是否有 user 表，没有直接回调空数组
+   * 2. 查询是否有登陆记录，没有直接回调空数组
    */
   getCacheUser(setting) {
-    helper.query('user', {rowid: 1}, result => {
-      setting.success(result);
+    let callback = setting.success;
+    helper.queryStrict('user', {rowid: 1}, result => {
+      callback(result);
     });
   };
 
@@ -576,9 +614,18 @@ class Cache {
    * 清除本地用户信息
    */
   logout(setting) {
-    helper.delete('user', {rowid: 1}, result => {
-      setting.success(result);
+    helper.queryStrict('install_record', {}, result => {
+      result && result.length ? tools.cordova.alert('检测到本地还有未提交的数据，请先提交数据') : helper.delete('user', {rowid: 1}, result => {
+        setting.success(result);
+      });
     });
+  };
+
+  /**
+   * 清除本地缓存
+   */
+  clear() {
+    helper.clear();
   };
 
 };

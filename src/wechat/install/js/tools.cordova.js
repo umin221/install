@@ -60,6 +60,7 @@ class Cordova {
    * 检测更新
    */
   checkUpdate() {
+    let me = this;
     // 说明：这里的使用了Framework7
     chcp.fetchUpdate(function(error, data) {
       if (!error) {
@@ -74,7 +75,7 @@ class Cordova {
           }
         });
       } else {
-        console.log('你当前是最新版本', ['提示']);
+        console.log('你当前是最新版本');
       }
     });
   };
@@ -84,7 +85,7 @@ class Cordova {
    * wifi/4g
    */
   checkNetwork() {
-    return navigator.connection.type;
+    return navigator.connection.type || 'wifi';
   };
 
   /**

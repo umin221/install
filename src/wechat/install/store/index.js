@@ -29,6 +29,12 @@ export default {
         getCacheUser({state}, setting) {
           setting.key = 'getCacheUser';
           cache.invoke(setting);
+        },
+        // 清除缓存
+        clear() {
+          cache.invoke({
+            key: 'clear'
+          });
         }
       }
     },
@@ -56,7 +62,7 @@ export default {
          * 获取安装批次列表
          * @param {Object} data 必填 接口请求参数
          * @param {Boolean} more 选填 是否加载更多
-         * @param {String} lst 选填 结果渲染列表
+         * @param {String} list 选填 结果渲染列表
          * @param {Function} callback 选填 处理回调
          * @param {Function} error 选填 错误回调
          */

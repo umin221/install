@@ -1,10 +1,12 @@
 <template>
   <div class="login-container">
-    <div class="logo">
+    <div class="logo" @click="clearFn">
       <img src="../assets/bg_login.png" />
     </div>
 
-    <div class="login-form xs-icon">
+    <indicator></indicator>
+    <div class="login-form xs-icon"
+      v-show="login">
       <cus-field class="account" label="账号" tag="账号"
                  v-model="username"
                  v-valid.require></cus-field>
@@ -37,7 +39,7 @@
       let me = this;
       me.getCacheUser({
         success: result => {
-          if (result.length) me.$router.push('index');
+          result.length ? me.$router.push('index') : me.login = true;
         }
       });
     },
@@ -45,11 +47,15 @@
       return {
         remember: [],
         username: '13048225658',
-        password: '123'
+        password: '123',
+        login: false
       };
     },
     methods: {
-      ...mapActions(NAMESPACE, ['queryUserInfo', 'cacheUser', 'getCacheUser']),
+      ...mapActions(NAMESPACE, ['queryUserInfo', 'cacheUser', 'getCacheUser', 'clear']),
+      clearFn() {
+        this.clear();
+      },
       loginFn() {
         let me = this;
         tools.valid.call(me, () => {
@@ -97,6 +103,7 @@
 
     .login-form {
       position: relative;
+      background-color: #fff;
       padding: 0 20px 20px;
       z-index: 1;
 
@@ -177,8 +184,8 @@
 
         label {
           display: inline-block;
-          letter-spacing: 20px;
-          text-indent: 20px;
+          letter-spacing: 40px;
+          text-indent: 40px;
         }
       }
     }

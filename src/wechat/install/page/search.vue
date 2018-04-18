@@ -4,53 +4,26 @@
                 :show="true"
                 placeholder="请输入项目名称">
 
-        <cus-loadmore ref="result"
-                      :loadBottom="loadBottomFn"
-                      :emptyTips="false"
-                      :topStatus="topStatus">
-          <cus-cell class="multiple"
-                    :key="item.id"
-                    :title="'合作伙伴名称:'+ item.Name"
-                    @click.native="toDetailFn(item)"
-                    v-for="item in result"
-                    is-link>
-            <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
-            <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Main Phone Number']}}</div>
-          </cus-cell>
-        </cus-loadmore>
+      <cus-cell class="multiple"
+                v-for="item in result"
+                :key="item.id"
+                :title="'订单批次:'+ item.Id"
+                @click.native="toDetailFn(item.Id)"
+                is-link>
+        <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
+        <div class="mint-cell-sub-title" slot="title">创建日期: {{item['Created']}}</div>
+      </cus-cell>
 
     </cus-search>
   </div>
 </template>
 
 <script type="es6">
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapMutations} from 'vuex';
   import cusLoadmore from 'public/components/cus-loadmore';
   import cusSearch from 'public/components/cus-search';
   import cusCell from 'public/components/cus-cell';
   //
-  let loader = function(...args) {
-    let me = this;
-    let event = args.pop();
-    let name = me.value;
-    let param = {
-      data: {
-        'Name': name
-      },
-      more: args.pop(),
-      callback: (data) => {
-        me.$refs.result[event](data.length);
-      },
-      // 结果渲染列表
-      lst: 'result'
-    };
-    if (!this.isManager) {
-      param.data['KL Partner Status'] = '待审批';
-    }
-    // 获取团队列表
-    me.getPartners(param);
-  };
-
   const NAMESPACE = 'index';
   export default {
     name: 'search',
@@ -62,40 +35,32 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['result']),
-      ...mapState('index', ['isManager'])
+      ...mapState(NAMESPACE, ['pending', 'result'])
     },
     methods: {
-      ...mapActions(NAMESPACE, ['getPartners']),
+      ...mapMutations(NAMESPACE, ['setTask']),
       /**
        * 搜索回调
        * @param {String} val 搜索值
        */
       searchFn(val) {
-        loader.call(this, 'onBottomLoaded');
+        let me = this;
+        let installTask = Array.prototype.filter.call(me.pending, item => item['KL Agreement Opportunity Name'].indexOf(val) !== -1);
+        me.setTask({installTask, list: 'result'});
       },
       /**
        * To detail
        * @param {Object} item 行内容
        */
-      toDetailFn(item) {
+      toDetailFn(id) {
         this.$router.push({
-          name: 'detail',
+          name: 'assets',
           query: {
-            // detail
-            type: 'read',
-            state: config.mapp.k2v[item['KL Partner Status']],
-            id: item.Id
+            TaskId: id
           }
         });
-      },
-      /**
-       * Load more
-       */
-      loadBottomFn() {
-        loader.call(this, {
-          more: true
-        }, 'onBottomLoaded');
+        // 标记楼栋资产刷新
+        KND.Session.set('refreshAssets', true);
       }
     }
   };

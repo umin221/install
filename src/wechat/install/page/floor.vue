@@ -112,6 +112,13 @@
       },
       // 删除房号
       removeFn(room, index) {
+        if (room['Serial Number']) {
+          Toast({
+            message: '已绑定智能锁设备，不允许删除',
+            position: 'bottom'
+          });
+          return;
+        };
         MessageBox.confirm('是否删除这个房间？', '请确认').then(() => {
           let remove = () => this.floor.splice(index, 1);
           console.log(room);

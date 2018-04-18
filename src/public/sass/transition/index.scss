@@ -88,3 +88,30 @@
     transition: all .3s ease;
   }
 }
+
+// Page Turn on Transian Effect
+.fade-on {
+  &-enter {
+    opacity: 0;
+  }
+  &-leave-to {
+  }
+  &-enter-active, &-leave-active  {
+    transition: all .3s ease;
+  }
+}
+
+// Page Turn Off Transian Effect
+.fade-off {
+  &-enter {
+  }
+  &-leave-to {
+    opacity: 0;
+  }
+  &-leave-active {
+    z-index: 2;
+  }
+  &-enter-active, &-leave-active  {
+    transition: all .3s ease;
+  }
+}
