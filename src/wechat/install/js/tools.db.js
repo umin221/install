@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018, YZKJ
  * @description cache
  */
-import api from './api';
+import api from '../api/api';
 
 let db = require('public/js/lib/db.sqlit');
 //

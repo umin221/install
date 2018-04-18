@@ -1,5 +1,5 @@
 import api from '../api/api';
-import cache from '../api/db.cache';
+import cache from '../js/tools.db';
 import { app } from 'public/store';
 
 // 缓存页面
