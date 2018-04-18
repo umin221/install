@@ -59,6 +59,14 @@
       };
     };
 
+    /**
+     * 文档ready前追加js文件
+     * @param url
+     */
+    preAppend(url) {
+      document.write(`<script type='application/javascript' src='${url}'></script>`);
+    }
+
   };
 
   global['tools'] = new Tools();

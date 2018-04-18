@@ -310,7 +310,7 @@ class Cache {
     let me = this;
     handle.getPendingInstallRecord(result => {
       if (result.length) {
-        tools.cordova.alert('发现本地有未提交的安装记录，请先提交本地记录！');
+        tools.cordova.alert('检测到本地还有未提交的数据，请先提交数据');
       } else {
         Indicator.process({
           text: '正在下载最新数据...'
@@ -614,8 +614,8 @@ class Cache {
    * 清除本地用户信息
    */
   logout(setting) {
-    helper.queryStrict('install_record', {}, result => {
-      result && result.length ? tools.cordova.alert('检测到本地还有未提交的数据，请先提交数据') : helper.delete('user', {rowid: 1}, result => {
+    handle.getPendingInstallRecord(result => {
+      result.length ? tools.cordova.alert('检测到本地还有未提交的数据，请先提交数据') : helper.delete('user', {rowid: 1}, result => {
         setting.success(result);
       });
     });
