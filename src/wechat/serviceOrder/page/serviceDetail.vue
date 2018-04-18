@@ -77,7 +77,7 @@
                     <div  v-for="(item, index) in orderEntry">
                       <div v-if="item['Order Entry - Line Items']">
                         <div class="enter-order">
-                          <!--<div>{{item['Order Entry - Line Items']['KL Warranty Flag'] === "N" ? '保内': '保外'}}</div>-->
+                          <div>{{item['Order Entry - Line Items']['KL Warranty Flag'] === "N" ? "保内": "保外"}}</div>
                           <div>{{item['Order Entry - Line Items']['KL Product Name Join']}}</div>
                           <div>{{item['Order Entry - Line Items']['Quantity Requested']}}</div>
                         </div>
@@ -126,7 +126,7 @@
                         <div>数量</div>
                       </div>
                       <div class="enter-order" v-if="item['KL Child SR Order']['KL Child SR Order Item']">
-                        <!--<div>{{item['KL Child SR Order']['KL Child SR Order Item']['KL Warranty Flag'] === "Y" ? '保内': '保外'}}</div>-->
+                        <div>{{item['KL Child SR Order']['KL Child SR Order Item']['KL Warranty Flag'] === "Y" ? '保内': '保外'}}</div>
                         <div>{{item['KL Child SR Order']['KL Child SR Order Item']['KL Product Name Join']}}</div>
                         <div>{{item['KL Child SR Order']['KL Child SR Order Item']['Quantity Requested']}}</div>
                       </div>
@@ -771,11 +771,13 @@
     padding-left: 1rem;
     li{
       line-height: 1.5rem;
+      font-size: 0.65rem;
     };
   }
   .enter-order {
     display: flex;
     margin-top: 10px;
+    font-size: 0.65rem;
     div{
      width: 25%;
       text-align: center;

@@ -36,7 +36,7 @@
             <mt-button type="primary" v-show="isBn === '保外'" @click.native="getLov1('wm')"><i class="xs-icon icon-add" ></i>添加上门费</mt-button>
           </div>
         </div>
-        <mt-cell class="require" title="总费用">￥{{Product}}</mt-cell>
+        <mt-cell title="总费用">￥{{Product}}</mt-cell>
         <mt-cell class="require" title="附件"></mt-cell>
         <div style="background-color: #ffffff">
           <attach ioName="KL Service Request Attachment IO" ref="attach"
@@ -54,6 +54,7 @@
 </template>
 <script>
 import {mapState, mapActions, mapMutations} from 'vuex';
+import { MessageBox } from 'mint-ui';
 import menuBox from '../../../public/components/cus-menu';
 import numBox from '../components/number-box';
 const NAMESPACE = 'saveFault';
@@ -134,7 +135,7 @@ export default {
       attach: { // 附件
         list: [],
         edit: true,
-        title: '相关照片'
+        title: '相关附件'
       }
     };
   },
@@ -183,49 +184,58 @@ export default {
     },
     submit() {
       let me = this;
-      let lineItems = [];
-      let obj = {};
-      let isBn = me.isBn === '保内' ? 'Y' : 'N';
-      let uploadAttach = id => {
-        _upload.call(me, me.$refs.attach.getServerIds(), id);
-      };
-      for (let i = 0;i < me.returnSelect.length; i++) {
-        obj = {
-          'Id': '1',
-          'Product': me.returnSelect[i].Name, // 产品编码
-          'Quantity Requested': me.returnSelect[i].num, // 数量
-          'KL Warranty Flag': me.switchStatus[i] ? 'Y' : 'N'
-        };
-        lineItems.push(obj);
-      }
-      obj = {
-        // 订单行
-        lineItems: lineItems,
-        // 订单头
-        ServiceRequestId: me['Service'].Id,   // 服务请求ID
-        priceId: me.priceId,      // 价格列表ID
-        warrantyFlag: me.isBn === '保内' ? 'Y' : 'N',    // 订单头是否保内
-        contactId: me['Service']['Contact Id'], // 联系人Id
-        assetId: me['Service']['Asset Id'], // 资产Id
-        srNum: me['Service']['SR Number'],
-        parentId: me.ServiceRequest.Id,
-        type: me.serviceType,
-        callBack: function(data) {
-          me.setPartner(data);
-          me.initSelected();
-          me.$router.go(-1);
-        }
-      };
-      if (me.Service['Product Warranty Flag'] !== isBn && !lineItems.length) {
-        me.upDateOrderStatu({
-          Id: me.ServiceRequest.Id,
-          type: isBn,
-          callback: obj.callBack
+      if (!me.attach.list.length) {
+        MessageBox({
+          title: '提示',
+          message: '请上传相关的维修单据'
         });
-      } else {
-        me.addServiceOrder(obj);
+        return;
       }
-      uploadAttach(me['Service'].Id);
+      MessageBox.confirm('确认提交，数据一经提交不可修改。', '提示').then(action => {
+        let lineItems = [];
+        let obj = {};
+        let isBn = me.isBn === '保内' ? 'Y' : 'N';
+        let uploadAttach = id => {
+          _upload.call(me, me.$refs.attach.getServerIds(), id);
+        };
+        for (let i = 0;i < me.returnSelect.length; i++) {
+          obj = {
+            'Id': '1',
+            'Product': me.returnSelect[i].Name, // 产品编码
+            'Quantity Requested': me.returnSelect[i].num, // 数量
+            'KL Warranty Flag': me.switchStatus[i] ? 'Y' : 'N'
+          };
+          lineItems.push(obj);
+        }
+        obj = {
+          // 订单行
+          lineItems: lineItems,
+          // 订单头
+          ServiceRequestId: me['Service'].Id,   // 服务请求ID
+          priceId: me.priceId,      // 价格列表ID
+          warrantyFlag: me.isBn === '保内' ? 'Y' : 'N',    // 订单头是否保内
+          contactId: me['Service']['Contact Id'], // 联系人Id
+          assetId: me['Service']['Asset Id'], // 资产Id
+          srNum: me['Service']['SR Number'],
+          parentId: me.ServiceRequest.Id,
+          type: me.serviceType,
+          callBack: function(data) {
+            me.setPartner(data);
+            me.initSelected();
+            me.$router.go(-1);
+          }
+        };
+        if (me.Service['Product Warranty Flag'] !== isBn && !lineItems.length) {
+          me.upDateOrderStatu({
+            Id: me.ServiceRequest.Id,
+            type: isBn,
+            callback: obj.callBack
+          });
+        } else {
+          me.addServiceOrder(obj);
+        }
+        uploadAttach(me['Service'].Id);
+      });
     },
     toTranslated() {
       this.$router.push('searchTrans');
@@ -258,7 +268,7 @@ export default {
       }
     }
   },
-  components: {menuBox, numBox}
+  components: {menuBox, numBox, MessageBox}
 };
 </script>
 <style lang="scss">
@@ -318,6 +328,10 @@ export default {
       }
     }
     .toRed {
+      color: red;
+    }
+    .require>.mint-cell-wrapper>.mint-cell-title>span:before{
+      content: '*';
       color: red;
     }
   }

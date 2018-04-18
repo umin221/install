@@ -703,6 +703,7 @@ export default new Vuex.Store({
               form
             },
             success: function(data) {
+              Toast('提交成功！');
               form.callback(data);
               // callback(data);
             },
@@ -719,6 +720,20 @@ export default new Vuex.Store({
             },
             success: function(data) {
               callback(data);
+            },
+            error: function(data) {
+              console.log('error');
+            }
+          });
+        },
+        upDateAddress({dispatch}, {address, form}) {
+          api.get({
+            key: 'upDateAddress',
+            data: {
+              address
+            },
+            success: function(data) {
+              dispatch('upDateService', form);
             },
             error: function(data) {
               console.log('error');

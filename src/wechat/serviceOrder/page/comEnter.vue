@@ -2,42 +2,52 @@
   <div style="background-color: #ebebeb;">
     <mt-header fixed title="故障记录">
       <fallback slot="left"></fallback>
-      <mt-button slot="right" @click.native="submit">提交</mt-button>
+      <mt-button slot="right"
+                 v-if="isSubmit"
+                 @click.native="submit">提交</mt-button>
     </mt-header>
 
     <div class="mint-content addService">
       <div class="addform">
-        <mt-field label="产品条形码" type="text" placeholder="输入或扫门锁条形码" @change="sarech" v-model="SerialNumber" class="textRight">
-          <i class="xs-icon icon-scan" @click="scan"></i>
+        <mt-field label="产品条形码"
+                  type="text"
+                  placeholder="输入或扫门锁条形码"
+                  @change="sarech"
+                  v-model="SerialNumber"
+                  :class="{readonly: !isSubmit}"
+                  class="textRight">
+          <i class="xs-icon icon-scan" @click="isSubmit&&scan"></i>
         </mt-field>
         <mt-cell class="mint-field" title="所在省市区" placeholder="请选择">{{Personal}}</mt-cell>
         <mt-field class="block"
+                  :class="{readonly: !isSubmit}"
                   label="详细地址"
                   v-model="Address"
                   placeholder="如设备过旧未贴条码,允许为空"
                   type="textarea" rows="2"></mt-field>
         <div class="floor-box">
-          <input type="text" placeholder="楼栋名" v-model="building">
-          <input type="text" placeholder="楼层" v-model="floor">
-          <input type="text" placeholder="房号" v-model="room">
+          <input type="text" :class="{'readonly': !isSubmit}" placeholder="楼栋名" v-model="building">
+          <input type="text" :class="{'readonly': !isSubmit}" placeholder="楼层" v-model="floor">
+          <input type="text" :class="{'readonly': !isSubmit}" placeholder="房号" v-model="room">
         </div>
         <!--<mt-cell class="require mint-field" title="产品型号" placeholder="请选择" @click.native="toSearchT('fault')" is-link>{{ProductModel}}</mt-cell>-->
         <mt-cell class="require mint-field"
                  title="面板型号"
                  placeholder="请选择"
-                 @click.native="toLov('KL_LOCK_BODY_MODEL')" is-link>{{KL_LOCK_BODY_MODEL}}</mt-cell>
+                 @click.native="isSubmit&&toLov('KL_LOCK_BODY_MODEL')" is-link>{{KL_LOCK_BODY_MODEL}}</mt-cell>
         <mt-cell class="require mint-field"
                  title="锁体型号"
                  placeholder="请选择"
-                 @click.native="toLov('KL_LOCK_MODEL')" is-link>{{KL_LOCK_MODEL}}</mt-cell>
+                 @click.native="isSubmit&&toLov('KL_LOCK_MODEL')" is-link>{{KL_LOCK_MODEL}}</mt-cell>
         <mt-cell class="mint-field require"
                  title="故障现象"
                  placeholder="请选择"
-                 @click.native="toLov('SR_ROOTCAUSE')" is-link>{{SR_ROOTCAUSE}}</mt-cell>
+                 @click.native="isSubmit&&toLov('SR_ROOTCAUSE')" is-link>{{SR_ROOTCAUSE}}</mt-cell>
         <mt-cell class="mint-field require"
                  :value="KL_SR_RESP"
-                 @click.native="toLov('KL_SR_RESP')" title="责任划分" is-link></mt-cell>
+                 @click.native="isSubmit&&toLov('KL_SR_RESP')" title="责任划分" is-link></mt-cell>
         <mt-field class="block require"
+                  :class="{readonly: !isSubmit}"
                   label="解决方法"
                   v-model="repairDetails"
                   placeholder="详细描述或附加需求..."
@@ -79,7 +89,7 @@
 <script>
   import {mapState, mapActions, mapMutations} from 'vuex';
   import menuBox from '../../../public/components/cus-menu';
-  import { MessageBox } from 'mint-ui';
+  import { Toast } from 'mint-ui';
 
   let mapp = config.mapp;
   const delay = (function() {
@@ -118,12 +128,13 @@
       let serviceId = me.$route.query.id;
       let serviceType = me.$route.query.type;
       let status = me.$route.query.statu;
-      if (serviceType === 'child') {
-        me.childId = serviceId;
-      }
+      me.serviceType = serviceType;
+//      KL Parent SR Complete Flag
+//      KL Status LIC
       if (status) {
         me.status = status;
       }
+      console.log(serviceId);
       if (serviceType === 'save') {
         me.getServiceR({
           Id: serviceId,
@@ -139,6 +150,27 @@
             if (me.SerialNumber) {
               me.sarech();
             }
+            if (data['KL Parent SR Complete Flag'] || data['KL Status LIC'] === 'Completed') {
+              console.log(me.isSubmit);
+              me.isSubmit = false;
+              console.log(me.isSubmit);
+            }
+            me.queryMedias({
+              data: {
+                'IOName': 'KL Service Request Attachment IO',
+                'SearchSpec': {
+                  'Service Request Attachment.Activity Id': data.Id,
+                  'Service Request Attachment.KL SR Att Type': 'LookupValue("KL_SR_ATT_TYPE", "Problem Record")'
+                }
+              },
+              success: data => {
+                let attach = KND.Util.toArray(data['SiebelMessage']['Service Request Attachment']);
+                if (attach) {
+                  me.attach.list = attach;
+                  me.attach.edit = false;
+                }
+              }
+            });
           }
         });
       }
@@ -190,19 +222,24 @@
         SerialNumber: '', // 条形码
         AssetNumber: '', // 产品编号
         ProductFlag: '', // 故障描述
+        Province: '',
+        City: '',
+        County: '',
         Personal: '',    // 省市
         Address: '',       // 详细地址
         KL_SR_RESP: '', // 责任划分
-        SR_ROOTCAUSE: '',           // 故障分类
+        SR_ROOTCAUSE: '',  // 故障分类
         repairDetails: '', // 方法明细
         ProductId: '',    // 产品Id
         KL_LOCK_BODY_MODEL: '',
         KL_LOCK_MODEL: '',
-        childId: '',
+        srId: '',
+        addressId: '',
         building: '',
         floor: '',
         room: '',
         lovType: '',
+        isSubmit: true,
         attach: { // 附件
           list: [],
           edit: true,
@@ -215,8 +252,8 @@
       ...mapState('detail', ['ServiceRequest'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getAsset', 'getLov1', 'valueChange1', 'upDateService', 'getServiceR']),
-      ...mapActions('app', ['getLov', 'upload']),
+      ...mapActions(NameSpace, ['getAsset', 'getLov1', 'valueChange1', 'upDateService', 'getServiceR', 'upDateAddress']),
+      ...mapActions('app', ['getLov', 'upload', 'queryMedias']),
       ...mapMutations(NameSpace, ['errorTips', 'setProductModel']),
       ...mapMutations('detail', ['setPartner']),
       sarech() {
@@ -227,10 +264,13 @@
               num: me.SerialNumber,
               callback: function(data) {
                 console.log(data);
-//              me.ProductModel = data['KL Product Model'];// 产品型号
+                me.addressId = data['Personal Address Id'];
                 me.AssetNumber = data['Asset Number'];
                 me.ProductId = data['Id'];  // 产品ID
-                me.Personal = data['KL Personal Province'] + data['Personal City'];    // 省市
+                me.City = data['Personal City'];
+                me.Province = data['KL Personal Province'];
+                me.County = data['KL Personal Town'];
+                me.Personal = data['KL Personal Province'] + data['Personal City'] + data['KL Personal Town'];    // 省市
                 me.Address = data['Personal Address'];// 详细地址
                 me.building = data['KL Personal Address Building'];
                 me.floor = data['KL Personal Address Floor'];
@@ -274,14 +314,6 @@
       cancel(value) {
         this.showBox = false;
       },
-//      toSearchT(type) {
-//        this.$router.push({
-//          name: 'searchTrans',
-//          query: {
-//            type: type
-//          }
-//        });
-//      },
       scan() {
         let me = this;
         KND.Native.scanQRCode({
@@ -296,10 +328,7 @@
         let serviceId = me.$route.query.id;
         for (let i = 0; i < me.mustForm.length; i++) {
           if (!me[me.mustForm[i].key]) {
-            MessageBox({
-              title: '提示',
-              message: '请选择' + me.mustForm[i].name + '！'
-            });
+            Toast('请选择' + me.mustForm[i].name + '！');
             return;
           }
         }
@@ -307,7 +336,7 @@
           _upload.call(me, me.$refs.attach.getServerIds(), id);
         };
         let form = {
-          'Id': me.childId || me.ServiceRequest['Id'],
+          'Id': serviceId,
           'Asset Number': me.AssetNumber, // 产品ID
           'SR Rootcause': me.SR_ROOTCAUSE,                   // 故障反馈
           'KL Responsibility': me.KL_SR_RESP,     // 责任划分
@@ -320,7 +349,7 @@
             if (data) {
               let name = me.$router.currentRoute.name;
               console.log(name);
-              if (me.childId) {
+              if (me.$route.query.type === 'child') {
                 me.$router.go(-2);
               } else {
                 me.$router.go(-1);
@@ -330,12 +359,24 @@
         };
         if (!me.AssetNumber) {
           delete form['Asset Number'];
+          me.upDateService(form);
+        } else {
+          let address = {
+            'addrId': me.addressId,
+            'Province': me.Province,
+            'City': me.City,
+            'County': me.County,
+            'Street Address': me.Address,
+            'Street Address 2': me.building,
+            'Street Address 3': me.floor,
+            'Street Address 4': me.room
+          };
+          me.upDateAddress({address, form});
         }
-        me.upDateService(form);
         uploadAttach(serviceId);
       }
     },
-    components: {menuBox, MessageBox}
+    components: {menuBox, Toast}
   };
 </script>
 <style lang="scss">
@@ -366,6 +407,7 @@
           input{
             height: 100%;
             text-align: right;
+            margin-right: 10px;
           }
         }
       }
@@ -427,5 +469,11 @@
         outline:0 !important
       }
     }
+  }
+  .readonly{
+    readonly:expression(this.readOnly=false);
+  }
+  .fieldonly>.mint-cell-wrapper>.mint-cell-value>.mint-field-core{
+    readonly:expression(this.readOnly=false);
   }
 </style>

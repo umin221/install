@@ -312,12 +312,22 @@ let ApiList = {
     };
     // 更新服务请求
   },
-  searchAddress: option => {
+  upDateAddress: option => {           // 更新地址
     return {
-      method: 'get',
-      url: 'data/CUT Address/CUT Address/?searchspec=[Street Address] = "' + option.data.Address + '"'
+      method: 'put',
+      url: 'data/CUT Address/CUT Address',
+      data: {
+        'Id': option.data.address.addrId,
+        'Country': '中国',
+        'Province': option.data.address.Province,
+        'City': option.data.address.City,
+        'County': option.data.address.County,
+        'Street Address': option.data.address['Street Address'],
+        'Street Address 2': option.data.address['Street Address 2'],
+        'Street Address 3': option.data.address['Street Address 3'],
+        'Street Address 4': option.data.address['Street Address 3']
+      }
     };
-    // 查找地址
   },
   // 查找所有产品安装工程师&主管 搜索&获取列表
   findEngineer: option => {

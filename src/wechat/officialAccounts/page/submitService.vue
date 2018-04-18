@@ -316,6 +316,7 @@
         position: absolute;
         left: 5px;
         top: 15px;
+        text-decoration: none;
       }
       .klsn:before{
         content: '\A133';

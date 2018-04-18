@@ -131,6 +131,9 @@
         self.initData(self.formatDate(d.getFullYear(), d.getMonth() + 1, 1));
         if (mon === self.currentMonth && myYear === self.currentYear) {
           self.leftBunHide = false;
+          self.daysUL = [];
+          self.isMyDay = false;
+          self.initData(null);
         }
       },
       pickNext(year, month) {     // 点击切换下个月
@@ -192,7 +195,6 @@
           this.days.push(d);
         }
         if (this.days.length % 7 === 0) {
-          this.daysUL.push(this.days);
           this.days = [];
         }
         for (let i = 1; i <= 35 - this.firstWeek; i += 1) {

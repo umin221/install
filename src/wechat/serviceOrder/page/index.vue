@@ -28,6 +28,7 @@
           <loadmore ref="pending"
                     @loadTop="loadTopFn"
                     @loadBottom="loadBottomFn"
+                    :auto-fill="true"
                     :param="{status:'待处理', list:'pending'}"
                     :topStatus="topStatus" :allLoaded="true">
             <div class="list-content" v-for="(item,index) in pending" @click="toDetail(item['SR Number'],item['Id'])" :key="index">

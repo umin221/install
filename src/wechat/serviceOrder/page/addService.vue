@@ -106,6 +106,7 @@
 </template>
 <script>
   import {mapState, mapActions, mapMutations} from 'vuex';
+  import { Toast } from 'mint-ui';
   import Vue from 'vue';
   import vp from 'public/plugin/validator';
   import menuBox1 from '../components/cus-menu';
@@ -205,18 +206,12 @@
         let me = this;
         for (let i = 0; i < me.mustField.length; i++) {
           if (!me[me.mustField[i].key]) {
-            MessageBox({
-              title: '提示',
-              message: '请选择' + me.mustField[i].name + '！'
-            });
+            Toast('请选择' + me.mustField[i].name + '！');
             return;
           }
           if (me[me.mustField[i].name] === '联系人电话') {
             if (textCall(me.Contact_Phone)) {
-              MessageBox({
-                title: '提示',
-                message: '联系电话格式错误请重新输入！'
-              });
+              Toast('联系电话格式错误请重新输入');
               me.Contact_Phone = '';
               return;
             }
@@ -402,7 +397,7 @@
         }, 500);
       }
     },
-    components: {menuBox, menuBox1, vp}
+    components: {menuBox, menuBox1, vp, Toast}
   };
 </script>
 <style lang="scss">

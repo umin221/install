@@ -42,10 +42,12 @@
     position: relative;
     line-height: 2rem;
     color: #000000;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     background-color: aliceblue;
     margin-top: 10px;
     border-radius: 5px;
+    padding-left: 10px;
+    font-weight: bolder;
 
     &.visible:after {
       -webkit-transform: translateX(-50%) rotate(135deg);
@@ -67,7 +69,7 @@
     padding-left: 20px;
   }
   .child{
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     background: lightblue;
   }
 </style>
