@@ -310,16 +310,17 @@
         },
         success: data => {
           let attach = KND.Util.toArray(data['SiebelMessage']['Service Request Attachment']);
+          console.log();
           if (attach) {
             for (let i = 0; i < attach.length; i++) {
               if (attach[i]['KL SR Att Type'] === '客户上传附件') {
-                me.attach.list = attach;
+                me.attach.list.push(attach[i]);
               }
               if (attach[i]['KL SR Att Type'] === '故障问题记录') {
-                me.attach1.list = attach;
+                me.attach1.list.push(attach[i]);
               }
               if (attach[i]['KL SR Att Type'] === '维修单据') {
-                me.attach2.list = attach;
+                me.attach2.list.push(attach[i]);
               }
             }
           }

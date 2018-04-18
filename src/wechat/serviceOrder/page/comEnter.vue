@@ -16,7 +16,7 @@
                   v-model="SerialNumber"
                   :class="{readonly: !isSubmit}"
                   class="textRight">
-          <i class="xs-icon icon-scan" @click="isSubmit&&scan"></i>
+          <i class="xs-icon icon-scan" v-if="isSubmit" @click="scan"></i>
         </mt-field>
         <mt-cell class="mint-field" title="所在省市区" placeholder="请选择">{{Personal}}</mt-cell>
         <mt-field class="block"
@@ -134,7 +134,6 @@
       if (status) {
         me.status = status;
       }
-      console.log(serviceId);
       if (serviceType === 'save') {
         me.getServiceR({
           Id: serviceId,
@@ -210,6 +209,7 @@
           }
         }
       });
+      console.log(me.isSubmit);
     },
     data: () => {
       return {
@@ -316,6 +316,7 @@
       },
       scan() {
         let me = this;
+        console.log(111);
         KND.Native.scanQRCode({
           success(data) {
             me.SerialNumber = data.resultStr;
