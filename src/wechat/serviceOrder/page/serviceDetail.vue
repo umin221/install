@@ -125,10 +125,13 @@
                         <div>产品名称</div>
                         <div>数量</div>
                       </div>
-                      <div class="enter-order" v-if="item['KL Child SR Order']['KL Child SR Order Item']">
-                        <div>{{item['KL Child SR Order']['KL Child SR Order Item']['KL Warranty Flag'] === "Y" ? '保内': '保外'}}</div>
-                        <div>{{item['KL Child SR Order']['KL Child SR Order Item']['KL Product Name Join']}}</div>
-                        <div>{{item['KL Child SR Order']['KL Child SR Order Item']['Quantity Requested']}}</div>
+                      <div class="enter-order"
+                           v-for="(oItem, index) in childItem(item['KL Child SR Order']['KL Child SR Order Item'])"
+                           :key="index"
+                           v-if="item['KL Child SR Order']['KL Child SR Order Item']">
+                        <div>{{oItem['KL Warranty Flag'] === "Y" ? '保内': '保外'}}</div>
+                        <div>{{oItem['KL Product Name Join']}}</div>
+                        <div>{{oItem['Quantity Requested']}}</div>
                       </div>
                       <div class="enter-order">
                         <div>总金额：{{item['KL Child SR Order']['Order Total']}}</div>
@@ -369,6 +372,9 @@
       ...mapActions('app', ['upload', 'queryMedias']),
       ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress', 'addChildService']),
       ...mapMutations(NameSpace, ['setRole', 'setAttachs']),
+      childItem(item) {
+        return KND.Util.toArray(item);
+      },
       boxClose(msg) {               // 关闭取消事件
         this.showBox = false;
       },

@@ -200,7 +200,7 @@ export default {
         };
         for (let i = 0;i < me.returnSelect.length; i++) {
           obj = {
-            'Id': '1',
+            'Id': i + 1,
             'Product': me.returnSelect[i].Name, // 产品编码
             'Quantity Requested': me.returnSelect[i].num, // 数量
             'KL Warranty Flag': me.switchStatus[i] ? 'Y' : 'N'
