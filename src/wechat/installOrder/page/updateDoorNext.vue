@@ -82,9 +82,9 @@
   export default {
     name: 'updateDoorNext',
     created() {
-      let param = this.$route.query;
-      this.item = param.item;
-      this.id = param.item.Id;
+      // let param = this.$route.query;
+      this.item = this.itemTask;
+      this.id = this.item.Id;
       console.dir('=====' + this.id);
     },
     data: () => {
@@ -112,6 +112,7 @@
     },
     computed: {
       ...mapState(NameSpace, ['form']),
+      ...mapState('detail', ['itemTask']),
       // 表单只读
       read() {
         return this.type === 'read';

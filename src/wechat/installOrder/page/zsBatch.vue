@@ -77,7 +77,7 @@
       <button-group>
         <mt-button class="single"
                    v-show="showZs"
-                   @click.native="nextPageFn">下一步</mt-button>
+                   @click.native="nextPageFn" v-text="butText"></mt-button>
         <mt-button class="single"
                    v-show="!showZs"
                    @click.native="submitFn">提交</mt-button>
@@ -167,8 +167,7 @@
     // 成功回调
     let callback = data => {
       tools.success(data, {
-        back: false,
-        successTips: '提交成功'
+        back: false
       });
     };
     // 上传附件
@@ -226,6 +225,9 @@
           self.getPlanList(self.batchCode); // 详细计划
           self.getInstallerList(self.batchCode); // 委外联系人
           self.getQueryMedias(self.batchCode); // 附件
+          if (self.pcObj['Calculated Activity Status'] === 'Declined') {
+            self.butText = '提交';
+          }
 
         } else {
           self.getBatch(self.item.Id);
@@ -262,6 +264,7 @@
         orderID: '', // 订单id
         id: '', // 记录新增后的批次ID
         type: 'edit', // add 新增 / edit 编辑 / read 只读
+        butText: '下一步', // 审批驳回时 直接提交 不需要跳初始化楼层页面
         editable: true,
         titleVal: '新建批次',
         attach: { // 附件
@@ -353,7 +356,7 @@
         if (self.attach.list.length > 0) {
           uploadAttach(self.id);
         }
-        /* if (self.box1) {
+        if (self.box1) {
           if (!self.companyId) {
             Toast('合作伙伴不能为空，请选择！');
             return;
@@ -366,15 +369,34 @@
         if (self.planList.length === 0) {
           Toast('详细计划不能为空！');
           return;
-        }*/
-        this.$router.push({
-          name: 'buildingInfo',
-          query: {
-            type: 'add',
-            id: self.id,
-            orderID: self.orderID
-          }
-        });
+        }
+        if (self.pcObj['Calculated Activity Status'] === 'Declined') {
+          api.get({ // 更改按钮状态
+            key: 'getUPStatus',
+            method: 'POST',
+            data: {
+              'body': {
+                'ProcessName': 'KL Install Task Submit For Approval Workflow',
+                'RowId': self.id
+              }
+            },
+            success: function(dataObj) {
+              if (!dataObj.ERROR) {
+                Toast('提交成功');
+                KND.Util.back();
+              }
+            }
+          });
+        } else {
+          this.$router.push({
+            name: 'buildingInfo',
+            query: {
+              type: 'add',
+              id: self.id,
+              orderID: self.orderID
+            }
+          });
+        }
       },
       getPlanList(id) {
         var self = this;
@@ -445,6 +467,9 @@
               self.companyId = data['KL Partner Id'];
               self.companyName = data['KL Partner Name'];
               self.getPcObj(data); // 保存store
+              if (self.pcObj['Calculated Activity Status'] === 'Declined') {
+                self.butText = '提交';
+              }
             }
           }
         });
@@ -504,7 +529,9 @@
             },
             success: data => {
               Status = KND.Util.toArray(data.items)[0].Value;
-              parma.Status = Status;
+              if (self.pcObj['Calculated Activity Status'] !== 'Declined') {
+                parma.Status = Status;
+              }
               parma['KL Detail Type'] = self.itemTask['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
               parma['Template Id'] = self.itemTask['Template Id'];
               parma['Order Id'] = self.itemTask['Order Id'];
@@ -518,6 +545,9 @@
                     self.batchCode = data.items.Id; // 新增批次返回的ID
                     if (self.pcObj['KL Partner Name']) { // 返回数据中没有公司名字 有值就添加
                       data.items['KL Partner Name'] = self.pcObj['KL Partner Name'];
+                    }
+                    if (self.pcObj['Calculated Activity Status'] === 'Declined') { // 审批驳回记录状态
+                      data.items['Calculated Activity Status'] = 'Declined';
                     }
                     self.getPcObj(data.items); // 保存store
                     // 提交图片

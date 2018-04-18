@@ -91,7 +91,7 @@
     name: 'clock',
     created() {
       var self = this;
-      self.titleVal = '打开记录';
+      self.titleVal = '打卡记录';
       let param = this.$route.query;
       this.id = param.id;
       this.getClock();

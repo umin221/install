@@ -121,7 +121,7 @@
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="addTask(taskData)" class="batchAdd"></span>
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(taskData)" class="batchClose"></span>
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="addTask(taskData)" class="batchAdd"></span>
-                  <span>{{taskData.Status}}</span>
+                  <span style="width:60px;">{{taskData.Status}}</span>
               </div>
               <div class="content-div"
                 v-if="taskData['KL Detail Type LIC']==='Trompil Batch Summary' ||
@@ -143,15 +143,15 @@
                     taskData['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
                     taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
                     taskData['KL Detail Type LIC'] === 'Transfer Summary'"
-                    :value="taskData['KL Completed Install Amount']+'/'+taskData['KL Install Amount Requested']">
-                    <span v-if="taskData['Calculated Activity Status'] === 'In Progress' && taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
-                    <span v-if="taskData['Calculated Activity Status'] === 'In Progress' && taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
+                    :value="itemTask['KL Completed Install Amount']+'/'+itemTask['KL Install Amount Requested']">
+                    <span v-if="showClose(itemTask)" @click.stop="closeTask(itemTask)" class="batchClose"></span>
+                    <span v-if="itemTask['Calculated Activity Status'] === 'In Progress' && itemTask['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
                   </mt-field>
                   <mt-field label="合格/计划数量"
                     v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
                     taskData['KL Detail Type LIC'] === 'Check Before Trans Summary'"
-                    :value="taskData['KL Qualified Amount']+'/'+taskData['KL Spot Check Amount']">
-                    <span v-if="taskData['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
+                    :value="itemTask['KL Qualified Amount']+'/'+itemTask['KL Spot Check Amount']">
+                    <span v-if="itemTask['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
                   </mt-field>
                   <mt-field label="时间" :value="new Date(itemTask['Planned Completion']).format('yyyy-MM-dd')"></mt-field>
                   <mt-field label="状态" :value="itemTask.Status"></mt-field>
@@ -238,7 +238,7 @@
     .crm-zyList ul .butLi span {
       display: inline-block;
       text-align: center;
-      width: 45px;
+      width: 40px;
       font-size: 14px !important;
       color: #999 !important;
     }
@@ -472,9 +472,6 @@
 
     .stage_li > .mui-scroll-wrapper a > div.present {
       color: #8bc17c;
-      margin: 0px 6px 0px 6px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #0772c1;
     }
 
     .stage_li > .mui-scroll-wrapper a > div.close {
@@ -627,6 +624,11 @@
           }
         }
       },
+      showClose(item) {
+        var val = item['Calculated Activity Status'] === 'In Progress' && item['KL Detail Type LIC'] !== 'Transfer Summary';
+        console.dir(val);
+        return val;
+      },
       getClose() { // 关闭整个任务
         let self = this;
         api.get({ // 更改状态
@@ -651,12 +653,16 @@
           data: {
             'body': {
               'OutputIntObjectName': 'KL App Lead List IO',
-              'PrimaryRowId': '1-103TCKOJ'
-              // 'PrimaryRowId': self.id
+              // 'PrimaryRowId': '1-103TCKOJ'
+              'PrimaryRowId': self.detailData['KL Agreement Opportunity Id']
             }
           },
           success: function(data) {
             var obj = data.SiebelMessage.Lead;
+            if (!obj) {
+              Toast('找不到订单经纬度，无法打卡！');
+              return;
+            }
             if (obj['KL Lead Address Latitude'] && obj['KL Lead Address Longitude']) {
               KND.Native.getLocation({ // 获取当前位置
                 success(dataList) {
@@ -809,29 +815,33 @@
         if (self.shipmentVal) {
           return;
         }
-        MessageBox({
-          title: '提示',
-          message: ' 确认提交？数据提交后不可修改。',
-          showCancelButton: true
-        }).then(action => {
-          if (action === 'confirm') {
-            api.get({ // 更改按钮状态
-              key: 'getUPStatus',
-              method: 'POST',
-              data: {
-                'body': {
-                  'ProcessName': 'KL Install Task Complete Action Workflow',
-                  'RowId': item.Id
+        if (userInfo['Person UId'] === item['Primary Owner Id']) {
+          MessageBox({
+            title: '提示',
+            message: ' 确认提交？数据提交后不可修改。',
+            showCancelButton: true
+          }).then(action => {
+            if (action === 'confirm') {
+              api.get({ // 更改按钮状态
+                key: 'getUPStatus',
+                method: 'POST',
+                data: {
+                  'body': {
+                    'ProcessName': 'KL Install Task Complete Action Workflow',
+                    'RowId': item.Id
+                  }
+                },
+                success: function(data) {
+                  self.detail();
                 }
-              },
-              success: function(data) {
-                self.detail();
-              }
-            });
-          } else {
-            self.shipmentVal = false;
-          }
-        });
+              });
+            } else {
+              self.shipmentVal = false;
+            }
+          });
+        } else {
+          Toast('不是任务责任人不可操作！');
+        }
       },
       addTask(item) {
         console.dir('0');
@@ -1089,7 +1099,7 @@
       },
       updateDoor(item, fItem) {
         /**
-         * 零星工程移交批次
+         * 零星工程移交汇总批次
          * */
         var self = this;
         if ((fItem['KL Detail Type LIC'] === 'Transfer Summary') && self.detailData['KL Delivery Sales Type'] !== '工程') {
@@ -1097,6 +1107,7 @@
             console.dir('零星移交完成状态');
           } else {
             if (userInfo['Person UId'] === item['Primary Owner Id']) { // 有权限更新
+              self.getTaskType(item);
               self.$router.push({
                 name: 'updateDoorNext',
                 query: {
@@ -1134,6 +1145,8 @@
                   }
                 });
               }
+            } else if (fItem['KL Detail Type LIC'] === 'Transfer Summary') { //
+              console.dir('真锁汇总移交完成状态操作');
             } else { // 其他批次都是跳转 更新页面
               if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary') {
                 typePage = 'updateDoorNext';
@@ -1180,6 +1193,7 @@
             } else { // 其他批次的更新 统一
               if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Approved' || item['Calculated Activity Status'] === 'Close Reject')) { // 当前登录人与批次负责人相等并且状态是进行中才能更新
                 if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary') {
+                  self.getTaskType(item);
                   self.$router.push({
                     name: 'updateDoorNext',
                     query: {
@@ -1200,12 +1214,10 @@
                   // 标记楼栋资产刷新
                   KND.Session.set('refreshAssets', true);
                 } else {
+                  self.getTaskType(item);
                   self.$router.push({
                     name: 'updateDoor',
-                    query: {
-                      type: 'add',
-                      item: item
-                    }
+                    query: {}
                   });
                 }
               } else { // 没有权限更新和不是负责人只能看日志

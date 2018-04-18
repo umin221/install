@@ -98,6 +98,7 @@
    * @param {String} id 业务id
    */
   let _upload = function(serverIds, id) {
+    var self = this;
     // 成功回调
     let callback = data => {
       tools.success(data, {
@@ -110,6 +111,7 @@
       data: {
         MediaId: serverIds,
         Id: id,
+        Comment: self.Description,
         IOName: 'KL Action Attachment'
       },
       success: callback
