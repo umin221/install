@@ -271,27 +271,27 @@
   // name
   const NameSpace = 'detail';
   //
-  let geocoder = null;
+//  let geocoder = null;
   // 经纬度转换地址
-  const getAaaress = (function() {
-    return function(callback) {
-      KND.Native.getLocation({
-        success(data) {
-          let newLatitude = data.latitude;
-          let newLongitude = data.longitude;
-          geocoder = new qq.maps.Geocoder({
-            complete: function(result) {
-              console.log(result);
-              let addtess = result.detail.address;
-              callback(addtess);
-            }
-          });
-          let latLng = new qq.maps.LatLng(newLatitude, newLongitude);
-          geocoder.getAddress(latLng);
-        }
-      });
-    };
-  })();
+//  const getAaaress = (function() {
+//    return function(callback) {
+//      KND.Native.getLocation({
+//        success(data) {
+//          let newLatitude = data.latitude;
+//          let newLongitude = data.longitude;
+//          geocoder = new qq.maps.Geocoder({
+//            complete: function(result) {
+//              console.log(result);
+//              let addtess = result.detail.address;
+//              callback(addtess);
+//            }
+//          });
+//          let latLng = new qq.maps.LatLng(newLatitude, newLongitude);
+//          geocoder.getAddress(latLng);
+//        }
+//      });
+//    };
+//  })();
   //
   export default {
     name: NameSpace,
