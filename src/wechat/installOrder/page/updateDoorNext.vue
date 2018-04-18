@@ -61,6 +61,7 @@
    * @param {String} id 业务id
    */
   let _upload = function(serverIds, id) {
+    var self = this;
     // 成功回调
     let callback = data => {
       tools.success(data, {
@@ -73,6 +74,7 @@
       data: {
         MediaId: serverIds,
         Id: id,
+        Comment: self.line['Description'],
         IOName: 'KL Installation Log Attachment'
       },
       success: callback
@@ -180,9 +182,9 @@
               if (self.attach.list.length > 0) {
                 uploadAttach(data.items.Id);
               }
-              Toast('提交成功');
               lineObj['Completed Install Amount'] = '';
               lineObj.Description = '';
+              self.attach.list = [];
               // 更新状态
               if (self.item['KL Detail Type LIC'] === 'Transfer Batch') { // 零星真锁移交时更新完成
                 api.get({ // 更改按钮状态
@@ -220,6 +222,7 @@
                       success: function(data) {
                         if (!data.ERROR) {
                           Toast('提交成功');
+                          KND.Util.back();
                         }
                       }
                     });

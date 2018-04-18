@@ -30,8 +30,8 @@
             <span class="journalName">{{item['Contact Login Name']}}</span>
           </li>
           <div class="content-div">
-            <div>已全检数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
-            <div>备注说明：{{item['Unqualified Solve Desc']}}</div>
+            <div>完成数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
+            <div>备注说明：{{Description}}</div>
           </div>
           <attach ioName="KL Installation Log Attachment"
                   :attach="upList(item['KL Installation Log Attachment'])"
@@ -121,6 +121,7 @@
         value: '',
         journalVal: true, // journalVal==true 显示updateDoor的日志  ，否则显示updateDoorNext的日志
         processDate: [],
+        Description: '',
         titleVal: '日志',
         attach: { // 附件
           list: [],
@@ -159,7 +160,11 @@
     },
     methods: {
       upList(obj) {
-        return KND.Util.toArray(obj);
+        var listObj = KND.Util.toArray(obj);
+        if (listObj) {
+          this.Description = listObj[0].Comment;
+        }
+        return listObj;
       },
       getJournal() {
         var self = this;

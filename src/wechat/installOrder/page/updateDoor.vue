@@ -194,6 +194,7 @@
                       success: function(data) {
                         if (!data.ERROR) {
                           Toast('提交成功');
+                          KND.Util.back();
                         }
                       }
                     });
