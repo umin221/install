@@ -176,19 +176,6 @@
   import cusHeader from 'public/components/cus-header';
   //
   const NameSpace = 'index';
-  //
-//  let loader = function(...args) {
-//    let me = this;
-//    let event = args.pop();
-//    let list = args.pop();
-//    let param = args.pop();
-//    me.getList(Object.assign({
-//      callback: (data) => {
-//        console.log(data);
-//        me.$refs[list][event](data < COUNT);
-//      }
-//    }, param));
-//  };
   let loader = function(...args) {
     let me = this;
     let event = args.pop();

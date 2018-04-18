@@ -470,40 +470,64 @@
         let me = this;
         let parms = {};
         if (value1 === 'setOut') {
-          getAaaress(function(data) {
-            parms = {
-              'Object Id': me.ServiceRequest.Id,
-              'ActivityId': me.Action.Id,
-              'key': 'getDepart',
-              'type': 'setOut',
-              'KL Departure Location': data || '出发地址'
-            };
-            me.setStatus({parms: parms, srNum: me.srNumber});
-          });
+//          getAaaress(function(data) {
+//            parms = {
+//              'Object Id': me.ServiceRequest.Id,
+//              'ActivityId': me.Action.Id,
+//              'key': 'getDepart',
+//              'type': 'setOut',
+//              'KL Departure Location': data || '出发地址'
+//            };
+//            me.setStatus({parms: parms, srNum: me.srNumber});
+//          });
+          parms = {
+            'Object Id': me.ServiceRequest.Id,
+            'ActivityId': me.Action.Id,
+            'key': 'getDepart',
+            'type': 'setOut',
+            'KL Departure Location': '出发地址'
+          };
+          me.setStatus({parms: parms, srNum: me.srNumber});
         } else if (value1 === 'reach') {
-          getAaaress(function(data) {
-            console.log(data);
-            parms = {
-              'Object Id': me.ServiceRequest.Id,
-              'ActivityId': me.Action.Id,
-              'key': 'getDepart',
-              'type': 'reach',
-              'MeetingLocation': data || '上门地址'
-            };
-            me.setStatus({parms: parms, srNum: me.srNumber});
-          });
+//          getAaaress(function(data) {
+//            console.log(data);
+//            parms = {
+//              'Object Id': me.ServiceRequest.Id,
+//              'ActivityId': me.Action.Id,
+//              'key': 'getDepart',
+//              'type': 'reach',
+//              'MeetingLocation': data || '上门地址'
+//            };
+//            me.setStatus({parms: parms, srNum: me.srNumber});
+//          });
+          parms = {
+            'Object Id': me.ServiceRequest.Id,
+            'ActivityId': me.Action.Id,
+            'key': 'getDepart',
+            'type': 'reach',
+            'MeetingLocation': '上门地址'
+          };
+          me.setStatus({parms: parms, srNum: me.srNumber});
         } else if (value1 === 'end') {
-          getAaaress(function(data) {
-            console.log(data);
-            parms = {
-              'Object Id': me.ServiceRequest.Id,
-              'ActivityId': me.Action.Id,
-              'key': 'getDone',
-              'DoneLoc': data || '完成地址'
-            };
-            me.setStatus({parms: parms, srNum: me.srNumber});
-            me.popupVisible1 = !me.popupVisible1;
-          });
+//          getAaaress(function(data) {
+//            console.log(data);
+//            parms = {
+//              'Object Id': me.ServiceRequest.Id,
+//              'ActivityId': me.Action.Id,
+//              'key': 'getDone',
+//              'DoneLoc': data || '完成地址'
+//            };
+//            me.setStatus({parms: parms, srNum: me.srNumber});
+//            me.popupVisible1 = !me.popupVisible1;
+//          });
+          parms = {
+            'Object Id': me.ServiceRequest.Id,
+            'ActivityId': me.Action.Id,
+            'key': 'getDone',
+            'DoneLoc': '完成地址'
+          };
+          me.setStatus({parms: parms, srNum: me.srNumber});
+          me.popupVisible1 = !me.popupVisible1;
         }
         if (value1 === 'failureRecord') {
           this.$router.push({
