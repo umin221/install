@@ -5,6 +5,7 @@
     </div>
 
     <indicator></indicator>
+    <div class="copyright">坚朗五金制品股份有限公司</div>
     <div class="login-form xs-icon"
       v-show="login">
       <cus-field class="account" label="账号" tag="账号"
@@ -22,8 +23,6 @@
       <mt-button class="single"
                  @click.native="loginFn">登陆</mt-button>
     </div>
-
-    <div class="copyright">坚朗五金制品股份有限公司</div>
   </div>
 </template>
 
@@ -54,7 +53,9 @@
     methods: {
       ...mapActions(NAMESPACE, ['queryUserInfo', 'cacheUser', 'getCacheUser', 'clear']),
       clearFn() {
-        this.clear();
+        this.clear().then(result => {
+          Indicator.process(false);
+        });
       },
       loginFn() {
         let me = this;
@@ -105,12 +106,12 @@
       position: relative;
       background-color: #fff;
       padding: 0 20px 20px;
-      z-index: 1;
 
       .account {
         .mint-cell-wrapper:before {
           color: $theme-color;
           content: '\A186';
+          font-size: 0.9rem;
         }
       }
 
@@ -118,6 +119,7 @@
         .mint-cell-wrapper:before {
           color: $theme-color;
           content: '\A187';
+          font-size: 0.9rem;
         }
       }
 

@@ -1,6 +1,6 @@
 <template>
   <transition name="mint-indicator">
-    <div class="mint-indicator" v-show="visible">
+    <div class="mint-indicator process" v-show="visible">
       <div class="mint-indicator-wrapper" :style="{ 'padding': text ? '20px' : '15px' }">
         <spinner class="mint-indicator-spin" :type="convertedSpinnerType" :size="32"></spinner>
         <span class="mint-indicator-text" v-show="text">{{ text }}</span>
@@ -11,15 +11,9 @@
 </template>
 
 <style lang="scss">
-  body {
-    >.mint-indicator {
-      display: none;
-    }
-
-    .mint-indicator {
-      position: relative;
-      z-index: 1;
-    }
+  .mint-indicator.process {
+    position: relative;
+    z-index: 2;
   }
 </style>
 
@@ -36,7 +30,7 @@
           }, 1000);
         } else {
           me.visible = true;
-          me.text = option.text;
+          me.text = typeof option === 'string' ? option : option.text;
         }
       };
     },

@@ -122,9 +122,7 @@ class Helper {
     return new Promise((resolve, reject) => {
       console.log('------------ 获取最新数据 start ------------');
       console.log('清除历史数据...');
-      Indicator.process({
-        text: '正在清除历史数据...'
-      });
+      Indicator.process('正在清除历史数据...');
       me.invokeSQL('gt').then(result => {
         let tasks = [];
         result = util.toArray(result);
@@ -149,9 +147,7 @@ class Helper {
     let me = this;
     return new Promise((resolve, reject) => {
       console.log('初始化数据库表...');
-      Indicator.process({
-        text: '正在初始化数据...'
-      });
+      Indicator.process('正在初始化数据...');
       let tasks = [
         me.invokeSQL('ct', 'user', buildCreateField({user_id: null, data: null, state: null, create_date: null})).then(result => {
           console.log('创建数据库表 user...');
@@ -192,8 +188,8 @@ class DataHandle {
     util.log('DataHandle init...');
     let me = this;
     document.addEventListener('online', function() {
-      helper.queryStrict('install_record', {}, result => {
-        if (result && result.length) {
+      handle.getPendingInstallRecord(result => {
+        if (result.length) {
           me.checkNetwork();
         };
       });
@@ -230,9 +226,7 @@ class DataHandle {
     this.getPendingInstallRecord(data => {
       // 未提交数据
       if (data.length) {
-        Indicator.process({
-          text: '正在提交本地数据...'
-        });
+        Indicator.process('正在提交本地数据...');
         // 制定提交记录任务
         let tasks = [];
         let result = [];
@@ -312,9 +306,7 @@ class Cache {
       if (result.length) {
         tools.cordova.alert('检测到本地还有未提交的数据，请先提交数据');
       } else {
-        Indicator.process({
-          text: '正在下载最新数据...'
-        });
+        Indicator.process('正在下载最新数据...');
         helper.clear().then(result => helper.create()).then(result => me.reCache(data)).catch(err => console.error(err));
       }
     });
@@ -338,9 +330,7 @@ class Cache {
       return new Promise((resolve, reject) => {
         console.log(data);
         console.log('开始缓存批次...');
-        Indicator.process({
-          text: '正在缓存批次数据...'
-        });
+        Indicator.process('正在缓存批次数据...');
         invokeSQL('insert', 'batch', {
           data: JSON.stringify(data),
           create_date: now()
@@ -354,9 +344,7 @@ class Cache {
       // 2. 缓存订单行
       return new Promise((resolve, reject) => {
         console.log('开始缓存订单行...');
-        Indicator.process({
-          text: '正在缓存订单数据...'
-        });
+        Indicator.process('正在缓存订单数据...');
         let tasks = [];
         for (let i = 0, len = batchs.length; i < len; i++) {
           tasks.push(new Promise((resolve, reject) => {
@@ -386,9 +374,7 @@ class Cache {
       // 3. 缓存楼栋数据
       return new Promise((resolve, reject) => {
         console.log('开始缓存楼栋...');
-        Indicator.process({
-          text: '正在缓存楼栋数据...'
-        });
+        Indicator.process('正在缓存楼栋数据...');
         let tasks = [];
         for (let i = 0, len = batchs.length; i < len; i++) {
           tasks.push(new Promise((resolve, reject) => {
@@ -421,9 +407,7 @@ class Cache {
       return new Promise((resolve, reject) => {
         console.log(result);
         console.log('开始缓存资产...');
-        Indicator.process({
-          text: '正在缓存资产数据...'
-        });
+        Indicator.process('正在缓存资产数据...');
         let tasks = [];
         for (let i = 0, len = result.length; i < len; i++) {
           let building = [];
@@ -456,9 +440,7 @@ class Cache {
         };
         Promise.all(tasks).then(result => {
           console.log('资产缓存完成...');
-          Indicator.process({
-            text: '数据缓存成功...'
-          });
+          Indicator.process('数据缓存成功...');
           resolve(result);
         });
       });
