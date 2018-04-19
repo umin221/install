@@ -316,7 +316,6 @@
       },
       scan() {
         let me = this;
-        console.log(111);
         KND.Native.scanQRCode({
           success(data) {
             me.SerialNumber = data.resultStr;

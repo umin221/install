@@ -93,10 +93,10 @@
         for (let i = 0; i < me.result.length; i++) {
           if (me.selected[i]) {
             me.result[i].num = 1;
-            this.selectProduct(me.result[i]);
+            me.selectProduct(me.result[i]);
           }
         }
-        this.$router.go(-1);
+        me.$router.go(-1);
       }
     }
   };

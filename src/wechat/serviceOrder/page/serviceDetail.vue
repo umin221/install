@@ -50,50 +50,6 @@
             </mt-tab-container-item>
             <mt-tab-container-item id="tab-container2" class="marginB">
               <empty v-show="!ServiceRequest['Action'] && !allChildService.length"></empty>
-              <toggle v-if="ServiceRequest['Action']" :type="true" :label="ServiceRequest['SR Number']">
-                <div>
-                  <toggle :title="false"
-                          label="故障记录">
-                    <ul class="failure-record">
-                      <li>产品序列号：{{ServiceRequest['KL SN']}}</li>
-                      <li>详细地址：{{ServiceRequest['Personal Street Address']}}</li>
-                      <li>产品类型：{{ServiceRequest['KL Product Model']}}</li>
-                      <li>故障描述：{{ServiceRequest['Sub-Area']}}</li>
-                      <li>故障现象：{{ServiceRequest['Area']}}</li>
-                      <attach ioName="KL Service Request Attachment IO" ref="attach"
-                              :attach="attach1.list"
-                              :edit="attach1.edit"
-                              :title="attach1.title">
-                      </attach>
-                    </ul>
-                  </toggle>
-                  <toggle :title="false" label="完工确认单">
-                    <empty v-show="!orderEntry.length"></empty>
-                    <div class="enter-order">
-                      <div>保修期</div>
-                      <div>产品名称</div>
-                      <div>数量</div>
-                    </div>
-                    <div  v-for="(item, index) in orderEntry">
-                      <div v-if="item['Order Entry - Line Items']">
-                        <div class="enter-order">
-                          <div>{{item['Order Entry - Line Items']['KL Warranty Flag'] === "N" ? "保内": "保外"}}</div>
-                          <div>{{item['Order Entry - Line Items']['KL Product Name Join']}}</div>
-                          <div>{{item['Order Entry - Line Items']['Quantity Requested']}}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="enter-order">
-                      <div>总金额：{{orderEntry['Order Total']}}</div>
-                    </div>
-                    <attach ioName="KL Service Request Attachment IO" ref="attach"
-                            :attach="attach2.list"
-                            :edit="attach2.edit"
-                            :title="attach2.title">
-                    </attach>
-                  </toggle>
-                </div>
-              </toggle>
               <toggle v-if="allChildService.length"
                       v-for="(item, index) in allChildService"
                       :type="true"
@@ -102,7 +58,7 @@
                 <div>
                   <toggle :title="false"
                           label="故障记录"
-                          @ck="showAttach(item.Id, index, 'Problem Record',ProblemRecord[index].list.length)">
+                          @ck="showAttach({id:item.Id, index:index, type:'Problem Record',len:ProblemRecord[index].list.length})">
                     <ul class="failure-record">
                       <li>产品序列号：{{item['KL SN']}}</li>
                       <li>详细地址：{{item['Personal Street Address']}}</li>
@@ -118,7 +74,8 @@
                   </toggle>
                   <toggle :title="false"
                           label="完工确认单"
-                          @ck="showAttach(item.Id, index, 'Job Sheet',JobSheet[index].list.length)">
+                          @ck="showAttach({id:item.Id, index:index, type:'Job Sheet',len:JobSheet[index].list.length})">
+                    <empty v-show="!item['KL Child SR Order']"></empty>
                     <div v-if="item['KL Child SR Order']">
                       <div class="enter-order">
                         <div>保修期</div>
@@ -140,6 +97,52 @@
                               :attach="JobSheet[index].list"
                               :edit="JobSheet[index].edit"
                               :title="JobSheet[index].title">
+                      </attach>
+                    </div>
+                  </toggle>
+                </div>
+              </toggle>
+              <toggle v-if="ServiceRequest['Action']" :type="true" :label="ServiceRequest['SR Number']">
+                <div>
+                  <toggle :title="false"
+                          label="故障记录">
+                    <ul class="failure-record">
+                      <li>产品序列号：{{ServiceRequest['KL SN']}}</li>
+                      <li>详细地址：{{ServiceRequest['Personal Street Address']}}</li>
+                      <li>产品类型：{{ServiceRequest['KL Product Model']}}</li>
+                      <li>故障描述：{{ServiceRequest['Sub-Area']}}</li>
+                      <li>故障现象：{{ServiceRequest['Area']}}</li>
+                      <attach ioName="KL Service Request Attachment IO" ref="attach"
+                              :attach="attach1.list"
+                              :edit="attach1.edit"
+                              :title="attach1.title">
+                      </attach>
+                    </ul>
+                  </toggle>
+                  <toggle :title="false" label="完工确认单">
+                    <empty v-show="!orderEntry.length"></empty>
+                    <div v-if="orderEntry.length">
+                      <div class="enter-order">
+                        <div>保修期</div>
+                        <div>产品名称</div>
+                        <div>数量</div>
+                      </div>
+                      <div  v-for="(item, index) in orderEntry">
+                        <div v-if="item['Order Entry - Line Items']">
+                          <div class="enter-order">
+                            <div>{{item['Order Entry - Line Items']['KL Warranty Flag'] === "N" ? "保内": "保外"}}</div>
+                            <div>{{item['Order Entry - Line Items']['KL Product Name Join']}}</div>
+                            <div>{{item['Order Entry - Line Items']['Quantity Requested']}}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="enter-order">
+                        <div>总金额：{{orderEntry['Order Total']}}</div>
+                      </div>
+                      <attach ioName="KL Service Request Attachment IO" ref="attach"
+                              :attach="attach2.list"
+                              :edit="attach2.edit"
+                              :title="attach2.title">
                       </attach>
                     </div>
                   </toggle>
@@ -271,27 +274,28 @@
   // name
   const NameSpace = 'detail';
   //
-//  let geocoder = null;
-  // 经纬度转换地址
-//  const getAaaress = (function() {
-//    return function(callback) {
-//      KND.Native.getLocation({
-//        success(data) {
-//          let newLatitude = data.latitude;
-//          let newLongitude = data.longitude;
-//          geocoder = new qq.maps.Geocoder({
-//            complete: function(result) {
-//              console.log(result);
-//              let addtess = result.detail.address;
-//              callback(addtess);
-//            }
-//          });
-//          let latLng = new qq.maps.LatLng(newLatitude, newLongitude);
-//          geocoder.getAddress(latLng);
-//        }
-//      });
-//    };
-//  })();
+  let geocoder = null;
+   // 经纬度转换地址
+  const getAaaress = (function() {
+    return function(callback) {
+      KND.Native.getLocation({
+        success(data) {
+          let newLatitude = data.latitude;
+          let newLongitude = data.longitude;
+          geocoder = new qq.maps.Geocoder({
+            complete: function(result) {
+              console.log(result);
+              let addtess = result.detail.addressComponents;
+              let addrDetail = addtess.province + addtess.city + addtess.district + addtess.town + addtess.village + addtess.street + addtess.streetNumber;
+              callback(addrDetail);
+            }
+          });
+          let latLng = new qq.maps.LatLng(newLatitude, newLongitude);
+          geocoder.getAddress(latLng);
+        }
+      });
+    };
+  })();
   //
   export default {
     name: NameSpace,
@@ -310,7 +314,6 @@
         },
         success: data => {
           let attach = KND.Util.toArray(data['SiebelMessage']['Service Request Attachment']);
-          console.log();
           if (attach) {
             for (let i = 0; i < attach.length; i++) {
               if (attach[i]['KL SR Att Type'] === '客户上传附件') {
@@ -471,63 +474,63 @@
         let me = this;
         let parms = {};
         if (value1 === 'setOut') {
-//          getAaaress(function(data) {
-//            parms = {
-//              'Object Id': me.ServiceRequest.Id,
-//              'ActivityId': me.Action.Id,
-//              'key': 'getDepart',
-//              'type': 'setOut',
-//              'KL Departure Location': data || '出发地址'
-//            };
-//            me.setStatus({parms: parms, srNum: me.srNumber});
-//          });
-          parms = {
-            'Object Id': me.ServiceRequest.Id,
-            'ActivityId': me.Action.Id,
-            'key': 'getDepart',
-            'type': 'setOut',
-            'KL Departure Location': '出发地址'
-          };
-          me.setStatus({parms: parms, srNum: me.srNumber});
+          getAaaress(function(data) {
+            parms = {
+              'Object Id': me.ServiceRequest.Id,
+              'ActivityId': me.Action.Id,
+              'key': 'getDepart',
+              'type': 'setOut',
+              'KL Departure Location': data || '出发地址'
+            };
+            me.setStatus({parms: parms, srNum: me.srNumber});
+          });
+//          parms = {
+//            'Object Id': me.ServiceRequest.Id,
+//            'ActivityId': me.Action.Id,
+//            'key': 'getDepart',
+//            'type': 'setOut',
+//            'KL Departure Location': '出发地址'
+//          };
+//          me.setStatus({parms: parms, srNum: me.srNumber});
         } else if (value1 === 'reach') {
-//          getAaaress(function(data) {
-//            console.log(data);
-//            parms = {
-//              'Object Id': me.ServiceRequest.Id,
-//              'ActivityId': me.Action.Id,
-//              'key': 'getDepart',
-//              'type': 'reach',
-//              'MeetingLocation': data || '上门地址'
-//            };
-//            me.setStatus({parms: parms, srNum: me.srNumber});
-//          });
-          parms = {
-            'Object Id': me.ServiceRequest.Id,
-            'ActivityId': me.Action.Id,
-            'key': 'getDepart',
-            'type': 'reach',
-            'MeetingLocation': '上门地址'
-          };
-          me.setStatus({parms: parms, srNum: me.srNumber});
+          getAaaress(function(data) {
+            console.log(data);
+            parms = {
+              'Object Id': me.ServiceRequest.Id,
+              'ActivityId': me.Action.Id,
+              'key': 'getDepart',
+              'type': 'reach',
+              'MeetingLocation': data || '上门地址'
+            };
+            me.setStatus({parms: parms, srNum: me.srNumber});
+          });
+//          parms = {
+//            'Object Id': me.ServiceRequest.Id,
+//            'ActivityId': me.Action.Id,
+//            'key': 'getDepart',
+//            'type': 'reach',
+//            'MeetingLocation': '上门地址'
+//          };
+//          me.setStatus({parms: parms, srNum: me.srNumber});
         } else if (value1 === 'end') {
-//          getAaaress(function(data) {
-//            console.log(data);
-//            parms = {
-//              'Object Id': me.ServiceRequest.Id,
-//              'ActivityId': me.Action.Id,
-//              'key': 'getDone',
-//              'DoneLoc': data || '完成地址'
-//            };
-//            me.setStatus({parms: parms, srNum: me.srNumber});
-//            me.popupVisible1 = !me.popupVisible1;
-//          });
-          parms = {
-            'Object Id': me.ServiceRequest.Id,
-            'ActivityId': me.Action.Id,
-            'key': 'getDone',
-            'DoneLoc': '完成地址'
-          };
-          me.setStatus({parms: parms, srNum: me.srNumber});
+          getAaaress(function(data) {
+            console.log(data);
+            parms = {
+              'Object Id': me.ServiceRequest.Id,
+              'ActivityId': me.Action.Id,
+              'key': 'getDone',
+              'DoneLoc': data || '完成地址'
+            };
+            me.setStatus({parms: parms, srNum: me.srNumber});
+            me.popupVisible1 = !me.popupVisible1;
+          });
+//          parms = {
+//            'Object Id': me.ServiceRequest.Id,
+//            'ActivityId': me.Action.Id,
+//            'key': 'getDone',
+//            'DoneLoc': '完成地址'
+//          };
+//          me.setStatus({parms: parms, srNum: me.srNumber});
           me.popupVisible1 = !me.popupVisible1;
         }
         if (value1 === 'failureRecord') {
@@ -617,22 +620,27 @@
           }
         });
       },
-      showAttach(Id, index, type, len) {
-        if (!len) {
-          let me = this;
+      showAttach(form) {
+        let me = this;
+        let arr = [];
+        console.log(form.len);
+        if (!form.len) {
           me.queryMedias({
             data: {
               'IOName': 'KL Service Request Attachment IO',
               'SearchSpec': {
-                'Service Request Attachment.Activity Id': Id,
-                'Service Request Attachment.KL SR Att Type': 'LookupValue("KL_SR_ATT_TYPE", "' + type + '")'
+                'Service Request Attachment.Activity Id': form.id,
+                'Service Request Attachment.KL SR Att Type': 'LookupValue("KL_SR_ATT_TYPE", "' + form.type + '")'
               }
             },
             success: data => {
-              let arr = KND.Util.toArray(data['SiebelMessage']['Service Request Attachment']);
-              type = type.replace(/\s+/g, '');
-              console.log(type);
-              me.setAttachs({index: index, data: arr, type});
+              arr = KND.Util.toArray(data['SiebelMessage']['Service Request Attachment']);
+              form.type = form.type.replace(/\s+/g, '');
+              me.setAttachs({
+                index: form.index,
+                data: arr,
+                type: form.type
+              });
             }
           });
         }
@@ -737,6 +745,7 @@
                 font-size: 0.75rem;
               }
               .mt-Detail-info{
+                padding-left: 0.5rem;
                 div{
                   line-height: 1.5rem;
                   .detail-call{

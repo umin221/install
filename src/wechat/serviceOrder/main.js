@@ -17,6 +17,7 @@ import App from '../../App';
 import store from './store';
 import './filters'; // Vue Filter
 
+tools.preAppend('https://map.qq.com/api/js?v=2.exp');
 // For back
 Vue.component('fallback', fallback);
 

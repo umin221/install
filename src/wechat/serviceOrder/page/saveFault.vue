@@ -29,13 +29,18 @@
           </div>
           <div class="Parts" v-show="isBn === '保外'">
             <div style="width: 30%"></div>
-            <div class="PartsDetail"><div>上门费</div><div class="toRed">￥{{fee}}</div><div></div></div>
+            <!--<div class="PartsDetail"><div>上门费</div><div class="toRed">￥{{fee}}</div><div></div></div>-->
           </div>
           <div class="addBtn">
             <mt-button type="primary" @click.native="toTranslated"><i class="xs-icon icon-add"></i>添加配件</mt-button>
-            <mt-button type="primary" v-show="isBn === '保外'" @click.native="getLov1('wm')"><i class="xs-icon icon-add" ></i>添加上门费</mt-button>
+            <!--<mt-button type="primary" v-show="isBn === '保外'" @click.native="getLov1('wm')"><i class="xs-icon icon-add" ></i>添加上门费</mt-button>-->
           </div>
         </div>
+        <cus-field label="上门费"
+                   v-show="isBn === '保外'"
+                   placeholder="请输入上门费"
+                   :attr="{'min':'0'}"
+                   type="number" v-model="fee"></cus-field>
         <mt-cell title="总费用">￥{{Product}}</mt-cell>
         <mt-cell class="require" title="附件"></mt-cell>
         <div style="background-color: #ffffff">
@@ -57,6 +62,7 @@ import {mapState, mapActions, mapMutations} from 'vuex';
 import { MessageBox } from 'mint-ui';
 import menuBox from '../../../public/components/cus-menu';
 import numBox from '../components/number-box';
+import cusField from 'public/components/cus-field';
 const NAMESPACE = 'saveFault';
 let _upload = function(serverIds, id) {
   let callback = data => {
@@ -84,6 +90,12 @@ export default {
     let service = me.$route.query;
     let serviceId = service.id;
     me.serviceType = service.type;
+    console.log(me.selected.length);
+    if (!me.selected.length) {
+      me.initSelect();
+    } else {
+      me.deleteSelected();
+    }
     if (serviceId) {
       me.getServiceR({
         Id: serviceId,
@@ -108,7 +120,6 @@ export default {
       type: 'KL_SR_ATT_TYPE',
       parent: '',
       success: function(data) {
-        console.log(data);
         let items = data.items;
         for (let i = 0; i < items.length;i++) {
           if (items[i].Name === 'Job Sheet') {
@@ -128,7 +139,7 @@ export default {
       serviceType: '',
       productData: [],
       switchStatus: [],
-      fee: 0,
+      fee: '',
       allFee: 0,
       one: 1,
       Service: {},
@@ -141,21 +152,23 @@ export default {
   },
   computed: {
     ...mapState(NAMESPACE, ['isBn', 'returnSelect']),
-    ...mapState('searchTrans', ['priceId']),
+    ...mapState('searchTrans', ['priceId', 'selected']),
     ...mapState('detail', ['ServiceRequest']),
     Product() {
       let me = this;
       let len = me.returnSelect.length;
       me.allFee = 0;
       if (me.isBn === '保外') {
-        me.allFee = me.allFee + me.fee;
+        if (me.fee) {
+          me.allFee = me.allFee + parseFloat(me.fee, 0);
+        }
       } else {
         me.allFee = me.allFee + 0;
       }
       if (len) {
         for (let i = 0;i < len;i++) {
           if (!me.switchStatus[i]) {
-            me.allFee += me.returnSelect[i].num * parseInt(me.returnSelect[i]['List Price'], 0);
+            me.allFee += me.returnSelect[i].num * parseFloat(me.returnSelect[i]['List Price'], 0);
           }
         }
       }
@@ -164,9 +177,9 @@ export default {
   },
   methods: {
     ...mapActions(NAMESPACE, ['addServiceOrder', 'getServiceR']),
-    ...mapMutations(NAMESPACE, ['setIsBn', 'ProductNum', 'deleteProduct']),
+    ...mapMutations(NAMESPACE, ['setIsBn', 'ProductNum', 'deleteProduct', 'initSelect']),
     ...mapActions('app', ['getLov', 'upload']),
-    ...mapMutations('searchTrans', ['initSelected']),
+    ...mapMutations('searchTrans', ['initSelected', 'deleteSelected']),
     ...mapMutations('detail', ['setPartner']),
     productNumber(val, num, type) {
       let me = this;
@@ -181,6 +194,9 @@ export default {
     },
     deleteFn(item) {
       this.deleteProduct(item);
+    },
+    changeone() {
+      console.log(11);
     },
     submit() {
       let me = this;
@@ -204,6 +220,15 @@ export default {
             'Product': me.returnSelect[i].Name, // 产品编码
             'Quantity Requested': me.returnSelect[i].num, // 数量
             'KL Warranty Flag': me.switchStatus[i] ? 'Y' : 'N'
+          };
+          lineItems.push(obj);
+        }
+        if (me.isBn === '保外' && me.fee) {
+          obj = {
+            'Id': lineItems.length + 1,
+            'Product': 'AP003', // 产品编码
+            'Unit Price': me.fee,
+            'KL Warranty Flag': 'N'
           };
           lineItems.push(obj);
         }
@@ -268,7 +293,13 @@ export default {
       }
     }
   },
-  components: {menuBox, numBox, MessageBox}
+  watch: {
+    fee() {
+      let reg = new RegExp(/-/g, '');
+      this.fee = this.fee.replace(reg);
+    }
+  },
+  components: {menuBox, numBox, MessageBox, cusField}
 };
 </script>
 <style lang="scss">

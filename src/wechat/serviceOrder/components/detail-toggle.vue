@@ -11,7 +11,7 @@
 <script type="es6">
   export default {
     name: 'cus-toggle',
-    props: ['label', 'type', 'index'],
+    props: ['label', 'type', 'index', 'form'],
     data() {
       return {
         visible: false,
@@ -29,7 +29,7 @@
         let me = this;
         me.visible = !me.visible;
         if (me.visible) {
-          me.$emit('ck');
+          me.$emit('ck', this.form);
         }
       }
     }

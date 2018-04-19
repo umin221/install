@@ -7,7 +7,7 @@ import { app } from 'public/store';
 Vue.use(Vuex);
 
 // 缓存页面
-app.state.alive = ['index', 'close'];
+app.state.alive = ['index'];
 
 //
 // const STATUS2LIST = {
@@ -409,17 +409,22 @@ export default new Vuex.Store({
           }
           if (form['KL Child Service Request']) {
             let childService = KND.Util.toArray(form['KL Child Service Request']);
-            let attrch = { // 故障记录 附件
-              list: [],
-              edit: false,
-              title: '附件'
-            };
             childService = systemSort(childService, 'Opened Date');
             state.ProblemRecord = [];
             state.JobSheet = [];
             for (let i = 0; i < childService.length;i++) {
+              let attrch = { // 故障记录 附件
+                list: [],
+                edit: false,
+                title: '故障附件'
+              };
+              let attrch1 = { // 故障记录 附件
+                list: [],
+                edit: false,
+                title: '完工附件'
+              };
               state.ProblemRecord.push(attrch);
-              state.JobSheet.push(attrch);
+              state.JobSheet.push(attrch1);
             }
             state.allChildService = childService;
             state.childService = childService[0];
@@ -703,7 +708,7 @@ export default new Vuex.Store({
               form
             },
             success: function(data) {
-              Toast('提交成功！');
+
               form.callback(data);
               // callback(data);
             },
@@ -780,6 +785,9 @@ export default new Vuex.Store({
           for (let i = 0; i < state.result.length;i++) {
             state.selected.push(false);
           }
+        },
+        deleteSelected(state) {
+          state.selected = [];
         }
       },
       actions: {
@@ -924,9 +932,6 @@ export default new Vuex.Store({
         },
         selectProduct(state, select) {                    // 确认选择的配件
           state.returnSelect.push(select);
-          if (!state.returnSelect.length) {
-            Toast('请选择配件');
-          }
         },
         initSelect(state) {
           state.returnSelect = [];
