@@ -6,7 +6,7 @@ import { app } from 'public/store';
 Vue.use(Vuex);
 
 // 缓存页面
-app.state.alive = ['index'];
+app.state.alive = ['index', 'myRepair'];
 
 const systemSort = function(array, type) {
   return array.sort(function(a, b) {
