@@ -122,7 +122,7 @@
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="addTask(taskData)" class="batchAdd"></span>
                   <span style="width:60px;">{{taskData.Status}}</span>
               </div>
-              <div class="content-div"
+              <div class="content-div" style="margin-top: 20px"
                 v-if="taskData['KL Detail Type LIC']==='Trompil Batch Summary' ||
                 taskData['KL Detail Type LIC']==='Lock Body Install Summary' ||
                 taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
@@ -141,17 +141,19 @@
                     taskData['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
                     taskData['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
                     taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
-                    taskData['KL Detail Type LIC'] === 'Transfer Summary'"
+                    taskData['KL Detail Type LIC'] === 'Transfer Summary' ||
+                    taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
+                    taskData['KL Detail Type LIC'] === 'Check Before Trans Summary'"
                     :value="itemTask['KL Completed Install Amount']+'/'+itemTask['KL Install Amount Requested']">
                     <span v-if="showClose(itemTask)" @click.stop="closeTask(itemTask)" class="batchClose"></span>
                     <span v-if="itemTask['Calculated Activity Status'] === 'In Progress' && itemTask['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
                   </mt-field>
-                  <mt-field label="合格/计划数量"
+                 <!-- <mt-field label="合格/完成数量"
                     v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
                     taskData['KL Detail Type LIC'] === 'Check Before Trans Summary'"
-                    :value="itemTask['KL Qualified Amount']+'/'+itemTask['KL Spot Check Amount']">
+                    :value="itemTask['KL Qualified Amount']+'/'+itemTask['KL Completed Install Amount']">
                     <span v-if="itemTask['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
-                  </mt-field>
+                  </mt-field>-->
                   <mt-field label="时间" :value="new Date(itemTask['Planned Completion']).format('yyyy-MM-dd')"></mt-field>
                   <mt-field label="状态" :value="itemTask.Status"></mt-field>
                 </div>
@@ -389,7 +391,7 @@
     }
 
     .stage_li > .mui-scroll-wrapper a > div.icon > span.close {
-      background: #d61518 !important;
+      background: #0772c1 !important;
     }
     .stage_li > .mui-scroll-wrapper a > div.icon > span.approval {
       background: #0772c1 !important;
@@ -400,7 +402,7 @@
     }
 
     .stage_li > .mui-scroll-wrapper a > div.icon > span.close > span:before {
-      color: #d61518;
+      color: #0772c1;
       position: absolute;
       top: 2px;
       left: 2px;
@@ -474,7 +476,7 @@
     }
 
     .stage_li > .mui-scroll-wrapper a > div.close {
-      color: #d61518;
+      color: #0772c1;
     }
     .stage_li > .mui-scroll-wrapper a > div.approval {
       color: #0772c1;
@@ -505,6 +507,7 @@
     created() {
       let me = this;
       me.id = me.$route.query.id;
+
       this.detail();
       KND.Native.getUserInfo((info) => {
         userInfo = info;

@@ -311,6 +311,7 @@
             'body': {
               'ContactName': self.Contact_Name,
               'ContactPhone': self.Contact_Phone,
+              'Amount': self.assetsLeng,
               'ProcessName': 'KL Install Order Asset Lock Transfer Process',
               'SiebelMessage': {
                 'MessageId': '',

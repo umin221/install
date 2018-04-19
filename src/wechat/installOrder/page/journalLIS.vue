@@ -32,7 +32,7 @@
             <span class="journalName">{{item['Contact Login Name']}}</span>
           </li>
           <div class="content-div">
-            <div>已全检数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
+            <div>完成数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
             <div>备注说明：{{item['Unqualified Solve Desc']}}</div>
           </div>
           <attach :attach="attach.list"
