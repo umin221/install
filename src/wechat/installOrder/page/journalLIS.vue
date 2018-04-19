@@ -13,10 +13,10 @@
             <span class="journalName">{{item['Contact Login Name']}}</span>
           </li>
           <div class="content-div">
-            <span @click="addJounal(item)">抽样</span>
-            <div>安装人员：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
-            <div>已开孔数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
-            <div>合格数量/异常数量：{{item['Qualified Amoun']}}/{{item['Unqualified Amount']}}</div>
+            <span class="content-div-span" @click="addJounal(item)">抽样</span>
+            <div>安装人员：<span style="color: #0772c1">{{item['Contact Login Name']}}</span></div>
+            <div>完成数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
+            <div>合格数量/异常数量：{{item['Qualified Amount']}}/{{item['Unqualified Amount']}}</div>
             <div>异常处理数量：{{item['Unqualified Solve Amount']}}</div>
             <div>异常描述：{{item['Unqualified Desc']}}</div>
             <div>异常跟进描述：{{item['Unqualified Solve Desc']}}</div>
@@ -92,6 +92,11 @@
       padding-left: 10px;
       font-size: 0.7rem;
     }
+    .content-div-span {
+      position: absolute;
+      right: 10px;
+      color: #0772c1;
+    }
   }
 </style>
 <script type="application/javascript">
@@ -104,12 +109,12 @@
     handler: () => this.$messagebox('delete')
   }];
   export default {
-    name: 'journalLIS',
+    name: NameSpace,
     created() {
       var self = this;
       self.titleVal = '日志';
       let param = this.$route.query;
-      this.id = param.id;
+      this.id = this.itemTask.Id;
       this.type = param.type;
       if (this.type === 'updateDoorNext') {
         this.journalVal = false;
@@ -123,7 +128,12 @@
         value: '',
         journalVal: true, // journalVal==true 显示updateDoor的日志  ，否则显示updateDoorNext的日志
         processDate: [],
-        titleVal: '日志'
+        titleVal: '日志',
+        attach: { // 附件
+          list: [],
+          edit: false,
+          title: '附件'
+        }
       };
     },
     beforeRouteEnter(to, from, next) {
@@ -134,7 +144,7 @@
       });
     },
     computed: {
-      ...mapState(NameSpace, ['form', 'attach']),
+      ...mapState('detail', ['itemTask']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -175,11 +185,12 @@
         });
       },
       addJounal(item) {
+        var self = this;
         self.$router.push({
           name: 'updateLIS',
           query: {
             type: 'add',
-            fItem: item,
+            anName: item['Contact Login Name'],
             id: item.Id
           }
         });

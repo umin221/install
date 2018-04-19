@@ -37,9 +37,9 @@
         userInfo = info;
         console.log(userInfo);
       });
-      if (userInfo['KL Primary Position Type LIC'] === 'Field Service Manager') {
+      /* if (userInfo['KL Primary Position Type LIC'] === 'Field Service Manager') { // 主管可以修改负责人
         me.isUpPrimary = true;
-      }
+      }*/
       me.id = me.$route.query.id;
       api.get({
         key: 'getXttd',

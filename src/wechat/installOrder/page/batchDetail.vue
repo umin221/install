@@ -17,7 +17,7 @@
         </mt-field>
         <mt-field label="计划开始日期"  :value="start_Date"></mt-field>
         <mt-field label="计划完成日期" :value="end_Date"></mt-field>
-        <mt-field label="计划数量" class="enable numCla"
+        <mt-field label="计划数量" class="enable" :class="showNum()"
                   :value="batchNum"
                   @click.native="editBuildingFn"
                   is-link></mt-field>
@@ -145,6 +145,7 @@
         batchNum: 0, // 数量
         planList: [],
         installerList: [],
+        detailData: {}, // 详细信息
         appData: {}, // 审批信息头
         appDataTask: {}, // 审批信息子任务信息
         id: '',
@@ -186,6 +187,12 @@
           }
         });
       },
+      showNum() {
+        var self = this;
+        if (self.detailData['KL Detail Type LIC'] === 'Lock Installation Batch' && self.detailData['KL Delivery Sales Type'] === '工程') {
+          return 'numCla';
+        }
+      },
       addPlanList(item) {
         this.$router.push({
           name: 'detailPlan',
@@ -204,6 +211,7 @@
           },
           success: data => {
             console.dir(data);
+            self.detailData = data;
             if (data['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
               data['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
               data['KL Detail Type LIC'] === 'Door Hanging Acc Batch' ||
@@ -389,16 +397,18 @@
         if (self.is_option) { // 审批中不能查看楼栋编辑
           return;
         }
-        let id = this.$route.query.Id;
-        this.$router.push({
-          path: 'assets',
-          query: {
-            TaskId: id,
-            mode: 'edit'
-          }
-        });
-        // 标记楼栋资产刷新
-        KND.Session.set('refreshAssets', true);
+        if (self.detailData['KL Detail Type LIC'] === 'Lock Installation Batch' && self.detailData['KL Delivery Sales Type'] === '工程') {
+          let id = this.$route.query.Id;
+          this.$router.push({
+            path: 'assets',
+            query: {
+              TaskId: id,
+              mode: 'edit'
+            }
+          });
+          // 标记楼栋资产刷新
+          KND.Session.set('refreshAssets', true);
+        }
       }
     },
     components: {buttonGroup, lockLine}

@@ -650,6 +650,10 @@
       punchClock() { // 安装打卡
         var self = this;
         // 获取订单经纬度
+        if (!self.detailData['KL Agreement Opportunity Id']) {
+          Toast('无经纬度信息，无法打卡！');
+          return;
+        }
         api.get({
           key: 'getLatLong',
           method: 'POST',
@@ -663,7 +667,7 @@
           success: function(data) {
             var obj = data.SiebelMessage.Lead;
             if (!obj) {
-              Toast('找不到订单经纬度，无法打卡！');
+              Toast('无经纬度信息，无法打卡！');
               return;
             }
             if (obj['KL Lead Address Latitude'] && obj['KL Lead Address Longitude']) {
@@ -1127,9 +1131,9 @@
           // 根据状态跳转更新还是日志页面
           if (item['Calculated Activity Status'] === 'Completed') { // 已完成=Completed、已忽略=Ignore 跳转日志不能再修改
             if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次 完成状态先跳转日志   日志页面与其他日志页面不共用
+              self.getTaskType(item);
               if (self.detailData['KL Delivery Sales Type'] !== '工程') { // 零星
                 // 跳转真锁安装批次新增页面
-                self.getTaskType(item);
                 this.$router.push({
                   name: 'sporadic',
                   query: {
@@ -1172,9 +1176,9 @@
               if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Approved')) {
                 is_deit = true;
               }
+              self.getTaskType(item);
               if (self.detailData['KL Delivery Sales Type'] !== '工程') { // 零星
                 // 跳转真锁安装批次新增页面
-                self.getTaskType(item);
                 this.$router.push({
                   name: 'sporadic',
                   query: {

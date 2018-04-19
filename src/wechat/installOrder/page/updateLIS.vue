@@ -6,20 +6,19 @@
     <div class="mint-content zsBatch">
       <div class="read">
         <cus-field label="安装人员"
-                   v-model="XXX"></cus-field>
-        <cus-field label="完成数量"
-                   v-model="line['Completed Install Amount']"></cus-field>
+                   v-model="anName"></cus-field>
       </div>
       <div :class="{'readonly':read}">
+        <cus-field label="完成数量" tag="完成数量"
+                   type="number"
+                   v-valid.require
+                   v-model="line['Completed Install Amount']"></cus-field>
         <cus-field label="抽查数量"
                    type="number"
                    v-model="line['Spot Check Amount']"></cus-field>
         <cus-field label="合格数量"
                    type="number"
                    v-model="line['Qualified Amount']"></cus-field>
-        <!--<cus-field label="异常数量"
-                   type="number"
-                   v-model="line['Unqualified Amount']"></cus-field>-->
         <cus-field label="异常处理数量"
                    type="number"
                    v-model="line['Unqualified Solve Amount']"></cus-field>
@@ -58,16 +57,22 @@
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
   import api from '../api/api';
-  import {mapState} from 'vuex';
+  import {mapState, mapActions} from 'vuex';
+  import Vue from 'vue';
+  import vp from 'public/plugin/validator';
+  Vue.use(vp);
+
   export default {
     name: 'updateLIS',
     created() {
       let param = this.$route.query;
-      this.id = param.id;
+      this.id = this.itemTask.Id;
+      this.anName = param.anName;
     },
     data: () => {
       return {
         id: '',
+        anName: '',
         type: 'add', // add 新增 / edit 编辑 / read 只读
         titleVal: '真锁安装抽样',
         line: {},
@@ -83,6 +88,7 @@
     },
     computed: {
       ...mapState('index', ['infoUser']),
+      ...mapState('detail', ['itemTask']),
       // 表单只读
       read() {
         return this.type === 'read';
@@ -100,34 +106,79 @@
       }
     },
     methods: {
+      ...mapActions('app', ['getLov']),
       submitFn() {
         var self = this;
-        var lineObj = self.line;
-        api.get({ // 提交详细计划数据
-          key: 'setJourna',
-          method: 'PUT',
-          data: {
-            'Id': '0001', // 默认ID
-            'Activity Id': self.id,
-            'Completed Install Amount': lineObj['Completed Install Amount'], // 新增批次返回的ID
-            'Spot Check Amount': lineObj['Spot Check Amount'], // 新增批次返回的ID
-            'Qualified Amount': lineObj['Qualified Amount'], // 新增批次返回的ID
-            'Unqualified Solve Amount': lineObj['Unqualified Solve Amount'], // 新增批次返回的ID
-            'Unqualified Desc': lineObj['Unqualified Desc'], // 新增批次返回的ID
-            'Unqualified Solve Desc': lineObj['Unqualified Solve Desc'] // 新增批次返回的ID
-          },
-          success: function(data) {
-            if (!data.ERROR) {
-              Toast('提交成功');
-              lineObj['Completed Install Amount'] = '';
-              lineObj['Spot Check Amount'] = '';
-              lineObj['Qualified Amount'] = '';
-              lineObj['Unqualified Solve Amount'] = '';
-              lineObj['Unqualified Desc'] = '';
-              lineObj['Unqualified Solve Desc'] = '';
-              KND.Util.back();
+        tools.valid.call(this, () => {
+          var lineObj = self.line;
+          if (lineObj['Spot Check Amount']) { // 抽查数量有值 判断不能大于完成数量
+            if (parseInt(lineObj['Spot Check Amount'], 10) > parseInt(lineObj['Completed Install Amount'], 10)) {
+              Toast('抽查数量不能大于完成数量！');
+              return;
             }
           }
+          if (lineObj['Qualified Amount']) {
+            if (parseInt(lineObj['Qualified Amount'], 10) > parseInt(lineObj['Spot Check Amount'], 10)) {
+              Toast('合格数量不能大于抽查数量！');
+              return;
+            }
+          }
+          if (lineObj['Unqualified Solve Amount']) {
+            var numC = parseInt(lineObj['Completed Install Amount'], 10) - parseInt(lineObj['Qualified Amount'], 10);
+            if (parseInt(lineObj['Unqualified Solve Amount'], 10) > numC) {
+              Toast('异常处理数量不合理，不能大于完成数量与合格数量的差值！');
+              return;
+            }
+          }
+          api.get({ // 提交详细计划数据
+            key: 'setJourna',
+            method: 'PUT',
+            data: {
+              'Id': self.itemTask.Id, // 默认ID
+              'Activity Id': self.itemTask['Activity UID'],
+              'Completed Install Amount': lineObj['Completed Install Amount'], // 新增批次返回的ID
+              'Spot Check Amount': lineObj['Spot Check Amount'], // 新增批次返回的ID
+              'Qualified Amount': lineObj['Qualified Amount'], // 新增批次返回的ID
+              'Unqualified Solve Amount': lineObj['Unqualified Solve Amount'], // 新增批次返回的ID
+              'Unqualified Desc': lineObj['Unqualified Desc'], // 新增批次返回的ID
+              'Unqualified Solve Desc': lineObj['Unqualified Solve Desc'] // 新增批次返回的ID
+            },
+            success: function(data) {
+              if (!data.ERROR) {
+                lineObj['Completed Install Amount'] = '';
+                lineObj['Spot Check Amount'] = '';
+                lineObj['Qualified Amount'] = '';
+                lineObj['Unqualified Solve Amount'] = '';
+                lineObj['Unqualified Desc'] = '';
+                lineObj['Unqualified Solve Desc'] = '';
+                // 更新状态
+                var Status = '';
+                self.getLov({ // 取类型值
+                  data: {
+                    'Type': 'EVENT_STATUS',
+                    'Name': 'In Progress'
+                  },
+                  success: data => {
+                    Status = KND.Util.toArray(data.items)[0].Value;
+                    var parma = {};
+                    parma.Status = Status;
+                    parma.Id = self.id;
+                    api.get({ // 提交数据
+                      key: 'getUPData',
+                      method: 'PUT',
+                      data: parma,
+                      success: function(data) {
+                        if (!data.ERROR) {
+                          Toast('提交成功');
+                          KND.Util.back();
+                        }
+                      }
+                    });
+                  }
+                });
+              }
+            }
+          });
         });
       }
     },

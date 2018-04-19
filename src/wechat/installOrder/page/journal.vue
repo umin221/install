@@ -13,7 +13,7 @@
             <span class="journalName">{{item['Contact Login Name']}}</span>
           </li>
           <div class="content-div">
-            <div>已开孔数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
+            <div>完成数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
             <div>合格数量/异常数量：{{item['Qualified Amount']}}/{{item['Unqualified Amount']}}</div>
             <div>异常处理数量：{{item['Unqualified Solve Amount']}}</div>
             <div>异常描述：{{item['Unqualified Desc']}}</div>
@@ -31,7 +31,7 @@
           </li>
           <div class="content-div">
             <div>完成数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
-            <div>备注说明：{{Description}}</div>
+            <div>备注说明：{{showDescription(item, item['KL Installation Log Attachment'], index)}}</div>
           </div>
           <attach ioName="KL Installation Log Attachment"
                   :attach="upList(item['KL Installation Log Attachment'])"
@@ -160,11 +160,16 @@
     },
     methods: {
       upList(obj) {
+        return KND.Util.toArray(obj);
+      },
+      showDescription(item, obj, index) {
         var listObj = KND.Util.toArray(obj);
-        if (listObj) {
-          this.Description = listObj[0].Comment;
+        var description = '';
+        if (listObj.length > 0) {
+          description = listObj[0].Comment;
         }
-        return listObj;
+        console.dir(description);
+        return description;
       },
       getJournal() {
         var self = this;
