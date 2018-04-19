@@ -31,7 +31,7 @@ class Cordova {
     }, false);
     // 设备启动
     document.addEventListener('deviceready', function() {
-      me.ready();
+      me.onDeviceReady();
     }, false);
     //监听返回键按钮事件
     //document.addEventListener("backbutton", function() {
@@ -39,10 +39,36 @@ class Cordova {
   };
 
   /**
-   * cordova 启动完成回调
+   * 设备准备完成回调
    */
-  ready() {
-    this.checkUpdate();
+  onDeviceReady() {
+    this.getUpdateController();
+  };
+
+  /**
+   * 获取更新
+   */
+  getUpdateController() {
+    let me = this;
+    // check, if update was previously loaded and available for download
+    chcp.isUpdateAvailableForInstallation(function(error, data) {
+      console.log('isUpdateAvailableForInstallation: ' + JSON.stringify(error));
+      if (error) {
+        chcp.fetchUpdate((error, data) => {
+          console.log('fetchUpdate: ' + JSON.stringify(error));
+          if (!error) {
+            Indicator.open('正在更新');
+            chcp.installUpdate((error) => {
+              console.log('installUpdate: ' + JSON.stringify(error));
+              if (!error) {
+                me.alert('升级完成，重新启动');
+                console.log('Update installed!');
+              }
+            });
+          }
+        });
+      }
+    });
   };
 
   /**
@@ -53,30 +79,6 @@ class Cordova {
       console.log('goHome success');
     }, function() {
       console.log('goHome success1');
-    });
-  };
-
-  /**
-   * 检测更新
-   */
-  checkUpdate() {
-    let me = this;
-    // 说明：这里的使用了Framework7
-    chcp.fetchUpdate(function(error, data) {
-      if (!error) {
-        me.confirm('有更新，确定更新吗?', result => {
-          if (result === 2) {
-            me.alert('正在升级，升级完毕应用将自动重启...');
-            chcp.installUpdate(error => {
-              me.alert('更新完成');
-            });
-          } else {
-            console.log('取消更新！');
-          }
-        });
-      } else {
-        console.log('你当前是最新版本');
-      }
     });
   };
 

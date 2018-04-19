@@ -12,7 +12,6 @@
       <mt-button v-show="!isEdit && !isSelect" @click.native="submitFn" slot="right" >提交</mt-button>
     </mt-header>
 
-    <indicator></indicator>
     <div class="mint-content assets" :class="{read: !editable}">
       <mt-navbar v-model="selected">
         <mt-tab-item class="xs-icon"
@@ -83,6 +82,9 @@
   export default {
     name: NAMESPACE,
     activated() {
+      setTimeout(function() {
+        Indicator.process(false);
+      }, 10000);
       let me = this;
       // 刷新当前页
       let refresh = KND.Session.get('refreshAssets');
