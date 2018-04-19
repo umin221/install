@@ -146,14 +146,16 @@
       },
       // Delete Install Order
       deleteFn(item, index) {
-        if (item['Status'] === '草稿') {
-          this.delete({
-            id: item.Id,
-            index: index
-          });
-        } else {
-          Toast('非草稿状态不允许删除');
-        }
+        MessageBox.confirm('是否删除订单？', '请确认').then(action => {
+          if (item['Status'] === '草稿') {
+            this.delete({
+              id: item.Id,
+              index: index
+            });
+          } else {
+            Toast('非草稿状态不允许删除');
+          }
+        });
       }
     }
   };

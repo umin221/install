@@ -240,6 +240,7 @@ export default {
             data: data,
             success: data => {
               tools.success(data, {
+                back: true,
                 successTips: '添加成功'
               });
               // 标记楼栋资产刷新

@@ -39,7 +39,6 @@
                    v-valid.require
                    v-model="line['KL Door Thickness']"></cus-field>
         <cus-field label="锁芯中心距门内距" tag="锁芯中心距门内距"
-                   v-if="isVP || isPanel"
                    v-valid.require
                    v-model="line['KL Lock Core Distance']"></cus-field>
         <cus-field label="锁舌导向板规格" tag="锁舌导向板规格"
@@ -109,16 +108,15 @@
       me.type = param.type;
       // 当前页面是否可编辑
       me.editable = param.editable;
-      // 标记状态是否为添加订单行
+      // 无id，代表是新增，默认携带参数 面板 VP00301 / 锁体 VP00302
       me.isAdd = !line.Id;
-
-      // 不可编辑状态下不需要后续操作
-      if (!me.editable) return;
       // 订单行默认参数
       if (line) {
         me.line = line;
         me.line.Id = me.line.Id || KND.Util.now();
       };
+      // 不可编辑状态下不需要后续操作
+      if (!me.editable) return;
       // 仅标记为新增时可选择产品型号
       if (me.isAdd) {
         // 取 lov 产品型号
@@ -130,6 +128,7 @@
             me.line['KL Product Model No'] = data.items[0].Value;
           }
         });
+        line.Product = param.type === 'Panel' ? 'VP00301' : 'VP00302';
       };
 
       // 取 lov 开向
