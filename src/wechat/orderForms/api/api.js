@@ -1,6 +1,6 @@
 let ApiList = {
   getList: option => {
-    option.data.team = option.data.team ? 'Manager' : 'Personal';
+    option.data.team = option.data.team ? 'Manager' : 'Sales Rep';
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/QueryPage',
