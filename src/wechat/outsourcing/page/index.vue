@@ -101,6 +101,10 @@
     },
     // 列表刷新
     activated() {
+      // 清空委外详情表单
+      this.clear();
+      // 清空负责人选择
+      this.selEngineer('');
       let list = KND.Session.get('refresh');
       if (list) refresh.call(this, list);
     },
@@ -122,7 +126,9 @@
     methods: {
       ...mapActions(NAMESPACE, ['getPartners']),
       ...mapMutations(NAMESPACE, ['setManager']),
-      // 已失效顶部加载
+      ...mapMutations('detail', ['clear']),
+      ...mapMutations('engineer', ['selEngineer']),
+        // 已失效顶部加载
       loadTopFn(type) {
         loader.call(this, type, false);
       },

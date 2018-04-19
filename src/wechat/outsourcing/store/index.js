@@ -139,11 +139,21 @@ export default new Vuex.Store({
         addPartner({state}, success) {
           success = success || (data => console.log(data));
           let partner = state.form;
+          let select = this.state.engineer.select;
           // Alias 为必填，默认填入 Name
           partner.Alias = partner.Alias || partner.Name;
           // 失效编辑状态修改
-          if (partner.state === '失效') {
-            partner.state = '待审批';
+          // if (partner.state === '失效') {
+          //  partner.state = '待审批';
+          // };
+          // 添加委外负责人
+          if (select) {
+            partner['ListOfChannel Partner_Position'] = {
+              'Channel Partner_Position': {
+                'Id': select.Id,
+                'IsPrimaryMVG': select['KL Primary Position Type LIC'] === 'Field Service Manager' ? 'Y' : 'N'
+              }
+            };
           };
           api.get({
             key: 'submitPartner',
@@ -160,9 +170,21 @@ export default new Vuex.Store({
         update({state}, setting) {
           delete state.form['Channel Partner_Position'];
           delete state.form['User'];
+          let partner = state.form;
+          // 更新委外负责人
+          let select = this.state.engineer.select;
+          if (select) {
+            partner['ListOfChannel Partner_Position'] = {
+              'Channel Partner_Position': {
+                'Id': select.Id,
+                'IsPrimaryMVG': select['KL Primary Position Type LIC'] === 'Field Service Manager' ? 'Y' : 'N'
+              }
+            };
+          };
+          // 更新信息
           api.get(Object.extend(true, {
             key: 'update',
-            data: state.form,
+            data: partner,
             success: data => {
               tools.success(data, {
                 successTips: '更新成功'
@@ -257,6 +279,57 @@ export default new Vuex.Store({
                   message: '提交失败'
                 });
               }
+            }
+          });
+        }
+      }
+    },
+
+    /**
+     * 选择负责人
+     */
+    engineer: {
+      namespaced: true,
+      state: {
+        result: [],
+        select: ''
+      },
+      mutations: {
+        setEngineer(state, engineer) {
+          state.result = engineer;
+        },
+        addEngineer(state, engineer) {
+          state.result.push(...engineer);
+        },
+        selEngineer(state, engineer) {
+          state.select = engineer;
+        }
+      },
+      actions: {
+        /**
+         * 查找安装工程师
+         * @param {Object} data 必填 查询条件 键值对
+         */
+        findEngineer({state, commit}, {data, more, callback}) {
+          api.get({
+            key: 'findEngineer',
+            data: data,
+            paging: {
+              StartRowNum: more ? state.result.length : 0,
+              PageSize: PAGESIZE
+            },
+            success: data => {
+              let engineer = KND.Util.toArray(data.items);
+              commit(more ? 'addEngineer' : 'setEngineer', engineer);
+              if (callback) {
+                callback(engineer);
+              }
+            },
+            error: error => {
+              if (callback) {
+                callback();
+              };
+              console.log(error);
             }
           });
         }

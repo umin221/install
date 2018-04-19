@@ -12,16 +12,17 @@
 
     <!--create detail edit-->
     <div class="mint-content wide-form">
-      <div :class="{'readonly':read}">
+      <div :class="{'readonly': read}">
         <cus-field label="合作伙伴名称" placeholder="请输入名称" tag="名称"
                    @change="checkNameExistFn"
                    :edit=!read
                    v-valid.require
                    v-model="form['Name']"></cus-field>
         <cus-field label="合作伙伴负责人" placeholder="请输入负责人" tag="负责人"
-                   :edit=!read
+                   @click.native="selectEngineerFn"
                    v-valid.require
-                   v-model="form['KL Partner Owner Name']"></cus-field>
+                   v-model="select['Last Name']"
+                   is-link></cus-field>
         <cus-field label="联系电话" placeholder="请输入电话" type="tel" tag="电话"
                    :edit=!read
                    v-valid.require.phone
@@ -89,7 +90,7 @@
 </template>
 
 <script type="es6">
-  import {mapState, mapActions, mapMutations} from 'vuex';
+  import {mapState, mapActions} from 'vuex';
   import Vue from 'vue';
   import vp from 'public/plugin/validator';
   import titleGroup from 'public/components/cus-title-group';
@@ -139,8 +140,11 @@
     created() {
       let me = this;
       let param = me.$route.query;
+
       me.state = param.state;
       me.type = param.type;
+      // 选择&&参数只读时，处于页面编辑状态
+      if (this.select && param.type === 'read') me.type = 'edit';
       // 获取详情
       if (param.id) {
         me.findPartnerById(param.id);
@@ -165,8 +169,6 @@
             this.attach.list = KND.Util.toArray(data['SiebelMessage']['KL Channel Partner Attachment']);
           }
         });
-      } else {
-        me.clear();
       }
     },
     data: () => {
@@ -188,6 +190,7 @@
     },
     computed: {
       ...mapState('index', ['isManager']),
+      ...mapState('engineer', ['select']), // 责任人选择结果
       ...mapState(NAMESPACE, ['form']),
       // 表单只读
       read() {
@@ -221,7 +224,6 @@
       }
     },
     methods: {
-      ...mapMutations(NAMESPACE, ['clear']),
       ...mapActions('app', ['upload', 'queryMedias']),
       ...mapActions(NAMESPACE, ['findPartnerById', 'findPartner', 'addPartner', 'update', 'pushMedia', 'queryApprovalList']),
       toContact(contact) {
@@ -231,10 +233,10 @@
         });
       },
       // Check whether the name is repeated
-      checkNameExistFn() {
+      checkNameExistFn(val) {
         this.findPartner({
           data: {
-            Name: this.form.Name
+            Name: val
           },
           loading: false,
           success: data => {
@@ -311,6 +313,10 @@
         address['Province'] = value.KL_PROVINCE;
         address['City'] = value.KL_CITY;
         address['County'] = value.KL_TOWN;
+      },
+      // Select person in charge
+      selectEngineerFn() {
+        this.$router.push('engineer');
       }
     },
     components: {titleGroup, buttonGroup, cusField, cusCity}

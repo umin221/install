@@ -37,5 +37,11 @@ export default new Router({
     component(resolve) {
       require(['../page/contact'], resolve);
     }
+  }, { // 负责人
+    path: '/engineer',
+    name: 'engineer',
+    component(resolve) {
+      require(['../page/engineer'], resolve);
+    }
   }]
 });

@@ -6,6 +6,7 @@
       :value="currentValue"
       :state="state"
       :type="type"
+      @change="changeFn"
       @input="handleInput">
       <slot></slot>
     </mt-field>
@@ -14,6 +15,7 @@
       :placeholder="placeholder"
       :value="currentValue"
       :state="state"
+      @change="changeFn"
       :isLink="isLink">
       <slot></slot>
     </mt-cell>
@@ -44,6 +46,9 @@
       methods: {
         handleInput(val) {
           this.currentValue = val;
+        },
+        changeFn(val) {
+          this.$emit('change', val);
         }
       },
       watch: {
