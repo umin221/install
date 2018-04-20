@@ -117,17 +117,19 @@ class Helper {
    * 清除缓存
    * @returns {Promise}
    */
-  clear() {
+  clear(all) {
     let me = this;
     return new Promise((resolve, reject) => {
       console.log('------------ 获取最新数据 start ------------');
       console.log('清除历史数据...');
-      Indicator.process('正在清除历史数据...');
+      Indicator.process('正在初始化...');
       me.invokeSQL('gt').then(result => {
         let tasks = [];
         result = util.toArray(result);
         for (let i = 0, len = result.length; i < len; i++) {
           let table = result[i];
+          // 非全量初始化
+          if (!all && table === 'user') continue;
           console.log(`清除数据库表 ${table}...`);
           tasks.push(me.invokeSQL('dt', table));
         };
@@ -143,11 +145,10 @@ class Helper {
    * 初始化数据库表
    * @returns {Promise}
    */
-  create() {
+  create(all) {
     let me = this;
     return new Promise((resolve, reject) => {
       console.log('初始化数据库表...');
-      Indicator.process('正在初始化数据...');
       let tasks = [
         me.invokeSQL('ct', 'user', buildCreateField({user_id: null, data: null, state: null, create_date: null})).then(result => {
           console.log('创建数据库表 user...');
@@ -168,8 +169,11 @@ class Helper {
           console.log('创建数据库表 install_record...');
         })
       ];
+      // 非全量初始化
+      if (!all) tasks.shift();
       Promise.all(tasks).then(() => {
         console.log('init ok...');
+        Indicator.process('初始化完成...');
         resolve();
       });
     });
@@ -297,16 +301,26 @@ class Cache {
    * 初始化数据库
    * 1. 删除数据表
    * 2. 创建数据表
+   */
+  init(callback) {
+    // 初始化删除所有数据表
+    const ALL = 'all';
+    helper.clear(ALL).then(result => helper.create(ALL)).then(result => callback(result));
+  };
+
+  /**
+   * 获取最新数据
+   * 1. 删除数据表
+   * 2. 创建数据表
    * 3. 缓存数据
    * @param {Object} data 必填 批次汇总
    */
-  init(data) {
+  refresh(data) {
     let me = this;
     handle.getPendingInstallRecord(result => {
       if (result.length) {
         tools.cordova.alert('检测到本地还有未提交的数据，请先提交数据');
       } else {
-        Indicator.process('正在下载最新数据...');
         helper.clear().then(result => helper.create()).then(result => me.reCache(data)).catch(err => console.error(err));
       }
     });
@@ -361,6 +375,10 @@ class Cache {
                   data: JSON.stringify(data),
                   create_date: now()
                 }).then(resolve);
+              },
+              error: err => {
+                console.error(`订单失败：${err}`);
+                resolve(err);
               }
             });
           }));
@@ -393,6 +411,10 @@ class Cache {
                   data: JSON.stringify(data),
                   create_date: now()
                 }).then(resolve);
+              },
+              error: err => {
+                console.error(`楼栋失败：${err}`);
+                resolve(err);
               }
             });
           }));
@@ -412,7 +434,7 @@ class Cache {
         for (let i = 0, len = result.length; i < len; i++) {
           let building = [];
           let batch = result[i];
-          let buildingNumber = parseInt(batch.building.BuildingNumber, 10);
+          let buildingNumber = parseInt(batch.building && batch.building.BuildingNumber, 10);
           if (buildingNumber) building = batch.building.SiebelMessage.Building;
           // 获取楼栋下的资产
           for (let i = 0, len = building.length; i < len; i++) {
@@ -433,6 +455,10 @@ class Cache {
                     data: JSON.stringify(data),
                     create_date: now()
                   }).then(resolve);
+                },
+                error: err => {
+                  console.error(`资产失败：${err}`);
+                  resolve(err);
                 }
               });
             }));
@@ -465,7 +491,7 @@ class Cache {
       setting.success = data => {
         callback(data);
         // 缓存数据
-        me.init(data);
+        me.refresh(data);
       };
       api.get(setting);
     };
@@ -568,8 +594,7 @@ class Cache {
   /**
    * 缓存用户信息
    */
-  cacheUser(setting) {
-    let user = setting.data;
+  cacheUser(user) {
     helper.upsert('user', {
       user_id: user.Id,
       data: JSON.stringify(user),
@@ -589,6 +614,26 @@ class Cache {
     helper.queryStrict('user', {rowid: 1}, result => {
       callback(result);
     });
+  };
+
+  /**
+   * 委外人员登陆
+   * @param {Object} setting 必填 请求参数配置
+   */
+  queryUserInfo(setting) {
+    let me = this;
+    let callback = setting.success;
+    setting.success = data => {
+      let user = data.items;
+      // 初始化
+      me.init(result => {
+        // 缓存用户信息
+        me.cacheUser(user);
+        // 回调
+        callback(user);
+      });
+    };
+    api.get(setting);
   };
 
   /**

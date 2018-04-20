@@ -16,14 +16,7 @@ export default {
         // 查询用户信息，用户登陆使用
         queryUserInfo({state}, setting) {
           setting.key = 'queryUserInfo';
-          api.get(setting);
-        },
-        // 缓存用户信息
-        cacheUser({state}, user) {
-          cache.invoke({
-            key: 'cacheUser',
-            data: user
-          });
+          cache.invoke(setting);
         },
         // 获取最后登录用户的信息
         getCacheUser({state}, setting) {

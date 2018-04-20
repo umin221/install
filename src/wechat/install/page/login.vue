@@ -7,7 +7,7 @@
     <indicator></indicator>
     <div class="copyright">坚朗五金制品股份有限公司</div>
     <div class="login-form xs-icon"
-      v-show="login">
+      v-show="showLogin">
       <cus-field class="account" label="账号" tag="账号"
                  v-model="username"
                  v-valid.require></cus-field>
@@ -38,20 +38,26 @@
       let me = this;
       me.getCacheUser({
         success: result => {
-          result.length ? me.$router.push('index') : me.login = true;
+          if (result.length) {
+            // 获取缓存用户进入APP首页
+            KND.Session.set('userInfo', result[0].data);
+            me.$router.push('index');
+          } else {
+            me.showLogin = true;
+          }
         }
       });
     },
     data() {
       return {
         remember: [],
-        username: '13048225658',
+        username: '13899997777',
         password: '123',
-        login: false
+        showLogin: false
       };
     },
     methods: {
-      ...mapActions(NAMESPACE, ['queryUserInfo', 'cacheUser', 'getCacheUser', 'clear']),
+      ...mapActions(NAMESPACE, ['queryUserInfo', 'getCacheUser', 'clear']),
       clearFn() {
         this.clear().then(result => {
           Indicator.process(false);
@@ -65,10 +71,9 @@
               'Login Name': this.username,
               'KL Outsource Password': this.password
             },
-            success: result => {
-              // 缓存用户信息
-              me.cacheUser(result.items);
-              // 跳转首页
+            success: user => {
+              // 缓存用户进入APP首页
+              KND.Session.set('userInfo', JSON.stringify(user));
               me.$router.push('index');
             },
             error: err => {

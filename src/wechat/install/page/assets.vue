@@ -150,7 +150,7 @@
         maxFloor = 0;
         for (let i = 0, len = layer.length; i < len; i++) {
           // 房号
-          let room = this.markFn(layer[i]);
+          let room = layer[i];
           // 本地扫码记录
           let record = installRecords[room.Id];
           // 楼层
@@ -161,6 +161,8 @@
           if (this.isSelect) {
             if (room['Install Date']) continue;
           };
+          // 房号标记
+          room = this.markFn(layer[i]);
           // 楼层分组
           layers[floor] = layers[floor] || [];
           layers[floor].push(room);
@@ -326,12 +328,16 @@
        * @param {Object} room 必填 房号信息
        */
       toNextFn() {
-        this.$router.push({
-          name: 'yjBatch',
-          query: {
-            result: JSON.stringify(this.selectRooms)
-          }
-        });
+        if (KND.Util.isEmptyObject(this.selectRooms)) {
+          MessageBox.alert('至少要选择一个房间', '提示');
+        } else {
+          this.$router.push({
+            name: 'yjBatch',
+            query: {
+              result: JSON.stringify(this.selectRooms)
+            }
+          });
+        }
       },
       /**
        * 扫码填入资产信息

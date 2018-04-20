@@ -26,7 +26,6 @@
                         @loadTop="loadTopFn"
                         @loadBottom="loadBottomFn"
                         :loadmore="false"
-                        :param="{status: '待处理', list: 'pending'}"
                         :topStatus="topStatus">
             <cus-cell class="multiple"
                       @click.native="toDetailFn(item.Id)"
@@ -71,30 +70,37 @@
   import cusCell from 'public/components/cus-cell';
 
   const NAMESPACE = 'index';
-  //
-  let loader = function(...args) {
+  let user = {};
+  let loader = function(mode) {
     let me = this;
-    let event = args.pop();
-    let list = args.pop();
-    let param = Object.extend({
-      list: list,
-      callback: (data) => {
-        me.$refs[list][event](data.length);
-      }
-    }, args.pop());
     // 获取批次列表
-    me.queryInstallTask(param);
+    me.queryInstallTask({
+      data: {id: user.Id},
+      mode: mode,
+      list: 'pending',
+      callback: (data) => {
+        me.$refs['pending']['onBottomLoaded'](data.length);
+      }
+    });
   };
 
   export default {
     name: NAMESPACE,
     // 数据初始化
-    created() {
-      // 获取数据
-      this.loadBottomFn({
-        status: '待处理',
-        list: 'pending'
-      });
+    activated() {
+      let info = KND.Util.parse(KND.Session.get('userInfo'));
+      if (info) {
+        if (info.Id !== user.Id) {
+          user = info;
+          // 获取数据
+          this.loadBottomFn();
+        }
+      } else {
+        this.$router.replace({
+          name: 'login',
+          query: {login: true} // 重定向登陆页必须携带此参数
+        });
+      }
     },
     data: () => {
       return {
@@ -110,19 +116,14 @@
     methods: {
       ...mapActions(NAMESPACE, ['queryInstallTask', 'logout']),
       // 已失效顶部加载
-      loadTopFn(param) {
-        loader.call(this, {
-          mode: 'refresh'
-        }, param.list, 'onTopLoaded');
+      loadTopFn() {
+        // 获取批次列表
+        loader.call(this, 'refresh');
       },
       // 待审批底部加载
-      loadBottomFn(param) {
-        loader.call(this, {
-          data: {
-            'KL Partner Status': param.status
-          },
-          more: true
-        }, param.list, 'onBottomLoaded');
+      loadBottomFn() {
+        // 获取批次列表
+        loader.call(this);
       },
       // 注销登录
       logoutFn() {
@@ -130,6 +131,7 @@
         // 注销用户登录
         me.logout({
           success: result => {
+            KND.Session.remove('userInfo');
             me.$router.replace({
               name: 'login',
               query: {login: true} // 重定向登陆页必须携带此参数

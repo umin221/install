@@ -97,7 +97,7 @@
   &-leave-to {
   }
   &-enter-active, &-leave-active  {
-    transition: all .3s ease;
+    transition: opacity .3s ease;
   }
 }
 
@@ -106,12 +106,12 @@
   &-enter {
   }
   &-leave-to {
-    opacity: 0;
+    //opacity: 0;
   }
   &-leave-active {
-    z-index: 2;
+    //z-index: 2;
   }
   &-enter-active, &-leave-active  {
-    transition: all .3s ease;
+    //transition: opacity .3s ease;
   }
 }

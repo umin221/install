@@ -11,7 +11,11 @@ let apiList = {
       data: {
         'body': {
           'OutputIntObjectName': 'Base KL Contact - Installation Task', // 固定 io 名
-          'PrimaryRowId': '1-2BSH6IWP',
+          'PrimaryRowId': option.data.id, // 1-2BSH6IWP 1-2BSBXX0D  contact001 1-2BSBXX0D
+          'SearchSpec': KND.Util.condition({
+            'KL Detail Type LIC': 'Lock Installation Batch', // 真锁批次
+            'Calculated Activity Status': 'In Progress' // 进行中活动
+          }, 'KL Installation Task'),
           'ViewMode': 'All', // 选填 固定 All
           'StartRowNum': '0',
           'PageSize': '50'
@@ -194,10 +198,7 @@ let apiList = {
   queryOrderLines: option => {
     return {
       method: 'get',
-      url: 'data/Order Entry - Line Items/Order Entry - Line Items/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=100&StartRowNum=0',
-      error: data => {
-        console.log(data);
-      }
+      url: 'data/Order Entry - Line Items/Order Entry - Line Items/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=100&StartRowNum=0'
     };
   },
 
