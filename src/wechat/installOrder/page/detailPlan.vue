@@ -20,7 +20,7 @@
                    :value="PlannedCompletion"
                    v-valid.require
                    is-link></cus-field>
-        <div v-show="is_date || is_detailDate" :class="{enable: is_date}">
+        <div v-if="is_date || is_detailDate" :class="{enable: is_date}">
           <cus-field label="实际开始日期"  tag="实际开始日期"
                      @click.native="open('picker', 'Started')"
                      v-valid.require
