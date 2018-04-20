@@ -166,6 +166,12 @@ export default new Router({
     component(resolve) {
       require(['../page/orderLine'], resolve);
     }
+  }, { // 订单行 其他配件
+    path: '/fitting',
+    name: 'fitting',
+    component(resolve) {
+      require(['../page/fitting'], resolve);
+    }
   }, { // 项目楼层信息采集
     path: '/buildingInfo',
     name: 'buildingInfo',

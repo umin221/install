@@ -112,7 +112,7 @@
         // 面板
         panels: [],
         // vp
-        vp003: [],
+        VP003: [],
         // 假锁
         falseLock: [],
         // 其他配件
@@ -165,7 +165,7 @@
         let c2g = mapp.code2group;
         me['lockBody'] = []; // 锁体
         me['panels'] = []; // 面板
-        me['vp003'] = []; // vp
+        me['VP003'] = []; // vp
         me['falseLock'] = []; // 假锁
         me['others'] = []; // 其他配件
         for (let i = 0, len = lines.length; i < len; i++) {
@@ -194,39 +194,18 @@
       // 订单行
       toLineFn(line = {}, type) {
         let me = this;
-        let order = me.order;
+        // 跳转配件 或 其他订单行(面板、锁体、假锁)
+        let path = line['KL Product Type LIC'] === 'Other' ? 'fitting' : 'orderLine';
         // 填充订单id，保存编辑行时需要
-        line['Order Header Id'] = order.Id;
-
-        // 跳转订单行
-        let toLine = () => {
-          // 跳转配件 或 其他订单行(面板、锁体、假锁)
-          let path = line['KL Product Type LIC'] === 'Other' ? 'fitting' : 'orderLine';
-          me.$router.push({
-            path: path,
-            query: {
-              line: JSON.stringify(line),
-              type: line['KL Product Type LIC'] || type,
-              editable: this.editable
-            }
-          });
-        };
-
-        // 跳转订单行
-        if (line['Order Header Id']) {
-          toLine();
-        } else {
-          // 保存订单头
-          me.save({
-            data: order,
-            success: data => { // data => {"Object Id":"1-2BSEEOC3"}
-              line['Order Header Id'] = data['Object Id'];
-              order.Id = data['Object Id'];
-              KND.Util.setParam('order', JSON.stringify(order));
-              toLine();
-            }
-          });
-        }
+        line['Order Header Id'] = me.order.Id;
+        me.$router.push({
+          path: path,
+          query: {
+            line: JSON.stringify(line),
+            type: line['KL Product Type LIC'] || type,
+            editable: this.editable
+          }
+        });
       },
       // 选择对话框
       showLovFn(type) {
