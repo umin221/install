@@ -163,6 +163,11 @@
         let me = this;
         let lines = me.lines;
         let c2g = mapp.code2group;
+        me['lockBody'] = []; // 锁体
+        me['panels'] = []; // 面板
+        me['vp003'] = []; // vp
+        me['falseLock'] = []; // 假锁
+        me['others'] = []; // 其他配件
         for (let i = 0, len = lines.length; i < len; i++) {
           let line = lines[i];
           // 无分类 默认配件
@@ -183,7 +188,7 @@
         return this.editable ? [{
           content: '删除',
           style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
-          handler: () => this.deleteFn(line, index)
+          handler: () => this.deleteFn(line)
         }] : [];
       },
       // 订单行
@@ -308,16 +313,14 @@
         });
       },
       // Delete Install Order Line
-      deleteFn(line, index) {
-        this.delete({
-          id: line.Id,
-          index: index
-        });
+      deleteFn(line) {
+        this.delete(line.Id);
       },
       // Copy line
       copyFn(line) {
         MessageBox.confirm('复制此订单行记录？', '请确认').then(action => {
-          delete line.Id;
+          // 复制只修改id，其他字段拷贝
+          line.Id = KND.Util.now();
           // 跳转配件 或 其他订单行(面板、锁体、假锁)
           let path = line['KL Product Type LIC'] === 'Other' ? 'fitting' : 'orderLine';
           this.$router.push({

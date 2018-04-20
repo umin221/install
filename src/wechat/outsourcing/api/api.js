@@ -1,6 +1,6 @@
 let apiList = {
   /**
-   * 查询 或 搜索 委外厂商劣列表
+   * 查询 或 搜索 委外厂商列表
    * @param {String} option.data['Name'] 选填 厂商名称
    * @param {Object} option.data 选填 查询条件
    * @param {Object} option.paging 必填 翻页参数

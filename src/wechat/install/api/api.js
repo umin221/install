@@ -12,10 +12,11 @@ let apiList = {
         'body': {
           'OutputIntObjectName': 'Base KL Contact - Installation Task', // 固定 io 名
           'PrimaryRowId': option.data.id, // 1-2BSH6IWP 1-2BSBXX0D  contact001 1-2BSBXX0D
-          'SearchSpec': KND.Util.condition({
-            'KL Detail Type LIC': 'Lock Installation Batch', // 真锁批次
-            'Calculated Activity Status': 'In Progress' // 进行中活动
-          }, 'KL Installation Task'),
+          'SearchSpec': `(${KND.Util.condition2D({
+            'Calculated Activity Status': ['In Progress', 'Approved'] // 状态是 进行中 & 审批通过 的批次
+          }, 'KL Installation Task', ' OR ')}) AND ${KND.Util.condition({
+            'KL Detail Type LIC': 'Lock Installation Batch' // 真锁批次
+          }, 'KL Installation Task')}`,
           'ViewMode': 'All', // 选填 固定 All
           'StartRowNum': '0',
           'PageSize': '50'

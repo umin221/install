@@ -313,8 +313,14 @@ export default new Vuex.Store({
           state.lines = [];
           state.order = order;
         },
-        removeLine(state, index) {
-          state.lines.splice(index, 1);
+        removeLine(state, id) {
+          let lines = state.lines;
+          for (let i = 0, len = lines.length; i < len; i++) {
+            if (lines[i].Id === id) {
+              state.lines.splice(i, 1);
+              break;
+            }
+          }
         },
         setLines(state, lines) {
           state.lines = KND.Util.toArray(lines);
@@ -373,14 +379,14 @@ export default new Vuex.Store({
         /**
          * 删除订单行
          */
-        delete({commit}, setting) {
+        delete({commit}, id) {
           api.get({
             key: 'deleteOrderLine',
             data: {
-              id: setting.id
+              id: id
             },
             success: data => {
-              commit('removeLine', setting.index);
+              commit('removeLine', id);
               tools.success(data);
             }
           });
