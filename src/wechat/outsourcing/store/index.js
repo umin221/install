@@ -97,9 +97,7 @@ export default new Vuex.Store({
             'Id': KND.Util.now(),
             'Name': '',
             'Alias': '',
-            'KL Partner Owner Name': '',
             'Main Phone Number': '',
-            'Primary Address Street': '',
             'CUT Address': {Province: ''}
           };
         }
@@ -150,16 +148,14 @@ export default new Vuex.Store({
           if (select) {
             partner['ListOfChannel Partner_Position'] = {
               'Channel Partner_Position': {
-                'Id': select.Id,
-                'IsPrimaryMVG': select['KL Primary Position Type LIC'] === 'Field Service Manager' ? 'Y' : 'N'
+                'Position Id': select['Primary Position Id'],
+                'IsPrimaryMVG': 'Y'
               }
             };
           };
           api.get({
             key: 'submitPartner',
-            data: {
-              partner: partner
-            },
+            data: partner,
             success: success
           });
         },
@@ -167,23 +163,39 @@ export default new Vuex.Store({
          * 更新委外团队信息
          * @param {Object} setting 必填 请求参数配置
          */
-        update({state}, setting) {
-          delete state.form['Channel Partner_Position'];
-          delete state.form['User'];
+        updateSyn({state}, setting) {
           let partner = state.form;
+          let partnerPosition = KND.Util.toArray(partner['Channel Partner_Position']);
           // 更新委外负责人
           let select = this.state.engineer.select;
           if (select) {
-            partner['ListOfChannel Partner_Position'] = {
-              'Channel Partner_Position': {
-                'Id': select.Id,
-                'IsPrimaryMVG': select['KL Primary Position Type LIC'] === 'Field Service Manager' ? 'Y' : 'N'
+            // 添加选择的负责人
+            let arr = [{
+              'Position Id': select.Id,
+              'IsPrimaryMVG': 'Y'
+            }];
+            // 添加创建人，不添加创建人会看不到这个团队信息
+            for (let i in partnerPosition) {
+              let pos = partnerPosition[i];
+              if (partner['KL Partner Owner Name'].indexOf(pos['Last Name']) !== -1) {
+                arr.push({
+                  'Position Id': pos['Position Id'],
+                  'IsPrimaryMVG': 'N'
+                });
+                break;
               }
             };
-          };
+            // 委外负责人&创建人
+            partner['ListOfChannel Partner_Position'] = {
+              'Channel Partner_Position': arr
+            };
+          } else {
+            delete partner['Channel Partner_Position'];
+          }
+          delete partner['User'];
           // 更新信息
           api.get(Object.extend(true, {
-            key: 'update',
+            key: 'updateSyn',
             data: partner,
             success: data => {
               tools.success(data, {
@@ -258,6 +270,7 @@ export default new Vuex.Store({
          * @param {Object} contact 必填 人员信息 键值对
          */
         upsertContact({state}, contact) {
+          delete contact.Link;
           api.get({
             key: 'upsertContact',
             data: {

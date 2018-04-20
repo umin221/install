@@ -108,10 +108,12 @@ let apiList = {
    * @returns {{method: string, url: string}}
    */
   submitPartner: option => {
-    let partner = option.data.partner;
+    let partner = option.data;
+    partner['KL Partner Type'] = '委外厂商';
     partner['ListOfCUT Address'] = {
       'CUT Address': partner['CUT Address']
     };
+    delete option.data['CUT Address'];
     return {
       method: 'post',
       url: 'service/Workflow Process Manager/RunProcess/',
@@ -133,7 +135,7 @@ let apiList = {
   },
 
   /**
-   * 更新委外厂商信息
+   * 更新委外厂商信息 <废弃>
    * @param {Object} option.data 必填 委外厂商信息 键值对
    * @returns {{method: string, url: string}}
    */
@@ -141,6 +143,37 @@ let apiList = {
     return {
       method: 'put',
       url: 'data/Channel Partner/Channel Partner/'
+    };
+  },
+
+  /**
+   * 更新委外厂商信息
+   * @param {Object} option.data 必填 委外厂商信息 键值对
+   * @returns {{method: string, url: string}}
+   */
+  updateSyn: option => {
+    let partner = option.data;
+    partner['ListOfCUT Address'] = {
+      'CUT Address': partner['CUT Address']
+    };
+    delete option.data['CUT Address'];
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Synchronize',
+      data: {
+        'body': {
+          'ProcessName': 'KL Channel Partner Upsert Process',
+          'SiebelMessage': {
+            'MessageId': '',
+            'MessageType': 'Integration Object',
+            'IntObjectName': 'Base Channel Partner',
+            'IntObjectFormat': 'Siebel Hierarchical',
+            'ListOfBase Channel Partner': {
+              'Channel Partner': partner
+            }
+          }
+        }
+      }
     };
   },
 

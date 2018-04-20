@@ -21,7 +21,7 @@
         <cus-field label="合作伙伴负责人" placeholder="请输入负责人" tag="负责人"
                    @click.native="selectEngineerFn"
                    v-valid.require
-                   v-model="select['Last Name']"
+                   v-model="select['Last Name'] || form['KL Partner Owner Name']"
                    is-link></cus-field>
         <cus-field label="联系电话" placeholder="请输入电话" type="tel" tag="电话"
                    :edit=!read
@@ -225,7 +225,7 @@
     },
     methods: {
       ...mapActions('app', ['upload', 'queryMedias']),
-      ...mapActions(NAMESPACE, ['findPartnerById', 'findPartner', 'addPartner', 'update', 'pushMedia', 'queryApprovalList']),
+      ...mapActions(NAMESPACE, ['findPartnerById', 'findPartner', 'addPartner', 'updateSyn', 'pushMedia', 'queryApprovalList']),
       toContact(contact) {
         this.$router.push({
           name: 'contact',
@@ -283,9 +283,9 @@
       updateFn() {
         let me = this;
         tools.valid.call(me, () => {
-          me.update({
+          me.updateSyn({
             success: data => {
-              _upload.call(me, me.$refs.attach.getServerIds(), data.items.Id);
+              _upload.call(me, me.$refs.attach.getServerIds(), data.PrimaryRowId);
               // 标记列表刷新
               KND.Session.set('refresh', 'valid');
             }
@@ -299,7 +299,7 @@
           me.$router.push('contact');
         } else {
           // fail out partner
-          me.update({
+          me.updateSyn({
             data: {
               'KL Partner Status': '失效'
             }
