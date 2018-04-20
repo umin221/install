@@ -59,7 +59,7 @@ export default new Vuex.Store({
               PageSize: PAGESIZE
             },
             success: function(data) {
-              let productList = KND.Util.toArray(data['SiebelMessage']['FS InvLoc Product']);
+              let productList = KND.Util.toArray(data['SiebelMessage']['KL FS Invloc Product']);
               if (productList) {
                 commit(more ? 'addData' : 'setData', {
                   dataList: productList,

@@ -10,9 +10,9 @@ let ApiList = {
       condition['Status'] = status.split(',');
     };
     if (status) {
-      SearchSpec = '[FS InvLoc Product.KL Inventory Product Status]=LookupValue("KL_PROD_STATUS", "' + status + '")';
+      SearchSpec = '[KL FS Invloc Product.KL Inventory Product Status]=LookupValue("KL_PROD_STATUS", "' + status + '")';
     } else {
-      SearchSpec = KND.Util.condition2D(condition, 'FS InvLoc Product', ' OR ', operator);
+      SearchSpec = KND.Util.condition2D(condition, 'KL FS Invloc Product', ' OR ', operator);
     }
     return {
       url: 'service/EAI Siebel Adapter/QueryPage',
