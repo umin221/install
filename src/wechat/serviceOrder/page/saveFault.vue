@@ -64,10 +64,9 @@ import menuBox from '../../../public/components/cus-menu';
 import numBox from '../components/number-box';
 import cusField from 'public/components/cus-field';
 const NAMESPACE = 'saveFault';
-let _upload = function(serverIds, id) {
+let _upload = function(serverIds, id, successBack) {
   let callback = data => {
     tools.success(data, {
-      back: false,
       successTips: '提交成功'
     });
   };
@@ -78,8 +77,10 @@ let _upload = function(serverIds, id) {
       IOName: 'KL Service Request Attachment IO',
       Comment: this.val
     },
-    success: data => {
-      console.log(data);
+    success: successBack,
+    error: data => {
+      data.ERROR = '附件提交失败,请重新上传';
+      callback(data);
     }
   }) : callback(id);
 };
@@ -212,53 +213,60 @@ export default {
         let obj = {};
         let isBn = me.isBn === '保内' ? 'Y' : 'N';
         let uploadAttach = id => {
-          _upload.call(me, me.$refs.attach.getServerIds(), id);
+          _upload.call(me,
+            me.$refs.attach.getServerIds(),
+            id,
+            function(data) {
+              console.log(1111);
+              for (let i = 0;i < me.returnSelect.length; i++) {
+                obj = {
+                  'Id': i + 1,
+                  'Product': me.returnSelect[i].Name, // 产品编码
+                  'Quantity Requested': me.returnSelect[i].num, // 数量
+                  'KL Warranty Flag': me.switchStatus[i] ? 'Y' : 'N'
+                };
+                lineItems.push(obj);
+              }
+              if (me.isBn === '保外' && me.fee) {
+                obj = {
+                  'Id': lineItems.length + 1,
+                  'Product': 'AP003', // 产品编码
+                  'Unit Price': me.fee,
+                  'KL Warranty Flag': 'N'
+                };
+                lineItems.push(obj);
+              }
+              obj = {
+                // 订单行
+                lineItems: lineItems,
+                // 订单头
+                ServiceRequestId: me['Service'].Id,   // 服务请求ID
+                priceId: me.priceId,      // 价格列表ID
+                warrantyFlag: me.isBn === '保内' ? 'Y' : 'N',    // 订单头是否保内
+                contactId: me['Service']['Contact Id'], // 联系人Id
+                assetId: me['Service']['Asset Id'], // 资产Id
+                srNum: me['Service']['SR Number'],
+                parentId: me.ServiceRequest.Id,
+                type: me.serviceType,
+                callBack: function(data) {
+                  me.setPartner(data);
+                  me.deleteSelected();
+                  me.$router.go(-1);
+                  _upload('', true);
+                }
+              };
+              if (me.Service['Product Warranty Flag'] !== isBn && !lineItems.length) {
+                me.upDateOrderStatu({
+                  Id: me.ServiceRequest.Id,
+                  type: isBn,
+                  callback: obj.callBack
+                });
+              } else {
+                me.addServiceOrder(obj);
+              }
+            }
+          );
         };
-        for (let i = 0;i < me.returnSelect.length; i++) {
-          obj = {
-            'Id': i + 1,
-            'Product': me.returnSelect[i].Name, // 产品编码
-            'Quantity Requested': me.returnSelect[i].num, // 数量
-            'KL Warranty Flag': me.switchStatus[i] ? 'Y' : 'N'
-          };
-          lineItems.push(obj);
-        }
-        if (me.isBn === '保外' && me.fee) {
-          obj = {
-            'Id': lineItems.length + 1,
-            'Product': 'AP003', // 产品编码
-            'Unit Price': me.fee,
-            'KL Warranty Flag': 'N'
-          };
-          lineItems.push(obj);
-        }
-        obj = {
-          // 订单行
-          lineItems: lineItems,
-          // 订单头
-          ServiceRequestId: me['Service'].Id,   // 服务请求ID
-          priceId: me.priceId,      // 价格列表ID
-          warrantyFlag: me.isBn === '保内' ? 'Y' : 'N',    // 订单头是否保内
-          contactId: me['Service']['Contact Id'], // 联系人Id
-          assetId: me['Service']['Asset Id'], // 资产Id
-          srNum: me['Service']['SR Number'],
-          parentId: me.ServiceRequest.Id,
-          type: me.serviceType,
-          callBack: function(data) {
-            me.setPartner(data);
-            me.initSelected();
-            me.$router.go(-1);
-          }
-        };
-        if (me.Service['Product Warranty Flag'] !== isBn && !lineItems.length) {
-          me.upDateOrderStatu({
-            Id: me.ServiceRequest.Id,
-            type: isBn,
-            callback: obj.callBack
-          });
-        } else {
-          me.addServiceOrder(obj);
-        }
         uploadAttach(me['Service'].Id);
       });
     },

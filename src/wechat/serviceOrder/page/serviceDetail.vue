@@ -531,7 +531,6 @@
 //            'DoneLoc': '完成地址'
 //          };
 //          me.setStatus({parms: parms, srNum: me.srNumber});
-          me.popupVisible1 = !me.popupVisible1;
         }
         if (value1 === 'failureRecord') {
           this.$router.push({
