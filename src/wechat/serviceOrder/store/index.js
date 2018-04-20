@@ -360,7 +360,8 @@ export default new Vuex.Store({
         starAddress: '',
         visitAddress: '',
         endAddress: '',
-        orderEntry: [],
+        orderEntry: {},
+        orderEntryItem: [],
         ProblemRecord: [],
         JobSheet: [],
         meg: ''
@@ -405,7 +406,10 @@ export default new Vuex.Store({
             }
           }
           if (form['Order Entry - Orders']) {
-            state.orderEntry = KND.Util.toArray(form['Order Entry - Orders']);
+            state.orderEntry = form['Order Entry - Orders'];
+            if (form['Order Entry - Orders']['Order Entry - Line Items']) {
+              state.orderEntryItem = KND.Util.toArray(form['Order Entry - Orders']['Order Entry - Line Items']);
+            }
           }
           if (form['KL Child Service Request']) {
             let childService = KND.Util.toArray(form['KL Child Service Request']);
