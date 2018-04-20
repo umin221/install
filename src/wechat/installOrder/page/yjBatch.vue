@@ -17,12 +17,17 @@
         <mt-field label="联系电话"
                   type="number"
                   placeholder="请输入联系电话"
+                  v-show="is_contact"
                   v-model.trim="Contact_Phone"></mt-field>
+        <ul class="search-list">
+          <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item)">{{item['Work Phone #']}} {{item['Last Name']}}</li>
+        </ul>
         <mt-field label="物业联系人"
                   type="text"
                   id="contactText"
                   :attr="isCall"
                   placeholder="请输入联系人"
+                  v-show="is_contact"
                   v-model="Contact_Name"
                   class="textRight require"></mt-field>
       </div>
@@ -31,12 +36,9 @@
               :edit="!read"
               :title="attach.title">
       </attach>
-      <div :class="{'readonly':read}">
+      <!--<div :class="{'readonly':read}">
         <mt-field label="备注说明" type="textarea" v-model="Description"></mt-field>
-      </div>
-      <ul class="search-list">
-        <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item)">{{item['Work Phone #']}} {{item['Last Name']}}</li>
-      </ul>
+      </div>-->
       <button-group>
         <mt-button class="single"
                    @click.native="submitFn">提交</mt-button>
@@ -62,7 +64,7 @@
     .search-list{
       z-index: 1;
       position: absolute;
-      top: 9.8rem;
+      margin-top: 1px;
       background: white;
       list-style: none;
       box-shadow: 1px 1px 5px #ededed;
@@ -151,6 +153,17 @@
         self.assetsLeng ++;
       }
       console.dir(self.itemTask);
+      /* if (self.itemTask['KL Property Contact Id']) { // 有物业联系人则不需选择
+        console.dir('物业联系人');
+        self.is_contact = false;
+        self.Contact_Id = self.itemTask['KL Property Contact Id'];
+        self.Contact_Phone = self.itemTask['KL Property Contact Cellular Phone'];
+        self.Contact_Name = self.itemTask['KL Property Contact Name'];
+        self.isCall = {disabled: true};
+        self.isEdit = {disabled: true};
+        self.isClick = true;
+        self.removeSearch();
+      }*/
     },
     data: () => {
       return {
@@ -159,6 +172,7 @@
         assetsObj: {},
         batchCode: '', // 批次
         Contact_Id: '', // id
+        is_contact: true, // 是否显示选择物业  已存在不显示
         Contact_Phone: '',     // 联系电话
         Contact_Name: '',   // 报修联系人
         Description: '', // 备注
@@ -283,7 +297,7 @@
           Toast('联系人电话不能为空！');
           return;
         }
-        if (textCall(self.Contact_Phone)) {
+        if (!textCall(self.Contact_Phone)) {
           MessageBox({
             title: '提示',
             message: '联系电话格式错误请重新输入！'

@@ -55,7 +55,7 @@
               :attach="attach.list"
               :edit="!read"
               :title="attach.title"
-              v-show="is_installer">
+              v-show="is_installer || is_attach">
       </attach>
       <button-group v-show="is_option && is_but">
         <mt-button class="single"
@@ -105,6 +105,7 @@
   import buttonGroup from 'public/components/cus-button-group';
   import lockLine from '../components/cusLockLine';
   import api from '../api/api';
+  let userInfo = {};
   export default {
     name: 'batchDetail',
     created() {
@@ -123,6 +124,10 @@
       if (param.type === '') {
         self.is_show = true;
       }
+      KND.Native.getUserInfo((info) => {
+        userInfo = info;
+        console.log(userInfo);
+      });
     },
     data: () => {
       return {
@@ -132,6 +137,7 @@
         InboxItemId: '', // 审批id
         InboxTaskId: '', // 审批id
         option: '', // 区分从哪跳转到详情页
+        is_User: false, // 是否负责人
         is_plan: true, // 是否显示详细计划
         is_option: false, // 是否审批
         is_but: false, // 判断是否显示按钮   1.审批时 2.没有审批过
@@ -139,6 +145,7 @@
         start_Date: '',        // 开始时间
         end_Date: '',        // 结束时间
         is_installer: false, // 是否替代锁、真锁批次 显示委外联系人
+        is_attach: false, // 工程移交显示附件
         companyName: '', // 合作伙伴名称
         is_zs: false, // 是否真锁批次 显示交接日期
         deliveryTime: '', // 交接日期
@@ -189,15 +196,21 @@
       },
       showNum() {
         var self = this;
-        if (self.detailData['KL Detail Type LIC'] === 'Lock Installation Batch' && self.detailData['KL Delivery Sales Type'] === '工程') {
+        if (self.detailData['KL Detail Type LIC'] === 'Lock Installation Batch' && self.detailData['KL Delivery Sales Type'] === '工程' && self.is_User) {
           return 'numCla';
         }
       },
       addPlanList(item) {
-        this.$router.push({
+        var self = this;
+        var is_date = false;
+        if (self.is_User && (self.detailData['Calculated Activity Status'] === 'In Progress' || self.detailData['Calculated Activity Status'] === 'Approved') && !item['Started']) { // 判断是否可以编辑完成时间 审批通过、进行中 && 当前负责人&& 完成时间为空才能修改
+          is_date = true;
+        }
+        self.$router.push({
           name: 'detailPlan',
           query: {
             type: 'read',
+            is_date: is_date,
             item: item
           }
         });
@@ -212,6 +225,9 @@
           success: data => {
             console.dir(data);
             self.detailData = data;
+            if (userInfo['Person UId'] === self.detailData['Primary Owner Id']) {
+              self.is_User = true;
+            }
             if (data['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
               data['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
               data['KL Detail Type LIC'] === 'Door Hanging Acc Batch' ||
@@ -237,7 +253,7 @@
                       }
                     },
                     success: data => {
-                      this.attach.list = KND.Util.toArray(data['SiebelMessage']['Action Attachment']);
+                      self.attach.list = KND.Util.toArray(data['SiebelMessage']['Action Attachment']);
                     }
                   });
                   self.companyName = data['KL Partner Name'];
@@ -247,6 +263,22 @@
                       self.deliveryTime = new Date(data['KL Delivery Time']).format('yyyy-MM-dd') || ''; // 结束时间
                     }
                   }
+                } else if (data['KL Detail Type LIC'] === 'Transfer Batch') { // 工程真锁移交=Transfer Batch、 现象需要显示附件
+                  console.dir('工程移交详情查附件');
+                  self.queryMedias({ // 附件查询
+                    data: {
+                      'IOName': 'KL Action Attachment',
+                      'SearchSpec': {
+                        'Action Attachment.Activity Id': id
+                      }
+                    },
+                    success: data => {
+                      self.attach.list = KND.Util.toArray(data['SiebelMessage']['Action Attachment']);
+                      if (self.attach.list.length > 0) {
+                        self.is_attach = true;
+                      }
+                    }
+                  });
                 }
               }
             }
@@ -397,7 +429,7 @@
         if (self.is_option) { // 审批中不能查看楼栋编辑
           return;
         }
-        if (self.detailData['KL Detail Type LIC'] === 'Lock Installation Batch' && self.detailData['KL Delivery Sales Type'] === '工程') {
+        if (self.detailData['KL Detail Type LIC'] === 'Lock Installation Batch' && self.detailData['KL Delivery Sales Type'] === '工程' && self.is_User) {
           let id = this.$route.query.Id;
           this.$router.push({
             path: 'assets',

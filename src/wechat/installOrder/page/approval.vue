@@ -40,6 +40,9 @@
         line-height: 30px;
       }
     }
+    .icon-add-circle:before {
+      content: ''!important;
+    }
     /*流程*/
     .crm-zyList {
       overflow: hidden;

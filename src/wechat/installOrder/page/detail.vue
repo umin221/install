@@ -135,19 +135,16 @@
                  @click.stop="updateDoor(itemTask,taskData)">
                 <div class="readonly enable">
                   <mt-field label="批次" class="itemTaskId" :value="itemTask.Id"  @click.native.stop="taskClick(itemTask,taskData)"></mt-field>
-                  <mt-field label="已完成/计划数量"  class="itemTask"
-                    v-if="taskData['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
-                    taskData['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
-                    taskData['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
-                    taskData['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
-                    taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
-                    taskData['KL Detail Type LIC'] === 'Transfer Summary' ||
-                    taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
-                    taskData['KL Detail Type LIC'] === 'Check Before Trans Summary'"
-                    :value="itemTask['KL Completed Install Amount']+'/'+itemTask['KL Install Amount Requested']">
+                  <mt-field label="已完成/计划数量"
+                            class="itemTask"
+                            :value="itemTask['KL Completed Install Amount']+'/'+itemTask['KL Install Amount Requested']">
                     <span v-if="showClose(itemTask)" @click.stop="closeTask(itemTask)" class="batchClose"></span>
                     <span v-if="itemTask['Calculated Activity Status'] === 'In Progress' && itemTask['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
                   </mt-field>
+                  <mt-field label="物业联系人/电话"
+                            class="itemTask"
+                            v-if="itemTask['KL Property Contact Id']"
+                            :value="itemTask['KL Property Contact Name']+'/'+itemTask['KL Property Contact Cellular Phone']"></mt-field>
                  <!-- <mt-field label="合格/完成数量"
                     v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
                     taskData['KL Detail Type LIC'] === 'Check Before Trans Summary'"

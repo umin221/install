@@ -68,17 +68,18 @@ export const app = {
       let data = option.data;
       option.success = option.success || (data => console.log(data));
       ajax({
-        url: 'service/EAI Siebel Adapter/Query',
+        url: 'service/EAI Siebel Adapter/QueryPage',
         data: {
           'body': {
             'OutputIntObjectName': data.IOName, // 'KL Action Attachment',
-            'SearchSpec': KND.Util.condition(data.SearchSpec) // '[Action Attachment.Activity Id]="1-2BSE8H3R"'
+            'SearchSpec': KND.Util.condition(data.SearchSpec), // '[Action Attachment.Activity Id]="1-2BSE8H3R"'
+            'SortSpec': 'ActivityFileDate (DESCENDING)',
+            'PageSize': '100'
           }
         },
         success: option.success
       });
     },
-
     /**
      * 上传附件
      * @param {String} option['IOName'] 必填 上传io 安装任务：KL Action Attachment 委外管理：KL Channel Partner Attachments

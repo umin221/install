@@ -20,16 +20,27 @@
                    :value="PlannedCompletion"
                    v-valid.require
                    is-link></cus-field>
-        <mt-cell v-show="type==='edit'" title="实际开始日期" @click.native="open('picker', 'Started')" :value="Started" is-link></mt-cell>
-        <mt-cell v-show="type==='edit'" title="实际结束日期" @click.native="open('pickerEnd', 'Done')" :value="Done" is-link></mt-cell>
+        <div v-show="is_date || is_detailDate" :class="{enable: is_date}">
+          <cus-field label="实际开始日期"  tag="实际开始日期"
+                     @click.native="open('picker', 'Started')"
+                     v-valid.require
+                     :value="Started" is-link></cus-field>
+          <cus-field label="实际结束日期" tag="实际结束日期"
+                     @click.native="open('picker', 'Done')"
+                     v-valid.require
+                     :value="Done" is-link></cus-field>
+        </div>
         <cus-field label="备注"
-                   type="textarea"
-                   v-model="planObj['Description']"></cus-field>
+                 type="textarea"
+                 v-model="planObj['Description']"></cus-field>
       </div>
       <button-group>
         <mt-button class="single"
                    v-show="editable"
                    @click.native="submitFn">保存</mt-button>
+        <mt-button class="single"
+                   v-show="is_date"
+                   @click.native="submitFn">提交</mt-button>
       </button-group>
       <mt-datetime-picker
         ref="picker"
@@ -101,8 +112,10 @@
       self.id = param.id;
       self.planType = param.planType;
       self.type = param.type;
+      self.is_date = param.is_date;
       self.planItem = param.item;
       console.dir(self.planItem);
+      self.planObj['Id'] = '00001';
       // 获取详情
       if (self.type === 'add') {
         // 取 lov 门材质
@@ -118,20 +131,28 @@
       } else {
         self.titleVal = '详细计划详情';
         self.editable = false;
-      }
-      self.planObj['Id'] = '00001';
-      if (self.planItem) { // planItem有值的时候显示
-        self.planObj['Id'] = self.planItem['Id'];
-        self.planObj['KL Detail Type'] = self.planItem['KL Detail Type'];
-        self.planObj['Planned'] = self.planItem['Planned'];
-        self.planObj['Planned Completion'] = self.planItem['Planned Completion'];
-        self.planObj['Started'] = self.planItem['Started'];
-        self.planObj['Done'] = self.planItem['Done'];
-        self.planObj['Description'] = self.planItem['Description'];
-        self.Planned = new Date(self.planItem['Planned']).format('yyyy-MM-dd hh:mm:ss');
-        self.PlannedCompletion = new Date(self.planItem['Planned Completion']).format('yyyy-MM-dd hh:mm:ss');
-        self.Started = new Date(self.planItem['Started']).format('yyyy-MM-dd hh:mm:ss');
-        self.Done = new Date(self.planItem['Done']).format('yyyy-MM-dd hh:mm:ss');
+        if (self.planItem) { // planItem有值的时候显示
+          self.planObj['Id'] = self.planItem['Id'];
+          self.id = self.planItem['Parent Activity Id'];
+          self.planObj['KL Detail Type'] = self.planItem['KL Detail Type'];
+          self.planObj['Planned'] = self.planItem['Planned'];
+          self.planObj['Planned Completion'] = self.planItem['Planned Completion'];
+          self.planObj['Started'] = self.planItem['Started'];
+          self.planObj['Done'] = self.planItem['Done'];
+          self.planObj['Description'] = self.planItem['Description'];
+          self.Planned = new Date(self.planItem['Planned']).format('yyyy-MM-dd hh:mm:ss');
+          self.PlannedCompletion = new Date(self.planItem['Planned Completion']).format('yyyy-MM-dd hh:mm:ss');
+          if (self.planItem['Started']) {
+            self.is_detailDate = true;
+            self.Started = new Date(self.planItem['Started']).format('yyyy-MM-dd hh:mm:ss');
+          }
+          if (self.planItem['Done']) {
+            self.Done = new Date(self.planItem['Done']).format('yyyy-MM-dd hh:mm:ss');
+          }
+        }
+        if (!self.planObj['Started']) {
+          console.dir('没有完成时间需提交');
+        }
       }
     },
     data: () => {
@@ -145,6 +166,8 @@
         planItem: '',
         planType: '',
         editable: true,
+        is_detailDate: false, // 显示详情时间
+        is_date: false, // 是否可以编辑完成时间
         type: 'add', // add 新增 / edit 编辑 / read 只读
         titleVal: '新建详细计划',
         vk: 'Value',
@@ -220,24 +243,6 @@
         // 选择填充
         this.planObj[type] = values[0]['Value'];
       },
-      getBatch(obj) {
-        var self = this;
-        api.get({ // 批次详情
-          key: 'findBatchById', // 'findBatchById',
-          data: {
-            id: obj.Id
-          },
-          success: data => {
-            console.dir(data);
-            self.batchCode = data.Id; // 批次
-            self.start_Date = new Date(data.Planned + ':00').format('yyyy-MM-dd hh:mm:ss'); // 开始时间
-            self.end_Date = new Date(data['Planned Completion'] + ':00').format('yyyy-MM-dd hh:mm:ss'); // 结束时间
-            self.startDate = self.start_Date.format('MM/dd/yyyy hh:mm:ss'); // 后台存值格式
-            self.endDate = self.end_Date.format('MM/dd/yyyy hh:mm:ss');
-            self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
-          }
-        });
-      },
       submitFn() {
         var self = this;
         tools.valid.call(this, () => {
@@ -250,8 +255,8 @@
               'Planned': self.planObj.Planned,
               'KL Detail Type': self.planObj['KL Detail Type'],
               'Planned Completion': self.planObj['Planned Completion'],
-              'Started': '',
-              'Done': '',
+              'Started': self.planObj.Started,
+              'Done': self.planObj.Done,
               'Description': self.planObj.Description
             },
             success: function(data) {
