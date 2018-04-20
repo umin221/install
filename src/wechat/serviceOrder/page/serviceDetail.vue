@@ -102,6 +102,8 @@
                   </toggle>
                 </div>
               </toggle>
+
+
               <toggle v-if="ServiceRequest['Action']" :type="true" :label="ServiceRequest['SR Number']">
                 <div>
                   <toggle :title="false"
@@ -120,19 +122,19 @@
                     </ul>
                   </toggle>
                   <toggle :title="false" label="完工确认单">
-                    <empty v-show="!orderEntry.length"></empty>
-                    <div v-if="orderEntry.length">
+                    <empty v-show="!ServiceRequest['Order Entry - Orders']"></empty>
+                    <div v-if="ServiceRequest['Order Entry - Orders']">
                       <div class="enter-order">
                         <div>保修期</div>
                         <div>产品名称</div>
                         <div>数量</div>
                       </div>
-                      <div  v-for="(item, index) in orderEntry">
-                        <div v-if="item['Order Entry - Line Items']">
+                      <div v-if="orderEntry['Order Entry - Line Items']">
+                        <div  v-for="(item, index) in orderEntryItem">
                           <div class="enter-order">
-                            <div>{{item['Order Entry - Line Items']['KL Warranty Flag'] === "N" ? "保内": "保外"}}</div>
-                            <div>{{item['Order Entry - Line Items']['KL Product Name Join']}}</div>
-                            <div>{{item['Order Entry - Line Items']['Quantity Requested']}}</div>
+                            <div>{{item['KL Warranty Flag'] === "N" ? "保内": "保外"}}</div>
+                            <div>{{item['KL Product Name Join']}}</div>
+                            <div>{{item['Quantity Requested']}}</div>
                           </div>
                         </div>
                       </div>
@@ -370,7 +372,7 @@
     },
     computed: {
       ...mapState('index', ['loginMeg', 'role']),
-      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'ProblemRecord', 'JobSheet', 'tabList', 'orderEntry', 'childService', 'allChildService'])
+      ...mapState(NameSpace, ['ServiceRequest', 'Action', 'processDate', 'Statu', 'BtnStatu', 'ProblemRecord', 'JobSheet', 'tabList', 'orderEntry', 'orderEntryItem', 'childService', 'allChildService'])
     },
     methods: {
       ...mapActions('app', ['upload', 'queryMedias']),
