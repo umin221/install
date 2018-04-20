@@ -376,6 +376,7 @@
       ...mapActions('app', ['upload', 'queryMedias']),
       ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress', 'addChildService']),
       ...mapMutations(NameSpace, ['setRole', 'setAttachs']),
+      ...mapMutations('saveFault', ['initSelect']),
       childItem(item) {
         return KND.Util.toArray(item);
       },
@@ -533,6 +534,7 @@
 //          me.setStatus({parms: parms, srNum: me.srNumber});
         }
         if (value1 === 'failureRecord') {
+          this.initSelect();
           this.$router.push({
             name: 'saveFault',
             query: {
@@ -584,6 +586,7 @@
       },
       childRecord(child) {
         let me = this;
+        me.initSelect();
         me.$router.push({
           name: 'saveFault',
           query: {

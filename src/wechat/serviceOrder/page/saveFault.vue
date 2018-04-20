@@ -91,12 +91,6 @@ export default {
     let service = me.$route.query;
     let serviceId = service.id;
     me.serviceType = service.type;
-    console.log(me.selected.length);
-    if (!me.selected.length) {
-      me.initSelect();
-    } else {
-      me.deleteSelected();
-    }
     if (serviceId) {
       me.getServiceR({
         Id: serviceId,
@@ -217,7 +211,6 @@ export default {
             me.$refs.attach.getServerIds(),
             id,
             function(data) {
-              console.log(1111);
               for (let i = 0;i < me.returnSelect.length; i++) {
                 obj = {
                   'Id': i + 1,
@@ -250,7 +243,6 @@ export default {
                 type: me.serviceType,
                 callBack: function(data) {
                   me.setPartner(data);
-                  me.deleteSelected();
                   me.$router.go(-1);
                   _upload('', true);
                 }

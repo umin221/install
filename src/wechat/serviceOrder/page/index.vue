@@ -207,7 +207,9 @@
           status = '待处理';
           list = 'cusPending';
         } else {
-          role = 'other';
+          role = 'install';
+          status = '待处理';
+          list = 'pending';
         }
         me.setManager({
           role: role,
