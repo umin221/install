@@ -75,10 +75,12 @@
 <script type="application/javascript">
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
-  import menuBox from '../components/cus-menu';
+  import menuBox from 'public/components/cus-menu.vue';
   import api from '../api/api';
   import Vue from 'vue';
   import vp from 'public/plugin/validator';
+  import {mapState} from 'vuex';
+
   Vue.use(vp);
   const NameSpace = 'scanCode';
   let mapp = config.mapp;
@@ -88,31 +90,33 @@
     created() {
       var self = this;
       let param = this.$route.query;
-      this.id = param.id;
-      this.type = param.type;
-      this.copy = param.copy;
-      this.item = param.item;
-      this.orderID = param.orderID;
-      if (this.item) {
-        if (this.copy) { // 复制把ID置空 新增
-          this.item['Personal Address Id'] = '';
-          this.item.Id = '';
+      self.id = param.id;
+      self.type = param.type;
+      self.copy = param.copy;
+      self.item = param.item;
+      self.orderID = param.orderID;
+      if (self.item) {
+        if (self.copy) { // 复制把ID置空 新增
+          self.item['Personal Address Id'] = '';
+          self.item.Id = '';
         }
-        this.KL_PROVINCE = this.item.Province;
-        this.KL_CITY = this.item.City;
-        this.SerialNumber = this.item['Serial Number'];
-        this.provinces = this.item.Province + this.item.City;
-        this.detailAddress = this.item['Street Address'];
-        this.BuilingName = this.item['Street Address 2'];
-        this.FloorName = this.item['Street Address 3'];
-        this.RoomName = this.item['Street Address 4'];
-        this.productId = this.item['Product Id'];
-        this.productCode = this.item['Product Model No'];
-        this.lockBody = this.item['KL Product Model No Lock Body'];
-        this.panel = this.item['KL Product Model No Panel'];
+        self.KL_PROVINCE = self.item.Province;
+        self.KL_CITY = self.item.City;
+        self.SerialNumber = self.item['Serial Number'];
+        self.provinces = self.item.Province + self.item.City;
+        self.detailAddress = self.item['Street Address'];
+        self.BuilingName = self.item['Street Address 2'];
+        self.FloorName = self.item['Street Address 3'];
+        self.RoomName = self.item['Street Address 4'];
+        self.productId = self.item['Product Id'];
+        self.productCode = self.item['Product Model No'];
+        self.lockBody = self.item['KL Product Model No Lock Body'];
+        self.panel = self.item['KL Product Model No Panel'];
       }
-      mapp.option['panel'] = KND.Util.toArray(self.panelList);
-      mapp.option['lockBody'] = KND.Util.toArray(self.lockBodyList);
+      console.dir(self.panelsList);
+      console.dir(self.lockBodyList);
+      mapp.option['panel'] = self.panelsList;
+      mapp.option['lockBody'] = self.lockBodyList;
 
     },
     data: () => {
@@ -122,21 +126,9 @@
         copy: '', // 是否复制
         orderID: '',
         titleVal: '扫码录入',
-        vk: 'Value',
+        vk: 'KL Product Model No',
         slots: [
           {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
-        ],
-        panelList: [
-          {
-            'code': '0001',
-            'Value': '0001'
-          }
-        ],
-        lockBodyList: [
-          {
-            'code': '0002',
-            'Value': '0002'
-          }
         ],
         showBox: false,
         lovType: '',
@@ -165,6 +157,7 @@
     },
     components: {buttonGroup, menuBox, cusField},
     computed: {
+      ...mapState('detail', ['detailData', 'panelsList', 'lockBodyList']),
       // 表单只读
       read() {
         return !this.type;
@@ -188,6 +181,7 @@
         var self = this;
         self.lovType = type;
         self.showBox = true;
+        console.dir('=========' + self.vk);
         self.slots[0].values = mapp.option[type];
       },
       // 选择确认
@@ -197,9 +191,9 @@
         me.showBox = false;
         // 选择填充
         if (type === 'lockBody') {
-          me.lockBody = values[0]['Value'];
+          me.lockBody = values[0]['KL Product Model No'];
         } else {
-          me.panel = values[0]['Value'];
+          me.panel = values[0]['KL Product Model No'];
         }
       },
       scavenging() {
@@ -219,10 +213,11 @@
                   'IntObjectFormat': 'Siebel Hierarchical',
                   'ListOfBase KL Install Order Asset Address': {
                     'Base KL Install Order Asset Address': {
-                      'Country': '中国',
-                      'Province': self.KL_PROVINCE,
-                      'City': self.KL_CITY,
-                      'Street Address': self.detailAddress,
+                      'Country': self.detailData['KL Delivery Country'],
+                      'County': self.detailData['KL Delivery County'] || '宝安区',
+                      'Province': self.detailData['KL Delivery Province'],
+                      'City': self.detailData['KL Delivery City'],
+                      'Street Address': self.detailData['KL Delivery Address'],
                       'Street Address 2': self.BuilingName,
                       'Street Address 3': self.FloorName,
                       'Street Address 4': self.RoomName,
@@ -236,8 +231,8 @@
                           'KL Activity Id': self.id,
                           'Serial Number': self.SerialNumber,
                           'Product Id': self.productId,
-                          /* 'KL Product Model No Panel': self.panel,
-                          'KL Product Model No Lock Body': self.lockBody,*/
+                          'KL Product Model No Panel': self.panel,
+                          'KL Product Model No Lock Body': self.lockBody,
                           'Id': self.item.Id || '0000'
                         }
                       }

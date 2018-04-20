@@ -14,7 +14,7 @@
         <mt-field label="项目名称" :value="detailData['KL Agreement Opportunity Name']"></mt-field>
         <mt-field label="销售类型" :value="detailData['KL Delivery Sales Type']"></mt-field>
         <mt-field label="安装数量" :value="detailData['KL Install Amount'] || 0"></mt-field>
-        <mt-field label="地址" :value="detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery Country'] + detailData['KL Delivery Address']"></mt-field>
+        <mt-field label="地址" :value="detailData['KL Delivery Country'] + detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery Address']"></mt-field>
         <div slot="title" class="mint-content-div enable">
           <div class="mint-content-xt" @click="punchClock">打卡</div>
           <div class="mint-content-xt" @click="butXttd">协同团队</div>
@@ -572,7 +572,7 @@
       ...mapMutations('index', ['setTaskIndex']),
       ...mapMutations('batch', ['clear']),
       ...mapMutations('engineer', ['delEngineer']),
-      ...mapMutations(NameSpace, ['setOrderId', 'setTaskDataST']),
+      ...mapMutations(NameSpace, ['setOrderId', 'setTaskDataST', 'setLockBody', 'setPanels', 'setDetailData']),
       ...mapActions(NameSpace, ['getTaskType', 'deleteOrderLine', 'setShowZs']),
       getRows(type) {
         return this[type];
@@ -594,6 +594,7 @@
             console.dir(data.SiebelMessage);
             console.dir('=========' + self.taskIndex);
             self.detailData = data.SiebelMessage['Order Entry - Orders'];
+            self.setDetailData(self.detailData);
             var taskData = self.detailData['KL Installation Task'];
             if (taskData) {
               self.selectName = taskData[self.taskIndex]['KL Detail Type'];
@@ -1207,6 +1208,8 @@
                 is_deit = true;
               }
               self.getTaskType(item);
+              self.setLockBody(self.lockBody);
+              self.setPanels(self.panels);
               if (self.detailData['KL Delivery Sales Type'] !== '工程') { // 零星
                 // 跳转真锁安装批次新增页面
                 this.$router.push({

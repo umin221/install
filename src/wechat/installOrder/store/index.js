@@ -100,18 +100,32 @@ export default new Vuex.Store(Object.extend(true, sto, {
       state: {
         showZs: false,
         orderId: '',
+        detailData: {}, // 订单详情
         itemTask: [],
+        // 锁体
+        lockBodyList: [],
+        // 面板
+        panelsList: [],
         taskDataST: '' // 面板锁体
       },
       mutations: {
         removeTaskDataST(state, index) {
           state.taskDataST.splice(index, 1);
         },
+        setDetailData(state, data) {
+          state.detailData = data;
+        },
         setOrderId(state, id) {
           state.orderId = id;
         },
         setTaskDataST(state, data) {
           state.taskDataST = data;
+        },
+        setLockBody(state, data) {
+          state.lockBodyList = data;
+        },
+        setPanels(state, data) {
+          state.panelsList = data;
         }
       },
       actions: {

@@ -230,7 +230,7 @@
             }
             if (data['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
               data['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
-              data['KL Detail Type LIC'] === 'Door Hanging Acc Batch' ||
+              data['KL Detail Type LIC'] === 'Door Hanging Acc Summary' ||
               data['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
               data['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
               data['KL Detail Type LIC'] === 'Lock Installation Summary' ||
