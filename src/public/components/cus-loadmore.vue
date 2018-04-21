@@ -1,7 +1,7 @@
 <template>
   <mt-loadmore :bottom-method="loadBottom"
                :bottom-all-loaded="allLoaded"
-               :top-method="refresh && loadTop"
+               :top-method="loadTop"
                :autoFill="false"
                @bottom-status-change="handleBottomChange"
                @top-status-change="handleTopChange"

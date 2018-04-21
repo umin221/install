@@ -72,6 +72,31 @@ class Cordova {
   };
 
   /**
+   * 条形码扫描
+   *
+   function (result) {
+        alert("We got a barcode\n" +
+          "Result: " + result.text + "\n" +
+          "Format: " + result.format + "\n" +
+          "Cancelled: " + result.cancelled);
+      },
+   function (error) {
+        alert("Scanning failed: " + error);
+      }
+   */
+  scan(success, fail) {
+    if (window.cordova) {
+      cordova.plugins.barcodeScanner.scan(success, err => {
+        console.error(err);
+      });
+    } else {
+      success({
+        text: '6917878030623'
+      });
+    }
+  };
+
+  /**
    * APP进入后台
    */
   goHome() {

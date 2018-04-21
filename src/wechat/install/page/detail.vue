@@ -110,7 +110,10 @@
        * 调用app扫码
        */
       toScanFn() {
-        console.log('scan');
+        let me = this;
+        tools.cordova.scan(result => {
+          me.assets['Serial Number'] = result.text;
+        });
       },
       // 选择确认
       enter(values, type) {

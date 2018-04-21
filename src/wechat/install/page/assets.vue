@@ -343,7 +343,17 @@
        * 扫码填入资产信息
        */
       toScanFn() {
-        this.$router.push('detail');
+        let room = this.sheetObject;
+        // this.$router.push('detail');
+        tools.cordova.scan(result => {
+          room['Serial Number'] = result.text;
+          this.$router.push({
+            name: 'detail',
+            query: {
+              room: JSON.stringify(room)
+            }
+          });
+        });
       },
       /**
        * 填入资产信息
