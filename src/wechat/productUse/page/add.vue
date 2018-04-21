@@ -4,104 +4,99 @@
       <fallback slot="left"></fallback>
     </mt-header>
     <div class="mint-content product-use">
-        <div class="add-parts-list">
-          <div class="add-btn" @click="selectPart">
-            <i class="xs-icon icon-add"></i>
-            <span>添加配件</span>
-          </div>
+      <div class="add-parts-list">
+        <div class="add-btn" @click="selectPart">
+          <i class="xs-icon icon-add"></i>
+          <span>添加配件</span>
         </div>
-        <div class="parts-list">
-            <mt-cell-swipe v-for='(item, index) in partList' :key='index' class="cell-swipe"  style=" word-break: break-all; padding:5px 0;"
-            :right="operation(index)"
-            :title="'配件编码：' + item.type"
-            :label="'配件名称：' + item.name">
-                <div class="operation">
-                    <span class="add" @click="addSum(index)">+</span>
-                    <span class="num">{{item.sum}}</span>
-                    <span class="subtract" @click="subtractSum(index)">-</span>
-                </div>
-            </mt-cell-swipe>
-            
-        </div>
-        <div class="margin10" @click="selectProject">
+      </div>
+      <div class="parts-list">
+          <mt-cell-swipe v-for='(item, index) in partList' :key='index' class="cell-swipe"  style=" word-break: break-all; padding:5px 0;"
+          :right="operation(index)"
+          :title="'配件编码：' + item.Name"
+          :label="'配件名称：' + item['KL Translated Name']">
+              <div class="operation">
+                <num-box :index="index" :type="true" @input="productNumber"></num-box>
+              </div>
+          </mt-cell-swipe>
+      </div>
+      <div class="margin10" @click="selectProject" v-if="isProject">
         <a class="mint-cell require mint-field">
-        <span class="mint-cell-mask"></span>
-        <div class="mint-cell-left"></div> 
-        <div class="mint-cell-wrapper">
-            <div class="mint-cell-title"><!----> 
-                <span class="mint-cell-text">工程替代锁所属项目</span>
-            </div> 
-            <div class="mint-cell-value is-link" style="justify-content: flex-end;">
-                <span style="margin-right: 5px;">{{project.name}}</span>
-            </div> 
-            <i class="mint-cell-allow-right"></i>
-        </div> 
+          <span class="mint-cell-mask"></span>
+          <div class="mint-cell-left"></div>
+          <div class="mint-cell-wrapper" >
+              <div class="mint-cell-title">
+                  <span class="mint-cell-text">工程替代锁所属项目</span>
+              </div>
+              <div class="mint-cell-value is-link" v-if="project.Id" style="justify-content: flex-end;">
+                  <span style="margin-right: 5px;">{{project['KL Agreement Opportunity Name']}}</span>
+              </div>
+              <i class="mint-cell-allow-right"></i>
+          </div>
         <div class="mint-cell-right"></div>
         </a>
-    </div>
-     <mt-cell class="border-top" title="选择领用时间"  @click.native='openPicker'>
-         <span style="margin-right:5px;">{{formatDate()}}</span>
-         <span class="xs-icon icon-time"></span>
-    </mt-cell>
+        <!--isProject-->
+      </div>
+      <!--<mt-cell class="require"-->
+                <!--title="工程替代锁所属项目"-->
+                <!--:value="project['KL Agreement Opportunity Name']"-->
+                <!--@click.native='selectProject'></mt-cell>-->
+      <!--<mt-cell class="border-top" title="选择领用时间"  @click.native='openPicker'>-->
+         <!--<span style="margin-right:5px;">{{formatDate()}}</span>-->
+         <!--<span class="xs-icon icon-time"></span>-->
+      <!--</mt-cell>-->
     <mt-cell class="border-top" title="领用说明"></mt-cell>
     <div class="desc">
-        <textarea placeholder="可在这录入您的附件需求..."></textarea>
+        <textarea placeholder="可在这录入您的附件需求..." v-model="Description"></textarea>
     </div>
      <button-group class="singBtn">
-      <mt-button class="submitBtn" type="primary" @click.native="handleSave">保存</mt-button>
+      <mt-button class="submitBtn" @click.native="handleSave">保存</mt-button>
     </button-group>
-    <mt-datetime-picker
-        ref="picker"
-        v-model="pickerValue"
-        type="date"
-        year-format="{value} 年"
-        month-format="{value} 月"
-        date-format="{value} 日"
-        @confirm="handleConfirm"
-        >
-      </mt-datetime-picker>
+    <!--<mt-datetime-picker-->
+        <!--ref="picker"-->
+        <!--v-model="pickerValue"-->
+        <!--:start-date="new Date()"-->
+        <!--type="date"-->
+        <!--year-format="{value} 年"-->
+        <!--month-format="{value} 月"-->
+        <!--date-format="{value} 日"-->
+        <!--@confirm="handleConfirm"-->
+        <!--&gt;-->
+      <!--</mt-datetime-picker>-->
     </div>
   </div>
 </template>
 <script>
-import {mapState, mapActions} from 'vuex';
+import {mapState, mapActions, mapMutations} from 'vuex';
 import { CellSwipe, Toast, DatetimePicker } from 'mint-ui';
 import buttonGroup from 'public/components/cus-button-group';
+import numBox from '../components/number-box.vue';
+import cusCell from 'public/components/cus-cell';
 
 const NAMESPACE = 'add';
 
 export default {
-  components: {CellSwipe, buttonGroup, DatetimePicker},
+  components: {CellSwipe, buttonGroup, DatetimePicker, numBox, cusCell},
   data() {
     return {
-      pickerValue: ''
+      isProject: false,
+      Description: ''
     };
   },
   created() {
-    this.pickerValue = this.time.year + '-' + this.time.month + '-' + this.time.day;
+    let me = this;
+    me.isProjected();
   },
   computed: {
-    ...mapState(NAMESPACE, ['partList', 'project', 'time', 'descript'])
+    ...mapState(NAMESPACE, ['partList', 'project', 'descript']),
+    ...mapState('selectParts', ['selected'])
   },
   methods: {
-    ...mapActions(NAMESPACE, ['setPartList', 'setProject', 'setTime', 'setDescript', 'setpartNum', 'deletePart']),
-    // 格式日期
-    formatDate() {
-      let y = this.time.year;
-      let m = this.time.month;
-      if (m < 10) m = `0${m}`;
-      let d = this.time.day;
-      if (d < 10) d = `0${d}`;
-      return `${y}-${m}-${d}`;
-    },
-    // 跳转配件选择
-    selectPart() {
-      this.$router.push('./selectParts');
-    },
-    // 跳转项目选择
-    selectProject() {
-      this.$router.push('./selectProject');
-    },
+    ...mapActions(NAMESPACE, ['setPartList', 'setProject', 'setTime', 'setDescript', 'setpartNum', 'deletePart', 'addServiceOrder']),
+    ...mapMutations(NAMESPACE, ['initSelect']),
+    /*
+    * 左滑 删除
+    * */
     operation(index) {
       return [
         {
@@ -111,48 +106,81 @@ export default {
         }
       ];
     },
-    // 数量加
-    addSum(index) {
-      var sum = this.partList[index].sum;
-      var sumVal = sum + 1;
-      this.partList[index].sum = sumVal;
-      // this.setpartNum(index, sumVal);
+    /*
+    * 跳转 配件选择
+    * */
+    selectPart() {
+      this.$router.push('./selectParts');
     },
-    // 数量减
-    subtractSum(index) {
-      var sum = this.partList[index].sum;
-      if (sum <= 1) {
-        Toast('数量不能少于1');
-        return;
-      }
-      var sumVal = sum - 1;
-      this.partList[index].sum = sumVal;
-      // this.setpartNum(index, sumVal);
+    /*
+    * 跳转 项目选择
+    * */
+    selectProject() {
+      this.$router.push('./selectProject');
     },
-    // 删除配件
+    /*
+    * 删除 配件
+    * */
     deleteParts(index) {
-      this.deletePart(index);
+      let me = this;
+      me.deletePart(index);
+      me.isProjected();
     },
-    // 打开日期面板
-    openPicker() {
-      this.$refs.picker.open();
+    /*
+    * 加减 运算
+    * */
+    productNumber(val, num) {
+      let me = this;
+      me.partList[num].num = val;
+      console.log(me.partList[num].num);
     },
-    // 确认日期选择
-    handleConfirm(date) {
-      var orgDate = new Date(date);
-      var time = {
-        year: orgDate.getFullYear(),
-        month: orgDate.getMonth() + 1,
-        day: orgDate.getDate()
-      };
-      this.setTime(time);
-      console.log(date);
-    },
-    // 保存
-    handleSave() {
-      if (!this.project.id) {
-        Toast('请选择所属项目');
+    isProjected() {
+      let me = this;
+      me.isProject = false;
+      if (me.partList.length) {
+        for (let i = 0; i < me.partList.length; i++) {
+          if (me.partList[i]['KL Product Series Code'] === '工程替代锁') {
+            me.isProject = true;
+          }
+        }
       }
+    },
+    handleSave() {
+      let me = this;
+      let obj = {};
+      let lineItems = [];
+      if (me.isProject) {
+        if (!me.project.Id) {
+          Toast('请选择所属项目');
+          return;
+        }
+      }
+      if (me.partList.length) {
+        for (let i = 0;i < me.partList.length; i++) {
+          obj = {
+            'Id': i + 1,
+            'Product': me.partList[i].Name, // 产品编码
+            'Quantity Requested': me.partList[i].num // 数量
+          };
+          lineItems.push(obj);
+        }
+        obj = {
+          // 订单行
+          lineItems: lineItems,
+          // 订单头
+          installId: me.project.Id,
+          installName: me.project['KL Agreement Opportunity Name'],
+          Description: me.Description,
+          callBack: function(data) {
+            Toast(data);
+            me.$router.go(-1);
+          }
+        };
+        me.addServiceOrder(obj);
+      } else {
+        Toast('请选择配件');
+        return;
+      };
     }
   }
 };
@@ -172,12 +200,11 @@ export default {
   }
   .add-btn {
     background: #00599f;
-    border-radius:20px;
     font-size: .75rem;
     line-height: 35px;
     color: #fff;
     width: 120px;
-    margin: 8px 0; 
+    margin: 8px 0;
     .icon-add{
       font-size: .55rem;
     }
@@ -204,7 +231,7 @@ export default {
   }
   .cell-swipe{
     border-bottom: 1px solid #eee;
-    word-break: break-all; 
+    word-break: break-all;
     padding:5px 0;
   }
   .mint-field .mint-cell-title {

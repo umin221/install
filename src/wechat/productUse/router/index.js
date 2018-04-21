@@ -40,5 +40,11 @@ export default new Router({
     component(resolve) {
       require(['../page/selectProject'], resolve);
     }
+  }, {
+    path: '/approval', // 审批记录
+    name: 'approval',
+    component(resolve) {
+      require(['../page/approval'], resolve);
+    }
   }]
 });

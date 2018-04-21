@@ -43,8 +43,8 @@
           {'id': 'serviceOrder', 'vul': '维修工单', 'icon': 'service'},
           {'id': 'orderForms', 'vul': '维修订单', 'icon': 'forms'},
           {'id': 'myProduct', 'vul': '我的配件'},
-/*          {'id': 1, 'vul': '配件领用'},
-          {'id': 1, 'vul': '配件退入'},*/
+          {'id': 'productUse', 'vul': '配件领用', 'icon': 'use'},
+//          {'id': 1, 'vul': '配件退入'},
           {'id': 'outsourcing', 'vul': '委外人员管理', 'icon': 'out'}
         ]
       };
@@ -116,6 +116,16 @@
         &.plan:before {
           content: '\A170';
           color: #4e9cf2;
+        }
+
+        &.Product:before {
+          content: '\A170';
+          color: #4e9cf2;
+        }
+
+        &.use:before {
+          content: '\A178';
+          color: #5bd47b;
         }
       }
     }
