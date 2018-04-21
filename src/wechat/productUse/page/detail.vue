@@ -24,7 +24,7 @@
           </div>
         </div>
       </div>
-      <button-group>
+      <button-group v-show="is_option && is_but">
         <mt-button class="single"
                    @click.native="submitFn('Rejected')">驳回</mt-button>
         <mt-button class="single"
