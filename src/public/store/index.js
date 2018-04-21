@@ -73,7 +73,7 @@ export const app = {
           'body': {
             'OutputIntObjectName': data.IOName, // 'KL Action Attachment',
             'SearchSpec': KND.Util.condition(data.SearchSpec), // '[Action Attachment.Activity Id]="1-2BSE8H3R"'
-            'SortSpec': 'ActivityFileDate (DESCENDING)',
+            'SortSpec': 'Updated (DESCENDING)',
             'PageSize': '100'
           }
         },
