@@ -398,13 +398,14 @@ export default new Vuex.Store({
               } else if (Action['Status INT'] === 'Appointed' || Action['Status INT'] === 'Departed' || Action['Status INT'] === 'Arrived') {
                 state.BtnStatu = 'status3';
               } else if (Action['Status INT'] === 'Done') {
-                state.BtnStatu = 'status6';
+                state.BtnStatu = '';
               }
               state.Action = Action;
             } else {
               state.BtnStatu = '';
             }
           }
+          console.log(state.BtnStatu);
           if (form['Order Entry - Orders']) {
             state.orderEntry = form['Order Entry - Orders'];
             if (form['Order Entry - Orders']['Order Entry - Line Items']) {

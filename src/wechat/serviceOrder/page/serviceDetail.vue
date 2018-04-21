@@ -5,7 +5,7 @@
         <fallback slot="left"></fallback>
         <mt-button  slot="right"
                      @click.native="openConfirm"
-                     v-if="role === 'install'&&BtnStatu ">关闭</mt-button>
+                     v-if="role === 'install'&& BtnStatu">关闭</mt-button>
       </mt-header>
 
       <div class="mint-content service-detail">
@@ -36,7 +36,12 @@
                 <div>申请时间：{{ServiceRequest['Created']}}</div>
                 <div>客户预约时间：{{ServiceRequest['CEM Planned Start Date']}}</div>
                 <div>实际预约时间：{{ServiceRequest['CEM Planned Start Date']}}</div>
-                <div>地址：{{ServiceRequest['Personal City']}}{{ServiceRequest['Personal Street Address']}}</div>
+                <div>地址：
+                  {{ServiceRequest['KL Province']}}
+                  {{ServiceRequest['KL City']}}
+                  {{ServiceRequest['KL Town']}}
+                  {{ServiceRequest['KL Address']}}
+                </div>
                 <div>用户故障说明：{{ServiceRequest['Sub-Area']}}</div>
                 <div>问题说明：
                   <div>{{ServiceRequest['Description']}}</div>
@@ -63,8 +68,8 @@
                       <li>产品序列号：{{item['KL SN']}}</li>
                       <li>详细地址：{{item['Personal Street Address']}}</li>
                       <li>产品类型：{{item['KL Product Model']}}</li>
-                      <li>故障描述：{{item['Sub-Area']}}</li>
-                      <li>故障现象：{{item['Area']}}</li>
+                      <li>故障描述：{{item['KL Responsbility']}}</li>
+                      <li>故障现象：{{item['SR Rootcause']}}</li>
                       <attach ioName="KL Service Request Attachment IO" ref="attach"
                               :attach="ProblemRecord[index].list"
                               :edit="ProblemRecord[index].edit"
@@ -104,16 +109,22 @@
               </toggle>
 
 
-              <toggle v-if="ServiceRequest['Action']" :type="true" :label="ServiceRequest['SR Number']">
+              <toggle :type="true" :label="ServiceRequest['SR Number']">
                 <div>
                   <toggle :title="false"
+                          v-if="ServiceRequest['Action']"
                           label="故障记录">
                     <ul class="failure-record">
                       <li>产品序列号：{{ServiceRequest['KL SN']}}</li>
-                      <li>详细地址：{{ServiceRequest['Personal Street Address']}}</li>
+                      <li>详细地址：
+                        {{ServiceRequest['KL Province']}}
+                        {{ServiceRequest['KL City']}}
+                        {{ServiceRequest['KL Town']}}
+                        {{ServiceRequest['KL Address']}}
+                      </li>
                       <li>产品类型：{{ServiceRequest['KL Product Model']}}</li>
-                      <li>故障描述：{{ServiceRequest['Sub-Area']}}</li>
-                      <li>故障现象：{{ServiceRequest['Area']}}</li>
+                      <li>故障描述：{{ServiceRequest['KL Responsbility']}}</li>
+                      <li>故障现象：{{ServiceRequest['SR Rootcause']}}</li>
                       <attach ioName="KL Service Request Attachment IO" ref="attach"
                               :attach="attach1.list"
                               :edit="attach1.edit"
