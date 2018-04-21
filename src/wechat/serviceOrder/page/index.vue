@@ -292,8 +292,8 @@
       background-position: bottom;
       .badge-status{
         line-height: 0.75rem;
-        width: 2.7rem;
         margin-top: 0.5rem;
+        width: 3rem;
       }
     }
     .multiple{

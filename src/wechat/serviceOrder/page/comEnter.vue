@@ -346,14 +346,14 @@
           'KL Lock Body Model': me['KL_LOCK_BODY_MODEL'],
           'KL Lock Model': me['KL_LOCK_MODEL'],
           callback: function(data) {
-            let name1 = me.$router.currentRoute.name;
-            console.log(name1);
             me.$router.go(-1);
-            let name = me.$router.currentRoute.name;
-            console.log(name);
-            if (name === 'comEnter') {
-              me.$router.go(-1);
-            }
+            setTimeout(function() {
+              let name = me.$router.currentRoute.name;
+              console.log(name);
+              if (name === 'comEnter') {
+                me.$router.go(-1);
+              }
+            }, 300);
             Toast('提交成功');
           }
         };
@@ -361,6 +361,7 @@
           delete form['Asset Number'];
           me.upDateService(form);
         } else {
+          console.log(me.room);
           let address = {
             'addrId': me.addressId,
             'Province': me.Province,

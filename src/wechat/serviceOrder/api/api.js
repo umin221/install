@@ -325,7 +325,7 @@ let ApiList = {
         'Street Address': option.data.address['Street Address'],
         'Street Address 2': option.data.address['Street Address 2'],
         'Street Address 3': option.data.address['Street Address 3'],
-        'Street Address 4': option.data.address['Street Address 3']
+        'Street Address 4': option.data.address['Street Address 4']
       }
     };
   },
