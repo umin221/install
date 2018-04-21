@@ -260,7 +260,7 @@
           },
           success: function(data) {
             if (!data.ERROR) {
-              api.get({ // 更改按钮状态
+              /* api.get({ // 更改按钮状态
                 key: 'getUPStatus',
                 method: 'POST',
                 data: {
@@ -275,7 +275,9 @@
                     self.$router.go(-2);
                   }
                 }
-              });
+              });*/
+              Toast('提交成功');
+              self.$router.go(-2);
             }
           }
         });

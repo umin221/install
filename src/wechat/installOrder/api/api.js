@@ -209,12 +209,15 @@ let apiList = {
       url: 'service/EAI Siebel Adapter/Query'
     };
   },
+  /**
+   * getSearch 查询联系人信息
+   * option.data.val 电话号码
+   * */
   getSearch: option => {
     return {
       method: 'get',
       url: 'data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] ~LIKE "' + option.data.val + '*" AND [User Type]<>LookupValue("CONTACT_USER_TYPE", "Sales") &PageSize=10&StartRowNum=0'
     };
-    // 搜索电话联系人
   },
   setPlan: option => { // 批次详细计划提交
     return {
@@ -281,8 +284,16 @@ let apiList = {
   getSporadic: option => {
     return {
       method: 'get',
-      url: 'data/KL Install Order Asset/KL Install Order Asset/?[KL Activity Id]=' + "'" + option.data.id + "'" + '&PageSize=100&StartRowNum=0',
+      url: 'data/KL Install Order Asset/KL Install Order Asset/?searchspec=[KL Activity Id]=' + "'" + option.data.id + "'" + '&PageSize=100&StartRowNum=0',
       data: {}
+    };
+  },
+  /*
+  * 零星扫码新增后更新条形码
+  * */
+  getUPNumber: option => {
+    return {
+      url: 'data/KL Install Order Asset/KL Install Order Asset/'
     };
   },
   /*

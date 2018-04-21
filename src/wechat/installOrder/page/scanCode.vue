@@ -224,16 +224,16 @@
                       'KL Building Number': '1',
                       'KL Floor Number': '1',
                       'KL Room Number': '1',
-                      'Id': self.item['Personal Address Id'] || '00009',
+                      'Id': self.item['Personal Address Id'] || '000099',
                       'ListOfKL Install Order Asset': {
                         'KL Install Order Asset': {
                           'Original Order Id': self.orderID,
                           'KL Activity Id': self.id,
-                          'Serial Number': self.SerialNumber,
+                          // 'Serial Number': self.SerialNumber,
                           'Product Id': self.productId,
                           'KL Product Model No Panel': self.panel,
                           'KL Product Model No Lock Body': self.lockBody,
-                          'Id': self.item.Id || '0000'
+                          'Id': self.item.Id || '00001'
                         }
                       }
                     }
@@ -243,8 +243,25 @@
             },
             success: function(data) {
               if (!data.ERROR) {
-                Toast('保存成功');
-                KND.Util.back();
+                if (!self.copy) { // 新增成功 更新条形码
+                  api.get({
+                    key: 'getUPNumber',
+                    method: 'PUT',
+                    data: {
+                      'Id': data.AssetId,
+                      'Serial Number': self.SerialNumber
+                    },
+                    success: function(data) {
+                      if (!data.ERROR) {
+                        Toast('保存成功');
+                        KND.Util.back();
+                      }
+                    }
+                  });
+                } else {
+                  Toast('保存成功');
+                  KND.Util.back();
+                }
               }
             }
           });

@@ -40,7 +40,7 @@
                    @click.native="submitFn">保存</mt-button>
         <mt-button class="single"
                    v-show="is_date"
-                   @click.native="submitFn">提交</mt-button>
+                   @click.native="upStatus">提交</mt-button>
       </button-group>
       <mt-datetime-picker
         ref="picker"
@@ -265,6 +265,33 @@
               KND.Util.back();
             }
           });
+        });
+      },
+      upStatus() { // 先更新到进行中在更改数据
+        var self = this;
+        // 更新状态
+        var Status = '';
+        self.getLov({ // 取类型值
+          data: {
+            'Type': 'EVENT_STATUS',
+            'Name': 'In Progress'
+          },
+          success: data => {
+            Status = KND.Util.toArray(data.items)[0].Value;
+            var parma = {};
+            parma.Status = Status;
+            parma.Id = self.id;
+            api.get({ // 提交数据
+              key: 'getUPData',
+              method: 'PUT',
+              data: parma,
+              success: function(data) {
+                if (!data.ERROR) {
+                  self.submitFn();
+                }
+              }
+            });
+          }
         });
       }
     },

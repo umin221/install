@@ -108,7 +108,7 @@
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(taskData)" class="batchClose"></span>
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="addTask(taskData)" class="batchAdd"></span>
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="addTask(taskData)" class="batchAdd"></span>
-                  <span style="width:60px;">{{taskData.Status}}</span>
+                  <span style="width:60px;text-align: right;">{{taskData.Status}}</span>
               </div>
               <div class="content-div" style="margin-top: 20px"
                 v-if="taskData['KL Detail Type LIC']==='Trompil Batch Summary' ||
@@ -129,10 +129,14 @@
                     <span v-if="showClose(itemTask)" @click.stop="closeTask(itemTask)" class="batchClose"></span>
                     <span v-if="itemTask['Calculated Activity Status'] === 'In Progress' && itemTask['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
                   </mt-field>
-                  <mt-field label="物业联系人/电话"
+                  <mt-field label="物业联系人"
                             class="itemTask"
                             v-if="itemTask['KL Property Contact Id']"
-                            :value="itemTask['KL Property Contact Name']+'/'+itemTask['KL Property Contact Cellular Phone']"></mt-field>
+                            :value="itemTask['KL Property Contact Name']"></mt-field>
+                  <mt-field label="移动电话/工作电话"
+                            class="itemTask"
+                            v-if="itemTask['KL Property Contact Id']"
+                            :value="itemTask['KL Property Contact Cellular Phone']+'/'+itemTask['KL Property Contact Work Phone']"></mt-field>
                  <!-- <mt-field label="合格/完成数量"
                     v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
                     taskData['KL Detail Type LIC'] === 'Check Before Trans Summary'"
@@ -798,6 +802,9 @@
       },
       updateState(item, status, id, index) { // 任务事件 ；1.还没开始先开始 ； 2.已开始就跳转关闭页面
         var self = this;
+        if (item['Calculated Activity Status'] === 'Completed') {
+          return;
+        }
         if (item['KL Detail Type LIC'] !== 'Substitution Lock Trans Return') {
           if (userInfo['Person UId'] !== item['Primary Owner Id']) {
             Toast('不是任务责任人不可操作！');

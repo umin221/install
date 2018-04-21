@@ -503,7 +503,7 @@ export default new Vuex.Store(Object.extend(true, sto, {
             },
             success: function(data) {
               if (data.items) {
-                state.objList = data.items;
+                state.objList = KND.Util.toArray(data.items);
               }
             }
           });

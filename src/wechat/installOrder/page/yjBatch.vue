@@ -15,12 +15,11 @@
           <span>{{assetsLeng}}</span>
         </mt-cell>
         <mt-field label="联系电话"
-                  type="number"
                   placeholder="请输入联系电话"
                   v-show="is_contact"
                   v-model.trim="Contact_Phone"></mt-field>
         <ul class="search-list">
-          <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item)">{{item['Work Phone #']}} {{item['Last Name']}}</li>
+          <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item)">{{item['Last Name']}} {{showPhone(item)}} </li>
         </ul>
         <mt-field label="物业联系人"
                   type="text"
@@ -135,9 +134,16 @@
     };
   })();
   const textCall = (function() {
+    var self = this;
     return function(callNum) {
       let phoneReg = new RegExp('^[1][3,4,5,7,8][0-9]{9}$');
       let workPhoneReg = new RegExp('^(([0\\+]\\d{2,3})?(0\\d{2,3}))(\\d{7,8})((\\d{3,}))?$');
+      if (phoneReg.test(callNum)) {
+        self.CellPhone = callNum;
+      }
+      if (workPhoneReg.test(callNum)) {
+        self.WorkPhone = callNum;
+      }
       return (phoneReg.test(callNum) || workPhoneReg.test(callNum));
     };
   })();
@@ -178,6 +184,9 @@
         Description: '', // 备注
         batchNum: 100, // 数量
         isCall: {},
+        arr: [],
+        CellPhone: '', // 移动电话
+        WorkPhone: '', // 工作电话
         orderID: '', // 订单id
         titleVal: '真锁移交',
         attach: { // 附件
@@ -232,6 +241,16 @@
       open(picker) {
         this.$refs[picker].open();
       },
+      showPhone(item) {
+        var arrList = [];
+        if (item['Cellular Phone #']) {
+          arrList.push(item['Cellular Phone #']);
+        }
+        if (item['Work Phone #']) {
+          arrList.push(item['Work Phone #']);
+        }
+        return arrList.join('/');
+      },
       async fetchData(val) {
         let me = this;
         if (me.Contact_Phone.length > 4) {
@@ -244,52 +263,18 @@
         console.log(val);
         let me = this;
         me.Contact_Id = val['Id'];
-        me.Contact_Phone = val['Work Phone #'];
+        if (val['Cellular Phone #']) {
+          me.arr.push(val['Cellular Phone #']);
+        }
+        if (val['Work Phone #']) {
+          me.arr.push(val['Work Phone #']);
+        }
+        me.Contact_Phone = me.arr.join('/');
         me.Contact_Name = val['Last Name'];
         me.isCall = {disabled: true};
         me.isEdit = {disabled: true};
         me.isClick = true;
         me.removeSearch();
-      },
-      toSaveFn() {
-        var self = this;
-        var aId = '';
-        if (self.type === 'add') {
-          aId = self.item.Id;
-        } else if (self.type === 'edit') {
-          aId = self.item['Parent Activity Id'];
-        }
-        var parma = {
-          'KL Property Contact Name': self.Contact_Name, // 物业联系人
-          'KL Property Contact Cellular Phone': self.Contact_Phone, // 物业联系人电话
-          'Id': self.batchCode,
-          'KL Detail Type': self.item['KL Detail Type'],
-          'Parent Activity Id': aId
-        };
-        var Status = '';
-        self.getLov({ // 取类型值
-          data: {
-            'Type': 'EVENT_STATUS',
-            'Name': 'Planning'
-          },
-          success: data => {
-            Status = KND.Util.toArray(data.items)[0].Value;
-            parma.Status = Status;
-            parma['KL Detail Type'] = self.itemTask['KL Detail Type']; // 取默认第一个批次的 类型、Template Id
-            parma['Template Id'] = self.itemTask['Template Id'];
-            parma['Order Id'] = self.itemTask['Order Id'];
-            api.get({ // 提交数据
-              key: 'getUPData',
-              method: 'PUT',
-              data: parma,
-              success: function(data) {
-                if (!data.ERROR) {
-                  Toast('保存成功');
-                }
-              }
-            });
-          }
-        });
       },
       submitFn() {
         var self = this;
@@ -297,13 +282,19 @@
           Toast('联系人电话不能为空！');
           return;
         }
-        if (!textCall(self.Contact_Phone)) {
-          MessageBox({
-            title: '提示',
-            message: '联系电话格式错误请重新输入！'
-          });
-          self.Contact_Phone = '';
-          return;
+        if (self.Contact_Id) { //
+          console.dir('--');
+          self.CellPhone = self.arr[0];
+          self.WorkPhone = self.arr[1];
+        } else {
+          if (!textCall(self.Contact_Phone)) {
+            MessageBox({
+              title: '提示',
+              message: '联系电话格式错误请重新输入！'
+            });
+            self.Contact_Phone = '';
+            return;
+          }
         }
         var newDate = new Date().format('MM/dd/yyyy hh:mm:ss');
         var assetsList = [];
@@ -323,8 +314,10 @@
           method: 'POST',
           data: {
             'body': {
+              'ContactId': self.Contact_Id,
               'ContactName': self.Contact_Name,
-              'ContactPhone': self.Contact_Phone,
+              'CellPhone': self.CellPhone,
+              'WorkPhone': self.WorkPhone,
               'Amount': self.assetsLeng,
               'ProcessName': 'KL Install Order Asset Lock Transfer Process',
               'SiebelMessage': {
