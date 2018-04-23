@@ -78,8 +78,8 @@
       data: {id: user.Id},
       mode: mode,
       list: 'pending',
-      callback: (data) => {
-        me.$refs['pending']['onBottomLoaded'](data.length);
+      callback: () => {
+        me.$refs['pending']['onBottomLoaded']();
       }
     });
   };
