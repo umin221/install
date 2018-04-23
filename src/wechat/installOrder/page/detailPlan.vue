@@ -246,6 +246,18 @@
       submitFn() {
         var self = this;
         tools.valid.call(this, () => {
+          if (self.planObj.Planned > self.planObj['Planned Completion']) {
+            console.dir('计划开始日期不能小于计划完成日期');
+            Toast('计划开始日期不能小于计划完成日期');
+            return;
+          }
+          if (self.planObj.Started) {
+            if (self.planObj.Started > self.planObj.Done) {
+              console.dir('实际开始日期不能小于实际结束日期');
+              Toast('实际开始日期不能小于实际结束日期');
+              return;
+            }
+          }
           api.get({ // 提交详细计划数据
             key: 'setPlan',
             method: 'PUT',

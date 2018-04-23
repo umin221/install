@@ -106,9 +106,13 @@ export default new Vuex.Store(Object.extend(true, sto, {
         lockBodyList: [],
         // 面板
         panelsList: [],
+        isOutside: true,
         taskDataST: '' // 面板锁体
       },
       mutations: {
+        setIsOutside(state, val) {
+          state.isOutside = val;
+        },
         removeTaskDataST(state, index) {
           state.taskDataST.splice(index, 1);
         },
@@ -745,34 +749,6 @@ export default new Vuex.Store(Object.extend(true, sto, {
               console.log(data);
             }
           });
-        },
-        // 数量加减
-        plusValFn({state}, obj) {
-          console.dir(state.buildingNum);
-          var type = obj.type;
-          if (type === 'buildingNum') {
-            state.buildingNum ++;
-          } else if (type === 'layerNum') {
-            state.layerNum ++;
-          } else if (type === 'roomNum') {
-            state.roomNum ++;
-          }
-        },
-        reduceValFn({state}, obj) {
-          var type = obj.type;
-          if (type === 'buildingNum') {
-            if (state.buildingNum > 1) {
-              state.buildingNum --;
-            }
-          } else if (type === 'layerNum') {
-            if (state.layerNum > 1) {
-              state.layerNum --;
-            }
-          } else if (type === 'roomNum') {
-            if (state.roomNum > 1) {
-              state.roomNum --;
-            }
-          }
         },
         calculationFn({state}, index) {
           console.dir('=====index=' + state.buildingNum);

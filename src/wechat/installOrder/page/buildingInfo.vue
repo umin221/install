@@ -149,6 +149,9 @@
         KL_CITY: '',
         KL_TOWN: '',
         detailAddress: '',
+        buildingNum: '1',
+        layerNum: '1',
+        roomNum: '1',
         active: 'tab-container'
       };
     },
@@ -160,7 +163,35 @@
       });
     },
     methods: {
-      ...mapActions(NameSpace, ['reduceValFn', 'plusValFn', 'getLov']),
+      ...mapActions(NameSpace, ['getLov']),
+      // 数量加减
+      plusVal(type) {
+        var slef = this;
+        console.dir(slef.buildingNum);
+        if (type === 'buildingNum') {
+          slef.buildingNum ++;
+        } else if (type === 'layerNum') {
+          slef.layerNum ++;
+        } else if (type === 'roomNum') {
+          slef.roomNum ++;
+        }
+      },
+      reduceVal(type) {
+        var slef = this;
+        if (type === 'buildingNum') {
+          if (slef.buildingNum > 1) {
+            slef.buildingNum --;
+          }
+        } else if (type === 'layerNum') {
+          if (slef.layerNum > 1) {
+            slef.layerNum --;
+          }
+        } else if (type === 'roomNum') {
+          if (slef.roomNum > 1) {
+            slef.roomNum --;
+          }
+        }
+      },
       showLovFn(type) {
         let me = this;
         me.slots[0].values = [];
@@ -221,7 +252,7 @@
           });
         }
       },
-      reduceVal: function(type) {
+      /* reduceVal: function(type) {
         this.reduceValFn({
           type: type,
           success: data => {
@@ -234,7 +265,7 @@
           success: data => {
           }
         });
-      },
+      },*/
       submitFn: function() {
         var self = this;
         api.get({
@@ -285,8 +316,7 @@
     },
     components: {buttonGroup, menuBox, cusField},
     computed: {
-      ...mapState(NameSpace, ['Municipality']),
-      ...mapState(NameSpace, ['buildingNum', 'layerNum', 'roomNum'])
+      ...mapState(NameSpace, ['Municipality'])
     }
 
   };

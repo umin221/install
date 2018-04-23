@@ -151,7 +151,7 @@
   import Vue from 'vue';
   import vp from 'public/plugin/validator';
   import cusField from 'public/components/cus-field';
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
   import lockLine from '../components/cusLockLine';
   import api from '../api/api';
@@ -189,6 +189,7 @@
       self.type = param.type;
       self.item = param.item;
       self.orderID = param.orderID;
+      self.box1 = self.isOutside;
       if (self.type === 'add') {
         if (self.pcObj.Id) { // 批次页面新增保存有数据
           self.id = self.pcObj.Id;
@@ -283,7 +284,7 @@
       });
     },
     computed: {
-      ...mapState('detail', ['itemTask', 'showZs']),
+      ...mapState('detail', ['itemTask', 'showZs', 'isOutside']),
       ...mapState('batch', ['pcObj']),
 
       // 表单只读
@@ -300,6 +301,7 @@
     methods: {
       ...mapActions('app', ['getLov', 'upload', 'queryMedias']),
       ...mapActions('batch', ['getPcObj']),
+      ...mapMutations('detail', ['setIsOutside']),
       getSwipeBtn(line, index) {
         return this.editable ? [{
           content: '删除',
@@ -511,6 +513,11 @@
           if (self.deliveryTime === 'aN/aN/NaN') {
             self.deliveryTime = '';
           }
+          if (self.startDate > self.endDate) {
+            console.dir('计划开始日期不能小于计划完成日期');
+            Toast('计划开始日期不能小于计划完成日期');
+            return;
+          }
           var parma = {
             'Planned': self.startDate,
             'Planned Completion': self.endDate,
@@ -541,6 +548,8 @@
                 data: parma,
                 success: function(data) {
                   if (!data.ERROR) {
+                    // store存是否委外
+                    self.setIsOutside(self.box1);
                     self.id = data.items.Id; // 新增批次返回的ID
                     self.batchCode = data.items.Id; // 新增批次返回的ID
                     if (self.pcObj['KL Partner Name']) { // 返回数据中没有公司名字 有值就添加

@@ -2,7 +2,7 @@
   <div>
     <mt-header fixed title="真锁安装">
       <fallback slot="left"></fallback>
-      <mt-button slot="right" @click.native="submit"  v-show="type">提交</mt-button>
+      <mt-button slot="right" @click.native="submit"  v-show="type" v-if="objList.length > 0">提交</mt-button>
     </mt-header>
     <div class="mint-content">
       <mt-cell-swipe
@@ -11,7 +11,8 @@
         :right="getSwipeBtn(item, index)"
         is-link ref="body"
         @click.native="scavenging(item, '')">
-        <div slot="title" class="list-text"><span>产品型号:</span><span>{{item['Product Model No']}}</span></div>
+        <div slot="title" class="list-text"><span>面板型号:</span><span>{{item['KL Product Model No Panel']}}</span></div>
+        <div slot="title" class="list-text"><span>锁体型号:</span><span>{{item['KL Product Model No Lock Body']}}</span></div>
         <div slot="title" class="list-text">
           <span v-show="type" class="icon-copy" @click.stop="scavenging(item,'copy')"></span>
           <span>产品条形码:</span><span>{{item['Serial Number']}}</span>
@@ -91,7 +92,7 @@
               method: 'POST',
               data: {
                 'body': {
-                  'ProcessName': 'KL Install Task Submit For Approval Workflow',
+                  'ProcessName': 'KL Install Task Complete Action Workflow',
                   'RowId': self.id
                 }
               },

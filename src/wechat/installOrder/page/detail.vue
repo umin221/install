@@ -14,7 +14,7 @@
         <mt-field label="项目名称" :value="detailData['KL Agreement Opportunity Name']"></mt-field>
         <mt-field label="销售类型" :value="detailData['KL Delivery Sales Type']"></mt-field>
         <mt-field label="安装数量" :value="detailData['KL Install Amount'] || 0"></mt-field>
-        <mt-field label="地址" :value="detailData['KL Delivery Country'] + detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery Address']"></mt-field>
+        <mt-field label="地址" :value="detailData['KL Delivery Country'] + detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery County'] + detailData['KL Delivery Address']"></mt-field>
         <div slot="title" class="mint-content-div enable">
           <div class="mint-content-xt" @click="punchClock">打卡</div>
           <div class="mint-content-xt" @click="butXttd">协同团队</div>
@@ -576,7 +576,7 @@
       ...mapMutations('index', ['setTaskIndex']),
       ...mapMutations('batch', ['clear']),
       ...mapMutations('engineer', ['delEngineer']),
-      ...mapMutations(NameSpace, ['setOrderId', 'setTaskDataST', 'setLockBody', 'setPanels', 'setDetailData']),
+      ...mapMutations(NameSpace, ['setOrderId', 'setTaskDataST', 'setLockBody', 'setPanels', 'setDetailData', 'setIsOutside']),
       ...mapActions(NameSpace, ['getTaskType', 'deleteOrderLine', 'setShowZs']),
       getRows(type) {
         return this[type];
@@ -685,99 +685,83 @@
       punchClock() { // 安装打卡
         var self = this;
         // 获取订单经纬度
-        if (!self.detailData['KL Agreement Opportunity Id']) {
+        if (!self.detailData['KL Lead Address Latitude']) {
           Toast('无经纬度信息，无法打卡！');
           return;
         }
-        api.get({
-          key: 'getLatLong',
-          method: 'POST',
-          data: {
-            'body': {
-              'OutputIntObjectName': 'KL App Lead List IO',
-              // 'PrimaryRowId': '1-103TCKOJ'
-              'PrimaryRowId': self.detailData['KL Agreement Opportunity Id']
-            }
-          },
-          success: function(data) {
-            var obj = data.SiebelMessage.Lead;
-            if (!obj) {
-              Toast('无经纬度信息，无法打卡！');
-              return;
-            }
-            if (obj['KL Lead Address Latitude'] && obj['KL Lead Address Longitude']) {
-              KND.Native.getLocation({ // 获取当前位置
-                success(dataList) {
-                  console.log(dataList);
-                  var newLatitude = dataList.latitude;
-                  var newLongitude = dataList.longitude;
-                  var dis1 = getDisance(obj['KL Lead Address Latitude'], obj['KL Lead Address Longitude'], newLatitude, newLongitude);
-                  // MessageBox('项目距离的公里有：', dis1.toFixed(2));
-                  // 查询限制的范围距离
-                  var lov = '';
-                  self.getLov({ // 取类型值
-                    data: {
-                      'Type': 'KL_DISTANCE'
-                    },
-                    success: data => {
-                      lov = KND.Util.toArray(data.items)[0].Value;
-                      console.dir(lov);
-                      if (dis1.toFixed(2) > lov) {
-                        Toast('不在范围内不能打卡！');
-                      } else {
-                        var init = function() {
-                          geocoder = new qq.maps.Geocoder({
-                            complete: function(result) {
-                              console.dir('=======');
-                              var address = result.detail.addressComponents.province + result.detail.addressComponents.city + result.detail.addressComponents.district + result.detail.addressComponents.town + result.detail.addressComponents.street + result.detail.addressComponents.streetNumber;
-                              console.dir(address);
-                              // Toast(address);
-                              MessageBox({
-                                message: address,
-                                confirmButtonText: '确认打卡',
-                                showCancelButton: true
-                              }).then(action => {
-                                if (action === 'confirm') {
-                                  var newDate = new Date().format('MM/dd/yyyy hh:mm:ss');
-                                  api.get({ // 提交打卡
-                                    key: 'setPunchClock',
-                                    method: 'PUT',
-                                    data: {
-                                      'Id': '0005',
-                                      'Parent Row Id': self.id,
-                                      'Address Latitude': newLatitude,
-                                      'Address Longitude': newLongitude,
-                                      'Employee Full Name': userInfo['KL Employee Full Name'],
-                                      'Time': newDate,
-                                      'Address': address
-                                    },
-                                    success: function(data) {
-                                      if (!data.ERROR) {
-                                        Toast('打卡成功');
-                                      }
-                                    }
-                                  });
+        if (self.detailData['KL Lead Address Latitude'] && self.detailData['KL Lead Address Longitude']) {
+          KND.Native.getLocation({ // 获取当前位置
+            success(dataList) {
+              console.log(dataList);
+              var newLatitude = dataList.latitude; // 22.7290071287,114.0792846680
+              var newLongitude = dataList.longitude;
+              var dis1 = getDisance(self.detailData['KL Lead Address Latitude'], self.detailData['KL Lead Address Longitude'], newLatitude, newLongitude);
+              // MessageBox('项目距离的公里有：', dis1.toFixed(2));
+              // 查询限制的范围距离
+              var lov = '';
+              self.getLov({ // 取类型值
+                data: {
+                  'Type': 'KL_DISTANCE'
+                },
+                success: data => {
+                  lov = KND.Util.toArray(data.items)[0].Value;
+                  console.dir('-------打开范围------------');
+                  console.dir(lov);
+                  console.dir(parseFloat(dis1.toFixed(2)));
+                  if (parseFloat(dis1.toFixed(2)) > parseFloat(lov)) {
+                    Toast('不在范围内不能打卡！');
+                  } else {
+                    var init = function() {
+                      geocoder = new qq.maps.Geocoder({
+                        complete: function(result) {
+                          console.dir('=======');
+                          var address = result.detail.addressComponents.province + result.detail.addressComponents.city + result.detail.addressComponents.district + result.detail.addressComponents.town + result.detail.addressComponents.street + result.detail.addressComponents.streetNumber;
+                          console.dir(address);
+                          // Toast(address);
+                          MessageBox({
+                            message: address,
+                            confirmButtonText: '确认打卡',
+                            showCancelButton: true
+                          }).then(action => {
+                            if (action === 'confirm') {
+                              var newDate = new Date().format('MM/dd/yyyy hh:mm:ss');
+                              api.get({ // 提交打卡
+                                key: 'setPunchClock',
+                                method: 'PUT',
+                                data: {
+                                  'Id': '0005',
+                                  'Parent Row Id': self.id,
+                                  'Address Latitude': newLatitude,
+                                  'Address Longitude': newLongitude,
+                                  'Employee Full Name': userInfo['KL Employee Full Name'],
+                                  'Time': newDate,
+                                  'Address': address
+                                },
+                                success: function(data) {
+                                  if (!data.ERROR) {
+                                    Toast('打卡成功');
+                                  }
                                 }
                               });
                             }
                           });
-                        };
-                        init();
-                        var lat = parseFloat(newLatitude);
-                        var lng = parseFloat(newLongitude);
-                        var latLng = new qq.maps.LatLng(lat, lng);
-                        // 调用获取位置方法
-                        geocoder.getAddress(latLng);
-                      }
-                    }
-                  });
+                        }
+                      });
+                    };
+                    init();
+                    var lat = parseFloat(newLatitude);
+                    var lng = parseFloat(newLongitude);
+                    var latLng = new qq.maps.LatLng(lat, lng);
+                    // 调用获取位置方法
+                    geocoder.getAddress(latLng);
+                  }
                 }
               });
-            } else {
-              Toast('暂不能打卡,请联系管理员！');
             }
-          }
-        });
+          });
+        } else {
+          Toast('暂不能打卡,请联系管理员！');
+        }
         // 获取当前的经纬度
         function toRad(d) { return d * Math.PI / 180; }
         function getDisance(lat1, lng1, lat2, lng2) { // #lat为纬度, lng为经度, 一定不要弄错
@@ -902,6 +886,7 @@
               self.setShowZs(false);
             }
             self.clear();
+            self.setIsOutside(true);
             this.$router.push({
               name: 'zsBatch',
               query: {
@@ -1114,6 +1099,7 @@
               } else { // 替代锁
                 self.setShowZs(false);
               }
+              self.setIsOutside(true);
               this.$router.push({
                 name: 'zsBatch',
                 query: {
