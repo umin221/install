@@ -54,7 +54,7 @@
     },
     methods: {
       getUrl(id) {
-        let href = '../' + id + '/index.html' + location.search;
+        let href = `../${id}/index.html${location.search}&timestamp=${new Date().getTime()}`;
         document.location.href = href;
       }
     }

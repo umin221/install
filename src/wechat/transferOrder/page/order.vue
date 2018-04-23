@@ -120,12 +120,12 @@
       };
     },
     computed: {
-      ...mapState('index', ['isTeam']),
+      ...mapState('index', {readonly: 'isTeam'}),
       ...mapState(NAMESPACE, ['order', 'lines']),
       // 是否可编辑
       editable() {
         let status = this.order['Calculated Order Status'];
-        return (!status || status === 'Draft' || status === 'Rejected') && !this.isTeam;
+        return (!status || status === 'Draft' || status === 'Rejected') && !this.readonly;
       },
       // 是否显示 发起提交 按钮
       showSubmit() {

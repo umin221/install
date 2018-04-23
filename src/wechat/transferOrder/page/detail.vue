@@ -6,7 +6,7 @@
       <fallback slot="left"></fallback>
       <!--<mt-button slot="right"-->
                  <!--@click.native="$router.push('close')"-->
-                 <!--v-show="!isTeam && !isCompleted">关闭</mt-button>-->
+                 <!--v-show="!readonly && !isCompleted">关闭</mt-button>-->
     </mt-header>
 
     <!--detail-->
@@ -31,7 +31,7 @@
         <mt-cell title="销售方式"
                  :value="form['Sales Type']"></mt-cell>
         <mt-cell title="指派安装工程师"
-                 v-show="!isTeam"
+                 v-show="!readonly"
                  :value="select['Last Name']"
                  @click.native="toEngineer"
                  is-link></mt-cell>
@@ -42,7 +42,7 @@
         <mt-cell-swipe class="multiple"
                        @click.native="toOrderFn(item)"
                        v-for="(item, index) in orders"
-                       :right="isTeam || isCompleted ? [] : [{
+                       :right="readonly || isCompleted ? [] : [{
                                  content: '删除',
                                  style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
                                  handler: () => deleteFn(item, index)
@@ -58,7 +58,7 @@
     </div>
 
     <!--buttons-->
-    <button-group v-show="!isTeam && !isCompleted">
+    <button-group v-show="!readonly && !isCompleted">
       <mt-button v-show="isPending" @click.native="$router.push('reject')">驳回</mt-button>
       <mt-button type="primary" v-show="isPending"  @click.native="assignFn">确认分配</mt-button>
       <mt-button v-show="!isPending" @click.native="generateOrderFn">生成安装订单</mt-button>
@@ -89,12 +89,14 @@
       };
     },
     computed: {
-      ...mapState('index', ['isTeam']),
+      ...mapState('index', {readonly: 'isTeam'}),
       ...mapState(NAMESPACE, ['form', 'orders']),
       ...mapState('engineer', ['select']),
+      // 未交接交接单
       isPending() {
         return this.form['Status LIC'] === 'Pending Approval';
       },
+      // 已完成交接单
       isCompleted() {
         let statusLIC = this.form['Status LIC'];
         return statusLIC === 'Closed' || statusLIC === 'Rejected';
@@ -102,10 +104,11 @@
     },
     methods: {
       ...mapActions(NAMESPACE, ['generateOrder', 'findTransferOrderById', 'queryOrdersById', 'addPartner', 'assign', 'delete']),
+      // 跳转指派工程师界面
       toEngineer() {
         this.$router.push('engineer');
       },
-      // Confirm allocation assign order
+      // 指派安装工程师
       assignFn() {
         let positionId = this.select['Primary Position Id'];
         if (positionId) {
@@ -114,7 +117,7 @@
           Toast('请选择安装工程师');
         }
       },
-      // generate order
+      // 生成安装订单
       generateOrderFn(item) {
         let me = this;
         let id = me.form.Id;
@@ -125,7 +128,7 @@
           }
         });
       },
-      // todo edit
+      // 跳转到安装订单详情，未提交前未交接单的订单详情，交接后为安装订单的订单详情
       toOrderFn(item) {
         let status = item['Calculated Order Status'];
         // 无状态 或者 状态 为 草稿，已驳回时
@@ -144,7 +147,7 @@
           location.href = '../installOrder/index.html#/detail?id=' + item.Id;
         }
       },
-      // Delete Install Order
+      // 删除安装订单
       deleteFn(item, index) {
         MessageBox.confirm('是否删除订单？', '请确认').then(action => {
           if (item['Status'] === '草稿') {
