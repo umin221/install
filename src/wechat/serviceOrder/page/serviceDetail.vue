@@ -20,7 +20,7 @@
               @click="call = !call">
             <i class="xs-icon icon-call"
                   style="font-size: 0.75rem">
-              {{ServiceRequest['Contact Business Phone']}}
+              {{ServiceRequest['KL Contact Mobile Phone']}}
               </i>
             </a></div>
         </div>
