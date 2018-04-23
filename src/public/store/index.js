@@ -80,6 +80,7 @@ export const app = {
         success: option.success
       });
     },
+
     /**
      * 上传附件
      * @param {String} option['IOName'] 必填 上传io 安装任务：KL Action Attachment 委外管理：KL Channel Partner Attachments
