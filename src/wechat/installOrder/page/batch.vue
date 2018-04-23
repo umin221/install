@@ -9,7 +9,7 @@
         <mt-cell title="批次">
           <span>{{batchCode}}</span>
         </mt-cell>
-       <!-- <cus-field label="计划开始日期" tag="计划开始日期"
+        <cus-field label="计划开始日期" tag="计划开始日期"
                    @click.native="open('picker')"
                    v-model="start_Date"
                    v-valid.require
@@ -18,7 +18,7 @@
                    @click.native="open('pickerEnd')"
                    v-model="end_Date"
                    v-valid.require
-                   is-link></cus-field>-->
+                   is-link></cus-field>
         <cus-field label="计划数量" tag="计划数量"
                    placeholder="请输入"
                    v-valid.require
