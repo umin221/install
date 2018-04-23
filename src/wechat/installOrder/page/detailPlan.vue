@@ -22,11 +22,11 @@
                    is-link></cus-field>
         <div v-if="is_date || is_detailDate" :class="{enable: is_date}">
           <cus-field label="实际开始日期"  tag="实际开始日期"
-                     @click.native="open('picker', 'Started')"
+                     @click.native="openCompletion('pickerEnd', 'Started')"
                      v-valid.require
                      :value="Started" is-link></cus-field>
           <cus-field label="实际结束日期" tag="实际结束日期"
-                     @click.native="open('picker', 'Done')"
+                     @click.native="openCompletion('pickerEnd', 'Done')"
                      v-valid.require
                      :value="Done" is-link></cus-field>
         </div>
@@ -46,6 +46,18 @@
         ref="picker"
         v-model="pickerVisible"
         :startDate="sDate"
+        type="datetime"
+        year-format="{value} 年"
+        month-format="{value} 月"
+        date-format="{value} 日"
+        hour-format="{value} 时"
+        class="datetime"
+        @confirm="handleChangePlan">
+      </mt-datetime-picker>
+      <mt-datetime-picker
+        ref="pickerEnd"
+        v-model="pickerVisibleEnd"
+        :endDate="eDate"
         type="datetime"
         year-format="{value} 年"
         month-format="{value} 月"
@@ -159,7 +171,9 @@
       return {
         value: '',
         pickerVisible: today,
+        pickerVisibleEnd: today,
         sDate: today,
+        eDate: today,
         index: '',
         id: '',
         timeKey: '', // 标记什么时间
@@ -208,7 +222,18 @@
         this.timeKey = key;
         var self = this;
         if (key === 'PlannedCompletion') {
-          self.aDate = new Date(self.start_Date);
+          self.aDate = new Date(self.Planned);
+        }
+        self.$refs[picker].open();
+      },
+      openCompletion(picker, key) {
+        this.timeKey = key;
+        var self = this;
+        if (key === 'Started') {
+          self.pickerVisibleEnd = today;
+        }
+        if (key === 'Done') {
+          self.pickerVisibleEnd = new Date(self.Started);
         }
         self.$refs[picker].open();
       },
