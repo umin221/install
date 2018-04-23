@@ -10,9 +10,13 @@ let apiList = {
     let condition = Object.assign({}, option.data);
     let status = condition.Status;
     let viewMode = condition.ViewMode;
+    // 用户职位
+    let position = config.userInfo['KL Primary Position Type LIC'];
     delete condition.ViewMode;
-    // 总部专员只看协作团队的单
-    if (config.userInfo['KL Primary Position Type LIC'] === 'HQ Support Assistant') viewMode = 'Sales Rep';
+    // 总部支持专员只看协作团队的单
+    if (position === 'HQ Support Assistant') viewMode = 'Sales Rep';
+    // 总部支持主管只看下属的单
+    if (position === 'HQ Support Manager') viewMode = 'Manager';
     // 状态多匹配 逗号分隔
     if (status) {
       condition['Status'] = status.split(',');

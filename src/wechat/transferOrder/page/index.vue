@@ -120,7 +120,7 @@
         // 主管可查看团队试图
         me.viewTeam = position === 'Field Service Manager';
         // 是否总部支持专员，专员有管理分配交接单权限
-        me.setManager(position === 'HQ Support Assistant');
+        me.setManager(position === 'HQ Support Assistant'); // || position === 'HQ Support Manager'
         // 获取列表数据
         me.loadBottomFn({
           status: '待处理',
