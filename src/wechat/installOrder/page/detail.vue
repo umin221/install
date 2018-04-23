@@ -575,6 +575,7 @@
       ...mapActions('app', ['getLov']),
       ...mapMutations('index', ['setTaskIndex']),
       ...mapMutations('batch', ['clear']),
+      ...mapMutations('sporadic', ['clObjList']),
       ...mapMutations('engineer', ['delEngineer']),
       ...mapMutations(NameSpace, ['setOrderId', 'setTaskDataST', 'setLockBody', 'setPanels', 'setDetailData', 'setIsOutside']),
       ...mapActions(NameSpace, ['getTaskType', 'deleteOrderLine', 'setShowZs']),
@@ -646,7 +647,12 @@
         });
       },
       upList(obj) {
-        return KND.Util.toArray(obj);
+        let list = KND.Util.toArray(obj);
+        list = JSON.parse(JSON.stringify(list));
+        if (list.length > 1) {
+          list.sort((a, b) => new Date(a['Created']) < new Date(b['Created']));
+        }
+        return list;
       },
       updateTask(index, selName) { // 点击任务切换子任务
         let me = this;
@@ -1163,6 +1169,7 @@
           if (item['Calculated Activity Status'] === 'Completed') { // 已完成=Completed、已忽略=Ignore 跳转日志不能再修改
             if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次 完成状态先跳转日志   日志页面与其他日志页面不共用
               self.getTaskType(item);
+              self.clObjList();
               if (self.detailData['KL Delivery Sales Type'] !== '工程') { // 零星
                 // 跳转真锁安装批次新增页面
                 this.$router.push({
@@ -1210,6 +1217,7 @@
               self.getTaskType(item);
               self.setLockBody(self.lockBody);
               self.setPanels(self.panels);
+              self.clObjList(); // 清空上一次的值
               if (self.detailData['KL Delivery Sales Type'] !== '工程') { // 零星
                 // 跳转真锁安装批次新增页面
                 this.$router.push({

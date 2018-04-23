@@ -133,20 +133,9 @@
       child[0].removeAttribute('disabled');
     };
   })();
-  const textCall = (function() {
-    var self = this;
-    return function(callNum) {
-      let phoneReg = new RegExp('^[1][3,4,5,7,8][0-9]{9}$');
-      let workPhoneReg = new RegExp('^(([0\\+]\\d{2,3})?(0\\d{2,3}))(\\d{7,8})((\\d{3,}))?$');
-      if (phoneReg.test(callNum)) {
-        self.CellPhone = callNum;
-      }
-      if (workPhoneReg.test(callNum)) {
-        self.WorkPhone = callNum;
-      }
-      return (phoneReg.test(callNum) || workPhoneReg.test(callNum));
-    };
-  })();
+ /* const textCall = (function() {
+    console.dir('==');
+  })();*/
   export default {
     name: NameSpace,
     created() {
@@ -241,6 +230,18 @@
       open(picker) {
         this.$refs[picker].open();
       },
+      phone(callNum) {
+        var self = this;
+        var phoneReg = new RegExp('^[1][3,4,5,7,8][0-9]{9}$');
+        var workPhoneReg = new RegExp('^(([0\\+]\\d{2,3})?(0\\d{2,3}))(\\d{7,8})((\\d{3,}))?$');
+        if (phoneReg.test(callNum)) {
+          self.CellPhone = callNum;
+        }
+        if (workPhoneReg.test(callNum)) {
+          self.WorkPhone = callNum;
+        }
+        return (phoneReg.test(callNum) || workPhoneReg.test(callNum));
+      },
       showPhone(item) {
         var arrList = [];
         if (item['Cellular Phone #']) {
@@ -262,6 +263,8 @@
       selectCaLL(val) {
         console.log(val);
         let me = this;
+        me.Contact_Phone = ''; // 清空
+        me.arr = [];
         me.Contact_Id = val['Id'];
         if (val['Cellular Phone #']) {
           me.arr.push(val['Cellular Phone #']);
@@ -287,7 +290,7 @@
           self.CellPhone = self.arr[0];
           self.WorkPhone = self.arr[1];
         } else {
-          if (!textCall(self.Contact_Phone)) {
+          if (!self.phone(self.Contact_Phone)) {
             MessageBox({
               title: '提示',
               message: '联系电话格式错误请重新输入！'

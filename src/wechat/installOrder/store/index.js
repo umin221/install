@@ -494,6 +494,9 @@ export default new Vuex.Store(Object.extend(true, sto, {
         objList: []
       },
       mutations: {
+        clObjList(state) {
+          state.objList = [];
+        },
         removeLine(state, index) {
           state.objList.splice(index, 1);
         }
