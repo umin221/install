@@ -300,8 +300,8 @@
             aId = self.item['Parent Activity Id'];
           }
           if (self.startDate > self.endDate) {
-            console.dir('计划开始日期不能小于计划完成日期');
-            Toast('计划开始日期不能小于计划完成日期');
+            console.dir('计划开始日期不能大于计划完成日期');
+            Toast('计划开始日期不能大于计划完成日期');
             return;
           }
           var parma = {

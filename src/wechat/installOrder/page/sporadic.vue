@@ -10,11 +10,11 @@
         :key="item.id"
         :right="getSwipeBtn(item, index)"
         is-link ref="body"
-        @click.native="scavenging(item, '')">
+        @click.stop.native="scavenging(item, '')">
+        <span v-show="type" class="icon-copy" @click.stop="scavenging(item,'copy')"></span>
         <div slot="title" class="list-text"><span>面板型号:</span><span>{{item['KL Product Model No Panel']}}</span></div>
         <div slot="title" class="list-text"><span>锁体型号:</span><span>{{item['KL Product Model No Lock Body']}}</span></div>
         <div slot="title" class="list-text">
-          <span v-show="type" class="icon-copy" @click.stop="scavenging(item,'copy')"></span>
           <span>产品条形码:</span><span>{{item['Serial Number']}}</span>
         </div>
         <div slot="title" class="list-text"><span></span><span>{{item.Province}}{{item.City}}{{item['Street Address']}}{{item['Street Address 2']}}{{item['Street Address 3']}}{{item['Street Address 4']}}</span></div>

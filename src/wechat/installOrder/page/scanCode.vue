@@ -243,7 +243,7 @@
             },
             success: function(data) {
               if (!data.ERROR) {
-                if (!self.copy) { // 新增成功 更新条形码
+                if (self.type) { // 新增成功 更新条形码
                   api.get({
                     key: 'getUPNumber',
                     method: 'PUT',

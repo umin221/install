@@ -15,11 +15,15 @@
         <mt-field label="批次">
           <span>{{batchCode}}</span>
         </mt-field>
-        <mt-field label="计划开始日期"  :value="start_Date"></mt-field>
-        <mt-field label="计划完成日期" :value="end_Date"></mt-field>
+        <mt-field label="计划开始日期"  :value="start_Date" v-show="is_plan"></mt-field>
+        <mt-field label="计划完成日期" :value="end_Date" v-show="is_plan"></mt-field>
         <mt-field label="计划数量" class="enable" :class="showNum()"
                   :value="batchNum"
                   @click.native="editBuildingFn"
+                  is-link></mt-field>
+        <mt-field label="完成数量"
+                  v-show="!is_plan"
+                  :value="completeNum"
                   is-link></mt-field>
         <mt-field v-show="is_installer" label="合作伙伴"  :value="companyName"></mt-field>
         <mt-field v-show="is_zs" label="真锁交接日期"  :value="deliveryTime"></mt-field>
@@ -150,6 +154,7 @@
         is_zs: false, // 是否真锁批次 显示交接日期
         deliveryTime: '', // 交接日期
         batchNum: 0, // 数量
+        completeNum: 0, // 完成数量
         planList: [],
         installerList: [],
         detailData: {}, // 详细信息
@@ -290,6 +295,7 @@
               self.end_Date = new Date(data['Planned Completion']).format('yyyy-MM-dd') || ''; // 结束时间
             }
             self.batchNum = data['KL Install Amount Requested'] || 0; // 数量
+            self.completeNum = data['KL Completed Install Amount'] || 0; // 完成数量
             /*
             * 根据类型判断是否可以审批
             * 审批中=Approval in Process

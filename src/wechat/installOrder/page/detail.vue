@@ -1134,8 +1134,15 @@
          * */
         var self = this;
         if ((fItem['KL Detail Type LIC'] === 'Transfer Summary') && self.detailData['KL Delivery Sales Type'] !== '工程') {
-          if (item['Calculated Activity Status'] === 'Completed') { // 已完成=Completed 跳转看日志
+          if (item['Calculated Activity Status'] === 'Closing' || item['Calculated Activity Status'] === 'Completed') { // 关闭中=Closing、已完成=Completed 跳转看日志
             console.dir('零星移交完成状态');
+            self.$router.push({
+              name: 'journal',
+              query: {
+                id: item.Id,
+                type: 'updateDoorNext'
+              }
+            });
           } else {
             if (userInfo['Person UId'] === item['Primary Owner Id']) { // 有权限更新
               self.getTaskType(item);
