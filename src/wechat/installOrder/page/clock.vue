@@ -117,7 +117,7 @@
     methods: {
       getClock() {
         var self = this;
-        api.get({ // 提交数据
+        /* api.get({ // 提交数据
           key: 'getClock',
           method: 'GET',
           data: {
@@ -127,6 +127,22 @@
             if (data.items) {
               self.clockDate = KND.Util.toArray(data.items);
             }
+          }
+        });*/
+        api.get({ // 获取日志
+          key: 'getJournal',
+          method: 'POST',
+          data: {
+            'body': {
+              'OutputIntObjectName': 'Base KL Order Employee Clock',
+              'SortSpec': 'Created (DESCENDING)',
+              'PageSize': '100',
+              'SearchSpec': '[KL Order Employee Clock.Parent Row Id]=' + '"' + self.id + '"'
+            }
+          },
+          success: function(data) {
+            self.clockDate = KND.Util.toArray(data.SiebelMessage['KL Order Employee Clock']);
+            console.dir(self.clockDate);
           }
         });
       }
