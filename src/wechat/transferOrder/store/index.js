@@ -22,9 +22,9 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
-        // 是否主管
+        // 是否主管权限，可分配交接单给工程师
         isManager: false,
-        // 查看团队
+        // 查看团队，此状态下所有信息只可查看，不可编辑
         isTeam: false,
         // 待审批
         pending: [],

@@ -11,6 +11,8 @@ let apiList = {
     let status = condition.Status;
     let viewMode = condition.ViewMode;
     delete condition.ViewMode;
+    // 总部专员只看协作团队的单
+    if (config.userInfo['KL Primary Position Type LIC'] === 'HQ Support Assistant') viewMode = 'Sales Rep';
     // 状态多匹配 逗号分隔
     if (status) {
       condition['Status'] = status.split(',');
