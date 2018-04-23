@@ -36,7 +36,7 @@
       return {
         active: 'tab-container1',
         listObj: [
-          {'id': 'demo', 'vul': 'demo', 'icon': 'demo'},
+          // {'id': 'demo', 'vul': 'demo', 'icon': 'demo'},
           {'id': 'workPlan', 'vul': '工作计划', 'icon': 'plan'},
           {'id': 'transferOrder', 'vul': '安装交接单', 'icon': 'transfer'},
           {'id': 'installOrder', 'vul': '安装订单', 'icon': 'install'},
