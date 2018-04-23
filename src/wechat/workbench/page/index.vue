@@ -54,8 +54,10 @@
     },
     methods: {
       getUrl(id) {
-        let href = `../${id}/index.html${location.search}&timestamp=${new Date().getTime()}`;
-        document.location.href = href;
+        let join = '&';
+        let search = location.search;
+        if (!search.length) join = '?';
+        document.location.href = (`../${id}/index.html${search}${join}timestamp=${new Date().getTime()}`);
       }
     }
   };
