@@ -180,10 +180,11 @@ import cache from '../lib/cache';
           spinnerType: 'fading-circle'
         });
       };
+      let auth = config.authorization;
       // post data
       let setting = Object.extend(true, {
         headers: {
-          'Authorization': 'Basic ' + btoa(userID + ':' + userID)
+          'Authorization': `Basic ${btoa(userID + ':' + (auth === 'ACCOUNT' ? userID : auth))}`
         },
         timeout: 30000,
         method: 'post'
