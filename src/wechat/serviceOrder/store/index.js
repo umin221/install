@@ -121,7 +121,7 @@ export default new Vuex.Store({
       namespaced: true,
       state: {
         mustField: [
-          {name: '联系电话', key: 'Contact_Phone'},
+          {name: '联系人电话', key: 'Contact_Phone'},
           {name: '报修联系人', key: 'Contact_Name'},
           {name: '联系人类型', key: 'CONTACT_TYPE'},
           {name: '省市', key: 'KL_PROVINCE'},

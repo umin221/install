@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      <mt-header fixed title="维修订单详情">
+      <mt-header fixed title="服务订单详情">
         <fallback slot="left"></fallback>
       </mt-header>
 

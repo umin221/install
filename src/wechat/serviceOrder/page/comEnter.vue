@@ -349,12 +349,11 @@
             me.$router.go(-1);
             setTimeout(function() {
               let name = me.$router.currentRoute.name;
-              console.log(name);
               if (name === 'comEnter') {
                 me.$router.go(-1);
               }
+              Toast('提交成功');
             }, 300);
-            Toast('提交成功');
           }
         };
         if (!me.AssetNumber) {

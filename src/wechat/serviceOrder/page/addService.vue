@@ -5,10 +5,10 @@
     </mt-header>
     <div class="mint-content addService">
       <div class="addform">
-        <mt-field label="联系电话"
-                  type="number"
+        <mt-field label="联系人电话"
+                  type="tel"
                   placeholder="请输入联系电话"
-                  v-model.trim="Contact_Phone"
+                  v-model="Contact_Phone"
                   class="textRight require"></mt-field>
         <mt-field label="报修联系人"
                   type="text"
@@ -96,7 +96,7 @@
         @confirm="handleChange">
       </mt-datetime-picker>
       <ul class="search-list">
-        <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item)">{{item['Work Phone #']}} {{item['Last Name']}}</li>
+        <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item)">{{item['Last Name']}}{{showPhone(item)}}</li>
       </ul>
       <div class="submitButton">
         <mt-button size="normal" type="danger" @click.native="submit">提交</mt-button>
@@ -139,13 +139,18 @@
       child[0].removeAttribute('disabled');
     };
   })();
-  const textCall = (function() {
-    return function(callNum) {
-      let phoneReg = new RegExp('^[1][3,4,5,7,8][0-9]{9}$');
-      let workPhoneReg = new RegExp('^(([0\\+]\\d{2,3})?(0\\d{2,3}))(\\d{7,8})((\\d{3,}))?$');
-      return (phoneReg.test(callNum) || workPhoneReg.test(callNum));
-    };
-  })();
+  let textCall = function(callNum) {
+    let me = this;
+    let phoneReg = new RegExp('^[1][3,4,5,7,8][0-9]{9}$');
+    let workPhoneReg = new RegExp('^(([0\\+]\\d{2,3})?(0\\d{2,3}))(\\d{7,8})((\\d{3,}))?$');
+    if (phoneReg.test(callNum)) {
+      me.callPhone = callNum;
+    }
+    if (workPhoneReg.test(callNum)) {
+      me.workPhone = callNum;
+    }
+    return (phoneReg.test(callNum) || workPhoneReg.test(callNum));
+  };
   const NameSpace = 'addService';
   export default {
     name: NameSpace,
@@ -163,6 +168,8 @@
         slots1: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
         slots2: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
         Contact_Phone: '',     // 联系电话
+        callPhone: '',
+        workPhone: '',
         Contact_Name: '',   // 报修联系人
         Contact_Id: '',     // 客户Id
         Address: '',       // 详细地址
@@ -177,6 +184,7 @@
         ProductFlag: '',    // 客服说明
         Start_Date: null,        // 客户预约时间
         KL_SN: '',           // 条形码
+        arr: [],
         isCall: {},
         isEdit: {},
         isClick: false
@@ -202,6 +210,16 @@
         let me = this;
         me.hideMore = true;
       },
+      showPhone(item) {
+        let arrList = [];
+        if (item['Cellular Phone #']) {
+          arrList.push(item['Cellular Phone #']);
+        }
+        if (item['Work Phone #']) {
+          arrList.push(item['Work Phone #']);
+        }
+        return arrList.join('/');
+      },
       submit() {
         let me = this;
         for (let i = 0; i < me.mustField.length; i++) {
@@ -209,11 +227,18 @@
             Toast('请选择' + me.mustField[i].name + '！');
             return;
           }
-          if (me[me.mustField[i].name] === '联系人电话') {
-            if (textCall(me.Contact_Phone)) {
-              Toast('联系电话格式错误请重新输入');
-              me.Contact_Phone = '';
-              return;
+          if (me.mustField[i].name === '联系人电话') {
+            if (me.isClick) {
+              me.callPhone = me.arr[0];
+              me.workPhone = me.arr[1];
+            } else {
+              if (!textCall.call(me, me.Contact_Phone)) {
+                Toast('联系电话格式错误请重新输入');
+                me.Contact_Phone = '';
+                return;
+              } else {
+                textCall.call(me, me.Contact_Phone);
+              }
             }
           }
         }
@@ -221,7 +246,8 @@
         let submitForm = {
           Contact_Id: me.Contact_Id,
           AddressId: me.AddressId,
-          Contact_Phone: me.Contact_Phone,
+          workPhone: me.workPhone,
+          callPhone: me.callPhone,
           Contact_Name: me.Contact_Name,
           CONTACT_TYPE: me.CONTACT_TYPE,
           KL_PROVINCE: me.KL_PROVINCE,      // 省
@@ -297,10 +323,16 @@
         }
       },
       selectCaLL(val) {
-        console.log(val);
         let me = this;
+        me.arr = [];
+        if (val['Cellular Phone #']) {
+          me.arr.push(val['Cellular Phone #']);
+        }
+        if (val['Work Phone #']) {
+          me.arr.push(val['Work Phone #']);
+        }
         me.Contact_Id = val['Id'];
-        me.Contact_Phone = val['Work Phone #'];
+        me.Contact_Phone = me.arr.join('/');
         me.AddressId = val['Primary Personal Address Id'];
         me.Contact_Name = val['Last Name'];
         me.KL_PROVINCE = val['KL Primary Personal Province'];      // 省

@@ -34,8 +34,8 @@
                 <div>产品条形码：<a href="javascript:void(0);" class="detail-call">{{ServiceRequest['KL SN']}}</a></div>
                 <div>产品型号：{{ServiceRequest['KL Product Model']}}</div>
                 <div>申请时间：{{ServiceRequest['Created']}}</div>
-                <div>客户预约时间：{{ServiceRequest['CEM Planned Start Date']}}</div>
-                <div>实际预约时间：{{ServiceRequest['CEM Planned Start Date']}}</div>
+                <div>客户预约时间：{{ServiceRequest['KL Customer Appointment Time']}}</div>
+                <div v-if="Action.Id">实际预约时间：{{Action['Planned']}}</div>
                 <div>地址：
                   {{ServiceRequest['KL Province']}}
                   {{ServiceRequest['KL City']}}
@@ -66,7 +66,12 @@
                           @ck="showAttach({id:item.Id, index:index, type:'Problem Record',len:ProblemRecord[index].list.length})">
                     <ul class="failure-record">
                       <li>产品序列号：{{item['KL SN']}}</li>
-                      <li>详细地址：{{item['Personal Street Address']}}</li>
+                      <li>详细地址：
+                        {{ServiceRequest['KL Province']}}
+                        {{ServiceRequest['KL City']}}
+                        {{ServiceRequest['KL Town']}}
+                        {{ServiceRequest['KL Address']}}
+                      </li>
                       <li>产品类型：{{item['KL Product Model']}}</li>
                       <li>故障描述：{{item['KL Responsbility']}}</li>
                       <li>故障现象：{{item['SR Rootcause']}}</li>
@@ -109,10 +114,12 @@
               </toggle>
 
 
-              <toggle :type="true" :label="ServiceRequest['SR Number']">
+              <toggle
+                v-if="ServiceRequest['Action']"
+                :type="true"
+                :label="ServiceRequest['SR Number']">
                 <div>
                   <toggle :title="false"
-                          v-if="ServiceRequest['Action']"
                           label="故障记录">
                     <ul class="failure-record">
                       <li>产品序列号：{{ServiceRequest['KL SN']}}</li>

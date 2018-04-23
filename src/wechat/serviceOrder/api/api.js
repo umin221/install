@@ -116,7 +116,8 @@ let ApiList = {
                 'M/F': '男',
                 'Type': option.data.form.CONTACT_TYPE,
                 'Last Name': option.data.form.Contact_Name,
-                'Work Phone #': option.data.form.Contact_Phone,
+                'Work Phone #': option.data.form.workPhone,
+                'Cellular Phone #': option.data.form.callPhone,
                 'User Type': '售后',
                 'ListOfCutAddress': {
                   'CUT Address': [
@@ -258,7 +259,7 @@ let ApiList = {
   getSearch: option => {
     return {
       method: 'get',
-      url: 'data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] ~LIKE "' + option.data.val + '*" AND [User Type]<>LookupValue("CONTACT_USER_TYPE", "Sales") &PageSize=10&StartRowNum=0'
+      url: 'data/KL Contact Interface BO/Contact/?searchspec = [User Type]<>LookupValue("CONTACT_USER_TYPE", "Sales") AND ([Work Phone %23] ~LIKE "' + option.data.val + '*" OR [Cellular Phone %23] ~LIKE "' + option.data.val + '*") &PageSize=10&StartRowNum=0'
     };
     // 搜索电话联系人
   },
@@ -307,7 +308,12 @@ let ApiList = {
         'KL Responsbility': option.data.form['KL Responsibility'],     // 责任划分
         'Repair Details': option.data.form['Repair Details'], // 解决方法明细
         'KL Lock Body Model': option.data.form['KL Lock Body Model'],
-        'KL Lock Model': option.data.form['KL Lock Model']
+        'KL Lock Model': option.data.form['KL Lock Model'],
+        'KL Country': '中国',
+        'KL Province': option.data.form.Province,
+        'KL City': option.data.form.City,
+        'KL Town': option.data.form.Town,
+        'KL Address': option.data.form.Address
       }
     };
     // 更新服务请求
@@ -365,7 +371,8 @@ let ApiList = {
                 'M/F': '女',
                 'Type': option.data.form.CONTACT_TYPE,
                 'Last Name': option.data.form.Contact_Name,
-                'Work Phone #': option.data.form.Contact_Phone,
+                'Work Phone #': option.data.form.Work_Phone,
+                'Cellular Phone #': option.data.form.callPhone,
                 'ListOfCUT Address': {
                   'CUT Address': [
                     {
