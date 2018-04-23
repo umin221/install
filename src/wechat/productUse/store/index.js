@@ -262,14 +262,17 @@ export default new Vuex.Store({
               id
             },
             success: function(data) {
+              console.log(data);
               let orderdetail = data['SiebelMessage']['Order Entry - Orders'];
-              let orderItem = KND.Util.toArray(orderdetail['Order Entry - Line Items']);
-              if (!orderItem) {
-                orderItem = [];
-              }
-              commit('setOrderEntry', {data: orderdetail, list: orderItem});
-              if (callback) {
-                callback(orderdetail);
+              if (orderdetail) {
+                let orderItem = KND.Util.toArray(orderdetail['Order Entry - Line Items']);
+                if (!orderItem) {
+                  orderItem = [];
+                }
+                commit('setOrderEntry', {data: orderdetail, list: orderItem});
+                if (callback) {
+                  callback(orderdetail);
+                }
               }
             }
           });

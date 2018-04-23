@@ -31,7 +31,7 @@
               :key="index"
               is-link>
               <div class="mint-cell-sub-title" slot="title">领用人: {{item['KL Primary Owner']}}</div>
-              <div class="mint-cell-sub-title" slot="title">申请领用日期: {{item['Order Date']}}</div>
+              <div class="mint-cell-sub-title" slot="title">申请领用日期: {{toDate(item['Order Date'])}}</div>
             </cus-cell>
           </loadmore>
         </mt-tab-container-item>
@@ -50,7 +50,7 @@
               :key="index"
               is-link>
               <div class="mint-cell-sub-title" slot="title">领用人: {{item['KL Primary Owner']}}</div>
-              <div class="mint-cell-sub-title" slot="title">申请领用日期: {{item['Order Date']}}</div>
+              <div class="mint-cell-sub-title" slot="title">申请领用日期: {{toDate(item['Order Date'])}}</div>
             </cus-cell>
           </loadmore>
         </mt-tab-container-item>
@@ -68,8 +68,8 @@
               v-for="(item,index) in invalid"
               :key="index"
               is-link>
-            <div class="mint-cell-sub-title" slot="title">领用人: {{item['KL Primary Owner']}}</div>
-              <div class="mint-cell-sub-title" slot="title">申请领用日期: {{item['Order Date']}}</div>
+              <div class="mint-cell-sub-title" slot="title">领用人: {{item['KL Primary Owner']}}</div>
+              <div class="mint-cell-sub-title" slot="title">申请销账日期: {{toDate(item['Order Date'])}}</div>
             </cus-cell>
           </loadmore>
         </mt-tab-container-item>
@@ -124,6 +124,13 @@
       ...mapActions('app', ['getLov']),
       ...mapMutations(NameSpace, ['setManager']),
       ...mapMutations('add', ['initSelect']),
+      toDate(time) {
+        if (time) {
+          return KND.Util.format(time, 'yyyy-MM-dd hh:mm:ss');
+        } else {
+          return '';
+        }
+      },
       toDateil(id) {
         this.$router.push({
           name: 'detail',

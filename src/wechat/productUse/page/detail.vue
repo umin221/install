@@ -11,7 +11,7 @@
           <div class="mt-Detail-title"><span class="name">申请单：</span><span class="val">{{orderEntry['Order Number']}}</span></div>
           <div class="mt-Detail-title"><span class="name">申请领用人：</span><span class="val">{{orderEntry['KL Primary Owner']}}</span></div>
           <div class="mt-Detail-title"><span class="name">工程替代锁所属项目：</span><span class="val">{{orderEntry['KL Install Order Opty Name']}}</span></div>
-          <div class="mt-Detail-title"><span class="name">申请领用时间：</span><span class="val">{{orderEntry['Order Date']}}</span></div>
+          <div class="mt-Detail-title"><span class="name">申请领用时间：</span><span class="val">{{toDate(orderEntry['Order Date'])}}</span></div>
           <div class="mt-Detail-title"><span class="name">领用说明：</span><span class="val">{{orderEntry['Description']}}</span></div>
           <div class="mt-Detail-title"><span class="name">状态：</span><span class="val" style="color: lightblue;">{{orderEntry['Status']}}</span></div>
         </div>
@@ -37,7 +37,6 @@
   import {mapState, mapActions} from 'vuex';
   import { Toast } from 'mint-ui';
   import api from '../api/api';
-  let userInfo = {};
   const NameSpace = 'detail';
   //
   export default {
@@ -47,25 +46,20 @@
       let param = this.$route.query;
       me.option = param.option; // 区分从哪跳转到详情页
       me.id = param.Id;
+      console.log(param);
       if (this.option === 'approval') {
-        console.log(param);
         this.InboxItemId = param.InboxItemId;
         this.InboxTaskId = param.InboxTaskId;
       }
       me.getOrderEntry({
         id: me.id,
         callback: data => {
-          console.log(data);
           if (data['Status LIC'] === 'Draft' || data['Status LIC'] === 'Rejected' || data['Status LIC'] === 'Awaiting Approval') {
             me.is_but = true;
           } else {
             me.is_but = false;
           }
         }
-      });
-      KND.Native.getUserInfo((info) => {
-        userInfo = info;
-        console.log(userInfo);
       });
     },
     data: () => {
@@ -84,6 +78,13 @@
     },
     methods: {
       ...mapActions(NameSpace, ['getOrderEntry']),
+      toDate(time) {
+        if (time) {
+          return KND.Util.format(time, 'yyyy-MM-dd hh:mm:ss');
+        } else {
+          return '';
+        }
+      },
       toApproval() {
         let me = this;
         console.log(me.orderEntry.Id);
