@@ -240,8 +240,8 @@ let apiList = {
   * */
   getClock: option => {
     return {
-      url: 'data/KL Order Employee Clock/KL Order Employee Clock/?searchspec=[Parent Row Id] = \'1-2BSBJVLW\''
-      // url: 'data/KL Order Employee Clock/KL Order Employee Clock/?searchspec=[Parent Row Id] = ' + "'" + option.data.id + "'"
+      // url: 'data/KL Order Employee Clock/KL Order Employee Clock/?searchspec=[Parent Row Id] = \'1-2BSBJVLW\''
+      url: 'data/KL Order Employee Clock/KL Order Employee Clock/?searchspec=[Parent Row Id] = ' + "'" + option.data.id + "'"
     };
   },
   /*
