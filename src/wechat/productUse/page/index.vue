@@ -1,6 +1,6 @@
 <template>
   <div style="background-color: #ebebeb;">
-    <mt-header fixed title="配件领入">
+    <mt-header fixed title="配件领用">
       <fallback slot="left"></fallback>
       <mt-button @click.native="toAdd" slot="right">
         <i class="xs-icon icon-add"></i>

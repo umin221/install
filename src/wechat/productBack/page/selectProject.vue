@@ -8,35 +8,24 @@
     <!-- <mt-header fixed :title="headTitle">
       <fallback slot="left"></fallback>
     </mt-header> -->
-    <cus-search ref="search" placeholder="请输入关键字" @input='searchFn' :show="isShwo" v-model="value">
-        <div class="mint-content">
-        <cus-loadmore ref="pending" @loadTop='pendingLoadTopFn' @loadBottom="pendingLoadBottomFn" :param="{status:'all'}">
-            <mt-cell class='border-bottom' :title="item.name" v-for='(item,index) in list' :key='index' @click.native="handleChange(item)"></mt-cell>
-          </cus-loadmore>
-    </div>
+    <cus-search ref="search" placeholder="请输入关键字" :show="true" v-model="value">
+      <div class="mint-content">
+        <mt-cell class='border-bottom'
+                 :title="item['KL Agreement Opportunity Name']"
+                 v-for='(item,index) in installList'
+                 :key='index'
+                 @click.native="handleChange(item)"></mt-cell>
+      </div>
     </cus-search>
   </div>
 </template>
 <script>
-  import api from '../api/api';
-  import { mapActions } from 'vuex';
+  import {mapActions, mapState} from 'vuex';
   import cusLoadmore from 'public/components/cus-loadmore';
   import cusSearch from 'public/components/cus-search';
 
-  // const NAMESPACE = 'selectProject';
-
-  let loader = function(...args) {
-    let me = this;
-    let event = args.pop();
-    let list = args.pop();
-    let param = Object.extend(true, {
-      callback: (data) => {
-        me.$refs[list][event](data.length);
-      }
-    }, args.pop() || {});
-    // 获取数据
-    me.getList(param);
-  };
+  const NAMESPACE = 'selectProject';
+  let userInfo = {};
   export default {
     components: {cusLoadmore, cusSearch},
     name: 'selectProject',
@@ -45,76 +34,32 @@
         topStatus: 'loading',
         isShwo: true, // 显示搜索列表
         value: '', // 搜索参数
-        list: [
-          {
-            id: 1,
-            type: '脑白金礼品',
-            name: '上门配送免费'
-          },
-          {
-            id: 2,
-            type: '旺旺大礼品',
-            name: '包邮1'
-          },
-          {
-            id: 3,
-            type: '苹果',
-            name: '包邮2'
-          },
-          {
-            id: 4,
-            type: '香蕉',
-            name: '包邮3'
-          },
-          {
-            id: 5,
-            type: '西瓜',
-            name: '包邮4'
-          }
-        ],
         selected: []
       };
     },
     created() {
+      KND.Native.getUserInfo((info) => {
+        userInfo = info;
+        let PositionId = userInfo['Primary Position Id'];
+        this.getinstall({id: PositionId});
+      });
     },
     computed: {
+      ...mapState(NAMESPACE, ['installList'])
     },
     methods: {
       ...mapActions('add', ['setProject']),
-      // 获取数据
-      getList() {
-        api.get({
-          key: 'getProjectList',
-          success: data => {
-            console.log(data);
-          }
-        });
-      },
+      ...mapActions(NAMESPACE, ['getinstall']),
       // 点击
       handleChange(item) {
         this.setProject(item);
         this.$router.go(-1);
       },
-      // 顶部
-      pendingLoadTopFn(param) {
-        loader.call(this, {
-          data: {
-            'Status': param.status
-          }
-        }, param.list, 'onTopLoaded');
-      },
-      // 底部
-      pendingLoadBottomFn(param) {
-        loader.call(this, {
-          data: {
-            'Status': param.status
-          },
-          more: true
-        }, param.list, 'onBottomLoaded');
-      },
       // 搜索
       searchFn(val) {
-        console.log(val, this.value);
+        let me = this;
+        let PositionId = userInfo['Primary Position Id'];
+        me.getinstall({id: PositionId, name: val});
       }
     }
   };

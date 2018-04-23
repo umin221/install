@@ -66,12 +66,12 @@
                           @ck="showAttach({id:item.Id, index:index, type:'Problem Record',len:ProblemRecord[index].list.length})">
                     <ul class="failure-record">
                       <li>产品序列号：{{item['KL SN']}}</li>
-                      <li>详细地址：
-                        {{ServiceRequest['KL Province']}}
-                        {{ServiceRequest['KL City']}}
-                        {{ServiceRequest['KL Town']}}
-                        {{ServiceRequest['KL Address']}}
-                      </li>
+                      <!--<li>详细地址：-->
+                        <!--{{ServiceRequest['KL Province']}}-->
+                        <!--{{ServiceRequest['KL City']}}-->
+                        <!--{{ServiceRequest['KL Town']}}-->
+                        <!--{{ServiceRequest['KL Address']}}-->
+                      <!--</li>-->
                       <li>产品类型：{{item['KL Product Model']}}</li>
                       <li>故障描述：{{item['KL Responsbility']}}</li>
                       <li>故障现象：{{item['SR Rootcause']}}</li>
