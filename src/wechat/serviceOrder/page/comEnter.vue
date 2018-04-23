@@ -150,9 +150,7 @@
               me.sarech();
             }
             if (data['KL Parent SR Complete Flag'] || data['KL Status LIC'] === 'Completed') {
-              console.log(me.isSubmit);
               me.isSubmit = false;
-              console.log(me.isSubmit);
             }
             me.queryMedias({
               data: {
@@ -166,7 +164,6 @@
                 let attach = KND.Util.toArray(data['SiebelMessage']['Service Request Attachment']);
                 if (attach) {
                   me.attach.list = attach;
-                  me.attach.edit = false;
                 }
               }
             });
@@ -209,7 +206,6 @@
           }
         }
       });
-      console.log(me.isSubmit);
     },
     data: () => {
       return {
@@ -360,7 +356,6 @@
           delete form['Asset Number'];
           me.upDateService(form);
         } else {
-          console.log(me.room);
           let address = {
             'addrId': me.addressId,
             'Province': me.Province,

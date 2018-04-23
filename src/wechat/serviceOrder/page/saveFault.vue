@@ -8,7 +8,7 @@
     <div class="mint-content">
       <div class="saveFault">
         <mt-cell title="单据编号：" >{{Service['SR Number']}}</mt-cell>
-        <mt-cell title="移交日期：">{{Service['KL Cutoff Date']}}</mt-cell>
+        <mt-cell title="移交日期：">{{toDate(Service['KL Cutoff Date'])}}</mt-cell>
         <mt-cell class="require" title="是否保修范围" @click.native="getLov1('bn')" is-link>{{isBn}}</mt-cell>
         <mt-cell title="维修配件"><i class="xs-icon icon-arrow-down"></i></mt-cell>
         <div class="servesParts">
@@ -176,6 +176,13 @@ export default {
     ...mapActions('app', ['getLov', 'upload']),
     ...mapMutations('searchTrans', ['initSelected', 'deleteSelected']),
     ...mapMutations('detail', ['setPartner']),
+    toDate(time) {
+      if (time) {
+        return KND.Util.format(time, 'yyyy-MM-dd hh:mm:ss');
+      } else {
+        return '';
+      }
+    },
     productNumber(val, num, type) {
       let me = this;
       me.ProductNum({num, val});

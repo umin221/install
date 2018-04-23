@@ -41,7 +41,7 @@
         <mt-cell class="mint-field require"  title="故障现象" :value="SR_AREA" @click.native="getLov('SR_AREA','')"  placeholder="请选择" is-link></mt-cell>
         <mt-cell class="mint-field margin-right" title="故障分级" :value="Priority"></mt-cell>
         <mt-field class="block" label="客服说明" v-model="ProductFlag" placeholder="详细描述或附加需求..." type="textarea" rows="2"></mt-field>
-        <mt-cell class="mint-field" title="客户预约时间" @click.native="open('picker1')" :value="Start_Date"  placeholder="请选择" is-link></mt-cell>
+        <mt-cell class="mint-field" title="客户预约时间" @click.native="open('picker1')" :value="StartDate"  placeholder="请选择" is-link></mt-cell>
         <div v-if="hideMore">
           <mt-field label="产品条形码" placeholder="客户如提供请输入" @change="SnChange" v-model="KL_SN" class="textRight" ></mt-field>
           <mt-field label="产品型号" placeholder="客户如提供请输入" v-model="form.KL_Product_Model"  class="textRight"></mt-field>
@@ -183,6 +183,7 @@
         Priority: '',          // 故障等级
         ProductFlag: '',    // 客服说明
         Start_Date: null,        // 客户预约时间
+        StartDate: '',
         KL_SN: '',           // 条形码
         arr: [],
         isCall: {},
@@ -349,6 +350,7 @@
       },
       handleChange(value) {
         let me = this;
+        me.StartDate = KND.Util.format(value, 'yyyy-MM-dd hh:mm:ss');
         me.Start_Date = value.format('MM/dd/yyyy hh:mm:ss');
       },
       showLovFn(type) {

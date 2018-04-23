@@ -33,9 +33,9 @@
               <div class="mt-Detail-info">
                 <div>产品条形码：<a href="javascript:void(0);" class="detail-call">{{ServiceRequest['KL SN']}}</a></div>
                 <div>产品型号：{{ServiceRequest['KL Product Model']}}</div>
-                <div>申请时间：{{ServiceRequest['Created']}}</div>
-                <div>客户预约时间：{{ServiceRequest['KL Customer Appointment Time']}}</div>
-                <div v-if="Action.Id">实际预约时间：{{Action['Planned']}}</div>
+                <div>申请时间：{{toDate(ServiceRequest['Created'])}}</div>
+                <div>客户预约时间：{{toDate(ServiceRequest['KL Customer Appointment Time'])}}</div>
+                <div>实际预约时间：{{toDate(Action['Planned'])||''}}</div>
                 <div>地址：
                   {{ServiceRequest['KL Province']}}
                   {{ServiceRequest['KL City']}}
@@ -177,7 +177,7 @@
                   </li>
                   <li style="margin-right: 8px">{{item.Note}}</li>
                   <div class="content-div">
-                    <div>{{item.Created}}</div>
+                    <div>{{toDate(item.Created)}}</div>
                   </div>
                 </ul>
               </div>
@@ -397,6 +397,13 @@
       ...mapActions(NameSpace, ['getDetail', 'getCloseReason', 'setStatus', 'setContact', 'getMapAddress', 'addChildService']),
       ...mapMutations(NameSpace, ['setRole', 'setAttachs']),
       ...mapMutations('saveFault', ['initSelect']),
+      toDate(time) {
+        if (time) {
+          return KND.Util.format(time, 'yyyy-MM-dd hh:mm:ss');
+        } else {
+          return '';
+        }
+      },
       childItem(item) {
         return KND.Util.toArray(item);
       },

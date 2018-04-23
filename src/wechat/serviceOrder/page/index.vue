@@ -37,7 +37,7 @@
               </div>
               <mt-cell class="multiple" is-link>
                 <div class="my-cell-sub" slot="title">
-                  申请时间: {{item.Created}}
+                  申请时间: {{toDate(item.Created)}}
                 </div>
                 <div class="my-cell-sub" slot="title">
                   优先级: {{item.Priority}}
@@ -62,7 +62,7 @@
               </div>
               <mt-cell class="multiple" is-link>
                 <div class="my-cell-sub" slot="title">
-                  申请时间: {{item.Created}}
+                  申请时间: {{toDate(item.Created)}}
                 </div>
                 <div class="my-cell-sub" slot="title">
                   优先级: {{item.Priority}}
@@ -88,7 +88,7 @@
               </div>
               <mt-cell class="multiple" is-link>
                 <div class="my-cell-sub" slot="title">
-                  申请时间: {{item.Created}}
+                  申请时间: {{toDate(item.Created)}}
                 </div>
                 <div class="my-cell-sub" slot="title">
                   优先级: {{item.Priority}}
@@ -124,7 +124,7 @@
               </div>
               <mt-cell class="multiple" is-link>
                 <div class="my-cell-sub" slot="title">
-                  申请时间: {{item.Created}}
+                  申请时间: {{toDate(item.Created)}}
                 </div>
                 <div class="my-cell-sub" slot="title">
                   优先级: {{item.Priority}}
@@ -150,7 +150,7 @@
               </div>
               <mt-cell class="multiple" is-link>
                 <div class="my-cell-sub" slot="title">
-                  申请时间: {{item.Created}}
+                  申请时间: {{toDate(item.Created)}}
                 </div>
                 <div class="my-cell-sub" slot="title">
                   优先级: {{item.Priority}}
@@ -234,6 +234,13 @@
       ...mapMutations(NameSpace, ['setManager', 'setLoginMeg']),
       toSearch() {
         this.$router.push({path: '/search'});
+      },
+      toDate(time) {
+        if (time) {
+          return KND.Util.format(time, 'yyyy-MM-dd hh:mm:ss');
+        } else {
+          return '';
+        }
       },
       loadTopFn(param) {
 //        type = type || 'pending';
