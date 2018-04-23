@@ -16,6 +16,7 @@ import buttonGroup from 'public/components/cus-button-group';
 import App from '../../App';
 import store from './store';
 import './filters'; // Vue Filter
+import localConfig from './config';
 
 // For back
 Vue.component('fallback', fallback);
@@ -27,6 +28,8 @@ Vue.component('button-group', buttonGroup);
 Vue.component('attach', attach);
 
 Vue.config.productionTip = false;
+// Load Local Config
+Object.assign(config, localConfig);
 
 /* eslint-disable no-new */
 new Vue({

@@ -20,7 +20,7 @@
         me.$router.back();
       };
 
-      this.getAuthority();
+      me.getAuthority();
     },
     data() {
       return {
