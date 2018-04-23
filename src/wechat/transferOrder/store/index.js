@@ -26,6 +26,8 @@ export default new Vuex.Store({
         isManager: false,
         // 查看团队，此状态下所有信息只可查看，不可编辑
         isTeam: false,
+        // 是否安装工程师&安装主管，非安装人员不可操作安装订单
+        isEngineer: false,
         // 待审批
         pending: [],
         // 处理中
@@ -42,16 +44,21 @@ export default new Vuex.Store({
         addTransferOrders(state, {TransferOrders, list}) {
           state[list].push(...TransferOrders);
         },
-        setManager(state, isManager) {
-          mapps = config.mapp[isManager ? 'manager' : 'employee'];
-          state.isManager = isManager;
-        },
         setTeam(state, isTeam) {
           state.isTeam = isTeam;
           // 清空列表数据
           state.pending = [];
           state.process = [];
           state.completed = [];
+        },
+        // 根据用户职位，设置用户权限
+        setAuthority(state, position) {
+          // 总部支持主管 & 总部支持专员，有管理权限，可查看未分配交接单。 暂未处理权限：主管无分配权限 详情页面单独判断职位
+          let isManager = position === 'HQ Support Assistant' || position === 'HQ Support Manager';
+          mapps = config.mapp[isManager ? 'manager' : 'employee'];
+          state.isManager = isManager;
+          // 只有安装人员可操作安装订单
+          state.isEngineer = position === 'Field Service Manager' || position === 'Field Service Engineer';
         }
       },
       actions: {

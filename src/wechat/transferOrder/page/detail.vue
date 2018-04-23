@@ -31,7 +31,7 @@
         <mt-cell title="销售方式"
                  :value="form['Sales Type']"></mt-cell>
         <mt-cell title="指派安装工程师"
-                 v-show="!readonly"
+                 v-show="!isTeam"
                  :value="select['Last Name']"
                  @click.native="toEngineer"
                  is-link></mt-cell>
@@ -58,10 +58,10 @@
     </div>
 
     <!--buttons-->
-    <button-group v-show="!readonly && !isCompleted">
+    <button-group v-show="!isTeam && !isCompleted">
       <mt-button v-show="isPending" @click.native="$router.push('reject')">驳回</mt-button>
       <mt-button type="primary" v-show="isPending"  @click.native="assignFn">确认分配</mt-button>
-      <mt-button v-show="!isPending" @click.native="generateOrderFn">生成安装订单</mt-button>
+      <mt-button v-show="!isPending && isEngineer" @click.native="generateOrderFn">生成安装订单</mt-button>
     </button-group>
   </div>
 </template>
@@ -89,7 +89,7 @@
       };
     },
     computed: {
-      ...mapState('index', {readonly: 'isTeam'}),
+      ...mapState('index', ['isTeam', 'isEngineer']),
       ...mapState(NAMESPACE, ['form', 'orders']),
       ...mapState('engineer', ['select']),
       // 未交接交接单
@@ -100,6 +100,11 @@
       isCompleted() {
         let statusLIC = this.form['Status LIC'];
         return statusLIC === 'Closed' || statusLIC === 'Rejected';
+      },
+      // 订单只读状态
+      readonly() {
+        // 查看团队交接单&非安装人员不可操作
+        return this.isTeam || !this.isEngineer;
       }
     },
     methods: {

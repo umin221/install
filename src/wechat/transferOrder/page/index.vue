@@ -117,10 +117,10 @@
       KND.Native.getUserInfo((info) => {
         config.userInfo = info;
         let position = info['KL Primary Position Type LIC'];
-        // 主管可查看团队试图
+        // 设置用户权限
+        me.setAuthority(position);
+        // 主管可查看团队视图
         me.viewTeam = position === 'Field Service Manager';
-        // 是否总部支持专员，专员有管理分配交接单权限
-        me.setManager(position === 'HQ Support Assistant'); // || position === 'HQ Support Manager'
         // 获取列表数据
         me.loadBottomFn({
           status: '待处理',
@@ -143,7 +143,7 @@
     },
     methods: {
       ...mapActions(NAMESPACE, ['getTransferOrder']),
-      ...mapMutations(NAMESPACE, ['setManager', 'setTeam']),
+      ...mapMutations(NAMESPACE, ['setTeam', 'setAuthority']),
       // 标题栏菜单选择回调方法
       menuFn(item) {
         this.setTeam(item.key === 'team');
