@@ -53,7 +53,7 @@
       me.option = param.option; // 区分从哪跳转到详情页
       me.id = param.Id;
       if (this.option === 'approval') {
-        console.log(param);
+        this.is_option = true;
         this.InboxItemId = param.InboxItemId;
         this.InboxTaskId = param.InboxTaskId;
       }

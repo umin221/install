@@ -52,6 +52,7 @@
       me.id = param.Id;
       console.log(param);
       if (this.option === 'approval') {
+        this.is_option = true;
         this.InboxItemId = param.InboxItemId;
         this.InboxTaskId = param.InboxTaskId;
       }
