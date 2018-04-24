@@ -13,8 +13,6 @@ import cache from '../lib/cache';
   let session = context.Session;
   // 用户ID
   let userID;
-  // 是否本地调试
-  let debug = config.debug;
   // 缓存超时
   let exp = config.cacheExp;
 
@@ -259,7 +257,7 @@ import cache from '../lib/cache';
   /**
    * 本地调试
    */
-  if (debug) {
+  if (config.WeixinJSBridge === false) {
     // 选图
     native.chooseImage = option => {
       util.invoke(option.success, {

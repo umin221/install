@@ -157,9 +157,9 @@
           let floor = parseInt(room['KL Floor Number'], 10);
           // 扫码标记
           if (record) room['Serial Number'] = KND.Util.parse(record.data)['Serial Number'];
-          // 选择模式 不显示已移交房号
+          // 选择模式 不显示已移交房号，不显示未绑定条码房号
           if (this.isSelect) {
-            if (room['Install Date']) continue;
+            if (room['Install Date'] || !room['Serial Number']) continue;
           };
           // 房号标记
           room = this.markFn(layer[i]);

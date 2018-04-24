@@ -24,6 +24,57 @@
     data() {
       return {
         list: [{
+          userID: '16043202',
+          position: '安装主管_张世虎'
+        }, {
+          userID: '16043218',
+          position: '安装主管_谢应发'
+        }, {
+          userID: '18020016',
+          position: '产品安装工程师_刘家军'
+        }, {
+          userID: '17023092',
+          position: '产品安装工程师_刘耀'
+        }, {
+          userID: '16043215',
+          position: '门厂技术主管（代）_胡清秀'
+        }, {
+          userID: '17053018',
+          position: '门厂技术工程师_韦吉辉'
+        }, {
+          userID: '17080257',
+          position: '门厂技术工程师_覃仕权'
+        }, {
+          userID: '1651',
+          position: '部长（代）_郭利勤'
+        }, {
+          userID: '14083015',
+          position: '部长（代）_胡成涛'
+        }, {
+          userID: '16113009',
+          position: '客服主管_袁静'
+        }, {
+          userID: '1651',
+          position: '部长（代）_郭利勤'
+        }, {
+          userID: '13030172',
+          position: '安装支持主管（代）_张长虹'
+        }, {
+          userID: '15063016',
+          position: '安装支持主管（代）_李志勇'
+        }, {
+          userID: '18010047',
+          position: '安装支持专员_周振威'
+        }, {
+          userID: '18010174',
+          position: '安装支持专员_刘振伟'
+        }, {
+          userID: '14080088',
+          position: '客服专员_张沙沙'
+        }, {
+          userID: '17080258',
+          position: '客服专员_许壁填'
+        }, {
           userID: 'IM01',
           position: '产品安装主管_G40204_00000010'
         }, {

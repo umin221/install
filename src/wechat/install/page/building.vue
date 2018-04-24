@@ -6,12 +6,13 @@
     </mt-header>
     <div class="mint-content ban">
       <mt-cell-swipe v-for="(item, index) in building"
-                     title="楼栋名称"
+                     title="楼栋名称" tag="楼栋名称"
                      :right="[{
                         content: '删除',
                         style: { background: 'red', color: '#fff' },
                         handler: () => removeFn(item, index)
                       }]"
+                     v-valid.require
                      :key="index">
         <input type="text" class="mint-field-core" v-model="item['BuildingName']"/>
       </mt-cell-swipe>
@@ -53,15 +54,18 @@
       ...mapMutations(ASSETS, ['remove']),
       // 更新楼栋名称
       saveFn() {
-        let temp = KND.Util.parse(tempBuilding);
-        let id = this.$route.query.id;
-        let upArr = [];
-        for (let t in temp) {
-          if (temp[t].BuildingName !== this.building[t].BuildingName) upArr.push(this.building[t]);
-        }
-        this.updateBuildingName({
-          upArr: upArr,
-          id: id
+        let me = this;
+        tools.valid.call(me, () => {
+          let temp = KND.Util.parse(tempBuilding);
+          let id = me.$route.query.id;
+          let upArr = [];
+          for (let t in temp) {
+            if (temp[t].BuildingName !== me.building[t].BuildingName) upArr.push(me.building[t]);
+          }
+          me.updateBuildingName({
+            upArr: upArr,
+            id: id
+          });
         });
       },
       // 删除整栋
