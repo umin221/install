@@ -111,7 +111,6 @@ export default new Vuex.Store({
               form
             },
             success: data => {
-              console.log(data);
               dispatch('toApproval', {id: data.PrimaryRowId, form});
             },
             error: data => {

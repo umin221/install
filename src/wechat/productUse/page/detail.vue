@@ -3,7 +3,7 @@
     <div>
       <mt-header fixed title="领用申请详情">
         <fallback slot="left"></fallback>
-        <mt-button slot="right" @click.native="toApproval">审批记录</mt-button>
+        <mt-button slot="right" @click.native="toApprovalsave">审批记录</mt-button>
       </mt-header>
 
       <div class="mint-content orderForms">
@@ -29,6 +29,10 @@
                    @click.native="submitFn('Rejected')">驳回</mt-button>
         <mt-button class="single"
                    @click.native="submitFn('Approved')">确认</mt-button>
+      </button-group>
+      <button-group v-if="orderEntry['Status LIC'] === 'Draft'||orderEntry['Status LIC'] === 'Rejected'">
+        <mt-button class="single"
+                   @click.native="submitApproval">提交</mt-button>
       </button-group>
     </div>
   </div>
@@ -78,6 +82,7 @@
     },
     methods: {
       ...mapActions(NameSpace, ['getOrderEntry']),
+      ...mapActions('add', ['toApproval']),
       toDate(time) {
         if (time) {
           return KND.Util.format(time, 'yyyy-MM-dd hh:mm:ss');
@@ -85,7 +90,7 @@
           return '';
         }
       },
-      toApproval() {
+      toApprovalsave() {
         let me = this;
         console.log(me.orderEntry.Id);
         me.$router.push({
@@ -147,6 +152,16 @@
             }
           });
         }
+      },
+      submitApproval() {
+        let me = this;
+        let form = {
+          callBack: data => {
+            Toast(data);
+            me.$router.go(-1);
+          }
+        };
+        me.toApproval({id: me.orderEntry.Id, form});
       }
     },
     components: {Toast}

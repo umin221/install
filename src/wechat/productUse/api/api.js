@@ -131,7 +131,6 @@ let apiList = {
       data: {
         'body': {
           'OutputIntObjectName': 'Base Order Entry',
-          'ViewMode': 'Sales Rep',
           'SearchSpec': '[Order Entry - Orders.Id] = "' + id + '"'
         }
       }

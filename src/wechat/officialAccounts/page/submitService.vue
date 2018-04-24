@@ -38,7 +38,7 @@
                  is-link></mt-cell>
         <mt-cell title="预约时间"
                  placeholder="请选择"
-                 :value="AppointTime"
+                 :value="appointTime"
                  @click.native="open('picker1')"
                  is-link></mt-cell>
         <mt-field label="问题说明"
@@ -146,6 +146,7 @@
         SubArea: '',           // 故障描述
         ComplaintDescription: '', // 故障详情描述
         AddressId: '',        // 如果是用户自己新建了地址，传新建的地址Id,如果只是简单定位，不用传
+        appointTime: '',
         AppointTime: '',      // 用户的预约上门时间
         AssetId: '',           // 如果是用户扫码了，并带出了资产，传资产Id，扫不出来，不用传
         openId: '',
@@ -226,8 +227,8 @@
       },
       handleChange(value) {
         let me = this;
+        me.appointTime = KND.Util.format(value, 'yyyy-MM-dd hh:mm:ss');
         me.AppointTime = value.format('MM/dd/yyyy hh:mm:ss');
-        console.log(me.AppointTime);
       },
       open(picker) {
         this.$refs[picker].open();

@@ -74,6 +74,7 @@
         // 刷新数据
       },
       toDateil(name) {
+        console.log(name);
         this.$router.push({
           name: 'detail',
           query: {

@@ -44,7 +44,7 @@
           {'id': 'orderForms', 'vul': '维修订单', 'icon': 'forms'},
           {'id': 'myProduct', 'vul': '我的配件'},
           {'id': 'productUse', 'vul': '配件领用', 'icon': 'use'},
-//          {'id': 1, 'vul': '配件退入'},
+          {'id': 'productBack', 'vul': '配件退入', 'icon': 'transfer'},
           {'id': 'outsourcing', 'vul': '委外人员管理', 'icon': 'out'}
         ]
       };
