@@ -80,7 +80,7 @@
     created() {
       let me = this;
       let query = me.$route.query;
-      let order = KND.Util.parse(query.order);
+      let order = KND.Util.parse(KND.Session.get('order') || query.order);
 
       me.setOrder(order);
       // 取 lov 开孔方式
@@ -198,6 +198,8 @@
         let path = line['KL Product Type LIC'] === 'Other' ? 'fitting' : 'orderLine';
         // 填充订单id，保存编辑行时需要
         line['Order Header Id'] = me.order.Id;
+        // 缓存订单
+        KND.Session.set('order', JSON.stringify(me.order));
         me.$router.push({
           path: path,
           query: {
@@ -214,16 +216,18 @@
         this.slots[0].values = mapp.option[type];
       },
       // 订单行保存
-      saveFn() {
+      saveFn(callback) {
         let me = this;
         let order = me.order;
         if (order.Id) {
           delete order['Link'];
           me.update({
-            data: order
+            data: order,
+            success: callback
           });
         } else {
-          me.save({data: order});
+          // me.save({data: order});
+          MessageBox('保存失败，订单不存在！');
         }
       },
       // 选择确认
@@ -237,28 +241,24 @@
       transferFn() {
         let me = this;
         MessageBox.confirm('是否转发门厂确认？', '请确认').then(action => {
-          let order = me.order;
-          delete order['Link'];
+          let id = me.order.Id;
           // 保存订单
-          me.update({
-            data: order,
-            success: data => {
-              // 转发门厂
-              me.runProcess({
-                data: {
-                  body: {
-                    'ProcessName': 'KL Install Order Transfer Process',
-                    'Object Id': order.Id
-                  }
-                },
-                success: data => {
-                  tools.success(data, {
-                    back: true,
-                    successTips: '转发成功'
-                  });
+          me.saveFn(data => {
+            // 转发门厂
+            me.runProcess({
+              data: {
+                body: {
+                  'ProcessName': 'KL Install Order Transfer Process',
+                  'Object Id': id
                 }
-              });
-            }
+              },
+              success: data => {
+                tools.success(data, {
+                  back: true,
+                  successTips: '转发成功'
+                });
+              }
+            });
           });
         });
       },
@@ -266,28 +266,24 @@
       submitFn() {
         let me = this;
         MessageBox.confirm('是否确认提交审批？', '请确认').then(action => {
-          let order = me.order;
-          delete order['Link'];
+          let id = me.order.Id;
           // 保存订单
-          me.update({
-            data: order,
-            success: data => {
-              // 提交订单
-              me.runProcess({
-                data: {
-                  body: {
-                    'ProcessName': 'KL Install Order Submit Process',
-                    'Object Id': order.Id
-                  }
-                },
-                success: data => {
-                  tools.success(data, {
-                    back: true,
-                    successTips: '提交成功'
-                  });
+          me.saveFn(data => {
+            // 提交订单
+            me.runProcess({
+              data: {
+                body: {
+                  'ProcessName': 'KL Install Order Submit Process',
+                  'Object Id': id
                 }
-              });
-            }
+              },
+              success: data => {
+                tools.success(data, {
+                  back: true,
+                  successTips: '提交成功'
+                });
+              }
+            });
           });
         });
       },
@@ -297,12 +293,15 @@
       },
       // Copy line
       copyFn(line) {
+        let me = this;
         MessageBox.confirm('复制此订单行记录？', '请确认').then(action => {
           // 复制只修改id，其他字段拷贝
           line.Id = KND.Util.now();
           // 跳转配件 或 其他订单行(面板、锁体、假锁)
           let path = line['KL Product Type LIC'] === 'Other' ? 'fitting' : 'orderLine';
-          this.$router.push({
+          // 缓存订单
+          KND.Session.set('order', JSON.stringify(me.order));
+          me.$router.push({
             path: path,
             query: {
               line: JSON.stringify(line),

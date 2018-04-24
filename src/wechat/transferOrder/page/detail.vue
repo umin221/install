@@ -148,6 +148,8 @@
           // 安装订单编辑
           let me = this;
           delete item['Link'];
+          // 缓存订单
+          KND.Session.remove('order');
           me.$router.push({
             path: 'order',
             query: {
