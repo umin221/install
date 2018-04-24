@@ -124,9 +124,9 @@
             }
           }
           if (lineObj['Unqualified Solve Amount']) {
-            var numC = parseInt(lineObj['Completed Install Amount'], 10) - parseInt(lineObj['Qualified Amount'], 10);
+            var numC = parseInt(lineObj['Spot Check Amount'], 10) - parseInt(lineObj['Qualified Amount'], 10);
             if (parseInt(lineObj['Unqualified Solve Amount'], 10) > numC) {
-              Toast('异常处理数量不合理，不能大于完成数量与合格数量的差值！');
+              Toast('异常处理数量不合理，不能大于抽查数量与合格数量的差值！');
               return;
             }
           }
