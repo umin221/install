@@ -67,7 +67,7 @@
 </template>
 
 <script type="es6">
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import cusField from 'public/components/cus-field';
   import titleGroup from 'public/components/cus-title-group';
   import toggle from 'public/components/cus-toggle';
@@ -82,6 +82,12 @@
       let param = me.$route.query;
       // 获取详情
       me.findTransferOrderById(param.id);
+      // 获取用户&权限
+      KND.Native.getUserInfo((info) => {
+        config.userInfo = info;
+        // 设置用户权限
+        me.setAuthority(info['KL Primary Position Type LIC']);
+      });
     },
     data: () => {
       return {
@@ -109,6 +115,7 @@
     },
     methods: {
       ...mapActions(NAMESPACE, ['generateOrder', 'findTransferOrderById', 'queryOrdersById', 'addPartner', 'assign', 'delete']),
+      ...mapMutations('index', ['setAuthority']),
       // 跳转指派工程师界面
       toEngineer() {
         this.$router.push('engineer');
