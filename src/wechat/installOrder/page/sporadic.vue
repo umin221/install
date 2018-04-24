@@ -5,10 +5,10 @@
       <mt-button slot="right" @click.native="submit"  v-show="type" v-if="objList.length > 0">提交</mt-button>
     </mt-header>
     <div class="mint-content">
+      <!-- :right="getSwipeBtn(item, index)"-->
       <mt-cell-swipe
         v-for="(item, index) in objList"
         :key="item.id"
-        :right="getSwipeBtn(item, index)"
         is-link ref="body"
         @click.stop.native="scavenging(item, '')">
         <span v-show="type" class="icon-copy" @click.stop="scavenging(item,'copy')"></span>

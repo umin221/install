@@ -15,8 +15,8 @@
         <mt-field label="批次">
           <span>{{batchCode}}</span>
         </mt-field>
-        <mt-field label="计划开始日期"  :value="start_Date" v-show="is_plan"></mt-field>
-        <mt-field label="计划完成日期" :value="end_Date" v-show="is_plan"></mt-field>
+       <!-- <mt-field label="计划开始日期"  :value="start_Date" v-show="is_plan"></mt-field>
+        <mt-field label="计划完成日期" :value="end_Date" v-show="is_plan"></mt-field>-->
         <mt-field label="计划数量" class="enable" :class="showNum()"
                   :value="batchNum"
                   @click.native="editBuildingFn"
@@ -201,7 +201,7 @@
       },
       showNum() {
         var self = this;
-        if (self.detailData['KL Detail Type LIC'] === 'Lock Installation Batch' && self.detailData['KL Delivery Sales Type'] === '工程' && self.is_User) {
+        if (self.detailData['KL Detail Type LIC'] === 'Lock Installation Batch' && self.detailData['KL Delivery Sales Type'] === '工程' && self.is_User && self.detailData['Calculated Activity Status'] !== 'Completed') {
           return 'numCla';
         }
       },
@@ -435,7 +435,7 @@
         if (self.is_option) { // 审批中不能查看楼栋编辑
           return;
         }
-        if (self.detailData['KL Detail Type LIC'] === 'Lock Installation Batch' && self.detailData['KL Delivery Sales Type'] === '工程' && self.is_User) {
+        if (self.detailData['KL Detail Type LIC'] === 'Lock Installation Batch' && self.detailData['KL Delivery Sales Type'] === '工程' && self.is_User && self.detailData['Calculated Activity Status'] !== 'Completed') {
           let id = this.$route.query.Id;
           this.$router.push({
             path: 'assets',

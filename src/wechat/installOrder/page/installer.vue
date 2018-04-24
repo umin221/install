@@ -15,7 +15,7 @@
           <div class="mint-cell-title co-flex" slot="title">
             <span class="co-f1">姓名: {{item['Last Name']}}</span> <span class="co-f1">{{item['KL Primary Position Type']}}</span>
           </div>
-          <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Cellular Phone #']}}</div>
+          <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Phone #']}}</div>
           <div class="mint-cell-sub-title" slot="title">合作伙伴名称: {{item.companyName}}</div>
           <div v-show="showSelect(item)" class="selectIcon" slot="title">
             <i class="xs-icon icon-select"></i>
