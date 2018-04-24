@@ -35,8 +35,7 @@
    *  －在线，返回siebel图片列表
    */
   import titleGroup from '../../cus-title-group';
-
-  let downloadFromSiebel = (`${config.proxy}/webchat/api/external/downloadattachment?url=http://192.168.166.8:9001/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess`);
+  let downloadFromSiebel = (`${config.proxy}/webchat/api/external/downloadattachment?url=${config.attachServer}/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess`);
   let downloadFromWechat = (`${config.proxy}/webchat/api/local/downloadmedia?appNO=${config.appNo}&media_id=`);
 
   export default {

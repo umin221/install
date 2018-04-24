@@ -3,11 +3,36 @@ import prod from './prod.env';
 import dev from './dev.env';
 
 let project = global['project'] || {};
+// 环境
+let env = project['env'];
+// 环境配置
+let envConfig = {};
+// 项目配置
+let config;
 let name;
 
-let config = Object.assign(dev, process.env.NODE_ENV === 'production' ? prod : {}, project);
+/**
+ * 环境配置
+ * dev: http://192.168.166.8:9001/crm/dev/api/
+ * sit: http://crmsit.kinlong.cn:9003/siebel-rest/v1.0/
+ */
+switch (env) {
+  case 'SIT':
+    envConfig.attachServer = 'http://crmsit.kinlong.cn:9003'; // 附件接口服务 SIT环境
+    envConfig.context = '/crm/sit/api/';
+    envConfig.authorization = 'HELLO'; // 认证模式 认证密码
+    break;
+  case 'UAT':
+    break;
+  default:
+    envConfig.attachServer = 'http://192.168.166.8:9001'; // 附件接口服务 开发环境
+    envConfig.context = '/crm/dev/api/';
+    envConfig.authorization = 'ACCOUNT'; // 认证模式 认证密码
+};
 
+config = Object.assign(envConfig, dev, process.env.NODE_ENV === 'production' ? prod : {}, project);
 name = config['name'];
+
 global['config'] = config;
 global['context'] = name;
 global[name] = {};

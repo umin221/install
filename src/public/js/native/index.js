@@ -101,7 +101,7 @@ import cache from '../lib/cache';
      * 上传本地图片
      * @param {Number} option.isShowProgressTips 选填 默认为1，显示进度提示
      * @param {String} option.localId 必填 'img:///storage/emulated/0/xxx/xxx/xxx.jpg', 需要上传的图片localId
-     * @response {Array} res.serverId "1sb9A-V1qJt4tcfiKMM4UzpjMHuBHMMIIgYKl96OQ1_pBe8h0xte9G6aTPNjEQaYI" 上传结果
+     * @response {Array} res.serverId "3Powe2mmxCACbK8lUOIpfroUMDUl3aX2ecFFNXGZc43OymPcoJio49bVNh4pFDLn6" 上传结果
      * @response {String} res.errMsg uploadImage:ok
      */
     uploadImage(option) {
@@ -268,7 +268,7 @@ import cache from '../lib/cache';
     // 上传
     native.uploadImage = option => {
       util.invoke(option.success, {
-        serverId: '1sb9A-V1qJt4tcfiKMM4UzpjMHuBHMMIIgYKl96OQ1_pBe8h0xte9G6aTPNjEQaYI',
+        serverId: '3Powe2mmxCACbK8lUOIpfroUMDUl3aX2ecFFNXGZc43OymPcoJio49bVNh4pFDLn6',
         errMsg: 'uploadImage:ok'
       });
     };

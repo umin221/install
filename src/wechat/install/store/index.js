@@ -65,7 +65,8 @@ export default {
             data: data,
             mode: mode,
             success: data => {
-              let installTask = data.SiebelMessage.Contact['KL Installation Task'];
+              let contact = data.SiebelMessage.Contact;
+              let installTask = contact && contact['KL Installation Task'];
               commit('setTask', {installTask, list});
               if (callback) callback(installTask);
             }
