@@ -123,9 +123,13 @@
         me.getLov({
           type: 'KL_PRODUCT_MODEL',
           success: data => {
-            mapp.option['KL Product Model No'] = data.items;
+            // 按产品类型过滤产品型号待选列表
+            let model = data.items.filter(item => {
+              return item['Parent'] === param.type;
+            });
+            mapp.option['KL Product Model No'] = model;
             // 填充产品名称
-            me.line['KL Product Model No'] = data.items[0].Value;
+            me.line['KL Product Model No'] = model[0].Value;
           }
         });
         line.Product = param.type === 'Panel' ? 'VP00301' : 'VP00302';
