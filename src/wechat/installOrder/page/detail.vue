@@ -143,7 +143,7 @@
                     :value="itemTask['KL Qualified Amount']+'/'+itemTask['KL Completed Install Amount']">
                     <span v-if="itemTask['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
                   </mt-field>-->
-                  <mt-field label="时间" :value="new Date(itemTask['Planned Completion']).format('yyyy-MM-dd')"></mt-field>
+                  <mt-field label="时间" :value="new Date(itemTask['Created']).format('yyyy-MM-dd')"></mt-field>
                   <mt-field label="状态" :value="itemTask.Status"></mt-field>
                 </div>
               </div>

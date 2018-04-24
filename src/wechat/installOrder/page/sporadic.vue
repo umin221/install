@@ -38,6 +38,7 @@
   export default {
     name: NameSpace,
     created() {
+      var self = this;
       this.id = this.itemTask.Id;
       this.orderID = this.orderId;
       this.getSporadic(this.id);
@@ -45,7 +46,7 @@
         userInfo = info;
         console.log(userInfo);
       });
-      if (userInfo['Person UId'] === this.itemTask['Primary Owner Id'] && (this.itemTask['Calculated Activity Status'] === 'In Progress' || this.itemTask['Calculated Activity Status'] === 'Approved' || this.itemTask['Calculated Activity Status'] === 'Declined')) {
+      if (userInfo['Person UId'] === self.itemTask['Primary Owner Id'] && (self.itemTask['Calculated Activity Status'] === 'In Progress' || self.itemTask['Calculated Activity Status'] === 'Approved' || self.itemTask['Calculated Activity Status'] === 'Declined' || self.itemTask['Calculated Activity Status'] === 'Close Reject')) {
         this.type = true;
       }
     },

@@ -19,6 +19,7 @@
           <mt-field v-if="item['KL Detail Type LIC'] !== 'Working Drawing Sign'" label="签收数量"
                     placeholder="请输入签收数量"
                     :class="heartVisible"
+                    type="number"
                     v-model="form['KL Signed Amount']">
 
           </mt-field>
