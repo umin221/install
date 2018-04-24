@@ -77,6 +77,8 @@
   let maxFloor = 0;
   // 本地扫码记录
   let installRecords = {};
+  // loading 提示框
+  Indicator.process = Indicator.process || Indicator.open;
 
   const NAMESPACE = 'assets';
   export default {
