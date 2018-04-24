@@ -45,7 +45,7 @@
         userInfo = info;
         console.log(userInfo);
       });
-      if (userInfo['Person UId'] === this.itemTask['Primary Owner Id'] && (this.itemTask['Calculated Activity Status'] === 'In Progress' || this.itemTask['Calculated Activity Status'] === 'Approved')) {
+      if (userInfo['Person UId'] === this.itemTask['Primary Owner Id'] && (this.itemTask['Calculated Activity Status'] === 'In Progress' || this.itemTask['Calculated Activity Status'] === 'Approved' || this.itemTask['Calculated Activity Status'] === 'Declined')) {
         this.type = true;
       }
     },

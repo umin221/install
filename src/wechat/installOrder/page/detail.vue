@@ -1210,7 +1210,7 @@
             // 详情
             if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次 编辑跳转日志  判断日志页面有没有权限更新
               var is_deit = false;
-              if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Approved')) {
+              if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Approved' || item['Calculated Activity Status'] === 'Declined')) {
                 is_deit = true;
               }
               self.getTaskType(item);
