@@ -77,16 +77,11 @@
   let maxFloor = 0;
   // 本地扫码记录
   let installRecords = {};
-  // loading 提示框
-  Indicator.process = Indicator.process || Indicator.open;
 
   const NAMESPACE = 'assets';
   export default {
     name: NAMESPACE,
     activated() {
-      setTimeout(function() {
-        Indicator.process(false);
-      }, 10000);
       let me = this;
       // 刷新当前页
       let refresh = KND.Session.get('refreshAssets');

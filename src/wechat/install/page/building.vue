@@ -30,8 +30,13 @@
   }
 </style>
 <script type="es6">
+  import Vue from 'vue';
   import {mapState, mapActions, mapMutations} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
+  import vp from 'public/plugin/validator';
+
+  // use plugin
+  Vue.use(vp);
 
   let tempBuilding;
   const ASSETS = 'assets';
