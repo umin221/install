@@ -780,20 +780,20 @@ export default new Vuex.Store({
           }
         },
         setProduct(state, data) {
-          state.result = [];
+          state.result = data;
           state.selected = [];
-          for (let i = 0; i < data.length; i++) {
-            if (data[i].Product) {
-              if (KND.Util.isArray(data[i].Product)) {
-                state.result = state.result.concat(data[i].Product);
-              } else {
-                state.result.push(data[i].Product);
-              }
-            }
-          }
-          for (let i = 0; i < state.result.length;i++) {
-            state.selected.push(false);
-          }
+          // for (let i = 0; i < data.length; i++) {
+          //   if (data[i].Product) {
+          //     if (KND.Util.isArray(data[i].Product)) {
+          //       state.result = state.result.concat(data[i].Product);
+          //     } else {
+          //       state.result.push(data[i].Product);
+          //     }
+          //   }
+          // }
+          // for (let i = 0; i < state.result.length;i++) {
+          //   state.selected.push(false);
+          // }
         },
         initSelected(state) {
           state.selected = [];
@@ -815,15 +815,21 @@ export default new Vuex.Store({
                 api.get({
                   key: 'getProduct',
                   data: {
-                    val: val.value,
-                    id: data.Id,
-                    type: val.type
+                    // val: val.value,
+                    id: data.Id
+                    // type: val.type
                   },
                   success: function(data) {
                     let Catalog = KND.Util.toArray(data.SiebelMessage['Catalog Category']);
                     if (Catalog) {
                       commit('setProduct', Catalog);
+                      val(Catalog[0].Id);
+                    } else {
+                      console.log(data);
                     }
+                  },
+                  error: function(data) {
+                    console.log(data);
                   }
                 });
               }

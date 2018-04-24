@@ -421,13 +421,13 @@ let ApiList = {
     // 下拉二级
   },
   getProduct: option => {
-    let model = '';
+    // let model = '';
     // if (option.data.type) {
     //   model = ' AND [Product.KL Translated Description] ~LIKE "*' + option.data.val + '*"';
     // } else {
     //   model = 'AND [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*"';
     // }
-    model = 'AND ([Product.Name] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Description] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*")';
+    // model = 'AND ([Product.Name] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Description] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*")';
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/Query',
@@ -440,7 +440,8 @@ let ApiList = {
       data: {
         'body': {
           'OutputIntObjectName': 'Base Catalog Category (Content Management)',
-          'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '" ' + model,
+          // 'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '" ' + model,
+          'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '" ',
           'ViewMode': 'Group'
         }
       }
