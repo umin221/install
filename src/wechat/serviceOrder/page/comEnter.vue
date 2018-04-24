@@ -34,11 +34,11 @@
         <mt-cell class="require mint-field"
                  title="面板型号"
                  placeholder="请选择"
-                 @click.native="isSubmit&&toLov('KL_LOCK_BODY_MODEL')" is-link>{{KL_LOCK_BODY_MODEL}}</mt-cell>
+                 @click.native="isSubmit&&toLov('KL_LOCK_MODEL')" is-link>{{KL_LOCK_BODY_MODEL}}</mt-cell>
         <mt-cell class="require mint-field"
                  title="锁体型号"
                  placeholder="请选择"
-                 @click.native="isSubmit&&toLov('KL_LOCK_MODEL')" is-link>{{KL_LOCK_MODEL}}</mt-cell>
+                 @click.native="isSubmit&&toLov('KL_LOCK_BODY_MODEL')" is-link>{{KL_LOCK_MODEL}}</mt-cell>
         <mt-cell class="mint-field require"
                  title="故障现象"
                  placeholder="请选择"

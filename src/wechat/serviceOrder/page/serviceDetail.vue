@@ -480,10 +480,6 @@
           me.showBox2 = false;
           me.callEnd = false;
         } else {
-//          MessageBox({
-//            title: '提示',
-//            message: '请选择预约开始和结束时间！'
-//          });
           Toast('请选择预约开始和结束时间');
           me.showBox2 = false;
         }
