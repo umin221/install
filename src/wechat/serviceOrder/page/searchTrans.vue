@@ -89,12 +89,14 @@
       .mint-tab-container-wrap{
         display: block;
         .productTitle{
-          background-image: linear-gradient(0deg, #d9d9d9, #d9d9d9 1%, transparent 0%);
           padding: 0.8rem;
           text-align: center;
           color: #777;
           font-size: 18px;
         }
+        /*.mint-tab-container-item{*/
+          /*.mint-checklist*/
+        /*}*/
       }
     }
   }

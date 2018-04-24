@@ -34,11 +34,11 @@
         <mt-cell class="require mint-field"
                  title="面板型号"
                  placeholder="请选择"
-                 @click.native="isSubmit&&toLov('KL_LOCK_MODEL')" is-link>{{KL_LOCK_BODY_MODEL}}</mt-cell>
+                 @click.native="isSubmit&&toLov('KL_LOCK_MODEL')" is-link>{{KL_LOCK_MODEL}}</mt-cell>
         <mt-cell class="require mint-field"
                  title="锁体型号"
                  placeholder="请选择"
-                 @click.native="isSubmit&&toLov('KL_LOCK_BODY_MODEL')" is-link>{{KL_LOCK_MODEL}}</mt-cell>
+                 @click.native="isSubmit&&toLov('KL_LOCK_BODY_MODEL')" is-link>{{KL_LOCK_BODY_MODEL}}</mt-cell>
         <mt-cell class="mint-field require"
                  title="故障现象"
                  placeholder="请选择"
@@ -260,17 +260,22 @@
               num: me.SerialNumber,
               callback: function(data) {
                 console.log(data);
-                me.addressId = data['Personal Address Id'];
-                me.AssetNumber = data['Asset Number'];
-                me.ProductId = data['Id'];  // 产品ID
-                me.City = data['Personal City'];
-                me.Province = data['KL Personal Province'];
-                me.County = data['KL Personal Town'];
-                me.Personal = data['KL Personal Province'] + data['Personal City'] + data['KL Personal Town'];    // 省市
-                me.Address = data['Personal Address'];// 详细地址
-                me.building = data['KL Personal Address Building'];
-                me.floor = data['KL Personal Address Floor'];
-                me.room = data['KL Personal Address Room'];
+                if (data !== 'error') {
+                  me.addressId = data['Personal Address Id'];
+                  me.AssetNumber = data['Asset Number'];
+                  me.ProductId = data['Id'];  // 产品ID
+                  me.City = data['Personal City'];
+                  me.Province = data['KL Personal Province'];
+                  me.County = data['KL Personal Town'];
+                  me.Personal = data['KL Personal Province'] + data['Personal City'] + data['KL Personal Town'];    // 省市
+                  me.Address = data['Personal Address'];// 详细地址
+                  me.building = data['KL Personal Address Building'];
+                  me.floor = data['KL Personal Address Floor'];
+                  me.room = data['KL Personal Address Room'];
+                } else {
+                  Toast('查无此资产');
+                  me.SerialNumber = '';
+                }
               }
             });
           }

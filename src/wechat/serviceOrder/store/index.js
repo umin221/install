@@ -671,7 +671,6 @@ export default new Vuex.Store({
               num
             },
             success: function(data) {
-              console.log(data);
               let datas = [];
               if (data) {
                 if (data.items) {
@@ -684,8 +683,9 @@ export default new Vuex.Store({
               callback(datas[0]);
             },
             error: function(data) {
-              console.log(data);
-              commit('errorTips', data);
+              let error = 'error';
+              callback(error);
+              // commit('errorTips', data);
             }
           });
         },
