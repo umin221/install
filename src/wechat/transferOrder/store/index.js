@@ -163,9 +163,26 @@ export default new Vuex.Store({
           });
         },
         /**
-         * 驳回交接单
+         * 驳回交接单 <废弃>
          */
-        reject({state, dispatch}) {
+        reject({state}) {
+          api.get({
+            key: 'reject',
+            data: {
+              id: state.form.Id // 交接单id
+            },
+            success: data => {
+              tools.success(data, {
+                back: true,
+                successTips: '驳回成功'
+              });
+            }
+          });
+        },
+        /**
+         * 驳回交接单 <废弃>
+         */
+        reject1({state, dispatch}) {
           // 交接单待办Id
           let ownerInfoId = state.form['Inbox Task Id'];
           // 更新待办

@@ -164,13 +164,30 @@ let apiList = {
   },
 
   /**
-   * 更新待办
+   * 更新待办 <废弃>
    * @param {String} option.data.body['OwnerInfoId'] 必填 交接单待办Id
    * @returns {{method: string, url: string}}
    */
   deactivateInbox: option => {
     return {
       url: 'service/Universal Inbox/DeactivateInboxOwner'
+    };
+  },
+
+  /**
+   * 交接单驳回
+   * @param {String} option.data.body['ProcessName'] 必填 驳回安装交接单
+   * @param {String} option.data.body['Object Id'] 必填 安装交接单Id
+   */
+  reject: option => {
+    return {
+      url: 'service/Workflow Process Manager/RunProcess',
+      data: {
+        'body': {
+          'ProcessName': 'KL Contract Delivery Reject Process',
+          'Object Id': option.data.id
+        }
+      }
     };
   },
 
