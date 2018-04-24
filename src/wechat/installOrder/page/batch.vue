@@ -22,6 +22,7 @@
         <cus-field label="计划数量" tag="计划数量"
                    placeholder="请输入"
                    v-valid.require
+                   type="number"
                    v-model="batchNum"></cus-field>
       </div>
       <div class="lock-line">
