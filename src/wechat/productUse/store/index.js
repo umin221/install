@@ -173,7 +173,10 @@ export default new Vuex.Store({
                     id: data.Id
                   },
                   success: function(data) {
-                    commit('setProduct', data.SiebelMessage['Catalog Category']);
+                    let Catalog = KND.Util.toArray(data.SiebelMessage['Catalog Category']);
+                    if (Catalog) {
+                      commit('setProduct', Catalog);
+                    }
                   }
                 });
               }

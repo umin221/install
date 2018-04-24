@@ -31,14 +31,15 @@ let apiList = {
     };
   },
   getProduct: option => {
-    let model = 'AND ([Product.KL Translated Name] ~LIKE "*' + option.data.val + '*" OR [Product.Name] ~LIKE "*' + option.data.val + '*")';
+    let model = 'AND ([Product.Name] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Description] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*")';
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/Query',
       data: {
         'body': {
           'OutputIntObjectName': 'Base Catalog Category (Content Management)',
-          'SearchSpec': '[Catalog Category.Catalog Id]="1-UBGBGH" AND [Product.Price List Id]="' + option.data.id + '" ' + model + ' AND [Catalog Category.KL Brand Name]="海贝斯"'
+          'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '" ' + model,
+          'ViewMode': 'Group'
         }
       }
     };
