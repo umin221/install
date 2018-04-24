@@ -246,6 +246,11 @@ class DataHandle {
                 db.update('install_record', {state: 'finish'}, `'${item.id}'`, result => {
                   resolve(result);
                 });
+              },
+              error: () => {
+                let failRecord = util.parse(item.data);
+                Toast(`记录<${failRecord['Id']} , ${failRecord['Serial Number']}> 提交失败`);
+                console.log(failRecord);
               }
             });
           }));

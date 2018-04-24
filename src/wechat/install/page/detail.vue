@@ -55,12 +55,14 @@
       let me = this;
       let param = me.$route.query;
       me.assets = KND.Util.parse(param.room);
+      // 获取订单行
       this.queryOrderLines({
         data: {
           'Order Header Id': me.assets['Original Order Id']
         },
         success: data => {
           if (data.items) {
+            // 填充锁体面板，填充选择清单
             data.items.forEach(item => {
               if (item['KL Product Type LIC'] === 'Panel') me.panel.push(item);
               else if (item['KL Product Type LIC'] === 'Lock Body') me.body.push(item);
