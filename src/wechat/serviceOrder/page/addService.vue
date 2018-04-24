@@ -45,8 +45,10 @@
         <div v-if="hideMore">
           <mt-field label="产品条形码" placeholder="客户如提供请输入" @change="SnChange" v-model="KL_SN" class="textRight" ></mt-field>
           <mt-field label="产品型号" placeholder="客户如提供请输入" v-model="form.KL_Product_Model"  class="textRight"></mt-field>
-          <mt-cell class="mint-field margin-right" title="移交日期" :value="form.KL_Cutoff_Date"></mt-cell>
-          <mt-cell class="mint-field margin-right" title="保修期限" :value="form.Product_Warranty_Flag" ></mt-cell>
+          <mt-cell class="mint-field margin-right" title="移交日期"
+                   :value="form.KL_Cutoff_Date"></mt-cell>
+          <mt-cell class="mint-field margin-right" title="保修期限"
+                   :value="form.Product_Warranty_Flag === 'Y'?'保内':form.Product_Warranty_Flag === 'N'?'保外': ''" ></mt-cell>
         </div>
         <div class="addMore" v-if="!hideMore" @click="showMore">
           <i class="xs-icon icon-add"></i>
@@ -266,7 +268,7 @@
           Start_Date: me.Start_Date,
           KL_SN: me.KL_SN,
           KL_Product_Model: me.form.KL_Product_Model,
-          KL_Cutoff_Date: me.form.KL_Cutoff_Date,
+          KL_Cutoff_Date: new Date(me.form.KL_Cutoff_Date).format('MM/dd/yyyy hh:mm:ss'),
           Product_Warranty_Flag: me.form.Product_Warranty_Flag,
           key: key,
           Owner: me.loginMeg['Login Name'],

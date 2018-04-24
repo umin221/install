@@ -204,9 +204,15 @@ export default new Vuex.Store({
           }
         },
         setSn(state, data) {
-          state.form['KL_Product_Model'] = data[0]['KL Product Model'] || ''; // 产品类型
-          state.form['KL_Cutoff_Date'] = KND.Util.format(data[0]['Install Date'], 'yyyy-MM-dd hh:mm:ss') || '';  // 移交日期
-          state.form['Product_Warranty_Flag'] = data[0]['KL Warranty Flag'] === 'Y' ? '保内' : '保外' || '';  // 保修期限
+          if (data) {
+            state.form['KL_Product_Model'] = data[0]['KL Product Model'] || ''; // 产品类型
+            state.form['KL_Cutoff_Date'] = KND.Util.format(data[0]['Install Date'], 'yyyy-MM-dd hh:mm:ss') || '';  // 移交日期
+            state.form['Product_Warranty_Flag'] = data[0]['KL Warranty Flag'];  // 保修期限
+          } else {
+            state.form['KL_Product_Model'] = '';
+            state.form['KL_Cutoff_Date'] = '';
+            state.form['Product_Warranty_Flag'] = '';
+          }
         }
       },
       actions: {
@@ -271,6 +277,7 @@ export default new Vuex.Store({
               commit('setSn', arr);
             },
             error: function(data) {
+              commit('setSn');
               // commit('changeValue', 'error');
             }
           });
@@ -489,7 +496,7 @@ export default new Vuex.Store({
                   },
                   success: function(data) {
                     commit('setPartner', data.SiebelMessage['Service Request']);
-                    if (data) {
+                    if (parms.key === 'getDone') {
                       Toast('维修完成您辛苦了');
                     }
                   }
