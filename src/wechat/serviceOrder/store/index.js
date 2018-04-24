@@ -369,7 +369,7 @@ export default new Vuex.Store({
       mutations: {
         setPartner(state, form) {
           state.ServiceRequest = form;
-          state.processDat = [];
+          state.processDate = [];
           state.BtnStatu = '';
           let Note = null;
           Note = form['FIN Service Request Notes'];
@@ -489,6 +489,9 @@ export default new Vuex.Store({
                   },
                   success: function(data) {
                     commit('setPartner', data.SiebelMessage['Service Request']);
+                    if (data) {
+                      Toast('维修完成您辛苦了');
+                    }
                   }
                 });
               }
@@ -810,7 +813,10 @@ export default new Vuex.Store({
                     type: val.type
                   },
                   success: function(data) {
-                    commit('setProduct', data.SiebelMessage['Catalog Category']);
+                    let Catalog = KND.Util.toArray(data.SiebelMessage['Catalog Category']);
+                    if (Catalog) {
+                      commit('setProduct', Catalog);
+                    }
                   }
                 });
               }

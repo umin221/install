@@ -98,9 +98,12 @@
       <ul class="search-list">
         <li v-for="(item, index) in search" :key="item.Id" @click="selectCaLL(item)">{{item['Last Name']}}{{showPhone(item)}}</li>
       </ul>
-      <div class="submitButton">
-        <mt-button size="normal" type="danger" @click.native="submit">提交</mt-button>
-      </div>
+      <!--<div class="submitButton">-->
+        <!--<mt-button size="normal" type="danger" >提交</mt-button>-->
+      <!--</div>-->
+      <button-group>
+        <mt-button class="single" @click.native="submit" >提交</mt-button>
+      </button-group>
     </div>
   </div>
 </template>

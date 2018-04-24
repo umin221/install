@@ -59,7 +59,7 @@
 </template>
 <script>
 import {mapState, mapActions, mapMutations} from 'vuex';
-import { MessageBox } from 'mint-ui';
+import { Toast } from 'mint-ui';
 import menuBox from '../../../public/components/cus-menu';
 import numBox from '../components/number-box';
 import cusField from 'public/components/cus-field';
@@ -203,10 +203,11 @@ export default {
     submit() {
       let me = this;
       if (!me.attach.list.length) {
-        MessageBox({
-          title: '提示',
-          message: '请上传相关的维修单据'
-        });
+//        MessageBox({
+//          title: '提示',
+//          message: '请上传相关的维修单据'
+//        });
+        Toast('请上传相关的维修单据');
         return;
       }
       MessageBox.confirm('确认提交，数据一经提交不可修改。', '提示').then(action => {
@@ -306,7 +307,7 @@ export default {
       this.fee = this.fee.replace(reg);
     }
   },
-  components: {menuBox, numBox, MessageBox, cusField}
+  components: {menuBox, numBox, Toast, cusField}
 };
 </script>
 <style lang="scss">

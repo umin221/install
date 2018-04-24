@@ -20,7 +20,7 @@
               @click="call = !call">
             <i class="xs-icon icon-call"
                   style="font-size: 0.75rem">
-              {{ServiceRequest['KL Contact Mobile Phone']}}
+              {{ServiceRequest['KL Contact Mobile Phone']||ServiceRequest['Contact Business Phone']}}
               </i>
             </a></div>
         </div>
@@ -217,7 +217,7 @@
       <close :showBox1="showBox" @my-enter="boxEnter" @my-close="boxClose"></close>
 
       <!--打电话-->
-      <cus-call :number="ServiceRequest['Contact Business Phone']" v-model="call"></cus-call>
+      <cus-call :number="ServiceRequest['KL Contact Mobile Phone']||ServiceRequest['Contact Business Phone']" v-model="call"></cus-call>
 
       <!--工单操作-->
       <mt-popup v-model="popupVisible1" position="bottom" popup-transition="popup-fade" class="mint-popup-2">
@@ -286,7 +286,7 @@
 </template>
 <script>
   import {mapState, mapActions, mapMutations} from 'vuex';
-  import { MessageBox } from 'mint-ui';
+  import { Toast } from 'mint-ui';
   import close from '../components/close';
   import cusCall from 'public/components/cus-call';
   import toggle from '../components/detail-toggle';
@@ -480,10 +480,12 @@
           me.showBox2 = false;
           me.callEnd = false;
         } else {
-          MessageBox({
-            title: '提示',
-            message: '请选择预约开始和结束时间！'
-          });
+//          MessageBox({
+//            title: '提示',
+//            message: '请选择预约开始和结束时间！'
+//          });
+          Toast('请选择预约开始和结束时间');
+          me.showBox2 = false;
         }
       },
       callSolve() {
@@ -635,12 +637,12 @@
 //          me.setContact(params);
 //        });
 //      },
-      completeEnd() {
-        MessageBox({
-          title: '提示',
-          message: '维修完成您辛苦了！'
-        });
-      },
+//      completeEnd() {
+//        MessageBox({
+//          title: '提示',
+//          message: '维修完成您辛苦了！'
+//        });
+//      },
       toContact() {
         this.$router.push({
           name: 'engineer',
