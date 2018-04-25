@@ -22,22 +22,24 @@
         <span class="edit-class xs-icon icon-edit" @click="editBuildingFn(layer[0])"></span>
       </mt-navbar>
       <div style="height: 5px"></div>
-      <div style="background: white;margin-bottom: 5px;"  v-for="(floor, index) in layers"  :key="index" >
-        <mt-cell-swipe :right="[{
-                        content: '删除',
-                        style: { background: 'red', color: '#fff' },
-                        handler: () => deleteBuildingFn(floor)
-                      }]">
-          <div slot="title" class="list-text"><span class="list-text-span">{{floor[0]['Street Address 3']}}</span></div>
-          <span class="edit-class xs-icon icon-edit" @click="editFloorFn(floor)"></span>
-        </mt-cell-swipe>
-        <div class="assets-div co-flex co-wp">
-          <span v-for="(room, index) in floor"
-                :class="{'active': room['Serial Number'], 'selected': room['selected']}"
-                :key="index"
-                @click="roomFn(room)">{{room['Street Address 4']}}</span>
+      <lazy :time="350">
+        <div style="background: white;margin-bottom: 5px;"  v-for="(floor, index) in layers"  :key="index" >
+          <mt-cell-swipe :right="[{
+                          content: '删除',
+                          style: { background: 'red', color: '#fff' },
+                          handler: () => deleteBuildingFn(floor)
+                        }]">
+            <div slot="title" class="list-text"><span class="list-text-span">{{floor[0]['Street Address 3']}}</span></div>
+            <span class="edit-class xs-icon icon-edit" @click="editFloorFn(floor)"></span>
+          </mt-cell-swipe>
+          <div class="assets-div co-flex co-wp">
+            <span v-for="(room, index) in floor"
+                  :class="{'active': room['Serial Number'], 'selected': room['selected']}"
+                  :key="index"
+                  @click="roomFn(room)">{{room['Street Address 4']}}</span>
+          </div>
         </div>
-      </div>
+      </lazy>
 
       <button-group>
         <mt-button class="single"
@@ -67,6 +69,7 @@
 <script type="es6">
   import {mapState, mapActions, mapMutations} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
+  import lazy from 'public/components/cus-lazy';
 
   // 任务id
   let OrderId;
@@ -142,7 +145,8 @@
        * 重构楼层信息&标记选中状态
        */
       layers() {
-        let layer = this.layer;
+        let me = this;
+        let layer = me.layer;
         layers = {};
         maxFloor = 0;
         for (let i = 0, len = layer.length; i < len; i++) {
@@ -155,11 +159,11 @@
           // 扫码标记
           if (record) room['Serial Number'] = KND.Util.parse(record.data)['Serial Number'];
           // 选择模式 不显示已移交房号，不显示未绑定条码房号
-          if (this.isSelect) {
+          if (me.isSelect) {
             if (room['Install Date'] || !room['Serial Number']) continue;
           };
           // 房号标记
-          room = this.markFn(layer[i]);
+          room = me.markFn(layer[i]);
           // 楼层分组
           layers[floor] = layers[floor] || [];
           layers[floor].push(room);
@@ -167,7 +171,7 @@
           if (floor > maxFloor) maxFloor = floor;
         };
         // 清空全选操作
-        this.selectAll = false;
+        me.selectAll = false;
         // 房号排序
         for (let i in layers) {
           let floor = layers[i];
@@ -370,7 +374,7 @@
         this.checkAndSubmit();
       }
     },
-    components: {buttonGroup}
+    components: {buttonGroup, lazy}
 
   };
 </script>

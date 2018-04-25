@@ -45,7 +45,7 @@
   import {mapActions} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
-  import menuBox from 'public/components/cus-menu.vue';
+  import menuBox from 'public/components/cus-menu';
 
   const NAMESPACE = 'detail';
   export default {
