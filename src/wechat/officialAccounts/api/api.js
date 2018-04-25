@@ -26,7 +26,6 @@ let ApiList = {
           'Area': option.data.form['Area'], // 故障分类
           'Sub-Area': option.data.form['Sub-Area'], // 故障描述
           'Complaint Description': option.data.form['Complaint Description'], // 故障详情描述
-          // 'Open Id': option.data.form['Open Id'], // 微信端的OpenId
           'Open Id': option.data.form['Open Id'], // 微信端的OpenId
           'ProcessName': 'KL WeChat Public Account CreateSR Process'
         }

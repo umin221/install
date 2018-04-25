@@ -7,7 +7,7 @@
     <div class="center-text">坚朗五金</div>
     <div class="explain">下载安装扫码APP，经审核后您就是坚朗委外人员了，大量工作机会等着你。</div>
     <div class="down-APP">
-      <mt-button>点击下载APP</mt-button>
+      <a style="text-decoration: none; color: white"  href="https://mob.kinlong.cn:10443/xsimple/jd/550"><mt-button>点击下载APP</mt-button></a>
     </div>
     <div class="company">坚朗五金制品有限公司</div>
   </div>
