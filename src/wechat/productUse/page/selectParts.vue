@@ -1,6 +1,6 @@
 <template>
   <div class="searchTrans">
-    <cus-search v-model="value">
+    <cus-search v-model="value" :show="true">
       <cus-loadmore ref="result2"
                       :loadBottom="loadBottomFn"
                       :topStatus="topStatus">
@@ -40,6 +40,7 @@
     name: NAMESPACE,
     created() {
       this.initSelected();
+      this.getProduct();
     },
     components: {cusLoadmore, cusSearch, cusCell},
     data: () => {

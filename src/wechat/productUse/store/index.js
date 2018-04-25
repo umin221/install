@@ -128,9 +128,6 @@ export default new Vuex.Store({
             success: data => {
               console.log(data);
               form.callBack('保存成功');
-            },
-            error: data => {
-              form.callBack('保存失败');
             }
           });
         }
@@ -169,7 +166,7 @@ export default new Vuex.Store({
                 api.get({
                   key: 'getProduct',
                   data: {
-                    val: val.value,
+                    // val: val.value,
                     id: data.Id
                   },
                   success: function(data) {

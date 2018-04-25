@@ -13,8 +13,8 @@
       <div class="parts-list">
           <mt-cell-swipe v-for='(item, index) in partList' :key='index' class="cell-swipe"  style=" word-break: break-all; padding:5px 0;"
           :right="operation(index)"
-          :title="'配件编码：' + item.Name"
-          :label="'配件名称：' + item['KL Translated Name']">
+          :title="'配件编码：' + item['Product Name']"
+          :label="'配件名称：' + item['KL Product Name Join']">
               <div class="operation">
                 <num-box :index="index" :type="true" @input="productNumber"></num-box>
               </div>
@@ -159,7 +159,7 @@ export default {
         for (let i = 0;i < me.partList.length; i++) {
           obj = {
             'Id': i + 1,
-            'Product': me.partList[i].Name, // 产品编码
+            'Product': me.partList[i]['Product Name'], // 产品编码
             'Quantity Requested': me.partList[i].num // 数量
           };
           lineItems.push(obj);

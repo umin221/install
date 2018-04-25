@@ -1,21 +1,11 @@
 <template>
   <div class="searchTrans">
-    <cus-search v-model="value">
-      <cus-loadmore ref="result2"
-                      :loadBottom="loadBottomFn"
-                      :topStatus="topStatus">
-        <cus-cell class="multiple"
-                  :key="item.id"
-                  :title="'配件名称:'+ item['KL Translated Name']"
-                  v-for="(item, index) in result"
-                  @click.native="select(index, selected[index])">
-          <div class="mint-cell-sub-title" slot="title">配件代码: {{item.Name}}</div>
-          <div class="mint-cell-sub-title" slot="title">价格:{{item["List Price"]}} </div>
-          <div v-show="selected[index]" class="selectIcon" slot="title">
-            <i class="xs-icon icon-select"></i>
-          </div>
-        </cus-cell>
-        </cus-loadmore>
+    <cus-search v-model="value" :show="true">
+      <mt-checklist
+        v-if="result.length"
+        :options="arr"
+        v-model="name">
+      </mt-checklist>
     </cus-search>
     <button-group>
       <mt-button class="single" @click.native="selectEnter">确认</mt-button>
@@ -39,14 +29,27 @@
   export default {
     name: NAMESPACE,
     created() {
-      this.initSelected();
+      let me = this;
+      me.getProduct({
+        callback: function() {
+          for (let i = 0; i < me.result.length;i++) {
+            let name = me.result[i]['KL Product Name Join'] + me.result[i]['Product Name'];
+            me.arr.push({
+              label: name,
+              value: me.result[i]
+            });
+          }
+        }
+      });
     },
     components: {cusLoadmore, cusSearch, cusCell},
     data: () => {
       return {
         value: '',
+        name: [],
         number: [],
-        topStatus: ''
+        topStatus: '',
+        arr: []
       };
     },
     computed: {
@@ -58,19 +61,44 @@
       ...mapMutations('add', ['selectProduct']),
 //      ...mapMutations('comEnter', ['successCall']),
       searchFn(val) {
-        this.getProduct({value: val});
+        let me = this;
+        me.getProduct({
+          val: val,
+          callback: function() {
+            me.arr = [];
+            me.name = [];
+            for (let i = 0; i < me.result.length;i++) {
+              let name = me.result[i]['KL Product Name Join'] + me.result[i]['Product Name'];
+              me.arr.push({
+                label: name,
+                value: me.result[i]
+              });
+            }
+          }
+        });
       },
-      loadBottomFn() {
-      },
-      select(index, isShow) {
-        this.count({index, isShow});
-      },
+//      options() {
+//        let me = this;
+//        for (let i = 0; i < me.result.length;i++) {
+//          let name = me.result[i]['KL Product Name Join'] + me.result[i]['Product Name'];
+//          me.arr.push({
+//            label: name,
+//            value: me.result[i]
+//          });
+//        };
+//        return me.arr;
+//      },
+//      loadBottomFn() {
+//      },
+//      select(index, isShow) {
+//        this.count({index, isShow});
+//      },
       selectEnter() {
         let me = this;
         for (let i = 0; i < me.result.length; i++) {
-          if (me.selected[i]) {
-            me.result[i].num = 1;
-            me.selectProduct(me.result[i]);
+          if (me.name[i]) {
+            me.name[i].num = 1;
+            me.selectProduct(me.name[i]);
           }
         }
         me.$router.go(-1);

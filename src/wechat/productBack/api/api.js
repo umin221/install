@@ -31,27 +31,43 @@ let apiList = {
     };
   },
   getProduct: option => {
-    let model = 'AND ([Product.Name] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Description] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*")';
+    let model = '';
+    if (option.data.val) {
+      model = 'AND ([KL FS Invloc Product.KL Product Name Join] ~LIKE "*' + option.data.val + '*" OR [KL FS Invloc Product.Product Name] ~LIKE "*' + option.data.val + '*")';
+    }
     return {
-      method: 'post',
       url: 'service/EAI Siebel Adapter/Query',
       data: {
         'body': {
-          'OutputIntObjectName': 'Base Catalog Category (Content Management)',
-          'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '" ' + model,
-          'ViewMode': 'Group'
+          'OutputIntObjectName': 'Base KL FS InvLoc Product',
+          'SearchSpec': '[KL FS Invloc Product.KL Inventory Product Status]=LookupValue("KL_PROD_STATUS", "Parts")' + model,
+          'ViewMode': 'Personal'
         }
       }
     };
-    // 产品目录
   },
-  getPrice: option => {
-    return {
-      method: 'get',
-      url: 'data/Price List/Price List/?searchspec=KL Default Flag="Y"'
-    };
-    // 产品价格
-  },
+  // getProduct: option => {
+  //   let model = 'AND ([Product.Name] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Description] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*")';
+  //   return {
+  //     method: 'post',
+  //     url: 'service/EAI Siebel Adapter/Query',
+  //     data: {
+  //       'body': {
+  //         'OutputIntObjectName': 'Base Catalog Category (Content Management)',
+  //         'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '" ' + model,
+  //         'ViewMode': 'Group'
+  //       }
+  //     }
+  //   };
+  //   // 产品目录
+  // },
+  // getPrice: option => {
+  //   return {
+  //     method: 'get',
+  //     url: 'data/Price List/Price List/?searchspec=KL Default Flag="Y"'
+  //   };
+  //   // 产品价格
+  // },
   getinstall: option => {
     let positionId = option.data.id;
     let status = ' AND ([Order Entry - Orders.Status]="In Installing" OR [Order Entry - Orders.Status]="Sales Confirmed")';
@@ -140,6 +156,11 @@ let apiList = {
   getApproval: option => {
     return {
       url: 'service/EAI Siebel Adapter/Query'
+    };
+  },
+  setApproval: option => { // 审批操作
+    return {
+      url: 'service/Workflow Process Manager/RunProcess'
     };
   }
 };

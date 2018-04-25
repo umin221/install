@@ -31,14 +31,16 @@ let apiList = {
     };
   },
   getProduct: option => {
-    let model = 'AND ([Product.Name] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Description] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*")';
+    // let model = 'AND ([Product.Name] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Description] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*")';
+    let id = option.data.id;
+    delete option.data.id;
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/Query',
       data: {
         'body': {
           'OutputIntObjectName': 'Base Catalog Category (Content Management)',
-          'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '" ' + model,
+          'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + id + '"',
           'ViewMode': 'Group'
         }
       }
@@ -140,6 +142,11 @@ let apiList = {
   getApproval: option => {
     return {
       url: 'service/EAI Siebel Adapter/Query'
+    };
+  },
+  setApproval: option => { // 审批操作
+    return {
+      url: 'service/Workflow Process Manager/RunProcess'
     };
   }
 };
