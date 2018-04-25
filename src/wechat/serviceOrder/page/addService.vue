@@ -276,6 +276,7 @@
           callback: function(data) {
             if (data) {
               me.$router.go(-1);
+              Toast('提交成功！');
             }
           }
         };

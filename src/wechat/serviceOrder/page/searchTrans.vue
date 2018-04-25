@@ -9,7 +9,9 @@
       <mt-tab-item>产品目录</mt-tab-item>
       <mt-tab-item v-for="(item, index) in result"
                     :id="item.Id"
-                    :key="index">{{item['Display Name']}}</mt-tab-item>
+                    :key="index">{{item['Display Name']}}
+        <span v-if="isLen(value[item.Id],item.Id)">{{isLen(value[item.Id],item.Id)}}</span>
+      </mt-tab-item>
       </mt-navbar>
        <mt-tab-container v-model="selectId"
                          v-if="result.length">
@@ -20,8 +22,8 @@
           <empty v-show="!item.Product"></empty>
             <mt-checklist
               v-if="item.Product"
-              :options="toarr(item.Product)"
-              v-model="value">
+              :options="toarr(item.Product, item.Id)"
+              v-model="value[item.Id]">
             </mt-checklist>
           </mt-tab-container-item>
         </mt-tab-container>
@@ -71,21 +73,35 @@
     right: 0;
   }
   .searchTrans{
-    margin-bottom: 40px;
     .mint-navbar{
       flex-direction:column;
-      width: 25%;
+      width: 20%;
       a{
         background-image: linear-gradient(0deg, #d9d9d9, #d9d9d9 1%, transparent 0%);
         padding: 1rem 0;
+        position: relative;
+        span{
+          position: absolute;
+          width: 1.1rem;
+          height: 1.1rem;
+          background-color: #00599f;
+          top: -5px;
+          right: -5px;
+          z-index: 2001;
+          border-radius: 50%;
+          color: white;
+          text-align: center;
+          line-height: 1rem;
+        }
       }
+
     }
     .mint-tab-container{
       position: absolute;
       background-color: white;
-      width: 75%;
+      width: 80%;
       top:0;
-      left: 25%;
+      left: 20%;
       .mint-tab-container-wrap{
         display: block;
         .productTitle{
@@ -123,10 +139,11 @@
     data: () => {
       return {
         selectId: '',
-        value: [],
+        value: {},
         number: [],
         topStatus: '',
-        type: ''
+        type: '',
+        arr: {}
       };
     },
     computed: {
@@ -140,7 +157,7 @@
       searchFn(val) {
         this.getProduct({value: val, type: this.type});
       },
-      toarr(item) {
+      toarr(item, id) {
         let arr = [];
         let product = KND.Util.toArray(item);
         for (let i = 0; i < product.length;i++) {
@@ -150,7 +167,21 @@
             value: product[i]
           });
         };
-        return arr;
+        this.arr[id] = arr;
+//        if (!this.value[id]) {
+//          this.value[id] = [];
+//        }
+        return this.arr[id];
+      },
+      isLen(item, id) {
+        let me = this;
+        if (!item) {
+          me.value[id] = [];
+          return 0;
+        } else {
+          return item.length;
+        }
+//        return item.length;
       },
       loadBottomFn() {
       },
@@ -164,10 +195,13 @@
       },
       selectEnter() {
         let me = this;
-        if (me.value.length) {
-          for (let i = 0; i < me.value.length; i++) {
-            me.value[i].num = 1;
-            me.selectProduct(me.value[i]);
+        for (let key in me.value) {
+          console.log(me.value[key].length);
+          if (me.value[key].length) {
+            for (let i = 0;i < me.value[key].length; i++) {
+              me.value[key][i].num = 1;
+              me.selectProduct(me.value[key][i]);
+            }
           }
         }
         me.$router.go(-1);

@@ -299,7 +299,6 @@ export default new Vuex.Store({
           });
         },
         upDateContact({commit, dispatch}, form) {
-          console.log(form);
           api.get({
             key: form.key,
             data: {
@@ -320,7 +319,6 @@ export default new Vuex.Store({
               form
             },
             success: function(data) {
-              Toast('提交成功！');
               form.callback(data);
             },
             error: function(data) {
