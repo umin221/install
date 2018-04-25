@@ -19,6 +19,8 @@ import './mapp'; // Status Mapp
 import './js/tools.cordova'; // cordova tools
 import vp from 'public/plugin/validator';
 
+if (KND.Util.getDevice().PC) require('./sass/ios.scss');
+
 // use plugin
 Vue.use(vp);
 // For back

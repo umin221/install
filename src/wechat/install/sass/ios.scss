@@ -1,0 +1,27 @@
+$status-bar-height: 1rem;
+#app {
+  > div {
+
+    .mint-header.is-fixed {
+      border-top: $status-bar-height solid $theme-color;
+      height: 2.4rem + $status-bar-height;
+
+      &~.mint-content {
+        top: 2.4rem + $status-bar-height;
+
+        &.install {
+          top: 3.8rem + $status-bar-height;
+        }
+      }
+    }
+
+    .tips {
+      //top: $status-bar-height;
+      top: 2.4rem + $status-bar-height;
+    }
+
+    .cus-search {
+      border-top: $status-bar-height solid #d9d9d9;
+    }
+  }
+}

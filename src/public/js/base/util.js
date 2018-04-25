@@ -295,6 +295,25 @@
       if (this.hasClass(elements, cName)) elements.className = elements.className.replace(new RegExp('(\\s|^)' + cName + '(\\s|$)'), ' '); // replace方法是替换
     };
 
+    /**
+     * 获取当前平台类型
+     * @returns {{}}
+     */
+    getDevice() {
+      let ua = navigator.userAgent;
+      let pf = navigator.platform;
+      let platform = {};
+      platform.android = ua.indexOf('Android') > -1;
+      platform.iPhone = ua.indexOf('iPhone') > -1;
+      platform.iPad = ua.indexOf('iPad') > -1;
+      platform.iPod = ua.indexOf('iPod') > -1;
+      platform.winPhone = ua.indexOf('IE') > -1;
+      platform.PC = pf === 'MacIntel' || pf === 'Win32';
+      platform.IOS = platform.iPad || platform.iPhone || platform.iPod;
+      platform.touchDevice = 'ontouchstart' in window;
+      return platform;
+    };
+
   };
 
   /**
