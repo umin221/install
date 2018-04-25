@@ -422,6 +422,29 @@ let ApiList = {
   },
   getProduct: option => {
     // let model = '';
+    // model = 'AND ([Product.Name] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*")';
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base Catalog Category (Content Management)',
+          'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '" ',
+          'ViewMode': 'Group'
+        }
+      }
+    };
+    // 产品目录
+  },
+/*  getProduct: option => {
+    console.log(option.data);
+    let model = '';
+    if (option.data.Number) {
+      model = 'AND [Catalog Category.Sequence Number] = "' + option.data.Number + '"';
+    }
+    if (option.data.parentId) {
+      model = 'AND [Catalog Category.Sequence Number] = "' + option.data.Number + '" AND [Catalog Category.Parent Category Id] = "' + option.data.parentId + '"';
+    }
     // if (option.data.type) {
     //   model = ' AND [Product.KL Translated Description] ~LIKE "*' + option.data.val + '*"';
     // } else {
@@ -441,13 +464,13 @@ let ApiList = {
         'body': {
           'OutputIntObjectName': 'Base Catalog Category (Content Management)',
           // 'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '" ' + model,
-          'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '" ',
+          'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '" ' + model,
           'ViewMode': 'Group'
         }
       }
     };
     // 产品目录
-  },
+  },*/
   getPrice: option => {
     return {
       method: 'get',

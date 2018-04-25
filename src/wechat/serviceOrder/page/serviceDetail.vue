@@ -8,6 +8,7 @@
                      v-if="role === 'install'&& BtnStatu">关闭</mt-button>
       </mt-header>
 
+
       <div class="mint-content service-detail">
         <div class="detail-title">
           <div class="mt-Detail-title">服务单编号：{{ServiceRequest['SR Number']}}<span class="user-state">{{Action['Status']}}</span></div>

@@ -778,20 +778,22 @@ export default new Vuex.Store({
           }
         },
         setProduct(state, data) {
-          state.result = data;
+          // state.result = data;
+          // state.selected = [];
+          state.result = [];
           state.selected = [];
-          // for (let i = 0; i < data.length; i++) {
-          //   if (data[i].Product) {
-          //     if (KND.Util.isArray(data[i].Product)) {
-          //       state.result = state.result.concat(data[i].Product);
-          //     } else {
-          //       state.result.push(data[i].Product);
-          //     }
-          //   }
-          // }
-          // for (let i = 0; i < state.result.length;i++) {
-          //   state.selected.push(false);
-          // }
+          for (let i = 0; i < data.length; i++) {
+            if (data[i].Product) {
+              if (KND.Util.isArray(data[i].Product)) {
+                state.result = state.result.concat(data[i].Product);
+              } else {
+                state.result.push(data[i].Product);
+              }
+            }
+          }
+          for (let i = 0; i < state.result.length;i++) {
+            state.selected.push(false);
+          }
         },
         initSelected(state) {
           state.selected = [];
@@ -819,9 +821,83 @@ export default new Vuex.Store({
                   },
                   success: function(data) {
                     let Catalog = KND.Util.toArray(data.SiebelMessage['Catalog Category']);
+                    console.log(Catalog);
                     if (Catalog) {
                       commit('setProduct', Catalog);
-                      val(Catalog[0].Id);
+                    }
+                  }
+                });
+              }
+            }
+          });
+        }
+      }
+/*      mutations: {
+        count(state, val) {
+          console.log(val);
+          if (val.isShow) {
+            state.selected.splice(val.index, 1, false);
+          } else {
+            state.selected.splice(val.index, 1, true);
+          }
+        },
+        setProduct(state, data) {
+          for (let i = 0;i < data.length;i++) {
+            state.result2[data[i].Id] = [];
+          };
+          state.result = data;
+          state.selected = [];
+          // for (let i = 0; i < data.length; i++) {
+          //   if (data[i].Product) {
+          //     if (KND.Util.isArray(data[i].Product)) {
+          //       state.result = state.result.concat(data[i].Product);
+          //     } else {
+          //       state.result.push(data[i].Product);
+          //     }
+          //   }
+          // }
+          // for (let i = 0; i < state.result.length;i++) {
+          //   state.selected.push(false);
+          // }
+        },
+        setProduct2(state, {Catalog, parentId}) {
+          state.result2[parentId] = Catalog;
+        },
+        initSelected(state) {
+          state.selected = [];
+          for (let i = 0; i < state.result.length;i++) {
+            state.selected.push(false);
+          }
+        },
+        deleteSelected(state) {
+          state.selected = [];
+        }
+      },
+      actions: {
+        getProduct({state, commit}, {Number, parentId, callback}) {
+          api.get({
+            key: 'getPrice',
+            success: function(data) {
+              state.priceId = data.Id;
+              if (data.Id) {
+                api.get({
+                  key: 'getProduct',
+                  data: {
+                    parentId: parentId,
+                    id: data.Id,
+                    Number: Number
+                  },
+                  success: function(data) {
+                    let Catalog = KND.Util.toArray(data.SiebelMessage['Catalog Category']);
+                    if (Catalog) {
+                      if (Number === 1) {
+                        commit('setProduct', Catalog);
+                        callback(Catalog[0].Id);
+                      }
+                      if (Number === 2) {
+                        console.log(11);
+                        commit('setProduct2', {Catalog: Catalog, parentId});
+                      }
                     } else {
                       console.log(data);
                     }
@@ -834,7 +910,7 @@ export default new Vuex.Store({
             }
           });
         }
-      }
+      }*/
     },
     contact: {
       namespaced: true,

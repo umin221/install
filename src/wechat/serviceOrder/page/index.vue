@@ -43,7 +43,7 @@
                   优先级: {{item.Priority}}
                 </div>
                 <div class="my-cell-sub" slot="title">
-                  地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}
+                  地址:{{item['KL Province']}} {{item['KL City']}} {{item['KL Town']}} {{item['KL Address']}}
                 </div>
               </mt-cell>
             </div>
@@ -68,7 +68,7 @@
                   优先级: {{item.Priority}}
                 </div>
                 <div class="my-cell-sub" slot="title">
-                  地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}
+                  地址:{{item['KL Province']}} {{item['KL City']}} {{item['KL Town']}} {{item['KL Address']}}
                 </div>
               </mt-cell>
             </div>
@@ -94,7 +94,7 @@
                   优先级: {{item.Priority}}
                 </div>
                 <div class="my-cell-sub" slot="title">
-                  地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}
+                  地址:{{item['KL Province']}} {{item['KL City']}} {{item['KL Town']}} {{item['KL Address']}}
                 </div>
               </mt-cell>
             </div>
@@ -130,7 +130,7 @@
                   优先级: {{item.Priority}}
                 </div>
                 <div class="my-cell-sub" slot="title">
-                  地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}
+                  地址:{{item['KL Province']}} {{item['KL City']}} {{item['KL Town']}} {{item['KL Address']}}
                 </div>
               </mt-cell>
             </div>
@@ -156,7 +156,7 @@
                   优先级: {{item.Priority}}
                 </div>
                 <div class="my-cell-sub" slot="title">
-                  地址:{{item['KL Personal Province']}} {{item['Personal City']}} {{item['Personal Street Address']}}
+                  地址:{{item['KL Province']}} {{item['KL City']}} {{item['KL Town']}} {{item['KL Address']}}
                 </div>
               </mt-cell>
             </div>
