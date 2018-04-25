@@ -22,7 +22,7 @@
                    v-model="line['KL Hole Direction']"
                    v-valid.require
                    is-link></cus-field>
-        <mt-cell title="是否带天地" v-if="isVP || isPanel">
+        <mt-cell title="是否带天地" v-if="isVP || isLockBody">
           <mt-switch v-model="flag"></mt-switch>
         </mt-cell>
         <cus-field label="数量" tag="数量"
@@ -35,28 +35,36 @@
                    v-valid.require
                    is-link></cus-field>
         <cus-field label="门厚" tag="门厚"
-                   v-if="isVP || isPanel"
+                   v-if="isVP || isLockBody"
                    v-valid.require
                    v-model="line['KL Door Thickness']"></cus-field>
         <cus-field label="锁芯中心距门内距" tag="锁芯中心距门内距"
                    v-valid.require
                    v-model="line['KL Lock Core Distance']"></cus-field>
         <cus-field label="锁舌导向板规格" tag="锁舌导向板规格"
-                   v-if="isVP || isPanel"
+                   @click.native="showLovFn('KL Guide Plate Specification')"
+                   v-if="isVP || isLockBody"
                    v-valid.require
-                   v-model="line['KL Guide Plate Specification']"></cus-field>
+                   v-model="line['KL Guide Plate Specification']"
+                   is-link></cus-field>
         <cus-field label="门扣板规格" tag="门扣板规格"
+                   @click.native="showLovFn('KL Gate Plate Specification')"
+                   v-if="isVP || isLockBody"
+                   v-valid.require
+                   v-model="line['KL Gate Plate Specification']"
+                   is-link></cus-field>
+        <cus-field label="滑盖丝印" tag="滑盖丝印"
+                   @click.native="showLovFn('KL Slippery Screen Printing')"
                    v-if="isVP || isPanel"
                    v-valid.require
-                   v-model="line['KL Gate Plate Specification']"></cus-field>
-        <cus-field label="滑盖丝印" tag="滑盖丝印"
-                   v-if="isVP || isLockBody"
-                   v-valid.require
-                   v-model="line['KL Slippery Screen Printing']"></cus-field>
+                   v-model="line['KL Slippery Screen Printing']"
+                   is-link></cus-field>
         <cus-field label="彩卡丝印" tag="彩卡丝印"
-                   v-if="isVP || isLockBody"
+                   @click.native="showLovFn('KL Color Card Screen Printing')"
+                   v-if="isVP || isPanel"
                    v-valid.require
-                   v-model="line['KL Color Card Screen Printing']"></cus-field>
+                   v-model="line['KL Color Card Screen Printing']"
+                   is-link></cus-field>
         <cus-field label="配件要求" tag="配件要求"
                    v-valid.require
                    v-model="line['KL Parts Requirement']"></cus-field>
@@ -94,6 +102,50 @@
   let mapp = config.mapp;
   let today = new Date();
 
+  let getLov = function() {
+    let me = this;
+    let type = me.type;
+    let line = me.line;
+    let lovs = mapp.lovs;
+    // 仅标记为新增时可选择产品型号
+    if (me.isAdd) {
+      // 取 lov 产品型号
+      me.getLov({
+        type: 'KL_PRODUCT_MODEL',
+        success: data => {
+          // 按产品类型过滤产品型号待选列表
+          let model = data.items.filter(item => {
+            return item['Parent'] === type;
+          });
+          mapp.option['KL Product Model No'] = model;
+          // 填充产品名称
+          me.line['KL Product Model No'] = model[0].Value;
+        }
+      });
+      line.Product = type === 'Panel' ? 'VP00301' : 'VP00302';
+    };
+
+    // 取 lov 开向
+    me.getLov({
+      data: {
+        'Type': 'KL_HOLE_DIRECTION',
+        'Parent': type
+      },
+      success: data => {
+        mapp.option['KL Hole Direction'] = data.items;
+      }
+    });
+
+    for (let l in lovs) {
+      me.getLov({
+        type: lovs[l],
+        success: data => {
+          mapp.option[l] = data.items;
+        }
+      });
+    };
+  };
+
   const NAMESPACE = 'orderLine';
   export default {
     name: NAMESPACE,
@@ -117,44 +169,8 @@
       };
       // 不可编辑状态下不需要后续操作
       if (!me.editable) return;
-      // 仅标记为新增时可选择产品型号
-      if (me.isAdd) {
-        // 取 lov 产品型号
-        me.getLov({
-          type: 'KL_PRODUCT_MODEL',
-          success: data => {
-            // 按产品类型过滤产品型号待选列表
-            let model = data.items.filter(item => {
-              return item['Parent'] === param.type;
-            });
-            mapp.option['KL Product Model No'] = model;
-            // 填充产品名称
-            me.line['KL Product Model No'] = model[0].Value;
-          }
-        });
-        line.Product = param.type === 'Panel' ? 'VP00301' : 'VP00302';
-      };
-
-      // 取 lov 开向
-      me.getLov({
-        data: {
-          'Type': 'KL_HOLE_DIRECTION',
-          'Parent': param.type
-        },
-        // type: 'KL_HOLE_DIRECTION',
-        success: data => {
-          // 锁体 和 面板 的开向，取值不一样，通过 High 的取值 判断
-          mapp.option['KL Hole Direction'] = data.items;
-        }
-      });
-
-      // 取 lov 门材质
-      me.getLov({
-        type: 'KL_DOOR_MATERIAL_QUALITY',
-        success: data => {
-          mapp.option['KL Door Material Quality'] = data.items;
-        }
-      });
+      // 获取所有下拉值
+      getLov.call(me);
     },
     data() {
       return {

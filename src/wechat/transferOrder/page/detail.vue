@@ -13,7 +13,7 @@
     <div class="mint-content">
       <div class="readonly narrow-form">
         <cus-field label="合同编号" v-model="form['Agree Number']"></cus-field>
-        <cus-field label="工程名称" v-model="form['Opportunity Name']"></cus-field>
+        <cus-field label="工程名称" v-model="form['Opportunity Name']" isLink></cus-field>
         <cus-field label="项目地址" v-model="form['Address']"></cus-field>
 
         <toggle>
