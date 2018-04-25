@@ -9,6 +9,7 @@ import Vuex from 'vuex';
 import router from './router';
 import 'public/js/base/main';
 import 'public/js/base/mint';
+import './sass/ios.scss';
 import fallback from 'public/components/cus-fallback';
 import attach from 'public/components/cus-attach';
 import empty from 'public/components/cus-empty';
@@ -18,8 +19,6 @@ import sto from './store';
 import './mapp'; // Status Mapp
 import './js/tools.cordova'; // cordova tools
 import vp from 'public/plugin/validator';
-
-if (KND.Util.getDevice().PC) require('./sass/ios.scss');
 
 // use plugin
 Vue.use(vp);
@@ -48,9 +47,11 @@ config.offline = true;
  * 如果匹配到正确跳转
  */
 router.beforeEach((to, from, next) => {
+  let fromName = from.name;
+  let fromLogin = fromName === 'login';
   // 物理返回直接返回系统桌面
-  if (from.name === 'index' && to.name === 'login') {
-    if (to.query.login !== true) {
+  if ((fromName === 'index' || fromLogin) && to.name === 'login') {
+    if (fromLogin || to.query.login !== true) {
       next(false);
       tools.cordova.goHome();
       return;

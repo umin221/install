@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" :class="platform">
 	  <transition :name="transitionName" @afterLeave="clearTransition">
       <keep-alive :include="alive">
 		    <router-view></router-view>
@@ -16,14 +16,19 @@
     name: NameSpace,
     created() {
       let me = this;
+      let platform = KND.Util.getDevice();
       KND.Util.back = () => {
         me.$router.back();
       };
-
+      // 获取用户
       me.getAuthority();
+      // 平台风格
+      if (platform.IOS) me.platform = 'ios';
+      if (platform.android) me.platform = 'android';
     },
     data() {
       return {
+        platform: '',
         prevRoutes: []
       };
     },

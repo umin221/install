@@ -131,7 +131,10 @@
         // 注销用户登录
         me.logout({
           success: result => {
+            // 清除用户信息 下次匹配后刷新本地缓存
+            user = {};
             KND.Session.remove('userInfo');
+            // 重定向到登录
             me.$router.replace({
               name: 'login',
               query: {login: true} // 重定向登陆页必须携带此参数

@@ -22,7 +22,7 @@
         <span class="edit-class xs-icon icon-edit" @click="editBuildingFn(layer[0])"></span>
       </mt-navbar>
       <div style="height: 5px"></div>
-      <lazy :time="350">
+      <lazy :time="450">
         <div style="background: white;margin-bottom: 5px;"  v-for="(floor, index) in layers"  :key="index" >
           <mt-cell-swipe :right="[{
                           content: '删除',

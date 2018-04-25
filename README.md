@@ -27,10 +27,10 @@ npm run e2e
 npm test
 ```
 
-# build for officiaAccounts , modify the mode for configuration file mode => wechat
+# build for officiaAccounts
 npm run dev wx
 
-# build for app www
+# build app to www
 npm run build app
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).

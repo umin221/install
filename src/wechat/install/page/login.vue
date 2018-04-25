@@ -4,7 +4,6 @@
       <img src="../assets/bg_login.png" />
     </div>
 
-    <indicator></indicator>
     <div class="copyright">坚朗五金制品股份有限公司</div>
     <div class="login-form xs-icon"
       v-show="showLogin">
@@ -59,9 +58,9 @@
     methods: {
       ...mapActions(NAMESPACE, ['queryUserInfo', 'getCacheUser', 'clear']),
       clearFn() {
-        this.clear().then(result => {
-          Indicator.process(false);
-        });
+        // this.clear().then(result => {
+        //  Indicator.process(false);
+        // });
       },
       loginFn() {
         let me = this;
