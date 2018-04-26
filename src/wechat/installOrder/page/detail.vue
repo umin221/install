@@ -1308,7 +1308,7 @@
         return this.isConfirming ? [{
           content: '删除',
           style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
-          handler: () => this.deleteFn(line, index)
+          handler: () => this.deleteFn(line)
         }] : [];
       },
       // 订单行
@@ -1328,11 +1328,8 @@
         });
       },
       // Delete Install Order Line
-      deleteFn(line, index) {
-        this.deleteOrderLine({
-          id: line.Id,
-          index: index
-        });
+      deleteFn(line) {
+        this.deleteOrderLine(line.Id);
       },
       // Copy line
       copyFn(line) {

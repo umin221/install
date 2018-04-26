@@ -113,8 +113,14 @@ export default new Vuex.Store(Object.extend(true, sto, {
         setIsOutside(state, val) {
           state.isOutside = val;
         },
-        removeTaskDataST(state, index) {
-          state.taskDataST.splice(index, 1);
+        removeTaskDataST(state, id) {
+          let lines = state.taskDataST;
+          for (let i = 0, len = lines.length; i < len; i++) {
+            if (lines[i].Id === id) {
+              state.taskDataST.splice(i, 1);
+              break;
+            }
+          }
         },
         setDetailData(state, data) {
           state.detailData = data;
@@ -161,14 +167,14 @@ export default new Vuex.Store(Object.extend(true, sto, {
         /**
          * 删除订单行
          */
-        deleteOrderLine({commit}, setting) {
+        deleteOrderLine({commit}, id) {
           api.get({
             key: 'deleteOrderLine',
             data: {
-              id: setting.id
+              id: id
             },
             success: data => {
-              commit('removeTaskDataST', setting.index);
+              commit('removeTaskDataST', id);
               tools.success(data);
             }
           });
