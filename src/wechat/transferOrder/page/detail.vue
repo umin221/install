@@ -153,7 +153,8 @@
           me.$router.push({
             path: 'order',
             query: {
-              order: JSON.stringify(item)
+              order: JSON.stringify(item),
+              salesType: me.form['Sales Type']
             }
           });
         } else {

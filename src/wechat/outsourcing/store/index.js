@@ -171,7 +171,7 @@ export default new Vuex.Store({
           if (select) {
             // 添加选择的负责人
             let arr = [{
-              'Position Id': select.Id,
+              'Position Id': select['Primary Position Id'],
               'IsPrimaryMVG': 'Y'
             }];
             // 添加创建人，不添加创建人会看不到这个团队信息
