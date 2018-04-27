@@ -55,11 +55,11 @@
               <div class="mui-scroll" style="height: 65px;overflow: -webkit-paged-x;">
                 <a v-for="(item, index) in taskData" :key="index">
                   <div class="icon" @click="updateState(item, item['Calculated Activity Status'], item.Id, index)">
-                    <span v-show="index!=0"  class="left line" :class="colorClass(item['Calculated Activity Status'])"></span>
-                    <span class="point mui-icon" :class="colorClass(item['Calculated Activity Status'])"><span></span></span>
-                    <span  class="right line" :class="colorClass(item['Calculated Activity Status'])"></span>
+                    <span v-show="index!=0"  class="left line" :class="colorClass(item['Calculated Activity Status'], item)"></span>
+                    <span class="point mui-icon" :class="colorClass(item['Calculated Activity Status'], item)"><span></span></span>
+                    <span v-if="rightLine(index, taskData)" class="right line" :class="colorClass(item['Calculated Activity Status'], item)"></span>
                   </div>
-                  <div class="name" :class="colorClass(item['Calculated Activity Status'])" @click="updateTask(index, item['KL Detail Type'])">{{item['KL Detail Type']}}</div>
+                  <div class="name" :class="colorClass(item['Calculated Activity Status'], item)" @click="updateTask(index, item['KL Detail Type'])">{{item['KL Detail Type']}}</div>
                   <div v-show="showSelect(item)" style="height: 1px;background: #0772c1;margin-top: 10px;"></div>
                 </a>
                 <!--<a>
@@ -97,55 +97,44 @@
                 <span class="mt-switch"><mt-switch v-model="shipmentVal"  @click.native.stop="shipment(taskData)"></mt-switch></span>
               </li>
               <div class="butLi"
-                   v-if="taskData['KL Detail Type LIC']==='Trompil Batch Summary' ||
-                  taskData['KL Detail Type LIC']==='Lock Body Install Summary' ||
-                  taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
-                  taskData['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
-                  taskData['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
-                  taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
-                  taskData['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
-                  taskData['KL Detail Type LIC'] === 'Transfer Summary'" >
+                   v-if="showTaskData(taskData)">
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(taskData)" class="batchClose"></span>
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="addTask(taskData)" class="batchAdd"></span>
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="addTask(taskData)" class="batchAdd"></span>
                   <span style="width:60px;text-align: right;">{{taskData.Status}}</span>
               </div>
               <div class="content-div" style="margin-top: 20px"
-                v-if="taskData['KL Detail Type LIC']==='Trompil Batch Summary' ||
-                taskData['KL Detail Type LIC']==='Lock Body Install Summary' ||
-                taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
-                taskData['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
-                taskData['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
-                taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
-                taskData['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
-                taskData['KL Detail Type LIC'] === 'Transfer Summary'"
+                v-if="showTaskData(taskData)"
                  v-for="(itemTask, index) in upList(taskData['KL Installation Task'])" :key="index"
                  @click.stop="updateDoor(itemTask,taskData)">
-                <div class="readonly enable">
-                  <mt-field label="批次" class="itemTaskId" :value="itemTask.Id"  @click.native.stop="taskClick(itemTask,taskData)"></mt-field>
-                  <mt-field label="已完成/计划数量"
-                            class="itemTask"
-                            :value="itemTask['KL Completed Install Amount']+'/'+itemTask['KL Install Amount Requested']">
-                    <span v-if="showClose(itemTask)" @click.stop="closeTask(itemTask)" class="batchClose"></span>
-                    <span v-if="itemTask['Calculated Activity Status'] === 'In Progress' && itemTask['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
-                  </mt-field>
-                  <mt-field label="物业联系人"
-                            class="itemTask"
-                            v-if="itemTask['KL Property Contact Id']"
-                            :value="itemTask['KL Property Contact Name']"></mt-field>
-                  <mt-field label="移动电话/工作电话"
-                            class="itemTask"
-                            v-if="itemTask['KL Property Contact Id']"
-                            :value="itemTask['KL Property Contact Cellular Phone']+'/'+itemTask['KL Property Contact Work Phone']"></mt-field>
-                 <!-- <mt-field label="合格/完成数量"
-                    v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
-                    taskData['KL Detail Type LIC'] === 'Check Before Trans Summary'"
-                    :value="itemTask['KL Qualified Amount']+'/'+itemTask['KL Completed Install Amount']">
-                    <span v-if="itemTask['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
-                  </mt-field>-->
-                  <mt-field label="时间" :value="new Date(itemTask['Created']).format('yyyy-MM-dd')"></mt-field>
-                  <mt-field label="状态" :value="itemTask.Status"></mt-field>
-                </div>
+                <mt-cell-swipe is-link>
+                  <div class="readonly enable">
+                    <mt-field label="批次" class="itemTaskId" :value="itemTask.Id"  @click.native.stop="taskClick(itemTask,taskData)"></mt-field>
+                    <mt-field label="批次名称" :value="itemTask['KL Task Batch Name']"></mt-field>
+                    <mt-field label="已完成/计划"
+                              class="itemTask"
+                              :value="itemTask['KL Completed Install Amount']+'/'+itemTask['KL Install Amount Requested']">
+                      <span v-if="showClose(itemTask)" @click.stop="closeTask(itemTask)" class="batchClose"></span>
+                      <span v-if="itemTask['Calculated Activity Status'] === 'In Progress' && itemTask['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
+                    </mt-field>
+                    <mt-field label="物业联系人"
+                              class="itemTask"
+                              v-if="itemTask['KL Property Contact Id']"
+                              :value="itemTask['KL Property Contact Name']"></mt-field>
+                    <mt-field label="移动/工作电话"
+                              class="itemTask"
+                              v-if="itemTask['KL Property Contact Id']"
+                              :value="itemTask['KL Property Contact Cellular Phone']+'/'+itemTask['KL Property Contact Work Phone']"></mt-field>
+                   <!-- <mt-field label="合格/完成数量"
+                      v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
+                      taskData['KL Detail Type LIC'] === 'Check Before Trans Summary'"
+                      :value="itemTask['KL Qualified Amount']+'/'+itemTask['KL Completed Install Amount']">
+                      <span v-if="itemTask['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
+                    </mt-field>-->
+                    <mt-field label="时间" :value="new Date(itemTask['Created']).format('yyyy-MM-dd')"></mt-field>
+                    <mt-field label="状态" :value="itemTask.Status"></mt-field>
+                  </div>
+                </mt-cell-swipe>
               </div>
             </ul>
           </div>
@@ -277,7 +266,6 @@
     }
     .crm-zyList .content :nth-of-type(2) {
       font-size: 14px;
-      margin-top: 5px;
       color: #999;
       line-height: 27px;
     }
@@ -608,6 +596,9 @@
               self.pStatus = self.taskData[self.taskIndex]['Calculated Activity Status'];
               if (self.pStatus !== 'Not Started' || self.taskData[self.taskIndex]['KL Detail Type LIC'] === 'Substitution Lock Trans Return') { // 未开始时不获取子任务数据  替代锁状态不需要更改只是未开始
                 self.taskDataList = KND.Util.toArray(self.taskData[self.taskIndex]['KL Installation Task']);
+                if (self.taskDataList.length === 0) {
+                  self.taskDataList = KND.Util.toArray(self.taskData[self.taskIndex]);
+                }
               }
             }
             self.setOrderId(self.id);
@@ -615,6 +606,26 @@
             console.dir(self.taskDataST);
           }
         });
+      },
+      rightLine(index, item) {
+        if (index === (item.length - 1)) {
+          return false;
+        }
+        return true;
+      },
+      showTaskData(taskData) {
+        if (taskData['KL Detail Type LIC'] === 'Trompil Batch Summary' ||
+          taskData['KL Detail Type LIC'] === 'Lock Body Install Summary' ||
+          taskData['KL Detail Type LIC'] === 'Door Hanging Acc Summary' ||
+          taskData['KL Detail Type LIC'] === 'Substitution Lock Inst Summary' ||
+          taskData['KL Detail Type LIC'] === 'Subst Lock Trans Summary' ||
+          taskData['KL Detail Type LIC'] === 'Lock Installation Summary' ||
+          taskData['KL Detail Type LIC'] === 'Check Before Trans Summary' ||
+          taskData['KL Detail Type LIC'] === 'Transfer Summary') {
+          return true;
+        } else {
+          return false;
+        }
       },
       showSelect(item) {
         var self = this;
@@ -624,10 +635,13 @@
           return false;
         }
       },
-      colorClass(cla) {
+      colorClass(cla, item) {
         var colorCla = '';
         if (cla === 'Not Started') { // 未开始
           colorCla = 'p_grey';
+          if (item['KL Detail Type LIC'] === 'Substitution Lock Trans Return') { // 替代锁不需要开启  一开始默认进行中
+            colorCla = 'close';
+          }
         } else if (cla === 'In Progress') { // 进行中
           colorCla = 'close';
         } else if (cla === '') { // 审批中

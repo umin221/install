@@ -19,6 +19,10 @@
                    v-model="end_Date"
                    v-valid.require
                    is-link></cus-field>-->
+        <cus-field label="批次名称" tag="批次名称"
+                   placeholder="请输入"
+                   v-valid.require
+                   v-model="batchName"></cus-field>
         <cus-field label="计划数量" tag="计划数量"
                    placeholder="请输入"
                    v-valid.require
@@ -130,6 +134,7 @@
           self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
           self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
           self.batchNum = self.pcObj['KL Install Amount Requested']; // 数量
+          self.batchName = self.pcObj['KL Task Batch Name']; // 批次名称
           self.getPlanList(self.batchCode);
         }
       } else if (self.type === 'edit') {
@@ -141,6 +146,7 @@
           self.startDate = new Date(self.start_Date).format('MM/dd/yyyy'); // 后台存值格式
           self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
           self.batchNum = self.pcObj['KL Install Amount Requested']; // 数量
+          self.batchName = self.pcObj['KL Task Batch Name']; // 批次名称
           self.getPlanList(self.batchCode);
         } else {
           self.getBatch(self.item.Id);
@@ -159,6 +165,7 @@
         end_Date: '',        // 结束时间
         endDate: '',
         batchNum: '', // 数量
+        batchName: '', // 名称
         pickerVisible: today,
         sDate: today,
         eDate: today,
@@ -269,6 +276,7 @@
                 self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
               }
               self.batchNum = data['KL Install Amount Requested']; // 数量
+              self.batchName = data['KL Task Batch Name']; // 数量
               self.getPcObj(data); // 保存store
             }
           }
@@ -309,6 +317,7 @@
             /* 'Planned': self.startDate,
             'Planned Completion': self.endDate,*/
             'KL Install Amount Requested': self.batchNum,
+            'KL Task Batch Name': self.batchName,
             'Id': self.batchCode || '10001',
             'KL Detail Type': self.item['KL Detail Type'],
             'Parent Activity Id': aId

@@ -19,6 +19,10 @@
                    v-model="end_Date"
                   v-valid.require
                   is-link></cus-field>-->
+        <cus-field label="批次名称" tag="批次名称"
+                   placeholder="请输入"
+                   v-valid.require
+                   v-model="batchName"></cus-field>
         <cus-field label="安装数量" tag="安装数量"
                    placeholder="请输入"
                    type="number"
@@ -204,6 +208,7 @@
             self.deliveryTime = new Date(self.delivery_Time).format('MM/dd/yyyy');
           }
           self.batchNum = self.pcObj['KL Install Amount Requested']; // 数量
+          self.batchName = self.pcObj['KL Task Batch Name']; // 批次名称
           self.companyId = self.pcObj['KL Partner Id'];
           self.companyName = self.pcObj['KL Partner Name'];
           self.getPlanList(self.batchCode); // 详细计划
@@ -222,6 +227,7 @@
           self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
           self.deliveryTime = new Date(self.delivery_Time).format('MM/dd/yyyy') || '';
           self.batchNum = self.pcObj['KL Install Amount Requested']; // 数量
+          self.batchName = self.pcObj['KL Task Batch Name']; // 批次名称
           self.companyId = self.pcObj['KL Partner Id'];
           self.companyName = self.pcObj['KL Partner Name'];
           self.getPlanList(self.batchCode); // 详细计划
@@ -253,6 +259,7 @@
         deliveryTime: '',
         delivery_Time: '',
         batchNum: '', // 数量
+        batchName: '', // 名称
         companyName: '', // 合作伙伴名称
         companyId: '', // 合作伙伴id
         isPrimaryMVGPosition: '',
@@ -467,6 +474,7 @@
               self.endDate = new Date(self.end_Date).format('MM/dd/yyyy');
               self.deliveryTime = new Date(self.delivery_Time).format('MM/dd/yyyy') || '';
               self.batchNum = data['KL Install Amount Requested']; // 数量
+              self.batchName = data['KL Task Batch Name']; // 数量
               self.companyId = data['KL Partner Id'];
               self.companyName = data['KL Partner Name'];
               self.getPcObj(data); // 保存store
@@ -524,6 +532,7 @@
             'Planned Completion': self.endDate,*/
             'KL Delivery Time': self.deliveryTime,
             'KL Install Amount Requested': self.batchNum,
+            'KL Task Batch Name': self.batchName,
             'Id': self.batchCode || '10001',
             'KL Detail Type': self.item['KL Detail Type'],
             'KL Partner Id': self.pcObj['KL Partner Id'] || '',

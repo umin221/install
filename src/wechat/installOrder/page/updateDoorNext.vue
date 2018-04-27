@@ -8,7 +8,7 @@
     </mt-header>
     <div class="mint-content zsBatch">
       <div :class="{'readonly':read}">
-        <cus-field label="完成数量"
+        <cus-field :label="nextText"
                    type="number"
                    :class="heartVisible"
                    v-model="line['Completed Install Amount']"></cus-field>
@@ -94,6 +94,7 @@
         id: '',
         item: '',
         is_show: false,
+        nextText: '',
         type: 'add', // add 新增 / edit 编辑 / read 只读
         titleVal: '',
         line: {},
@@ -136,11 +137,14 @@
         var self = this;
         var val = '';
         if (item['KL Detail Type LIC'] === 'Substitution Lock Trans Batch') {
+          self.nextText = '完成数量';
           val = '移交进度更新';
           self.is_show = true;
         } else if (item['KL Detail Type LIC'] === 'Transfer Batch') {
+          self.nextText = '完成数量';
           val = '真锁移交';
         } else {
+          self.nextText = '签收数量';
           val = '替代锁回收';
         }
         return val;
