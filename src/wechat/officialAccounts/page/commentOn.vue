@@ -51,12 +51,13 @@
           }
         ]">
       </mt-radio>
-      <cus-field class="block"
+      <mt-field class="block"
                  label="建议与反馈"
                  id="comments"
                  type="textarea"
+                 :attr="{ maxlength: 250 }"
                  v-model="comments"
-                 placeholder="请输入意见与反馈"></cus-field>
+                 placeholder="请输入意见与反馈,最多输入200字..."></mt-field>
       <button-group v-if="!type">
         <mt-button class="single" @click.native="submit">提交</mt-button>
       </button-group>
@@ -189,7 +190,7 @@
       }
     }
     .block{
-      .mint-cell>.mint-cell-wrapper{
+      .mint-cell-wrapper{
         display: block;
 
         .mint-cell-value{

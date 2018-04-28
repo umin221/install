@@ -35,6 +35,7 @@
 <script>
   import {mapState, mapActions, mapMutations} from 'vuex';
   import menuBox from '../components/cus-menu';
+  import { Toast } from 'mint-ui';
   import cusField from 'public/components/cus-field';
   //  import { MessageBox } from 'mint-ui';
   let isMunicipality = function(...args) {
@@ -49,7 +50,6 @@
     return isMun;
   };
   const NameSpace = 'addAddress';
-
 //  let mapp = config.mapp;
   export default {
     name: NameSpace,
@@ -162,6 +162,14 @@
       saveAddress() {
         let me = this;
         let form = {};
+        if (!me.provinces) {
+          Toast('请选择省市区');
+          return;
+        }
+        if (!me.street_Address) {
+          Toast('请选择详细地址');
+          return;
+        }
         if (me.type === 'add') {
           form = {
             'Province': me.KL_PROVINCE,
@@ -200,7 +208,7 @@
         }
       }
     },
-    components: {menuBox, cusField}
+    components: {menuBox, cusField, Toast}
   };
 </script>
 <style lang="scss">

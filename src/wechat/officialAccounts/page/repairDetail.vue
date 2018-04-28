@@ -28,7 +28,7 @@
                 </p>
               </div>
               <div>问题说明：
-                <p style="color: grey;font-size: 14px;line-height: 0">
+                <p style="color: grey;font-size: 14px;width: 96%;">
                   {{serviceDetail['Complaint Description']}}
                 </p>
               </div>

@@ -23,7 +23,8 @@
 <script>
   import {mapState, mapActions} from 'vuex';
   import menuBox from 'public/components/cus-menu';
-//  import { MessageBox } from 'mint-ui';
+  import { Toast } from 'mint-ui';
+  let phoneReg = new RegExp('^[A-Za-z0-9]+$');
   const NameSpace = 'addDevice';
   export default {
     name: NameSpace,
@@ -49,15 +50,19 @@
       submit() {
         let me = this;
 //        console.log(me.assetDetail);
-        me.setContactAsset({
-          ContactId: me.ContactId,
-          AssetId: me.assetDetail.Id,
-          callback: function(data) {
-            if (data) {
-              me.$router.back();
+        if (me.assetDetail.Id) {
+          me.setContactAsset({
+            ContactId: me.ContactId,
+            AssetId: me.assetDetail.Id,
+            callback: function(data) {
+              if (data) {
+                me.$router.back();
+              }
             }
-          }
-        });
+          });
+        } else {
+          Toast('该码未录入系统');
+        }
       },
       search() {
         let me = this;
@@ -67,6 +72,11 @@
 //            me.productModel = data['KL Product Model'];
 //          }
 //        });
+        if (!phoneReg.test(me.klsn)) {
+          me.klsn = '';
+          Toast('请输入正确的条形码');
+          return;
+        }
         me.getAssetSn({
           klsn: me.klsn,
           callback: function(data) {

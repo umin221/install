@@ -36,14 +36,20 @@
                  v-valid.require
                  @click.native="showAreaBox"
                  is-link></mt-cell>
-        <mt-cell title="预约时间"
+        <mt-cell title="预约时间" tag="预约时间"
                  placeholder="请选择"
                  :value="appointTime"
+                 class="requisite"
+                 v-valid.require
                  @click.native="open('picker1')"
                  is-link></mt-cell>
         <mt-field label="问题说明"
+                  type="textarea"
+                  class="mint-textarea"
+                  :attr="{ maxlength: 200 }"
                   v-model="ComplaintDescription"
-                  placeholder="请详细说明..."></mt-field>
+                  rows="4"
+                  placeholder="请详细说明,最多输入200字..."></mt-field>
         <attach ioName="KL Service Request Attachment IO" ref="attach"
                 :attach="attach.list"
                 :edit="attach.edit"
@@ -76,9 +82,11 @@
 <script>
   import {mapState, mapActions, mapMutations} from 'vuex';
   import Vue from 'vue';
+  import { Toast } from 'mint-ui';
   import menuBox from 'public/components/cus-menu';
   import vp from 'public/plugin/validator';
   const NameSpace = 'index';
+  let phoneReg = new RegExp('^[A-Za-z0-9]+$');
   let _upload = function(serverIds, id) {
     // 成功回调
     let callback = data => {
@@ -120,7 +128,7 @@
       if (!me.callPhone) {
         me.getContact(function(data) {
           me.lastName = data['Last Name']; // 名字
-          me.callPhone = data['Work Phone #']; // 电话
+          me.callPhone = data['Cellular Phone #']; // 电话
         });
       }
     },
@@ -172,9 +180,6 @@
       ...mapActions('app', ['upload']),
       ...mapActions(NameSpace, ['getLov', 'submitService', 'getContact', 'getAsset']),
       ...mapMutations(NameSpace, ['addressBack']),
-      dd() {
-        console.log(111);
-      },
       submit() {
         let me = this;
         let uploadAttach = id => {
@@ -210,6 +215,11 @@
       },
       serchSn() {
         let me = this;
+        if (!phoneReg.test(me.KLSN)) {
+          me.KLSN = '';
+          Toast('请输入正确的条形码');
+          return;
+        }
         me.getAsset({
           num: me.KLSN,
           callback: function(data) {
@@ -240,7 +250,7 @@
           type: 'SR_AREA',
           parent: '',
           success: function(data) {
-            let items = data.items;
+            let items = KND.Util.toArray(data.items);
             for (let i = 0; i < items.length;i++) {
               me.slots[0].values.push(items[i].Value);
             }
@@ -262,7 +272,7 @@
           type: 'SR_AREA',
           parent: value[0],
           success: function(data) {
-            let items = data.items;
+            let items = KND.Util.toArray(data.items);
             for (let i = 0; i < items.length;i++) {
               me.slots[1].values.push(items[i].Value);
             }
@@ -304,6 +314,9 @@
       background-color: #ffffff;
       margin-bottom: 2rem;
 
+      .mint-textarea>.mint-cell-wrapper{
+        display: block;
+      }
       .marginL>.mint-cell-wrapper>.mint-cell-value>input{
         margin-right: 0.5rem;
       }
