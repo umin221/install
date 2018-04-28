@@ -1,6 +1,5 @@
 @mixin disable() {
   color: $gray-line-default !important;
-  background-color: $gray-default !important;
 }
 
 header.mint-header {
@@ -21,14 +20,14 @@ button {
   }
 
   &.disable {
-    display: none;
+    //display: none;
     @include disable;
   }
 }
 
 .disable, .readonly {
   button {
-    display: none;
+    //display: none;
     @include disable;
   }
 }

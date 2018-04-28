@@ -46,7 +46,8 @@
 
         <!--buttons-->
         <button-group v-show="editable">
-          <mt-button v-show="!showSubmit" :class="{'disable': !lineComplete}"
+          <mt-button v-show="!showSubmit"
+                     :class="{'disable': !lineComplete}"
                      @click.native="transferFn">转门厂技术</mt-button>
           <mt-button v-show="showSubmit"
                      :class="{'disable': !lineComplete}"

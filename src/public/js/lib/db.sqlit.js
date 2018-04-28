@@ -311,7 +311,7 @@ function sqlite(database, version, note, size) {
   }
   window.$sqlite = {};
 
-  $sqlite.db = new sqlite("sqlite", "1.1", "sqlite 1.1", 1024 * 1024 * 5);
+  if (config.offline) $sqlite.db = new sqlite("sqlite", "1.1", "sqlite 1.1", 1024 * 1024 * 5);
 })();
 
 module.exports = $sqlite.db;
