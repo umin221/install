@@ -1,7 +1,7 @@
 <template>
   <div>
     <mt-header fixed :title="titleVal">
-      <fallback slot="left"></fallback>
+      <fallback slot="left" v-show="!is_option"></fallback>
       <mt-button @click.native="approvalFn" slot="right" v-text="">审批记录</mt-button>
     </mt-header>
     <div class="mint-content batchDetail">
@@ -9,7 +9,7 @@
         <mt-field label="申请人" :value="appData['Party Name']"></mt-field>
         <mt-field label="类型" :value="appData['Item Type Display Name']"></mt-field>
         <mt-field label="提交日期" :value="new Date(appDataTask['Start Time']).format('yyyy-MM-dd')"></mt-field>
-        <mt-field label="订单详情" class="enable" @click.native="toDetailFn" :value="orderId"></mt-field>
+        <mt-field label="订单详情" class="enable numCla" @click.native="toDetailFn" :value="orderId"></mt-field>
       </div>
       <div class="readonly" style="margin-top: 10px">
         <mt-field label="批次">
@@ -18,13 +18,14 @@
        <!-- <mt-field label="计划开始日期"  :value="start_Date" v-show="is_plan"></mt-field>
         <mt-field label="计划完成日期" :value="end_Date" v-show="is_plan"></mt-field>-->
         <mt-field label="计划数量" class="enable" :class="showNum()"
-                  :value="batchNum"
-                  @click.native="editBuildingFn"
-                  is-link></mt-field>
+                  @click.native="editBuildingFn">
+          <span>{{batchNum}}</span>
+        </mt-field>
         <mt-field label="完成数量"
                   v-show="!is_plan"
-                  :value="completeNum"
-                  is-link></mt-field>
+                  is-link>
+          <span>{{completeNum}}</span>
+        </mt-field>
         <mt-field v-show="is_installer" label="合作伙伴"  :value="companyName"></mt-field>
         <mt-field v-show="is_zs" label="真锁交接日期"  :value="deliveryTime"></mt-field>
       </div>
@@ -230,7 +231,7 @@
           success: data => {
             console.dir(data);
             self.detailData = data;
-            if (userInfo['Person UId'] === self.detailData['Primary Owner Id']) {
+            if (userInfo['Id'] === self.detailData['Primary Owner Id']) {
               self.is_User = true;
             }
             if (data['KL Detail Type LIC'] === 'Trompil Batch Summary' ||

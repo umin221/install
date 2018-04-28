@@ -67,7 +67,7 @@
             method: 'POST',
             data: {
               'body': {
-                'ProcessName': 'KL Install Task Close Action Workflow',
+                'ProcessName': 'KL Install Task Complete Action Workflow',
                 'RowId': self.id
               }
             },

@@ -809,7 +809,7 @@
           return;
         }
         if (item['KL Detail Type LIC'] !== 'Substitution Lock Trans Return') {
-          if (userInfo['Person UId'] !== item['Primary Owner Id']) {
+          if (userInfo['Id'] !== item['Primary Owner Id']) {
             Toast('不是任务责任人不可操作！');
             return;
           }
@@ -862,7 +862,7 @@
         if (self.shipmentVal) {
           return;
         }
-        if (userInfo['Person UId'] === item['Primary Owner Id']) {
+        if (userInfo['Id'] === item['Primary Owner Id']) {
           MessageBox({
             title: '提示',
             message: ' 确认提交？数据提交后不可修改。',
@@ -893,7 +893,7 @@
       addTask(item) {
         console.dir('0');
         var self = this;
-        if (userInfo['Person UId'] === item['Primary Owner Id']) {
+        if (userInfo['Id'] === item['Primary Owner Id']) {
           var itemTask = KND.Util.toArray(item['KL Installation Task'])[0];
           self.getTaskType(itemTask);
           if ((item['KL Detail Type LIC'] === 'Lock Installation Summary' && self.detailData['KL Delivery Sales Type'] === '工程') || item['KL Detail Type LIC'] === 'Substitution Lock Inst Summary') { // 真锁批次新增 替代锁批次
@@ -932,7 +932,7 @@
         console.dir(item);
         var self = this;
         // 跳转关闭页面更新状态
-        if (userInfo['Person UId'] === item['Primary Owner Id']) {
+        if (userInfo['Id'] === item['Primary Owner Id']) {
           self.$router.push({
             name: 'updateState',
             query: {
@@ -962,7 +962,7 @@
           item['KL Detail Type LIC'] === 'Lock Sign' ||
           item['KL Detail Type LIC'] === 'Substitution Lock Trans Return') {  // 签收页面
           if (item['Calculated Activity Status'] === 'Not Started') { // 有权限新增
-            if (userInfo['Person UId'] === item['Primary Owner Id']) {
+            if (userInfo['Id'] === item['Primary Owner Id']) {
               this.$router.push({ // 新增
                 name: 'sign',
                 query: {
@@ -976,7 +976,7 @@
               Toast('不是任务责任人不可操作！');
             }
           } else if (item['Calculated Activity Status'] === 'Completed' || self.pStatus === 'In Progress') { // 判断是否有权限编辑   登陆者信息与任务负责人匹配 并且状态在进行中已完成则可以编辑
-            if (userInfo['Person UId'] === item['Primary Owner Id']) {
+            if (userInfo['Id'] === item['Primary Owner Id']) {
               if ((item['KL Detail Type LIC'] === 'Trompil Lock Sign' || item['KL Detail Type LIC'] === 'Working Drawing Sign') && item['Calculated Activity Status'] === 'Ignore') { // 开孔签收与图纸签证 不涉及签收不需要查看详情 不签收状态为已忽略=Ignore
                 console.dir('===');
               } else {
@@ -1043,7 +1043,7 @@
             /*
             * 批次汇总开启节点
             * */
-            if (userInfo['Person UId'] === item['Primary Owner Id']) {
+            if (userInfo['Id'] === item['Primary Owner Id']) {
               MessageBox({
                 title: '提示',
                 message: ' 是否开启节点?',
@@ -1098,7 +1098,7 @@
         }
           // 跳转批次详情、编辑
         //  && (item['Calculated Activity Status'] === 'Draft' || item['Calculated Activity Status'] === 'Rejected')
-        if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'Declined') && fItem['Calculated Activity Status'] === 'In Progress') { // 汇总节点是否开启  未开始=Not Started、草稿=Planning(设定计划)、审批驳回=Declined 要编辑提交 并且有权限的人才可做此操作
+        if (userInfo['Id'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'Declined') && fItem['Calculated Activity Status'] === 'In Progress') { // 汇总节点是否开启  未开始=Not Started、草稿=Planning(设定计划)、审批驳回=Declined 要编辑提交 并且有权限的人才可做此操作
           this.clear();
           var itemTask = KND.Util.toArray(fItem['KL Installation Task'])[0];
           this.getTaskType(itemTask);
@@ -1162,7 +1162,7 @@
               }
             });
           } else {
-            if (userInfo['Person UId'] === item['Primary Owner Id']) { // 有权限更新
+            if (userInfo['Id'] === item['Primary Owner Id']) { // 有权限更新
               self.getTaskType(item);
               self.$router.push({
                 name: 'updateDoorNext',
@@ -1223,7 +1223,7 @@
             // 详情
             if (fItem['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁批次 编辑跳转日志  判断日志页面有没有权限更新
               var is_deit = false;
-              if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Approved' || item['Calculated Activity Status'] === 'Declined')) {
+              if (userInfo['Id'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Approved' || item['Calculated Activity Status'] === 'Declined')) {
                 is_deit = true;
               }
               self.getTaskType(item);
@@ -1251,7 +1251,7 @@
                 });
               }
             } else { // 其他批次的更新 统一
-              if (userInfo['Person UId'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Approved' || item['Calculated Activity Status'] === 'Close Reject')) { // 当前登录人与批次负责人相等并且状态是进行中才能更新
+              if (userInfo['Id'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Approved' || item['Calculated Activity Status'] === 'Close Reject')) { // 当前登录人与批次负责人相等并且状态是进行中才能更新
                 if (fItem['KL Detail Type LIC'] === 'Subst Lock Trans Summary') {
                   self.getTaskType(item);
                   self.$router.push({
