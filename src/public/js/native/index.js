@@ -53,12 +53,14 @@ import cache from '../lib/cache';
       util.log('获取用户信息 ' + userID);
       let user = session.get('userInfo');
       if (user) {
+        Indicator.close();
         callback(util.parse(user));
       } else {
         this.ajax({
           method: 'get',
           url: 'data/KL Employee Interface BO/Employee/?searchspec=[Login Name] = "' + userID + '" &PageSize=2&StartRowNum=0',
           success: data => {
+            Indicator.close();
             session.set('userInfo', JSON.stringify(data.items));
             callback(data.items);
           }

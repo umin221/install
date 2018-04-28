@@ -1,13 +1,14 @@
-'use strict'
-const fs = require('fs')
-const path = require('path')
-const utils = require('./utils')
-const config = require('../config')
-const vueLoaderConfig = require('./vue-loader.conf')
+'use strict';
+const fs = require('fs');
+const path = require('path');
+const utils = require('./utils');
+const config = require('../config');
+const vueLoaderConfig = require('./vue-loader.conf');
+const mode = process.argv.splice(2).shift();
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
-}
+};
 
 const createLintingRule = () => ({
   test: /\.(js|vue)$/,
@@ -18,23 +19,44 @@ const createLintingRule = () => ({
     formatter: require('eslint-friendly-formatter'),
     emitWarning: !config.dev.showEslintErrorsInOverlay
   }
-})
+});
 
-const entry = {};
-const dir = fs.readdirSync('./src/wechat');
-for (var i = 0; i < dir.length; i++) {
-  if (dir[i].indexOf('.') > -1) {
-    continue;
+const getCompileModules = () => {
+  /**
+   * transferOrder outsourcing demo workbench workPlan installOrder serviceOrder orderForms controller install officialAccounts
+   * myProduct productUse productBack
+   */
+  let modules = fs.readdirSync('./src/wechat'); // ['installOrder']; // fs.readdirSync('./src/wechat'); //
+  if (mode) {
+    // 编译指定模块
+    switch(mode) {
+      case 'app':
+        config.build.assetsRoot = path.resolve(__dirname, '../src/cordova/installation/www');
+        modules = ['install'];
+        break;
+      case 'wx':
+        modules = ['officialAccounts'];
+        break;
+    };
+  };
+  console.log(`编译模块如下 ${modules}`);
+  return modules;
+};
+
+const createEntry = () => {
+  let entry = {};
+  let modules = getCompileModules();
+  for (var i = modules.length - 1; i >= 0; i--) {
+    let child = modules[i];
+    if (child.indexOf('.') !== -1 || child === 'sign') continue;
+    entry[child] = './src/wechat/'+ child +'/main.js';
   }
-  if (dir[i] === 'public' || dir[i] === 'cordova') {
-    continue;
-  }
-  entry[dir[i]] = './src/wechat/' + dir[i] + '/main.js';
-}
+  return entry;
+};
 
 module.exports = {
   context: path.resolve(__dirname, '../'),
-  entry: entry,
+  entry: createEntry(),
   output: {
     path: config.build.assetsRoot,
     filename: '[name].js',
@@ -61,7 +83,7 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: [resolve('src'), resolve('test')]
+        include: [resolve('src/public'), resolve('src/wechat')] // [resolve('src'), resolve('test')]
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,

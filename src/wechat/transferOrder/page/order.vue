@@ -15,7 +15,7 @@
                    @click.native="showLovFn('KL Hole Type')"
                    :value="order['KL Hole Type']"
                    is-link></mt-cell>
-          <mt-cell title="是否门厂安装锁体" v-show="isProject && isDoorFactoryrOpen">
+          <mt-cell title="是否门厂安装锁体" v-show="isProject && isDoorFactoryOpen">
             <mt-switch v-model="box1"></mt-switch>
           </mt-cell>
           <mt-cell title="是否安装替代锁" v-show="isProject">
@@ -132,16 +132,16 @@
         return (!status || status === 'Draft' || status === 'Rejected') && !this.isTeam && this.isEngineer;
       },
       // 是否门厂开孔
-      isDoorFactoryrOpen() {
+      isDoorFactoryOpen() {
         let isDoorFactoryOpen = this.order['KL Hole Type'] === '门厂开孔';
-        if (isDoorFactoryOpen) this.box1 = false;
+        if (!isDoorFactoryOpen) this.box1 = false;
         return isDoorFactoryOpen;
       },
       // 是否显示 发起提交 按钮
       showSubmit() {
         let me = this;
         let info = config.userInfo || {};
-        return (!me.isDooFactoryrOpen) || (me.order['KL Delivery Partner Owner Id'] === info.Id);
+        return (!me.isDoorFactoryOpen) || (me.order['KL Delivery Partner Owner Id'] === info.Id);
       },
       // 是否安装锁体 switch
       box1: {

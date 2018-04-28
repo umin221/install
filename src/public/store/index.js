@@ -57,6 +57,9 @@ export const app = {
           wx.ready(() => {
             console.log('WeChatAPI success');
           });
+        },
+        error: err => {
+          console.log(err);
         }
       });
     },

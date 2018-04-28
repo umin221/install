@@ -76,6 +76,17 @@ module.exports = {
     // View the bundle analyzer report after build finishes:
     // `npm run build --report`
     // Set to `true` or `false` to always turn it on or off
-    bundleAnalyzerReport: process.env.npm_config_report
+    bundleAnalyzerReport: process.env.npm_config_report,
+
+    // Zip output
+    output: path.resolve(__dirname, '../output'),
+
+    // Sftp publish
+    sftp: {
+      host: '192.168.166.12',
+      user: 'root',
+      pass: 'abcd1234',
+      remotePath: '/kinlong/html/deploy/'
+    }
   }
 }
