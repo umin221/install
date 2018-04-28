@@ -47,7 +47,11 @@
       <!--</mt-cell>-->
     <mt-cell class="border-top" title="领用说明"></mt-cell>
     <div class="desc">
-        <textarea placeholder="可在这录入您的附件需求..." v-model="Description"></textarea>
+        <textarea placeholder="可在这录入您的附件需求,最多输入200字..."
+                  maxlength="200"
+                  rows="4"
+                  style="font-size: 0.75rem;"
+                  v-model="Description"></textarea>
     </div>
      <button-group class="singBtn">
       <mt-button class="submitBtn" @click.native="handleSave">保存</mt-button>

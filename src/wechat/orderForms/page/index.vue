@@ -18,6 +18,7 @@
         <cus-cell
           v-for="(item,index) in orderEntry"
           :key="index"
+          class="multiple"
            @click.native="toDateil(item['Order Number'])" is-link>
           <div class="mint-cell-sub-title" slot="title">维修订单号： {{item['Order Number']}}</div>
           <div class="mint-cell-sub-title" slot="title">订单总额： ￥{{item['Order Total']}}</div>
