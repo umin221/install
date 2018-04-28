@@ -22,19 +22,19 @@
         <div class="cus-cell-call">
             <div class="cus-title">楼栋数<span class="cus-title-span">默认栋，如1栋</span></div>
             <div class="cus-title" style="text-align: right;margin-bottom: 10px;">
-              <div class="cus-title-div" ><span @click="reduceVal('buildingNum')">-</span><input type="number" v-model="buildingNum"/><span @click="plusVal('buildingNum')">+</span></div><span>栋</span>
+              <div class="cus-title-div" ><span @click="reduceVal('buildingNum')" style="border-right: 1px solid #ebebeb;">-</span><input type="number" v-model="buildingNum" class="numberCalss"/><span @click="plusVal('buildingNum')" style="border-left: 1px solid #ebebeb;">+</span></div><span>栋</span>
             </div>
         </div>
         <div class="cus-cell-call">
           <div class="cus-title">楼层数/栋<span class="cus-title-span">默认F，如1F</span></div>
           <div class="cus-title" style="text-align: right;margin-bottom: 10px;">
-            <div class="cus-title-div" ><span  @click="reduceVal('layerNum')">-</span><input v-model="layerNum" type="number"/><span @click="plusVal('layerNum')">+</span></div><span>F</span>
+            <div class="cus-title-div" ><span @click="reduceVal('layerNum')" style="border-right: 1px solid #ebebeb;">-</span><input v-model="layerNum" type="number" class="numberCalss"/><span @click="plusVal('layerNum')" style="border-left: 1px solid #ebebeb;">+</span></div><span>F</span>
           </div>
         </div>
         <div class="cus-cell-call">
           <div class="cus-title">房间数/层<span class="cus-title-span">房号，楼层号+001，如1001</span></div>
           <div class="cus-title" style="text-align: right;margin-bottom: 10px;">
-            <div class="cus-title-div" ><span  @click="reduceVal('roomNum')">-</span><input v-model="roomNum" type="number"/><span @click="plusVal('roomNum')">+</span></div><span>&nbsp;</span>
+            <div class="cus-title-div" ><span @click="reduceVal('roomNum')" style="border-right: 1px solid #ebebeb;">-</span><input v-model="roomNum" type="number" class="numberCalss"/><span @click="plusVal('roomNum')" style="border-left: 1px solid #ebebeb;">+</span></div><span>&nbsp;</span>
           </div>
         </div>
       </div>
@@ -79,27 +79,29 @@
     .cus-title-div {
       position: absolute;
       height: 36px;
-      width: 200px;
       border-radius: 4px;
       overflow: hidden;
       font-size: 0.75rem;
       right: 30px;
       background: white;
-      border: 1px solid #ebebeb;
     }
-    .cus-title-div input{
-      width: 100px;
+    .cus-title-div .numberCalss{
+      width: 80px;
       line-height: 36px;
-      border-left: 1px solid #ebebeb;
-      border-right: 1px solid #ebebeb;
-      border-bottom: none;
-      border-top: none;
+      border: none;
       text-align: center;
-      font-size: $font-size-icon;
-      color: $primary-color;
+      font-size: 1.1rem;
+      color: #31c27c;
+      display: inline-block;
     }
     .cus-title-div span{
-      padding:20px;
+      width: 50px;
+      display: inline-block;
+      height: 36px;
+      text-align: center;
+      font-size: 1.1rem;
+      position: relative;
+      top: -3px;
     }
     .buildingInfo-zy{
       color: #777;

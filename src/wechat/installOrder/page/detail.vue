@@ -51,8 +51,8 @@
       <div v-show="!isConfirming">
         <div class="content-lc" style="margin-top: 15px">
           <div class="stage_li">
-            <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 72px;">
-              <div class="mui-scroll" style="height: 65px;overflow: -webkit-paged-x;">
+            <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 80px;">
+              <div class="mui-scroll" style="height: 80px;overflow: -webkit-paged-x;">
                 <a v-for="(item, index) in taskData" :key="index">
                   <div class="icon" @click="updateState(item, item['Calculated Activity Status'], item.Id, index)">
                     <span v-show="index!=0"  class="left line" :class="colorClass(item['Calculated Activity Status'], item)"></span>
@@ -60,7 +60,7 @@
                     <span v-if="rightLine(index, taskData)" class="right line" :class="colorClass(item['Calculated Activity Status'], item)"></span>
                   </div>
                   <div class="name" :class="colorClass(item['Calculated Activity Status'], item)" @click="updateTask(index, item['KL Detail Type'])">{{item['KL Detail Type']}}</div>
-                  <div v-show="showSelect(item)" style="height: 1px;background: #0772c1;margin-top: 10px;"></div>
+                  <div v-show="showSelect(item)" style="height: 1px;background: #0772c1;"></div>
                 </a>
                 <!--<a>
                   <div class="icon" @click="getClose()">
@@ -210,7 +210,6 @@
       right: 0px;
       top: 0px;
       line-height: 27px;
-      width: 150px;
       height: 27px;
       text-align: right;
     }
@@ -338,7 +337,7 @@
     }
 
     .stage_li > .mui-scroll-wrapper a > div.icon {
-      height: 28px;
+      height: 24px;
       padding: 7px 0;
       position: relative;
     }
@@ -445,7 +444,7 @@
     .stage_li > .mui-scroll-wrapper a > div.name {
       font-size: 12px;
       color: #333;
-      line-height: 12px;
+      line-height: 36px;
     }
 
     .stage_li > .mui-scroll-wrapper a > div.present {
