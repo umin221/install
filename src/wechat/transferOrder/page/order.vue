@@ -15,10 +15,10 @@
                    @click.native="showLovFn('KL Hole Type')"
                    :value="order['KL Hole Type']"
                    is-link></mt-cell>
-          <mt-cell title="门厂是否安装锁体">
+          <mt-cell title="是否门厂安装锁体" v-show="isProject && isDoorFactoryOpen">
             <mt-switch v-model="box1"></mt-switch>
           </mt-cell>
-          <mt-cell title="是否安装替代锁">
+          <mt-cell title="是否安装替代锁" v-show="isProject">
             <mt-switch v-model="box2"></mt-switch>
           </mt-cell>
         </div>
@@ -82,6 +82,8 @@
       let query = me.$route.query;
       let order = KND.Util.parse(KND.Session.get('order') || query.order);
 
+      // 是否工程订单 工程/零星
+      me.isProject = query.salesType === '工程';
       me.setOrder(order);
       // 取 lov 开孔方式
       me.getLov({
@@ -116,7 +118,9 @@
         // 假锁
         falseLock: [],
         // 其他配件
-        others: []
+        others: [],
+        // 是否工程订单 工程/零星
+        isProject: false
       };
     },
     computed: {
@@ -127,11 +131,17 @@
         let status = this.order['Calculated Order Status'];
         return (!status || status === 'Draft' || status === 'Rejected') && !this.isTeam && this.isEngineer;
       },
+      // 是否门厂开孔
+      isDoorFactoryOpen() {
+        let isDoorFactoryOpen = this.order['KL Hole Type'] === '门厂开孔';
+        if (!isDoorFactoryOpen) this.box1 = false;
+        return isDoorFactoryOpen;
+      },
       // 是否显示 发起提交 按钮
       showSubmit() {
         let me = this;
         let info = config.userInfo || {};
-        return (me.order['KL Hole Type'] !== '门厂开孔') || (me.order['KL Delivery Partner Owner Id'] === info.Id);
+        return (!me.isDoorFactoryOpen) || (me.order['KL Delivery Partner Owner Id'] === info.Id);
       },
       // 是否安装锁体 switch
       box1: {

@@ -6,8 +6,6 @@ let ajax = api => {
 let proxy = config.proxy;
 // 附件接口服务地址
 let attachServer = config.attachServer;
-// 企业微信或公众号认证标记
-let appNo = config.appNo;
 
 export const app = {
   namespaced: true,
@@ -48,7 +46,7 @@ export const app = {
       if (config.offline) return;
       ajax({
         method: 'get',
-        url: (`${proxy}/webchat/api/local/permission?url=${encodeURIComponent(location.href.split('#')[0])}&appNO=${appNo}`),
+        url: (`${proxy}/webchat/api/local/permission?url=${encodeURIComponent(location.href.split('#')[0])}&appNO=${config.appNo}`),
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
@@ -59,6 +57,9 @@ export const app = {
           wx.ready(() => {
             console.log('WeChatAPI success');
           });
+        },
+        error: err => {
+          console.log(err);
         }
       });
     },
@@ -103,7 +104,7 @@ export const app = {
       let push = (media) => {
         ajax({
           method: 'get',
-          url: (`${proxy}/webchat/api/external/uploadattachment?url=${attachServer}/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess&IOName=${data.IOName}&Object Id=${data.Id}&Comment=${data.Comment || ''}&ProcessName=KL Attachment Upload Process&appNO=${appNo}&mediaID=${media}`),
+          url: (`${proxy}/webchat/api/external/uploadattachment?url=${attachServer}/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess&IOName=${data.IOName}&Object Id=${data.Id}&Comment=${data.Comment || ''}&ProcessName=KL Attachment Upload Process&appNO=${config.appNo}&mediaID=${media}`),
           success: result => {
             console.log(result);
             run(MediaId.pop(), result);

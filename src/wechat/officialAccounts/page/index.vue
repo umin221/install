@@ -24,12 +24,12 @@
   const NameSpace = 'index';
   export default {
     name: NameSpace,
-    created: () => {
-      KND.Native.getUserInfo((userInfo) => {
-        console.log(userInfo);
-      });
+    created() {
       let openId = KND.Util.getParam('openid');
       console.log(openId);
+    },
+    mounted() {
+      Indicator.close();
     },
     data: () => {
       return {

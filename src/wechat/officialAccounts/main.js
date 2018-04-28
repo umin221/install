@@ -6,6 +6,7 @@
  */
 import Vue from 'vue';
 import router from './router';
+import 'public/js/lib/es6-promise.auto';
 import 'public/js/base/main';
 import 'public/js/base/mint';
 import './mapp'; // Status Mapp
