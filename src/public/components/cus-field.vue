@@ -17,7 +17,7 @@
       :state="state"
       @change="changeFn"
       :isLink="isLink">
-      <slot></slot>
+      <slot>{{linkPlaceholder}}</slot>
     </mt-cell>
   </div>
 </template>
@@ -42,6 +42,12 @@
         return {
           currentValue: this.value
         };
+      },
+      computed: {
+        linkPlaceholder() {
+          let val = this.value;
+          return this.isLink && !val ? '请选择' : val;
+        }
       },
       methods: {
         handleInput(val) {

@@ -12,6 +12,7 @@ import './mapp'; // Status Mapp
 import fallback from 'public/components/cus-fallback';
 import attach from 'public/components/cus-attach';
 import empty from 'public/components/cus-empty';
+import buttonGroup from 'public/components/cus-button-group';
 import App from '../../App';
 import store from './store';
 import './filters'; // Vue Filter
@@ -22,6 +23,8 @@ Vue.component('fallback', fallback);
 Vue.component('attach', attach);
 // For Empty
 Vue.component('empty', empty);
+// For Buttons
+Vue.component('button-group', buttonGroup);
 
 Vue.config.productionTip = false;
 

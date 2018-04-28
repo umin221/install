@@ -23,7 +23,10 @@ const deployPackage = 'app.zip'
 gulp.task('clean', function (done) {
   rm(build.assetsRoot, err => {
     if (err) throw err
-    done()
+    rm(build.output, err => {
+      if (err) throw err
+      done();
+    })
   })
 })
 
@@ -61,7 +64,7 @@ gulp.task('zip', ['build'], function (done) {
   gulp.src([`${build.assetsRoot}/**`])
     .pipe(zip(deployPackage))
     .pipe(gulp.dest(build.output))
-  setTimeout(function() { done() }, 100)
+  setTimeout(function() { done() }, 300)
 })
 
 /*====================================

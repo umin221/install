@@ -94,7 +94,6 @@
   import Vue from 'vue';
   import vp from 'public/plugin/validator';
   import titleGroup from 'public/components/cus-title-group';
-  import buttonGroup from 'public/components/cus-button-group';
   import cusField from 'public/components/cus-field';
   import cusCity from 'public/components/cus-select-city';
   // use plugin
@@ -319,7 +318,7 @@
         this.$router.push('engineer');
       }
     },
-    components: {titleGroup, buttonGroup, cusField, cusCity}
+    components: {titleGroup, cusField, cusCity}
   };
 </script>
 

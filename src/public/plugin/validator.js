@@ -30,6 +30,7 @@ class ValidatorPlug {
         let el = this.el;
         let target = e.target || el.querySelector('input') || el.querySelector('.mint-cell-value');
         let value = target.value || target.innerText;
+        if (KND.Util.hasClass(target, 'is-link') && value === '请选择') value = '';
         let tag = el.getAttribute('tag');
         let msg;
         if (!tag) console.error(el + 'not tag!');
