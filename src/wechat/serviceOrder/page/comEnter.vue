@@ -19,16 +19,18 @@
           <i class="xs-icon icon-scan" v-if="isSubmit" @click="scan"></i>
         </mt-field>
         <mt-cell class="mint-field" title="所在省市区" placeholder="请选择">{{Personal}}</mt-cell>
-        <mt-field class="block"
+        <mt-field class="block border-none"
                   :class="{readonly: !isSubmit}"
                   label="详细地址"
                   v-model="Address"
                   placeholder="如设备过旧未贴条码,允许为空"
                   type="textarea" rows="2"></mt-field>
         <div class="floor-box">
-          <input type="text" :class="{'readonly': !isSubmit}" placeholder="楼栋名" v-model="building">
-          <input type="text" :class="{'readonly': !isSubmit}" placeholder="楼层" v-model="floor">
-          <input type="text" :class="{'readonly': !isSubmit}" placeholder="房号" v-model="room">
+          <div>
+            <input type="text" :class="{'readonly': !isSubmit}" placeholder="楼栋名" v-model="building">
+            <input type="text" :class="{'readonly': !isSubmit}" placeholder="楼层" v-model="floor">
+            <input type="text" :class="{'readonly': !isSubmit}" placeholder="房号" v-model="room">
+          </div>
         </div>
         <!--<mt-cell class="require mint-field" title="产品型号" placeholder="请选择" @click.native="toSearchT('fault')" is-link>{{ProductModel}}</mt-cell>-->
         <mt-cell class="require mint-field"
@@ -90,7 +92,7 @@
   import {mapState, mapActions, mapMutations} from 'vuex';
   import menuBox from '../../../public/components/cus-menu';
   import { Toast } from 'mint-ui';
-
+  let phoneReg = new RegExp('^[A-Za-z0-9]+$');
   let mapp = config.mapp;
   const delay = (function() {
     let timer = 0;
@@ -256,6 +258,11 @@
         let me = this;
         delay(() => {
           if (me.SerialNumber) {
+            if (!phoneReg.test(me.SerialNumber)) {
+              me.SerialNumber = '';
+              Toast('请输入正确的条形码');
+              return;
+            }
             me.getAsset({
               num: me.SerialNumber,
               callback: function(data) {
@@ -347,13 +354,14 @@
           'KL Lock Body Model': me['KL_LOCK_BODY_MODEL'],
           'KL Lock Model': me['KL_LOCK_MODEL'],
           callback: function(data) {
+            Toast('提交成功');
+            KND.Session.set('popupVisible', 'popupVisible');
             me.$router.go(-1);
             setTimeout(function() {
               let name = me.$router.currentRoute.name;
               if (name === 'comEnter') {
                 me.$router.go(-1);
               }
-              Toast('提交成功');
             }, 300);
           }
         };
@@ -456,19 +464,25 @@
       }
     }
     .floor-box {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      height: 48px;
-
-      input{
-        width: 30%;
-        line-height: 1.2rem;
-      }
-      input:focus{
-        outline:0 !important
+      padding: 0 0.5rem;
+      div{
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        height: 48px;
+        background-image: linear-gradient(0deg, #d9d9d9, #d9d9d9 2%, transparent 3%);
+        input{
+          width: 30%;
+          line-height: 1.2rem;
+        }
+        input:focus{
+          outline:0 !important
+        }
       }
     }
+  }
+  .border-none>.mint-cell-wrapper{
+    background-image: none;
   }
   .readonly{
     readonly:expression(this.readOnly=false);

@@ -23,7 +23,7 @@ let ApiList = {
       data: {
         'body': {
           'OutputIntObjectName': 'Base KL Service Request Interface BO',
-          'SearchSpec': '(' + parmer + ')AND [Service Request.Parent Service Request Id] IS NULL',
+          'SearchSpec': '(' + parmer + ') AND [Service Request.Parent Service Request Id] IS NULL',
           'SortSpec': 'Created(DESCENDING)',
           'StartRowNum': option.paging.StartRowNum,
           'PageSize': option.paging.PageSize
@@ -287,7 +287,7 @@ let ApiList = {
         'Description': option.data.form.ProductFlag,
         'SR Type': option.data.form.SR_TYPE,
         'CEM Planned Start Date': option.data.form.Start_Date || '',
-        'KL SN': option.data.form.KL_SN,
+        'KL SN': option.data.form.KL_SN || '',
         'KL Product Model': option.data.form.KL_Product_Model,
         'KL Cutoff Date': option.data.form.KL_Cutoff_Date,
         'Product Warranty Flag': option.data.form.Product_Warranty_Flag,
@@ -347,7 +347,7 @@ let ApiList = {
     };
     // 名字过滤
     if (name) {
-      specName += '[Last Name] ~LIKE "' + name + '*" OR ([KL Parent Service Region Name] ~LIKE "' + name + '*" OR [Service Region] ~LIKE "' + name + '*") AND';
+      specName += '[Last Name] ~LIKE "*' + name + '*" OR ([KL Parent Service Region Name] ~LIKE "*' + name + '*" OR [Service Region] ~LIKE "*' + name + '*") AND';
     };
     return {
       method: 'get',
@@ -422,14 +422,20 @@ let ApiList = {
   },
   getProduct: option => {
     // let model = '';
-    // model = 'AND ([Product.Name] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*")';
+    // model = 'AND [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*"';
+    // let oneCatalog = '';
+    // if (option.data.val === '1') {
+    //   oneCatalog = 'AND [Catalog Category.Sequence Number] = "1"';
+    // } else {
+    //   oneCatalog = 'AND [Catalog Category.Sequence Number] = "' + option.data.val + '" AND [Catalog Category.Parent Category Id] = "' + option.data.ParentId + '"';
+    // }
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/Query',
       data: {
         'body': {
           'OutputIntObjectName': 'Base Catalog Category (Content Management)',
-          'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '" ',
+          'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '"',
           'ViewMode': 'Group'
         }
       }

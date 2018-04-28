@@ -45,7 +45,8 @@
                 </div>
                 <div>用户故障说明：{{ServiceRequest['Sub-Area']}}</div>
                 <div>问题说明：
-                  <div>{{ServiceRequest['Description']}}</div>
+                  <div>{{ServiceRequest['Description']||ServiceRequest['Complaint Description']}}</div>
+                  <!--Complaint Description-->
                 </div>
                 <attach ioName="KL Service Request Attachment IO" ref="attach"
                         :attach="attach.list"
@@ -223,11 +224,19 @@
       <!--工单操作-->
       <mt-popup v-model="popupVisible1" position="bottom" popup-transition="popup-fade" class="mint-popup-2">
         <mt-cell class="setOut xs-icon icon-setout addralgin" title="出发" :value="Action['KL Departure Location']" >
-          <mt-button v-if="Action['Status INT']==='Appointed'" @click.native="clickPosition('setOut')">签到</mt-button>
+          <mt-button v-if="Action['Status INT']==='Appointed'&&!clickStatus" @click.native="clickPosition('setOut')">签到</mt-button>
+          <mt-spinner v-if="Action['Status INT']==='Appointed'&&clickStatus"
+                      style="margin-right: 1.7rem;"
+                      type="fading-circle"
+                      color="#26a2ff"></mt-spinner>
         </mt-cell>
         <mt-cell class="xs-icon icon-reach addralgin" title="到达" :value="Action['MeetingLocation']">
-          <mt-button v-if="Action['Status INT']==='Departed'" @click="clickPosition('reach')">签到</mt-button>
+          <mt-button v-if="Action['Status INT']==='Departed'&&!clickStatus2" @click="clickPosition('reach')">签到</mt-button>
           <mt-button v-else-if="Action['Status INT']==='Appointed'" style="background: gainsboro">签到</mt-button>
+          <mt-spinner v-if="Action['Status INT']==='Departed'&&clickStatus2"
+                      style="margin-right: 1.7rem;"
+                      type="fading-circle"
+                      color="#26a2ff"></mt-spinner>
         </mt-cell>
 
         <!--工单操作 记录故障-->
@@ -278,6 +287,38 @@
             <mt-button v-else style="background: gainsboro">确认</mt-button>
           </div>
         </mt-cell>
+
+
+<!--        <mt-cell class="xs-icon icon-saver" title="记录故障">
+          <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause']"
+                     @click="fillIn('ServiceRequest')">已填写</mt-button>
+          <mt-button v-else-if="Action['Status INT']==='Arrived' && !ServiceRequest['SR Rootcause']"
+                     @click="clickPosition('comEnter')">填写</mt-button>
+          <mt-button v-else style="background: gainsboro">填写</mt-button>
+        </mt-cell>
+
+        <mt-cell class="xs-icon icon-finish" title="完工确认">
+          <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause'] && !ServiceRequest['KL Parent SR Complete Flag']"
+                     @click.native="clickPosition('failureRecord')">填写</mt-button>
+          <mt-button v-else-if="ServiceRequest['KL Parent SR Complete Flag']"
+                     @click.native="moreOrder">再记一单</mt-button>
+          <mt-button v-else style="background: gainsboro">填写</mt-button>
+        </mt-cell>
+
+        &lt;!&ndash;再记一单&ndash;&gt;
+        <mt-cell class="completeEnd xs-icon icon-ending" title="结束">
+          <mt-button @click.native="moreOrder" style="margin-right: 10px;margin-bottom: 4px;">再记一单</mt-button>
+          <div v-if="!ServiceRequest['KL Child Service Request']">
+            <mt-button v-if="ServiceRequest['KL Parent SR Complete Flag']"
+                        @click.native="clickPosition('end')">确认</mt-button>
+            <mt-button v-else style="background: gainsboro">确认</mt-button>
+          </div>
+        <div v-else>
+          <mt-button v-if="childService['KL Status LIC'] === 'Completed'"
+                      @click.native="clickPosition('end')">确认</mt-button>
+          <mt-button v-else style="background: gainsboro">确认</mt-button>
+        </div>
+        </mt-cell>-->
         <div class="cancelHandle"
              style="color: red;"
              @click="popupVisible1 = !popupVisible1">取消</div>
@@ -350,6 +391,11 @@
           }
         }
       });
+      let list = KND.Session.get('popupVisible');
+      if (list) {
+        me.popupVisible1 = true;
+        KND.Session.remove('popupVisible');
+      }
     },
     data: () => {
       return {
@@ -363,6 +409,8 @@
         srNumber: '',
         contactName: '',
         Created: '',
+        clickStatus: false,
+        clickStatus2: false,
         showBox: false,
         showBox2: false,
         result: false,
@@ -444,7 +492,6 @@
             'inStatus': me.Statu['接单'],
             'key': 'getAccept'
           };
-          console.log(parms);
           me.setStatus({parms: parms, srNum: me.srNumber});
         }
       },
@@ -454,6 +501,7 @@
       },
       enter(val) {                     // 日历确定
         let me = this;
+        let myDate = new Date().format('MM/dd/yyyy hh:mm:ss');
           // 判断开始结束时间
         if (val.Time1.time && val.Time2.time) {
           if (val.Time1.key <= val.Time2.key) {
@@ -466,6 +514,11 @@
           // 转换时间格式
           me.starTime = new Date(val.selectDay + ' ' + me.starTime + ':00').format('MM/dd/yyyy hh:mm:ss');
           me.endTime = new Date(val.selectDay + ' ' + me.endTime + ':00').format('MM/dd/yyyy hh:mm:ss');
+          if (myDate > me.starTime) {
+            Toast('预约时间必须大于当前时间');
+            me.showBox2 = false;
+            return;
+          }
           if (me.BtnStatu === 'status2') {
             let parms = {
               'Object Id': me.ServiceRequest.Id,
@@ -475,8 +528,16 @@
               'endTime': me.endTime,
               'key': 'getAppoint'
             };
-            console.log(parms);
-            me.setStatus({parms: parms, srNum: me.srNumber});
+            me.setStatus({
+              parms: parms,
+              srNum: me.srNumber,
+              callback: data => {
+                Toast('预约成功');
+              },
+              error: data => {
+                Toast(data);
+              }
+            });
           }
           me.showBox2 = false;
           me.callEnd = false;
@@ -509,7 +570,15 @@
               'type': 'setOut',
               'KL Departure Location': data || '出发地址'
             };
-            me.setStatus({parms: parms, srNum: me.srNumber});
+            me.setStatus({
+              parms: parms,
+              srNum: me.srNumber,
+              error: data => {
+                Toast(data);
+                me.clickStatus = false;
+              }
+            });
+            me.clickStatus = true;
           });
 //          parms = {
 //            'Object Id': me.ServiceRequest.Id,
@@ -529,7 +598,14 @@
               'type': 'reach',
               'MeetingLocation': data || '上门地址'
             };
-            me.setStatus({parms: parms, srNum: me.srNumber});
+            me.setStatus({
+              parms: parms,
+              srNum: me.srNumber,
+              error: data => {
+                Toast(data);
+                me.clickStatus2 = false;
+              }});
+            me.clickStatus2 = true;
           });
 //          parms = {
 //            'Object Id': me.ServiceRequest.Id,

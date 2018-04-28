@@ -83,8 +83,7 @@
         loader.call(this, {
           data: {
             'srNum': val
-          },
-          more: true
+          }
         }, 'result', 'onTopLoaded');
       },
       /**

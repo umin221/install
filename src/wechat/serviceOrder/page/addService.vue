@@ -37,14 +37,42 @@
                   type="textarea" rows="2">
           <i class="xs-icon icon-edit" @click="editAddress" style="position: absolute;bottom: 1.8rem;right: 0.8rem;"></i>
         </mt-field>
-        <mt-cell class="mint-field require"  title="服务类型" :value="SR_TYPE" @click.native="getLov('SR_TYPE','')"  placeholder="请选择" is-link></mt-cell>
-        <mt-cell class="mint-field require"  title="故障现象" :value="SR_AREA" @click.native="getLov('SR_AREA','')"  placeholder="请选择" is-link></mt-cell>
-        <mt-cell class="mint-field margin-right" title="故障分级" :value="Priority"></mt-cell>
-        <mt-field class="block" label="客服说明" v-model="ProductFlag" placeholder="详细描述或附加需求..." type="textarea" rows="2"></mt-field>
-        <mt-cell class="mint-field" title="客户预约时间" @click.native="open('picker1')" :value="StartDate"  placeholder="请选择" is-link></mt-cell>
+        <mt-cell class="mint-field require"
+                 title="服务类型"
+                 :value="SR_TYPE"
+                 @click.native="getLov('SR_TYPE','')"
+                 placeholder="请选择" is-link></mt-cell>
+        <mt-cell class="mint-field require"
+                 title="故障现象"
+                 :value="SR_AREA"
+                 @click.native="getLov('SR_AREA','')"
+                 placeholder="请选择" is-link></mt-cell>
+        <mt-cell class="mint-field margin-right"
+                 title="故障分级"
+                 :value="Priority"></mt-cell>
+        <mt-field class="block"
+                  label="客服说明"
+                  v-model="ProductFlag"
+                  placeholder="详细描述或附加需求..."
+                  type="textarea"
+                  rows="2"></mt-field>
+        <mt-cell class="mint-field"
+                 title="客户预约时间"
+                 @click.native="open('picker1')"
+                 :value="StartDate"
+                 placeholder="请选择" is-link></mt-cell>
         <div v-if="hideMore">
-          <mt-field label="产品条形码" placeholder="客户如提供请输入" @change="SnChange" v-model="KL_SN" class="textRight" ></mt-field>
-          <mt-field label="产品型号" placeholder="客户如提供请输入" v-model="form.KL_Product_Model"  class="textRight"></mt-field>
+          <mt-field label="产品条形码"
+                    placeholder="客户如提供请输入"
+                    @change="SnChange"
+                    v-model="KL_SN"
+                    class="textRight" >
+            <i class="xs-icon icon-scan" @click="toScan"></i>
+          </mt-field>
+          <mt-field label="产品型号"
+                    placeholder="客户如提供请输入"
+                    v-model="form.KL_Product_Model"
+                    class="textRight"></mt-field>
           <mt-cell class="mint-field margin-right" title="移交日期"
                    :value="form.KL_Cutoff_Date"></mt-cell>
           <mt-cell class="mint-field margin-right" title="保修期限"
@@ -156,10 +184,12 @@
     }
     return (phoneReg.test(callNum) || workPhoneReg.test(callNum));
   };
+  let phoneReg = new RegExp('^[A-Za-z0-9]+$');
   const NameSpace = 'addService';
   export default {
     name: NameSpace,
     created() {
+      this.setSn();
     },
     data: () => {
       return {
@@ -211,7 +241,7 @@
     },
     methods: {
       ...mapActions(NameSpace, ['getSearch', 'getValue', 'valueChange', 'getSn', 'addContact', 'upDateContact', 'getLov1']),
-      ...mapMutations(NameSpace, ['removeSearch']),
+      ...mapMutations(NameSpace, ['removeSearch', 'setSn']),
       showMore() {
         let me = this;
         me.hideMore = true;
@@ -275,6 +305,7 @@
           Owner: me.loginMeg['Login Name'],
           callback: function(data) {
             if (data) {
+              KND.Session.set('reOrder', 'cusPending');
               me.$router.go(-1);
               Toast('提交成功！');
             }
@@ -408,8 +439,22 @@
       SnChange() {
         let me = this;
         delay(() => {
+          if (!phoneReg.test(me.KL_SN)) {
+            me.KL_SN = '';
+            Toast('请输入正确的条形码');
+            return;
+          }
           me.getSn(me.KL_SN);
-        }, 500);
+        }, 300);
+      },
+      toScan() {
+        let me = this;
+        KND.Native.scanQRCode({
+          success(data) {
+            me.KL_SN = data.resultStr;
+            me.SnChange();
+          }
+        });
       },
       async fetchData(val) {
         let me = this;
@@ -528,7 +573,6 @@
         input{
           height: 100%;
           text-align: right;
-          padding-right: 1rem;
         }
       }
     }

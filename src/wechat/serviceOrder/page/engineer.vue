@@ -83,16 +83,22 @@
        * @param {Object} item 用户选择结果
        */
       selectFn(item) {
+        console.log(item);
         let me = this;
-        MessageBox.confirm('是否指派给该工程师！', '提示').then(action => {
+        MessageBox.confirm('是否指派给工程师' + item['Last Name'] + '！', '提示').then(action => {
           let params = {
             id: me.$route.query.id,
             empId: item['Id'],
             empFullName: item['KL Employee Full Name'],
             type: 'Dispatch'
           };
-          this.setContact(params);
-          me.$router.go(-2);
+          this.setContact({
+            contacts: params,
+            callback: data => {
+              KND.Session.set('reOrder', 'cusPending');
+              me.$router.go(-2);
+            }
+          });
         });
       },
       /**

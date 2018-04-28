@@ -3,24 +3,9 @@
     <cus-search v-model="value"
                 :show="true"
                 placeholder="请输入配件名称">
-
-      <cus-loadmore v-if="type"
-                    ref="result1"
+      <cus-loadmore ref="result2"
                     :loadBottom="loadBottomFn"
                     :topStatus="topStatus">
-        <cus-cell class="multiple"
-                  :key="item.id"
-                  :title="'型号:'+ item['KL Product Model No']"
-                  v-for="(item, index) in result"
-                  @click.native="select(item)">
-          <div class="mint-cell-sub-title" slot="title">产品说明: {{item['KL Translated Description']}}</div>
-        </cus-cell>
-      </cus-loadmore>
-      <cus-loadmore v-else
-                    ref="result2"
-                    :loadBottom="loadBottomFn"
-                    :topStatus="topStatus">
-
         <cus-cell class="multiple"
                   :key="item.id"
                   :title="'配件名称:'+ item['KL Translated Name']"
@@ -40,6 +25,9 @@
   </div>
 </template>
 <style lang="scss">
+  .searchTerm{
+    background-color: white;
+  }
   .selectIcon {
     position: absolute;
     top: 0;
@@ -58,6 +46,7 @@
     created() {
       this.type = this.$route.query.type;
       this.initSelected();
+//      this.getProduct({value: '1'});
       this.getProduct();
     },
     components: {cusLoadmore, cusSearch, cusCell},
@@ -70,7 +59,7 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['result', 'selected', 'returnSelect'])
+      ...mapState(NAMESPACE, ['result', 'result1', 'result2', 'result3', 'result4', 'selected', 'returnSelect'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['getProduct']),
@@ -78,8 +67,7 @@
       ...mapMutations('saveFault', ['selectProduct']),
 //      ...mapMutations('comEnter', ['successCall']),
       searchFn(val) {
-        console.log(val);
-//        this.getProduct({value: val, type: this.type});
+        this.getProduct({value: val, type: this.type});
       },
       loadBottomFn() {
       },
@@ -91,6 +79,10 @@
 //          this.successCall({item: index, type: ' No'});
         }
       },
+//      toNetx(id, item) {
+//        console.log(item);
+//        this.getProduct({value: item, ParentId: id});
+//      },
       selectEnter() {
         console.log(this.result);
         let me = this;

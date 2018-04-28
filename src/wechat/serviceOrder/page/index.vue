@@ -219,6 +219,12 @@
       });
       me.getLoginMeg();
     },
+    activated() {
+      let me = this;
+      let list = KND.Session.get('reOrder');
+      if (list) me.loadTopFn({status: '待处理', list: list});
+      KND.Session.remove('reOrder');
+    },
     data: () => {
       return {
         selected: 'pending',
@@ -311,6 +317,10 @@
           .my-cell-sub{
             line-height: 1.5rem;
             font-size: 0.6rem;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 93%;
           }
         }
       }

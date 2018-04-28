@@ -126,7 +126,8 @@ export default new Vuex.Store({
           {name: '联系人类型', key: 'CONTACT_TYPE'},
           {name: '省市', key: 'KL_PROVINCE'},
           {name: '详细地址', key: 'Address'},
-          {name: '服务类型', key: 'SR_TYPE'}
+          {name: '服务类型', key: 'SR_TYPE'},
+          {name: '故障现象', key: 'SR_AREA'}
         ],
         Municipality: ['上海', '天津', '澳门', '重庆', '香港', '北京'],
         search: [],
@@ -478,7 +479,7 @@ export default new Vuex.Store({
             }
           });
         },
-        setStatus({commit}, {parms, srNum}) {          // 工单状态
+        setStatus({commit}, {parms, srNum, callback, error}) {          // 工单状态
           // let key = obj.type ? obj.key : 'setStatus';
           api.get({
             key: parms.key,
@@ -497,7 +498,11 @@ export default new Vuex.Store({
                     if (parms.key === 'getDone') {
                       Toast('维修完成您辛苦了');
                     }
-                  }
+                    if (callback) {
+                      callback();
+                    }
+                  },
+                  error
                 });
               }
             }
@@ -617,8 +622,8 @@ export default new Vuex.Store({
         mustForm: [
           // {name: '产品条形码', key: 'SerialNumber'},
           // {name: '产品型号', key: 'ProductModel'},
-          {name: '面板型号', key: 'KL_LOCK_BODY_MODEL'},
-          {name: '锁体型号', key: 'KL_LOCK_MODEL'},
+          {name: '面板型号', key: 'KL_LOCK_MODEL'},
+          {name: '锁体型号', key: 'KL_LOCK_BODY_MODEL'},
           {name: '故障现象', key: 'SR_ROOTCAUSE'},
           {name: '责任划分', key: 'KL_SR_RESP'},
           {name: '解决方法', key: 'repairDetails'}
@@ -764,6 +769,10 @@ export default new Vuex.Store({
       namespaced: true,
       state: {
         result: [],
+        result1: [],
+        result2: [],
+        result3: [],
+        result4: [],
         selected: [],
         returnSelect: [],
         priceId: ''
@@ -778,7 +787,7 @@ export default new Vuex.Store({
           }
         },
         setProduct(state, data) {
-          // state.result = data;
+          // state['result' + item] = data;
           // state.selected = [];
           state.result = [];
           state.selected = [];
@@ -816,13 +825,15 @@ export default new Vuex.Store({
                   key: 'getProduct',
                   data: {
                     // val: val.value,
+                    // ParentId: val.ParentId,
+                    // type: val.type,
                     id: data.Id
-                    // type: val.type
                   },
                   success: function(data) {
                     let Catalog = KND.Util.toArray(data.SiebelMessage['Catalog Category']);
                     console.log(Catalog);
                     if (Catalog) {
+                      // commit('setProduct', {data: Catalog, item: val.value});
                       commit('setProduct', Catalog);
                     }
                   }
@@ -959,7 +970,7 @@ export default new Vuex.Store({
             }
           });
         },
-        setContact({commit}, contacts) {
+        setContact({commit}, {contacts, callback}) {
           api.get({
             key: 'getActivity',
             data: {
@@ -969,7 +980,9 @@ export default new Vuex.Store({
               type: contacts.type
             },
             success: function(data) {
-              console.log(data);
+              if (callback) {
+                callback(data);
+              }
             }
           });
         }

@@ -167,7 +167,7 @@ export default {
           }
         }
       }
-      return me.allFee;
+      return me.allFee.toFixed(2);
     }
   },
   methods: {
@@ -250,6 +250,7 @@ export default {
                 parentId: me.ServiceRequest.Id,
                 type: me.serviceType,
                 callBack: function(data) {
+                  KND.Session.set('popupVisible', 'popupVisible');
                   me.setPartner(data);
                   me.$router.go(-1);
                   _upload('', true);
