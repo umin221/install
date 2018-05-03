@@ -393,6 +393,10 @@ export default new Vuex.Store({
               if ((form['KL Status LIC'] === 'Not Started' || form['KL Status LIC'] === 'To Be Assigned') && form['SR Type'] === '上门维修') {
                 state.BtnStatu = 'status4';
               }
+              if (form.Action) {
+                let Action = KND.Util.isArray(form.Action) ? form.Action[0] : form.Action;
+                state.Action = Action;
+              }
             }
           } else {
             if (form.Action) {
@@ -770,7 +774,7 @@ export default new Vuex.Store({
       state: {
         result: [],
         result1: [],
-        result2: [],
+        result2: {},
         result3: [],
         result4: [],
         selected: [],
@@ -787,22 +791,29 @@ export default new Vuex.Store({
           }
         },
         setProduct(state, data) {
-          // state['result' + item] = data;
+          // for (let i = 0; i < data.length;i++) {
+          //   state.result2[data[i].Id] = [];
+          // }
+          // if (val === '2') {
+          //   console.log(this);
+          // } else {
+          state['result1'] = data;
+          // }
           // state.selected = [];
-          state.result = [];
-          state.selected = [];
-          for (let i = 0; i < data.length; i++) {
-            if (data[i].Product) {
-              if (KND.Util.isArray(data[i].Product)) {
-                state.result = state.result.concat(data[i].Product);
-              } else {
-                state.result.push(data[i].Product);
-              }
-            }
-          }
-          for (let i = 0; i < state.result.length;i++) {
-            state.selected.push(false);
-          }
+          // state.result = [];
+          // state.selected = [];
+          // for (let i = 0; i < data.length; i++) {
+          //   if (data[i].Product) {
+          //     if (KND.Util.isArray(data[i].Product)) {
+          //       state.result = state.result.concat(data[i].Product);
+          //     } else {
+          //       state.result.push(data[i].Product);
+          //     }
+          //   }
+          // }
+          // for (let i = 0; i < state.result.length;i++) {
+          //   state.selected.push(false);
+          // }
         },
         initSelected(state) {
           state.selected = [];
@@ -824,17 +835,22 @@ export default new Vuex.Store({
                 api.get({
                   key: 'getProduct',
                   data: {
-                    // val: val.value,
-                    // ParentId: val.ParentId,
+                    val: val.value,
+                    ParentId: val.ParentId,
                     // type: val.type,
                     id: data.Id
                   },
                   success: function(data) {
                     let Catalog = KND.Util.toArray(data.SiebelMessage['Catalog Category']);
-                    console.log(Catalog);
-                    if (Catalog) {
+                    if (Catalog.length) {
                       // commit('setProduct', {data: Catalog, item: val.value});
-                      commit('setProduct', Catalog);
+                      // let name = val.value === '1' ? 'setProduct' : 'setProduct1';
+                      if (val.value === '1') {
+                        commit('setProduct', Catalog);
+                      }
+                      if (val.callback) {
+                        val.callback(Catalog);
+                      }
                     }
                   }
                 });

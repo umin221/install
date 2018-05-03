@@ -18,14 +18,23 @@
                   class="textRight">
           <i class="xs-icon icon-scan" v-if="isSubmit" @click="scan"></i>
         </mt-field>
-        <mt-cell class="mint-field" title="所在省市区" placeholder="请选择">{{Personal}}</mt-cell>
+        <!--<mt-cell class="mint-field" -->
+                 <!--title="所在省市区" -->
+                 <!--placeholder="请选择">{{Personal}}</mt-cell>-->
+        <cus-field class=""
+                 v-show="AssetNumber && SerialNumber"
+                 label="所在省市区"
+                   :value="Personal"
+                  is-link></cus-field>
+
         <mt-field class="block border-none"
+                  v-show="AssetNumber && SerialNumber"
                   :class="{readonly: !isSubmit}"
                   label="详细地址"
                   v-model="Address"
                   placeholder="如设备过旧未贴条码,允许为空"
                   type="textarea" rows="2"></mt-field>
-        <div class="floor-box">
+        <div class="floor-box" v-show="AssetNumber && SerialNumber">
           <div>
             <input type="text" :class="{'readonly': !isSubmit}" placeholder="楼栋名" v-model="building">
             <input type="text" :class="{'readonly': !isSubmit}" placeholder="楼层" v-model="floor">
@@ -33,21 +42,37 @@
           </div>
         </div>
         <!--<mt-cell class="require mint-field" title="产品型号" placeholder="请选择" @click.native="toSearchT('fault')" is-link>{{ProductModel}}</mt-cell>-->
-        <mt-cell class="require mint-field"
-                 title="面板型号"
-                 placeholder="请选择"
-                 @click.native="isSubmit&&toLov('KL_LOCK_MODEL')" is-link>{{KL_LOCK_MODEL}}</mt-cell>
-        <mt-cell class="require mint-field"
-                 title="锁体型号"
-                 placeholder="请选择"
-                 @click.native="isSubmit&&toLov('KL_LOCK_BODY_MODEL')" is-link>{{KL_LOCK_BODY_MODEL}}</mt-cell>
-        <mt-cell class="mint-field require"
-                 title="故障现象"
-                 placeholder="请选择"
-                 @click.native="isSubmit&&toLov('SR_ROOTCAUSE')" is-link>{{SR_ROOTCAUSE}}</mt-cell>
-        <mt-cell class="mint-field require"
+        <!--<mt-cell class="require mint-field"-->
+                 <!--title="面板型号"-->
+                 <!--placeholder="请选择"-->
+                 <!--@click.native="isSubmit&&toLov('KL_LOCK_MODEL')" is-link>{{KL_LOCK_MODEL}}</mt-cell>-->
+        <cus-field class="require"
+                   label="面板型号"
+                   :value="KL_LOCK_MODEL"
+                  @click.native="isSubmit&&toLov('KL_LOCK_MODEL')" is-link></cus-field>
+        <!--<mt-cell class="require mint-field"-->
+                 <!--title="锁体型号"-->
+                 <!--placeholder="请选择"-->
+                 <!--@click.native="isSubmit&&toLov('KL_LOCK_BODY_MODEL')" is-link>{{KL_LOCK_BODY_MODEL}}</mt-cell>-->
+        <cus-field class="require"
+                 label="锁体型号"
+                   :value="KL_LOCK_BODY_MODEL"
+                 @click.native="isSubmit&&toLov('KL_LOCK_BODY_MODEL')" is-link></cus-field>
+        <!--<mt-cell class="mint-field require"-->
+                 <!--title="故障现象"-->
+                 <!--placeholder="请选择"-->
+                 <!--@click.native="isSubmit&&toLov('SR_ROOTCAUSE')" is-link>{{SR_ROOTCAUSE}}</mt-cell>-->
+        <cus-field class="require"
+                 label="故障现象"
+                   :value="SR_ROOTCAUSE"
+                 @click.native="isSubmit&&toLov('SR_ROOTCAUSE')" is-link></cus-field>
+        <!--<mt-cell class="mint-field require"-->
+                 <!--:value="KL_SR_RESP"-->
+                 <!--@click.native="isSubmit&&toLov('KL_SR_RESP')" title="责任划分" is-link></mt-cell>-->
+        <cus-field class="require"
                  :value="KL_SR_RESP"
-                 @click.native="isSubmit&&toLov('KL_SR_RESP')" title="责任划分" is-link></mt-cell>
+                 @click.native="isSubmit&&toLov('KL_SR_RESP')"
+                   label="责任划分" is-link></cus-field>
         <mt-field class="block require"
                   :class="{readonly: !isSubmit}"
                   label="解决方法"
@@ -92,6 +117,7 @@
   import {mapState, mapActions, mapMutations} from 'vuex';
   import menuBox from '../../../public/components/cus-menu';
   import { Toast } from 'mint-ui';
+  import cusField from '../../../public/components/cus-field';
   let phoneReg = new RegExp('^[A-Za-z0-9]+$');
   let mapp = config.mapp;
   const delay = (function() {
@@ -365,7 +391,7 @@
             }, 300);
           }
         };
-        if (!me.AssetNumber) {
+        if (!me.AssetNumber || !me.SerialNumber) {
           delete form['Asset Number'];
           me.upDateService(form);
         } else {
@@ -384,7 +410,7 @@
         uploadAttach(serviceId);
       }
     },
-    components: {menuBox, Toast}
+    components: {menuBox, Toast, cusField}
   };
 </script>
 <style lang="scss">

@@ -17,17 +17,29 @@
                   placeholder="请输入联系人"
                   v-model="Contact_Name"
                   class="textRight require"></mt-field>
-        <mt-cell class="mint-field require"
-                 @click.native="getLov('CONTACT_TYPE')"
-                 title="联系人类型"
-                 :value="CONTACT_TYPE"
-                 placeholder="请选择" is-link></mt-cell>
-        <mt-cell title="省市区"
-                 class="mint-field require"
+        <!--<mt-cell class="mint-field require"-->
+                 <!--@click.native="getLov('CONTACT_TYPE')"-->
+                 <!--title="联系人类型"-->
+                 <!--:value="CONTACT_TYPE"-->
+                 <!--placeholder="请选择" is-link></mt-cell>-->
+
+        <!--<mt-cell title="省市区"-->
+                 <!--class="mint-field require"-->
+                 <!--@click.native="showLovFn('KL_PROVINCE')"-->
+                 <!--placeholder="请选择"-->
+                 <!--is-link-->
+                 <!--v-model="provinces"></mt-cell>-->
+        <cus-field class="require"
+                   @click.native="getLov('CONTACT_TYPE')"
+                   label="联系人类型"
+                   :value="CONTACT_TYPE"
+                   placeholder="请选择" is-link></cus-field>
+        <cus-field label="省市区"
+                 class="require"
                  @click.native="showLovFn('KL_PROVINCE')"
                  placeholder="请选择"
                  is-link
-                 v-model="provinces"></mt-cell>
+                 v-model="provinces"></cus-field>
         <mt-field class="block require"
                   id="addressText"
                   :attr="isEdit"
@@ -37,30 +49,48 @@
                   type="textarea" rows="2">
           <i class="xs-icon icon-edit" @click="editAddress" style="position: absolute;bottom: 1.8rem;right: 0.8rem;"></i>
         </mt-field>
-        <mt-cell class="mint-field require"
-                 title="服务类型"
-                 :value="SR_TYPE"
-                 @click.native="getLov('SR_TYPE','')"
-                 placeholder="请选择" is-link></mt-cell>
-        <mt-cell class="mint-field require"
-                 title="故障现象"
-                 :value="SR_AREA"
-                 @click.native="getLov('SR_AREA','')"
-                 placeholder="请选择" is-link></mt-cell>
-        <mt-cell class="mint-field margin-right"
-                 title="故障分级"
-                 :value="Priority"></mt-cell>
+        <!--<mt-cell class="mint-field require"-->
+                 <!--title="服务类型"-->
+                 <!--:value="SR_TYPE"-->
+                 <!--@click.native="getLov('SR_TYPE','')"-->
+                 <!--placeholder="请选择" is-link></mt-cell>-->
+        <!--<mt-cell class="mint-field require"-->
+                 <!--title="故障现象"-->
+                 <!--:value="SR_AREA"-->
+                 <!--@click.native="getLov('SR_AREA','')"-->
+                 <!--placeholder="请选择" is-link></mt-cell>-->
+        <!--<mt-cell class="mint-field margin-right"-->
+                 <!--title="故障分级"-->
+                 <!--:value="Priority"></mt-cell>-->
+        <cus-field class="require"
+                   label="服务类型"
+                   :value="SR_TYPE"
+                   @click.native="getLov('SR_TYPE','')"
+                   placeholder="请选择" is-link></cus-field>
+        <cus-field class=" require"
+                   label="故障现象"
+                   :value="SR_AREA"
+                   @click.native="getLov('SR_AREA','')"
+                   placeholder="请选择" is-link></cus-field>
+        <cus-field class=" margin-right"
+                   label="故障分级"
+                   :value="Priority"></cus-field>
         <mt-field class="block"
                   label="客服说明"
                   v-model="ProductFlag"
                   placeholder="详细描述或附加需求..."
                   type="textarea"
                   rows="2"></mt-field>
-        <mt-cell class="mint-field"
-                 title="客户预约时间"
+        <!--<mt-cell class="mint-field"-->
+                 <!--title="客户预约时间"-->
+                 <!--@click.native="open('picker1')"-->
+                 <!--:value="StartDate"-->
+                 <!--placeholder="请选择" is-link></mt-cell>-->
+        <cus-field class=""
+                 label="客户预约时间"
                  @click.native="open('picker1')"
                  :value="StartDate"
-                 placeholder="请选择" is-link></mt-cell>
+                 placeholder="请选择" is-link></cus-field>
         <div v-if="hideMore">
           <mt-field label="产品条形码"
                     placeholder="客户如提供请输入"
@@ -144,6 +174,7 @@
   import vp from 'public/plugin/validator';
   import menuBox1 from '../components/cus-menu';
   import menuBox from '../../../public/components/cus-menu';
+  import cusField from '../../../public/components/cus-field';
   Vue.use(vp);
   let today = new Date();
   //  import { MessageBox } from 'mint-ui';
@@ -279,7 +310,7 @@
           }
         }
         let key = (me.isClick) ? 'upDateContact' : 'addContact';
-        let KL_Cutoff_Date = me.form.KL_Cutoff_Date ? new Date(me.form.KL_Cutoff_Date).format('MM/dd/yyyy hh:mm:ss') : '';
+        let KL_Cutoff_Date = me.form.KL_Cutoff_Date ? KND.Util.format(me.form.KL_Cutoff_Date, 'MM/dd/yyyy hh:mm:ss') : '';
         let submitForm = {
           Contact_Id: me.Contact_Id,
           AddressId: me.AddressId,
@@ -483,7 +514,7 @@
         }, 500);
       }
     },
-    components: {menuBox, menuBox1, vp, Toast}
+    components: {menuBox, menuBox1, vp, Toast, cusField}
   };
 </script>
 <style lang="scss">

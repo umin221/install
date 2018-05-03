@@ -36,7 +36,7 @@
                 <div>产品型号：{{ServiceRequest['KL Product Model']}}</div>
                 <div>申请时间：{{toDate(ServiceRequest['Created'])}}</div>
                 <div>客户预约时间：{{toDate(ServiceRequest['KL Customer Appointment Time'])}}</div>
-                <div>实际预约时间：{{toDate(Action['Planned'])||''}}</div>
+                <div>实际预约时间：{{toDate(Action['Planned'])}}</div>
                 <div>地址：
                   {{ServiceRequest['KL Province']}}
                   {{ServiceRequest['KL City']}}
@@ -45,7 +45,9 @@
                 </div>
                 <div>用户故障说明：{{ServiceRequest['Sub-Area']}}</div>
                 <div>问题说明：
-                  <div>{{ServiceRequest['Description']||ServiceRequest['Complaint Description']}}</div>
+                  <p class="Description">
+                    {{ServiceRequest['Description']||ServiceRequest['Complaint Description']}}
+                  </p>
                   <!--Complaint Description-->
                 </div>
                 <attach ioName="KL Service Request Attachment IO" ref="attach"
@@ -240,7 +242,7 @@
         </mt-cell>
 
         <!--工单操作 记录故障-->
-        <mt-cell class="xs-icon icon-saver" title="记录故障">
+<!--        <mt-cell class="xs-icon icon-saver" title="记录故障">
           <div v-if="!ServiceRequest['KL Child Service Request']">
             <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause']"
                        @click="fillIn('ServiceRequest')">已填写</mt-button>
@@ -254,10 +256,10 @@
             <mt-button v-else
               @click.native="childCom(childService)">填写</mt-button>
           </div>
-        </mt-cell>
+        </mt-cell>-->
 
         <!--工单操作 完工确认-->
-        <mt-cell class="xs-icon icon-finish" title="完工确认">
+<!--        <mt-cell class="xs-icon icon-finish" title="完工确认">
           <div v-if="!ServiceRequest['KL Child Service Request']">
             <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause'] && !ServiceRequest['KL Parent SR Complete Flag']"
                        @click.native="clickPosition('failureRecord')">填写</mt-button>
@@ -272,10 +274,10 @@
                        @click.native="moreOrder">再记一单</mt-button>
             <mt-button v-else style="background: gainsboro">填写</mt-button>
           </div>
-        </mt-cell>
+        </mt-cell>-->
 
         <!--工单操作 结束-->
-        <mt-cell class="completeEnd xs-icon icon-ending" title="结束">
+<!--        <mt-cell class="completeEnd xs-icon icon-ending" title="结束">
           <div v-if="!ServiceRequest['KL Child Service Request']">
             <mt-button v-if="ServiceRequest['KL Parent SR Complete Flag']"
                        @click.native="clickPosition('end')">确认</mt-button>
@@ -286,39 +288,63 @@
                        @click.native="clickPosition('end')">确认</mt-button>
             <mt-button v-else style="background: gainsboro">确认</mt-button>
           </div>
-        </mt-cell>
+        </mt-cell>-->
 
-
-<!--        <mt-cell class="xs-icon icon-saver" title="记录故障">
-          <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause']"
-                     @click="fillIn('ServiceRequest')">已填写</mt-button>
-          <mt-button v-else-if="Action['Status INT']==='Arrived' && !ServiceRequest['SR Rootcause']"
-                     @click="clickPosition('comEnter')">填写</mt-button>
-          <mt-button v-else style="background: gainsboro">填写</mt-button>
-        </mt-cell>
-
-        <mt-cell class="xs-icon icon-finish" title="完工确认">
-          <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause'] && !ServiceRequest['KL Parent SR Complete Flag']"
-                     @click.native="clickPosition('failureRecord')">填写</mt-button>
-          <mt-button v-else-if="ServiceRequest['KL Parent SR Complete Flag']"
-                     @click.native="moreOrder">再记一单</mt-button>
-          <mt-button v-else style="background: gainsboro">填写</mt-button>
-        </mt-cell>
-
-        &lt;!&ndash;再记一单&ndash;&gt;
-        <mt-cell class="completeEnd xs-icon icon-ending" title="结束">
-          <mt-button @click.native="moreOrder" style="margin-right: 10px;margin-bottom: 4px;">再记一单</mt-button>
-          <div v-if="!ServiceRequest['KL Child Service Request']">
-            <mt-button v-if="ServiceRequest['KL Parent SR Complete Flag']"
-                        @click.native="clickPosition('end')">确认</mt-button>
-            <mt-button v-else style="background: gainsboro">确认</mt-button>
+        <div class="work-order">
+          <!--父服务请求标题-->
+          <sr-title :srNum="ServiceRequest['SR Number']"
+                    :name="ServiceRequest['Contact Last Name']"
+                    :iscomple="ServiceRequest['KL Parent SR Complete Flag'] === 'Y'"></sr-title>
+          <!--父服务请求-->
+          <div class="parent-work-order" v-if="!ServiceRequest['KL Parent SR Complete Flag']">
+            <!--父服务请求 记录故障-->
+            <mt-cell class="xs-icon icon-saver" title="记录故障">
+              <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause']"
+                         @click="fillIn('ServiceRequest')">已填写</mt-button>
+              <mt-button v-else-if="Action['Status INT']==='Arrived' && !ServiceRequest['SR Rootcause']"
+                         @click="clickPosition('comEnter')">填写</mt-button>
+              <mt-button v-else style="background: gainsboro">填写</mt-button>
+            </mt-cell>
+            <!--父服务请求 完工确认-->
+            <mt-cell class="xs-icon icon-finish" title="完工确认">
+              <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause'] && !ServiceRequest['KL Parent SR Complete Flag']"
+                         @click.native="clickPosition('failureRecord')">填写</mt-button>
+              <mt-button v-else style="background: gainsboro">填写</mt-button>
+            </mt-cell>
           </div>
-        <div v-else>
-          <mt-button v-if="childService['KL Status LIC'] === 'Completed'"
+
+          <!--子服务请求-->
+          <div class="child-work-order"
+                v-for="(item, index) in allChildService">
+            <!--子服务请求标题-->
+            <sr-title :srNum="item['SR Number']"
+                      :name="item['Contact Last Name']"
+                      :iscomple="item['KL Status LIC'] === 'Completed'"></sr-title>
+            <!--子服务请求 记录故障-->
+            <div v-if="item['KL Status LIC'] !== 'Completed'">
+              <mt-cell class="xs-icon icon-saver" title="记录故障">
+                <mt-button v-if="Action['Status INT']==='Arrived'&& item['SR Rootcause']"
+                           @click="fillIn(item.Id)">已填写</mt-button>
+                <mt-button v-else-if="Action['Status INT']==='Arrived' && !item['SR Rootcause']"
+                           @click="childCom(item)">填写</mt-button>
+                <mt-button v-else style="background: gainsboro">填写</mt-button>
+              </mt-cell>
+              <!--子服务请求 完工确认-->
+              <mt-cell class="xs-icon icon-finish" title="完工确认">
+                <mt-button v-if="Action['Status INT']==='Arrived'&& item['SR Rootcause']"
+                           @click.native="childRecord(item)">填写</mt-button>
+                <mt-button v-else style="background: gainsboro">填写</mt-button>
+              </mt-cell>
+            </div>
+          </div>
+        </div>
+        <!--再记一单&&结束工单-->
+        <mt-cell class="completeEnd">
+          <mt-button @click.native="moreOrder" style="margin-right: 10px;">再记一单</mt-button>
+          <mt-button v-if="Action['Status INT']==='Arrived'"
                       @click.native="clickPosition('end')">确认</mt-button>
           <mt-button v-else style="background: gainsboro">确认</mt-button>
-        </div>
-        </mt-cell>-->
+        </mt-cell>
         <div class="cancelHandle"
              style="color: red;"
              @click="popupVisible1 = !popupVisible1">取消</div>
@@ -333,6 +359,7 @@
   import cusCall from 'public/components/cus-call';
   import toggle from '../components/detail-toggle';
   import dateControl from '../components/dateControl';
+  import srTitle from '../components/srOrder-title';
   // name
   const NameSpace = 'detail';
   //
@@ -562,6 +589,7 @@
         let me = this;
         let parms = {};
         if (value1 === 'setOut') {
+          me.clickStatus = true;
           getAaaress(function(data) {
             parms = {
               'Object Id': me.ServiceRequest.Id,
@@ -578,7 +606,6 @@
                 me.clickStatus = false;
               }
             });
-            me.clickStatus = true;
           });
 //          parms = {
 //            'Object Id': me.ServiceRequest.Id,
@@ -589,6 +616,7 @@
 //          };
 //          me.setStatus({parms: parms, srNum: me.srNumber});
         } else if (value1 === 'reach') {
+          me.clickStatus2 = true;
           getAaaress(function(data) {
             console.log(data);
             parms = {
@@ -605,7 +633,6 @@
                 Toast(data);
                 me.clickStatus2 = false;
               }});
-            me.clickStatus2 = true;
           });
 //          parms = {
 //            'Object Id': me.ServiceRequest.Id,
@@ -750,7 +777,7 @@
         }
       }
     },
-    components: {close, dateControl, toggle, cusCall}
+    components: {close, dateControl, toggle, cusCall, srTitle}
   };
 </script>
 <style lang="scss">
@@ -855,6 +882,15 @@
                   .detail-call{
                     @include remove-decoration();
                   }
+                  .Description{
+                    width: 100%;
+                    height: auto;
+                    word-wrap: break-word;
+                    word-break: break-all;
+                    overflow: hidden;
+                    font-size: 0.75rem;
+                    color: gray;
+                  }
                 }
               }
             }
@@ -872,8 +908,8 @@
       }
     }
     .mint-popup-2{
-      width: 90%;
-      background-color: inherit !important;
+      width: 100%;
+      background-color: white !important;
       .mint-cell{
         padding: 0 0.5rem;
         line-height: 2.5rem;
@@ -885,23 +921,36 @@
             color: #ffffff;
             font-size: 0.75rem;
             width: 5rem;
-            border-radius: 0.6rem;
+            /*border-radius: 0.6rem;*/
           }
         }
       }
+      .work-order{
+        max-height: 12rem;
+        overflow: auto;
+
+        .parent-work-order{
+        }
+      }
       .setOut{
-        border-radius: 0.5rem 0.5rem 0 0;
+        /*border-radius: 0.5rem 0.5rem 0 0;*/
       }
       .completeEnd{
-        border-radius: 0 0 0.5rem 0.5rem;
+        .mint-cell-wrapper{
+          .mint-cell-value{
+            width: 100%;
+            justify-content: space-evenly;
+          }
+        }
+        /*border-radius: 0 0 0.5rem 0.5rem;*/
       }
       .cancelHandle{
         line-height: 2.5rem;
         text-align: center;
         border-top: 1px solid gainsboro;
         background-color: #ffffff;
-        margin: 0.5rem 0;
-        border-radius: 0.5rem;
+        /*margin: 0.5rem 0;*/
+        /*border-radius: 0.5rem;*/
       }
     }
   }

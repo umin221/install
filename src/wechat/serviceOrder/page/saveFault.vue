@@ -21,7 +21,7 @@
               </mt-switch>
               <div class="TranslatedLine">
                 <div>配件代码： {{item['KL Product Model No']}}</div>
-                <div>配件名称： {{item['KL Translated Name']}}</div>
+                <div style="width: 70%;">配件名称： {{item['KL Translated Name']}}</div>
                 <div class="toRed">￥{{item['List Price']}}</div>
                 <num-box :index="index" :type="switchStatus[index]" @input="productNumber"></num-box>
               </div>
