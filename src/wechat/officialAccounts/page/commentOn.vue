@@ -93,6 +93,8 @@
           value: parmer.srNum,
           callback: data => {
             if (data) {
+              me.box1 = data.Accessible;
+              me.box2 = data.Resolved;
               me.comments = data.Comments;
               me.changeStar(data['KL Knowledgable Stars'], 'technologyIs', data['Knowledgable']);
               me.changeStar(data['KL Overall Stars'], 'attitudeIs', data['Overall']);

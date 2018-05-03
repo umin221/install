@@ -13,7 +13,7 @@
         <mt-navbar v-model="active">
           <mt-tab-item v-for="tab in tabList" :id="tab.id" :key="tab.id">{{tab.name}}</mt-tab-item>
         </mt-navbar>
-        <mt-tab-container v-model="active">
+        <mt-tab-container v-model="active" style="margin-bottom: 40px;">
           <mt-tab-container-item id="tab-container1">
             <div class="mt-Detail-info">
               <div>产品条形码：{{serviceDetail['KL SN']}} <a href="javascript:void(0);" class="detail-call"></a></div>
@@ -81,7 +81,8 @@
         data: {
           'IOName': 'KL Service Request Attachment IO',
           'SearchSpec': {
-            'Service Request Attachment.Activity Id': me.$route.query.srId
+            'Service Request Attachment.Activity Id': me.$route.query.srId,
+            'Service Request Attachment.KL SR Att Type': 'LookupValue("KL_SR_ATT_TYPE", "Customer Upload File")'
           }
         },
         success: data => {
