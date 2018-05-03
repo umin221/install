@@ -228,6 +228,13 @@
       },
       // 订单行保存
       saveFn(callback) {
+        if (!KND.Util.isFunction(callback)) {
+          callback = data => {
+            if (data.items) {
+              Toast('保存成功');
+            }
+          };
+        };
         let me = this;
         let order = me.order;
         if (order.Id) {

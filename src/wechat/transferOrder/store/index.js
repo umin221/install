@@ -158,7 +158,7 @@ export default new Vuex.Store({
               'Project Id': id
             },
             success: data => {
-              commit('setOrders', data.items);
+              commit('setOrders', data.SiebelMessage['Order Entry - Orders']);
             }
           });
         },

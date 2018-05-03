@@ -82,13 +82,29 @@ let apiList = {
   },
 
   /**
-   * 通过交接单id获取订单列表
+   * 通过交接单id获取订单列表 <废弃>
+   * @param option
+   */
+  queryOrdersById1: option => {
+    return {
+      method: 'get',
+      url: 'data/Order Entry (Sales)/Order Entry - Orders/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=100&StartRowNum=0'
+    };
+  },
+
+  /**
+   * io方式 通过交接单id获取订单列表
    * @param option
    */
   queryOrdersById: option => {
     return {
-      method: 'get',
-      url: 'data/Order Entry (Sales)/Order Entry - Orders/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=100&StartRowNum=0'
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base Order Entry (Sales)',
+          'SearchSpec': KND.Util.condition(option.data, 'Order Entry - Orders')
+        }
+      }
     };
   },
 

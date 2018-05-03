@@ -4,6 +4,10 @@ header.mint-header {
   background-color: $theme-color;
   padding: 0 .2rem;
 
+  &.is-fixed {
+    z-index: 2;
+  }
+
   .mint-header-title {
     font-size: $font-size-large;
   }
