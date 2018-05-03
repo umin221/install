@@ -111,10 +111,13 @@
           },
           selected: me.selected
         });
-        // 查询本地缓存安装记录
-        me.queryLocalInstallRecord(result => {
-          installRecords = result;
-        });
+        // 离线app
+        if (config.offline) {
+          // 查询本地缓存安装记录
+          me.queryLocalInstallRecord(result => {
+            installRecords = result;
+          });
+        }
       }
     },
     data: () => {

@@ -25,7 +25,7 @@
         <mt-cell title="是否带天地" v-if="isVP || isLockBody">
           <mt-switch v-model="flag"></mt-switch>
         </mt-cell>
-        <cus-field label="数量" tag="数量"
+        <cus-field label="数量(cm)" tag="数量"
                    type="number"
                    v-valid.require.number
                    v-model="line['Quantity Requested']"></cus-field>
@@ -34,12 +34,12 @@
                    v-model="line['KL Door Material Quality']"
                    v-valid.require
                    is-link></cus-field>
-        <cus-field label="门厚" tag="门厚"
+        <cus-field label="门厚(cm)" tag="门厚"
                    v-if="isVP || isLockBody"
                    v-valid.require
                    v-model="line['KL Door Thickness']"></cus-field>
-        <cus-field label="锁芯中心距门内距" tag="锁芯中心距门内距"
-                   v-valid.require
+        <cus-field label="锁芯中心距门内距(cm)" type="number" tag="锁芯中心距门内距"
+                   v-valid.require.number
                    v-model="line['KL Lock Core Distance']"></cus-field>
         <cus-field label="锁舌导向板规格" tag="锁舌导向板规格"
                    @click.native="showLovFn('KL Guide Plate Specification')"

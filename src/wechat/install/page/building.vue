@@ -45,6 +45,8 @@
     name: NAMESPACE,
     created() {
       tempBuilding = JSON.stringify(this.building);
+      // 标记楼栋资产刷新
+      KND.Session.set('refreshAssets', true);
     },
     data: () => {
       return {
