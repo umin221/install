@@ -136,6 +136,7 @@
         me.generateOrder({
           data: {'Object Id': id},
           success: data => {
+            Toast('生成订单成功');
             me.queryOrdersById(id);
           }
         });

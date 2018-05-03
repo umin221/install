@@ -1,5 +1,5 @@
 'use strict';
-export default {
+Object.assign(config, {
   'host': 'https://www.kinlong.cn',
   'appNo': 'KINLONG2013'
-};
+});

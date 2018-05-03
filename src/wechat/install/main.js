@@ -15,10 +15,11 @@ import attach from 'public/components/cus-attach';
 import empty from 'public/components/cus-empty';
 import indicator from './components/indicator';
 import App from '../../App';
-import sto from './store';
 import './mapp'; // Status Mapp
-import './js/tools.cordova'; // cordova tools
+import './js/tools.cordova'; // Cordova Tools
+import './config'; // Load Local Config
 import vp from 'public/plugin/validator';
+import sto from './store';
 
 // use plugin
 Vue.use(vp);
@@ -36,9 +37,6 @@ Vue.config.productionTip = false;
 Vue.use(Vuex);
 
 let store = new Vuex.Store(sto);
-
-// 楼栋编辑不支持离线操作
-config.offline = true;
 
 /**
  * 导航守卫

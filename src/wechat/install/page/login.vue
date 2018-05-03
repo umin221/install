@@ -4,6 +4,7 @@
       <img src="../assets/bg_login.png" />
     </div>
 
+    <indicator></indicator>
     <div class="copyright">坚朗五金制品股份有限公司</div>
     <div class="login-form xs-icon"
       v-show="showLogin">

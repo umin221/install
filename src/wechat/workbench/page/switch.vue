@@ -85,6 +85,12 @@
           userID: '14080088', position: '客服专员', area: '产品安装支持组', name: '张沙沙'
         }, {
           userID: '17080258', position: '客服专员', area: '产品安装支持组', name: '许壁填'
+        }, {
+          userID: 'IM01', position: '产品安装主管', area: '00000010', name: 'IM01'
+        }, {
+          userID: 'IE01', position: '产品安装工程师', area: '00000001', name: 'IE01'
+        }, {
+          userID: 'DE01', position: '门厂技术工程师', area: '00000040', name: 'DE01'
         }]
       };
     },

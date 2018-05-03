@@ -440,7 +440,7 @@ class Cache {
           let building = [];
           let batch = result[i];
           let buildingNumber = parseInt(batch.building && batch.building.BuildingNumber, 10);
-          if (buildingNumber) building = batch.building.SiebelMessage.Building;
+          if (buildingNumber) building = util.toArray(batch.building.SiebelMessage.Building);
           // 获取楼栋下的资产
           for (let i = 0, len = building.length; i < len; i++) {
             tasks.push(new Promise((resolve, reject) => {
