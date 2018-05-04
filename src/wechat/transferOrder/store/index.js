@@ -374,6 +374,8 @@ export default new Vuex.Store({
          */
         update({state}, setting) {
           setting.key = 'updateOrder';
+          // 更新订单不操作订单行
+          delete setting.data['Order Entry - Line Items'];
           setting.success = setting.success || (data => {
             tools.success(data);
           });

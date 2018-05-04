@@ -39,7 +39,7 @@
                    v-valid.require
                    v-model="line['KL Door Thickness']"></cus-field>
         <cus-field label="锁芯中心距门内距(cm)" type="number" tag="锁芯中心距门内距"
-                   v-valid.require.number
+                   v-valid.require
                    v-model="line['KL Lock Core Distance']"></cus-field>
         <cus-field label="锁舌导向板规格" tag="锁舌导向板规格"
                    @click.native="showLovFn('KL Guide Plate Specification')"
