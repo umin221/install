@@ -300,7 +300,7 @@
             <!--父服务请求 记录故障-->
             <mt-cell class="xs-icon icon-saver" title="记录故障">
               <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause']"
-                         @click="fillIn('ServiceRequest')">已填写</mt-button>
+                         @click="fillIn(ServiceRequest.Id)">已填写</mt-button>
               <mt-button v-else-if="Action['Status INT']==='Arrived' && !ServiceRequest['SR Rootcause']"
                          @click="clickPosition('comEnter')">填写</mt-button>
               <mt-button v-else style="background: gainsboro">填写</mt-button>
@@ -342,7 +342,7 @@
         <mt-cell class="completeEnd">
           <mt-button @click.native="moreOrder" style="margin-right: 10px;">再记一单</mt-button>
           <mt-button v-if="Action['Status INT']==='Arrived'"
-                      @click.native="clickPosition('end')">确认</mt-button>
+                      @click.native="clickPosition('end')">结束</mt-button>
           <mt-button v-else style="background: gainsboro">确认</mt-button>
         </mt-cell>
         <div class="cancelHandle"
@@ -693,12 +693,12 @@
         };
         me.addChildService(params);
       },
-      fillIn(key) {
+      fillIn(id) {
         let me = this;
         me.$router.push({
           name: 'comEnter',
           query: {
-            id: me[key]['Id'],
+            id: id,
             type: 'save'
           }
         });
@@ -928,7 +928,7 @@
       .work-order{
         max-height: 12rem;
         overflow: auto;
-
+        min-height: 5rem;
         .parent-work-order{
         }
       }
@@ -939,7 +939,11 @@
         .mint-cell-wrapper{
           .mint-cell-value{
             width: 100%;
-            justify-content: space-evenly;
+            -webkit-justify-content: space-evenly;
+            justify-content:space-evenly;
+            -moz-box-pack: space-evenly;
+            -webkit--moz-box-pack:space-evenly;
+            box-pack:space-evenly;
           }
         }
         /*border-radius: 0 0 0.5rem 0.5rem;*/

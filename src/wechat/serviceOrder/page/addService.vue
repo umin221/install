@@ -301,7 +301,6 @@
             } else {
               if (!textCall.call(me, me.Contact_Phone)) {
                 Toast('联系电话格式错误请重新输入');
-                me.Contact_Phone = '';
                 return;
               } else {
                 textCall.call(me, me.Contact_Phone);
@@ -310,7 +309,6 @@
           }
         }
         let key = (me.isClick) ? 'upDateContact' : 'addContact';
-        let KL_Cutoff_Date = me.form.KL_Cutoff_Date ? KND.Util.format(me.form.KL_Cutoff_Date, 'MM/dd/yyyy hh:mm:ss') : '';
         let submitForm = {
           Contact_Id: me.Contact_Id,
           AddressId: me.AddressId,
@@ -330,7 +328,7 @@
           Start_Date: me.Start_Date,
           KL_SN: me.KL_SN,
           KL_Product_Model: me.form.KL_Product_Model,
-          KL_Cutoff_Date: KL_Cutoff_Date,
+          KL_Cutoff_Date: me.form.Cutoff_Date,
           Product_Warranty_Flag: me.form.Product_Warranty_Flag,
           key: key,
           Owner: me.loginMeg['Login Name'],

@@ -9,6 +9,7 @@
 </template>
 <style lang="scss">
   .work-order-title{
+    padding: 10px;
     position: relative;
     display: flex;
     .linear{

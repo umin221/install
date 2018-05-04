@@ -20,7 +20,7 @@
                 {{switchStatus[index]?"保内":"保外"}}
               </mt-switch>
               <div class="TranslatedLine">
-                <div>配件代码： {{item['KL Product Model No']}}</div>
+                <div>配件代码： {{item['Name']}}</div>
                 <div style="width: 70%;">配件名称： {{item['KL Translated Name']}}</div>
                 <div class="toRed">￥{{item['List Price']}}</div>
                 <num-box :index="index" :type="switchStatus[index]" @input="productNumber"></num-box>
@@ -197,16 +197,9 @@ export default {
     deleteFn(item) {
       this.deleteProduct(item);
     },
-    changeone() {
-      console.log(11);
-    },
     submit() {
       let me = this;
       if (!me.attach.list.length) {
-//        MessageBox({
-//          title: '提示',
-//          message: '请上传相关的维修单据'
-//        });
         Toast('请上传相关的维修单据');
         return;
       }

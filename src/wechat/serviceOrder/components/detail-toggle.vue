@@ -2,7 +2,7 @@
     <div>
       <div :class="{visible:visible, child: !type, colorN: isTitle,colorY: !isTitle}" class="cus-toggle-btn"
             @click="ck">{{type?title:''}}{{label1}}</div>
-      <div class="toggle-content" v-show="visible">
+      <div :class="{toggleContent:type}" v-show="visible">
         <slot></slot>
       </div>
     </div>
@@ -65,8 +65,8 @@
       transition: transform .4s ease;
     }
   }
-  .toggle-content{
-    /*padding-left: 20px;*/
+  .toggleContent{
+    padding-left: 20px;
   }
   .child{
     font-size: 0.7rem;

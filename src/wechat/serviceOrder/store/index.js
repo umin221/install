@@ -146,6 +146,7 @@ export default new Vuex.Store({
         form: {
           KL_Product_Model: '', // 产品类型
           KL_Cutoff_Date: '',  // 移交日期
+          Cutoff_Date: '',
           Product_Warranty_Flag: '' // 保修期限
         }
       },
@@ -208,10 +209,12 @@ export default new Vuex.Store({
           if (data) {
             state.form['KL_Product_Model'] = data[0]['KL Product Model'] || ''; // 产品类型
             state.form['KL_Cutoff_Date'] = KND.Util.format(data[0]['Install Date'], 'yyyy-MM-dd hh:mm:ss') || '';  // 移交日期
+            state.form['Cutoff_Date'] = data[0]['Install Date'] || '';
             state.form['Product_Warranty_Flag'] = data[0]['KL Warranty Flag'];  // 保修期限
           } else {
             state.form['KL_Product_Model'] = '';
             state.form['KL_Cutoff_Date'] = '';
+            state.form['Cutoff_Date'] = '';
             state.form['Product_Warranty_Flag'] = '';
           }
         }
@@ -1058,6 +1061,14 @@ export default new Vuex.Store({
           state.isBn = value;
         },
         selectProduct(state, select) {                    // 确认选择的配件
+          console.log(select);
+          if (state.returnSelect.length) {
+            for (let i = 0;i < state.returnSelect.length;i++) {
+              if (select.Id === state.returnSelect[i].Id) {
+                return;
+              }
+            }
+          }
           state.returnSelect.push(select);
         },
         initSelect(state) {
