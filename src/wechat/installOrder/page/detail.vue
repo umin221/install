@@ -51,8 +51,8 @@
       <div v-show="!isConfirming">
         <div class="content-lc" style="margin-top: 15px">
           <div class="stage_li">
-            <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 80px;">
-              <div class="mui-scroll" style="height: 80px;overflow: -webkit-paged-x;">
+            <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 80px;overflow: auto">
+              <div class="mui-scroll" style="height: 80px;" :style="{width: (74 * taskData.length) + 'px'}">
                 <a v-for="(item, index) in taskData" :key="index">
                   <div class="icon" @click="updateState(item, item['Calculated Activity Status'], item.Id, index)">
                     <span v-show="index!=0"  class="left line" :class="colorClass(item['Calculated Activity Status'], item)"></span>
