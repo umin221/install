@@ -54,7 +54,7 @@ export default new Vuex.Store({
         },
         // 根据用户职位，设置用户权限
         setAuthority(state, position) {
-          // 总部支持主管 & 总部支持专员，有管理权限，可查看未分配交接单。 暂未处理权限：主管无分配权限 详情页面单独判断职位
+          // 总部支持主管 & 总部支持专员，具备管理权限，可查看&分配未完成的交接单。
           let isManager = position === 'HQ Support Assistant' || position === 'HQ Support Manager';
           mapps = config.mapp[isManager ? 'manager' : 'employee'];
           state.isManager = isManager;
@@ -73,7 +73,6 @@ export default new Vuex.Store({
         getTransferOrder({state, commit, dispatch}, {data, more, callback, error}) {
           let status = data['Status'];
           let mapp = mapps[status] || {};
-          console.log(mapp);
           // 搜索时，没有状态
           let list = mapp['list'] || 'result';
 
@@ -279,7 +278,7 @@ export default new Vuex.Store({
       state: {
         result: [],
         select: {
-          'Last Name': '请选择'
+          'KL Employee Full Name': '请选择'
         }
       },
       mutations: {
@@ -289,7 +288,7 @@ export default new Vuex.Store({
         addEngineer(state, engineer) {
           state.result.push(...engineer);
         },
-        selEngineer(state, engineer) {
+        selEngineer(state, engineer = {'KL Employee Full Name': '请选择'}) {
           state.select = engineer;
         }
       },

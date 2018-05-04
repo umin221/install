@@ -27,12 +27,12 @@
         </toggle>
       </div>
 
-      <div v-show="isPending">
+      <div v-show="isManager && !isCompleted">
         <mt-cell title="销售方式"
                  :value="form['Sales Type']"></mt-cell>
         <mt-cell title="指派安装工程师"
                  v-show="!isTeam"
-                 :value="select['Last Name']"
+                 :value="select['KL Employee Full Name']"
                  @click.native="toEngineer"
                  is-link></mt-cell>
       </div>
@@ -59,8 +59,8 @@
 
     <!--buttons-->
     <button-group v-show="!isTeam && !isCompleted">
-      <mt-button v-show="isPending" @click.native="$router.push('reject')">驳回</mt-button>
-      <mt-button type="primary" v-show="isPending"  @click.native="assignFn">确认分配</mt-button>
+      <mt-button type="primary" v-show="isPending" @click.native="$router.push('reject')">驳回</mt-button>
+      <mt-button v-show="isManager && !isCompleted"  @click.native="assignFn">确认分配</mt-button>
       <mt-button v-show="!isPending && isEngineer" @click.native="generateOrderFn">生成安装订单</mt-button>
     </button-group>
   </div>
@@ -95,7 +95,7 @@
       };
     },
     computed: {
-      ...mapState('index', ['isTeam', 'isEngineer']),
+      ...mapState('index', ['isTeam', 'isEngineer', 'isManager']),
       ...mapState(NAMESPACE, ['form', 'orders']),
       ...mapState('engineer', ['select']),
       // 未交接交接单

@@ -144,6 +144,7 @@
     methods: {
       ...mapActions(NAMESPACE, ['getTransferOrder']),
       ...mapMutations(NAMESPACE, ['setTeam', 'setAuthority']),
+      ...mapMutations('engineer', ['selEngineer']),
       // 标题栏菜单选择回调方法
       menuFn(item) {
         this.setTeam(item.key === 'team');
@@ -178,6 +179,9 @@
       },
       // To detail or create
       toDetailFn(item) {
+        // 清空工程师选择结果
+        this.selEngineer();
+        // 跳转详情
         this.$router.push({
           name: 'detail',
           query: {
