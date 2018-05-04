@@ -44,6 +44,7 @@ export default new Vuex.Store({
         addTransferOrders(state, {TransferOrders, list}) {
           state[list].push(...TransferOrders);
         },
+        // 查看个人交接单&团队交接单
         setTeam(state, isTeam) {
           state.isTeam = isTeam;
           // 清空列表数据
@@ -77,8 +78,8 @@ export default new Vuex.Store({
           let list = mapp['list'] || 'result';
 
           data['Status'] = mapp['status'];
-          // ViewMode 随当前状态切换
-          data['ViewMode'] = state.isManager ? (status === '待处理' ? 'Sales Rep' : (state.isTeam ? 'Manager' : 'Personal')) : 'Personal';
+          // 查看个人交接单&团队交接单
+          data['ViewMode'] = state.isTeam ? 'Manager' : 'Personal';
 
           api.get({
             key: 'getTransferOrder',

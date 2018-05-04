@@ -51,10 +51,10 @@ import cache from '../lib/cache';
      */
     getUserInfo(callback) {
       util.log('获取用户信息 ' + userID);
-      let user = session.get('userInfo');
-      if (user) {
+      let user = util.parse(session.get('userInfo'));
+      if (user && user['Login Name'] === userID) {
         Indicator.close();
-        callback(util.parse(user));
+        callback(user);
       } else {
         this.ajax({
           method: 'get',
