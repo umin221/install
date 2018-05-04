@@ -98,7 +98,7 @@
               </li>
               <div class="butLi"
                    v-if="showTaskData(taskData)">
-                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(taskData)" class="batchClose"></span>
+                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Close Reject'" @click.stop="closeTask(taskData)" class="batchClose"></span>
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="addTask(taskData)" class="batchAdd"></span>
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="addTask(taskData)" class="batchAdd"></span>
                   <span style="width:60px;text-align: right;">{{taskData.Status}}</span>
@@ -115,7 +115,7 @@
                               class="itemTask"
                               :value="itemTask['KL Completed Install Amount']+'/'+itemTask['KL Install Amount Requested']">
                       <span v-if="showClose(itemTask)" @click.stop="closeTask(itemTask)" class="batchClose"></span>
-                      <span v-if="itemTask['Calculated Activity Status'] === 'In Progress' && itemTask['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
+                      <span v-if="(itemTask['Calculated Activity Status'] === 'In Progress' || itemTask['Calculated Activity Status'] === 'Close Reject') && itemTask['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
                     </mt-field>
                     <mt-field label="物业联系人"
                               class="itemTask"
@@ -231,7 +231,7 @@
        position: absolute;
        width: 45px;
        right: -15px;
-       top: -22px;
+       top: -14px;
        text-align: center;
     }
     .butLi .batchAdd::before{
@@ -682,7 +682,7 @@
         }
       },
       showClose(item) {
-        var val = item['Calculated Activity Status'] === 'In Progress' && item['KL Detail Type LIC'] !== 'Transfer Summary';
+        var val = (item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Close Reject') && item['KL Detail Type LIC'] !== 'Transfer Summary';
         console.dir(val);
         return val;
       },

@@ -154,53 +154,61 @@
               return;
             }
           }
-          api.get({ // 提交详细计划数据
-            key: 'setJourna',
-            method: 'PUT',
-            data: {
-              'Id': '0001', // 默认ID
-              'Activity Id': self.id,
-              'Completed Install Amount': lineObj['Completed Install Amount'], // 新增批次返回的ID
-              'Spot Check Amount': lineObj['Spot Check Amount'], // 新增批次返回的ID
-              'Qualified Amount': lineObj['Qualified Amount'], // 新增批次返回的ID
-              'Unqualified Solve Amount': lineObj['Unqualified Solve Amount'], // 新增批次返回的ID
-              'Unqualified Desc': lineObj['Unqualified Desc'], // 新增批次返回的ID
-              'Unqualified Solve Desc': lineObj['Unqualified Solve Desc'] // 新增批次返回的ID
-            },
-            success: function(data) {
-              if (!data.ERROR) {
-                lineObj['Completed Install Amount'] = '';
-                lineObj['Spot Check Amount'] = '';
-                lineObj['Qualified Amount'] = '';
-                lineObj['Unqualified Solve Amount'] = '';
-                lineObj['Unqualified Desc'] = '';
-                lineObj['Unqualified Solve Desc'] = '';
-                // 更新状态
-                var Status = '';
-                self.getLov({ // 取类型值
-                  data: {
-                    'Type': 'EVENT_STATUS',
-                    'Name': 'In Progress'
-                  },
-                  success: data => {
-                    Status = KND.Util.toArray(data.items)[0].Value;
-                    var parma = {};
-                    parma.Status = Status;
-                    parma.Id = self.id;
-                    api.get({ // 提交数据
-                      key: 'getUPData',
-                      method: 'PUT',
-                      data: parma,
-                      success: function(data) {
-                        if (!data.ERROR) {
-                          Toast('提交成功');
-                          KND.Util.back();
-                        }
+          MessageBox({
+            title: '提示',
+            message: ' 确认提交？一经提交不可修改',
+            showCancelButton: true
+          }).then(action => {
+            if (action === 'confirm') {
+              api.get({ // 提交详细计划数据
+                key: 'setJourna',
+                method: 'PUT',
+                data: {
+                  'Id': '0001', // 默认ID
+                  'Activity Id': self.id,
+                  'Completed Install Amount': lineObj['Completed Install Amount'], // 新增批次返回的ID
+                  'Spot Check Amount': lineObj['Spot Check Amount'], // 新增批次返回的ID
+                  'Qualified Amount': lineObj['Qualified Amount'], // 新增批次返回的ID
+                  'Unqualified Solve Amount': lineObj['Unqualified Solve Amount'], // 新增批次返回的ID
+                  'Unqualified Desc': lineObj['Unqualified Desc'], // 新增批次返回的ID
+                  'Unqualified Solve Desc': lineObj['Unqualified Solve Desc'] // 新增批次返回的ID
+                },
+                success: function(data) {
+                  if (!data.ERROR) {
+                    lineObj['Completed Install Amount'] = '';
+                    lineObj['Spot Check Amount'] = '';
+                    lineObj['Qualified Amount'] = '';
+                    lineObj['Unqualified Solve Amount'] = '';
+                    lineObj['Unqualified Desc'] = '';
+                    lineObj['Unqualified Solve Desc'] = '';
+                    // 更新状态
+                    var Status = '';
+                    self.getLov({ // 取类型值
+                      data: {
+                        'Type': 'EVENT_STATUS',
+                        'Name': 'In Progress'
+                      },
+                      success: data => {
+                        Status = KND.Util.toArray(data.items)[0].Value;
+                        var parma = {};
+                        parma.Status = Status;
+                        parma.Id = self.id;
+                        api.get({ // 提交数据
+                          key: 'getUPData',
+                          method: 'PUT',
+                          data: parma,
+                          success: function(data) {
+                            if (!data.ERROR) {
+                              Toast('提交成功');
+                              KND.Util.back();
+                            }
+                          }
+                        });
                       }
                     });
                   }
-                });
-              }
+                }
+              });
             }
           });
         });

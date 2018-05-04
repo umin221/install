@@ -169,60 +169,43 @@
           Toast('完成数量不能为空！');
           return;
         }
-        api.get({ // 提交详细计划数据
-          key: 'setJourna',
-          method: 'PUT',
-          data: {
-            'Id': '0002', // 默认ID
-            'Activity Id': self.id,
-            'Completed Install Amount': lineObj['Completed Install Amount']
-          },
-          success: function(data) {
-            if (!data.ERROR) {
-              // 提交图片
-              let uploadAttach = id => {
-                _upload.call(self, self.$refs.attach.getServerIds(), id);
-              };
-              if (self.attach.list.length > 0) {
-                uploadAttach(data.items.Id);
-              }
-              lineObj['Completed Install Amount'] = '';
-              lineObj.Description = '';
-              self.attach.list = [];
-              // 更新状态
-              if (self.item['KL Detail Type LIC'] === 'Transfer Batch') { // 零星真锁移交时更新完成
-                api.get({ // 更改按钮状态
-                  key: 'getUPStatus',
-                  method: 'POST',
-                  data: {
-                    'body': {
-                      'ProcessName': 'KL Install Task Complete Action Workflow',
-                      'RowId': self.id
-                    }
-                  },
-                  success: function(data) {
-                    if (!data.ERROR) {
-                      Toast('提交成功');
-                      KND.Util.back();
-                    }
+        MessageBox({
+          title: '提示',
+          message: ' 确认提交？一经提交不可修改',
+          showCancelButton: true
+        }).then(action => {
+          if (action === 'confirm') {
+            api.get({ // 提交详细计划数据
+              key: 'setJourna',
+              method: 'PUT',
+              data: {
+                'Id': '0002', // 默认ID
+                'Activity Id': self.id,
+                'Completed Install Amount': lineObj['Completed Install Amount']
+              },
+              success: function(data) {
+                if (!data.ERROR) {
+                  // 提交图片
+                  let uploadAttach = id => {
+                    _upload.call(self, self.$refs.attach.getServerIds(), id);
+                  };
+                  if (self.attach.list.length > 0) {
+                    uploadAttach(data.items.Id);
                   }
-                });
-              } else {
-                var Status = '';
-                self.getLov({ // 取类型值
-                  data: {
-                    'Type': 'EVENT_STATUS',
-                    'Name': 'In Progress'
-                  },
-                  success: data => {
-                    Status = KND.Util.toArray(data.items)[0].Value;
-                    var parma = {};
-                    parma.Status = Status;
-                    parma.Id = self.id;
-                    api.get({ // 提交数据
-                      key: 'getUPData',
-                      method: 'PUT',
-                      data: parma,
+                  lineObj['Completed Install Amount'] = '';
+                  lineObj.Description = '';
+                  self.attach.list = [];
+                  // 更新状态
+                  if (self.item['KL Detail Type LIC'] === 'Transfer Batch') { // 零星真锁移交时更新完成
+                    api.get({ // 更改按钮状态
+                      key: 'getUPStatus',
+                      method: 'POST',
+                      data: {
+                        'body': {
+                          'ProcessName': 'KL Install Task Complete Action Workflow',
+                          'RowId': self.id
+                        }
+                      },
                       success: function(data) {
                         if (!data.ERROR) {
                           Toast('提交成功');
@@ -230,10 +213,35 @@
                         }
                       }
                     });
+                  } else {
+                    var Status = '';
+                    self.getLov({ // 取类型值
+                      data: {
+                        'Type': 'EVENT_STATUS',
+                        'Name': 'In Progress'
+                      },
+                      success: data => {
+                        Status = KND.Util.toArray(data.items)[0].Value;
+                        var parma = {};
+                        parma.Status = Status;
+                        parma.Id = self.id;
+                        api.get({ // 提交数据
+                          key: 'getUPData',
+                          method: 'PUT',
+                          data: parma,
+                          success: function(data) {
+                            if (!data.ERROR) {
+                              Toast('提交成功');
+                              KND.Util.back();
+                            }
+                          }
+                        });
+                      }
+                    });
                   }
-                });
+                }
               }
-            }
+            });
           }
         });
       }
