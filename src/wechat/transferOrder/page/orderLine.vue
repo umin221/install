@@ -25,7 +25,7 @@
         <mt-cell title="是否带天地" v-if="isVP || isLockBody">
           <mt-switch v-model="flag"></mt-switch>
         </mt-cell>
-        <cus-field label="数量(cm)" tag="数量"
+        <cus-field :label="`数量(${line['KL Agreement Item Quantity']})`" tag="数量"
                    type="number"
                    v-valid.require.number
                    v-model="line['Quantity Requested']"></cus-field>

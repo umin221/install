@@ -196,10 +196,6 @@
     }
   }
 
-  .mint-content {
-    margin-bottom: 2.8rem;
-  }
-
   .install-order {
     .multiple {
       .mint-cell-title {
