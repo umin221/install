@@ -68,6 +68,7 @@
             data: {
               'body': {
                 'ProcessName': 'KL Install Task Complete Action Workflow',
+                'KL Close Reason': self.value,
                 'RowId': self.id
               }
             },

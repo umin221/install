@@ -99,8 +99,8 @@
               <div class="butLi"
                    v-if="showTaskData(taskData)">
                   <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Close Reject'" @click.stop="closeTask(taskData)" class="batchClose"></span>
-                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="addTask(taskData)" class="batchAdd"></span>
-                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="addTask(taskData)" class="batchAdd"></span>
+                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Close Reject'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="addTask(taskData)" class="batchAdd"></span>
+                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Close Reject'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="addTask(taskData)" class="batchAdd"></span>
                   <span style="width:60px;text-align: right;">{{taskData.Status}}</span>
               </div>
               <div class="content-div" style="margin-top: 20px"
