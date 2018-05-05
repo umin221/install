@@ -170,6 +170,24 @@ import cache from '../lib/cache';
     };
 
     /**
+     * 查看地图位置
+     * @param {String} option.latitude 纬度，浮点数，范围为90 ~ -90
+     * @param {String} option.longitude 经度，浮点数，范围为180 ~ -180。
+     * @param {String} option.name 位置名
+     * @param {String} option.address 地址详情说明
+     * @param {String} option.scale 地图缩放级别,整形值,范围从1~28。默认为16
+     */
+    openLocation(option) {
+      wx.openLocation(Object.assign({
+        latitude: 0,
+        longitude: 0,
+        name: '',
+        address: '',
+        scale: 1
+      }, option));
+    };
+
+    /**
      * 异步请求
      * @param {Object} option 必填 ajax setting
      */
@@ -282,6 +300,14 @@ import cache from '../lib/cache';
         speed: '',
         accuracy: ''
       });
+    };
+    // 扫一扫
+    native.scanQRCode = option => {
+      console.log('打开扫一扫');
+    };
+    // 查看地图
+    native.openLocation = option => {
+      console.log('打开企业微信查看地图');
     };
   };
 

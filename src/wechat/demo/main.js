@@ -14,13 +14,14 @@ import App from '../../App';
 import store from './store';
 import './filters'; // Vue Filter
 
+// 文档ready前追加js文件
+tools.preAppend('https://map.qq.com/api/js?v=2.exp');
 // For back
 Vue.component('fallback', fallback);
 // For Empty
 Vue.component('empty', empty);
 
 Vue.config.productionTip = false;
-
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

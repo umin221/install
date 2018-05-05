@@ -119,8 +119,14 @@
       },
       // 选择确认
       enter(values, type) {
+        let obj = values[0];
         this.showBox = false;
-        this.assets[type === 'panel' ? 'KL Product Model No Panel' : 'KL Product Model No Lock Body'] = values[0]['KL Product Model No Cal'];
+        if (type === 'panel') {
+          this.assets['Product Id'] = obj['KL Final Product Id'];
+          this.assets['KL Product Model No Panel'] = obj['KL Product Model No Cal'];
+        } else {
+          this.assets['KL Product Model No Lock Body'] = obj['KL Product Model No Cal'];
+        }
       },
       // 选择对话框
       showLovFn(type) {
