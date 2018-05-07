@@ -23,6 +23,7 @@ module.exports = {
   },
   globals: {
     'KND': true,
+    'FastClick': true,
     'config': true,
     'Indicator': true,
     'Toast': true,

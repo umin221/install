@@ -34,7 +34,7 @@
           </mt-cell-swipe>
           <div class="assets-div co-flex co-wp">
             <span v-for="(room, index) in floor"
-                  :class="{'active': room['Serial Number'], 'selected': room['selected']}"
+                  :class="{'active': room['Serial Number'], 'selected': room['selected'], 'modify': room['local']}"
                   :key="index"
                   @click="roomFn(room)">{{room['Street Address 4']}}</span>
           </div>
@@ -159,8 +159,12 @@
           let record = installRecords[room.Id];
           // 楼层
           let floor = parseInt(room['KL Floor Number'], 10);
-          // 扫码标记
-          if (record) room['Serial Number'] = KND.Util.parse(record.data)['Serial Number'];
+          // 增加本地扫码标记
+          if (record) {
+            let sn = KND.Util.parse(record.data)['Serial Number'];
+            room['Serial Number'] = sn;
+            if (record.state === 'pending') room['local'] = true;
+          }
           // 选择模式 不显示已移交房号，不显示未绑定条码房号
           if (me.isSelect) {
             if (room['Install Date'] || !room['Serial Number']) continue;
@@ -429,6 +433,12 @@
       &.selected {
         border-color: #fff;
         background-color: #2a64e8;
+        color: #fff;
+      }
+
+      &.modify {
+        border-color: #fff;
+        background-color: #efe24d;
         color: #fff;
       }
     }

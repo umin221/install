@@ -9,6 +9,7 @@ import Vuex from 'vuex';
 import router from './router';
 import 'public/js/base/main';
 import 'public/js/base/mint';
+import 'public/js/lib/fastclick';
 import './sass/ios.scss';
 import fallback from 'public/components/cus-fallback';
 import attach from 'public/components/cus-attach';
@@ -37,6 +38,8 @@ Vue.config.productionTip = false;
 Vue.use(Vuex);
 
 let store = new Vuex.Store(sto);
+
+FastClick.attach(document.body);
 
 /**
  * 导航守卫
