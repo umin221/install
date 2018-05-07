@@ -233,12 +233,11 @@ export default {
             key: 'addBuilding',
             data: data,
             success: data => {
-              tools.success(data, {
-                back: true,
-                successTips: '添加成功'
-              });
               // 标记楼栋资产刷新
               KND.Session.set('refreshAssets', true);
+              MessageBox.alert('当前添加楼栋信息不会立刻生效，请稍后查看添加结果', '添加成功').then(data => {
+                KND.Util.back();
+              });
             }
           });
         },

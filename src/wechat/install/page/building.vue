@@ -64,10 +64,11 @@
         let me = this;
         tools.valid.call(me, () => {
           let temp = KND.Util.parse(tempBuilding);
+          let building = me.building;
           let id = me.$route.query.id;
           let upArr = [];
-          for (let t in temp) {
-            if (temp[t].BuildingName !== me.building[t].BuildingName) upArr.push(me.building[t]);
+          for (let t in building) {
+            if (temp[t].BuildingName !== building[t].BuildingName) upArr.push(building[t]);
           }
           me.updateBuildingName({
             upArr: upArr,
