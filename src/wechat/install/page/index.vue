@@ -11,54 +11,32 @@
 
     <indicator></indicator>
     <div class="tips">下拉更新数据</div>
-    <div class="mint-content install">
+    <div class="wrapper install">
 
-      <!--<mt-navbar v-model="selected" v-if="isManager">-->
-        <!--<mt-tab-item id="pending"-->
-          <!--@click.native="!pending.length && loadBottomFn({status:'待处理', list:'pending'})">待处理</mt-tab-item>-->
-        <!--<mt-tab-item id="completed"-->
-          <!--@click.native="!completed.length && loadBottomFn({status:'已完成', list:'completed'})">已完成</mt-tab-item>-->
-      <!--</mt-navbar>-->
-      <!-- tab-container -->
-      <mt-tab-container v-model="selected">
-        <mt-tab-container-item id="pending">
-          <cus-loadmore ref="pending"
-                        @loadTop="loadTopFn"
-                        @loadBottom="loadBottomFn"
-                        :loadmore="false"
-                        :topStatus="topStatus">
-            <cus-cell class="multiple"
-                      @click.native="toDetailFn(item.Id)"
-                     :key="item.Id"
-                     :title="'订单批次:'+ item.Id"
-                     v-for="item in pending"
-                     is-link>
-              <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">创建日期: {{item['Created']}}</div>
-            </cus-cell>
-          </cus-loadmore>
-        </mt-tab-container-item>
+      <div class="mint-content">
 
-        <!--<mt-tab-container-item id="completed">-->
-          <!--<cus-loadmore ref="completed"-->
-                        <!--@loadTop="loadTopFn"-->
-                        <!--@loadBottom="loadBottomFn"-->
-                        <!--:param="{status: '已完成', list: 'completed'}"-->
-                        <!--:topStatus="topStatus">-->
-            <!--<cus-cell class="multiple"-->
-                      <!--@click.native="toDetailFn(item.Id)"-->
-                     <!--:key="item.Id"-->
-                     <!--:title="'订单批次:'+ item.Id"-->
-                     <!--v-for="item in completed"-->
-                     <!--is-link>-->
-              <!--<div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>-->
-              <!--<div class="mint-cell-sub-title" slot="title">创建日期: {{item['Created']}}</div>-->
-            <!--</cus-cell>-->
-          <!--</cus-loadmore>-->
-        <!--</mt-tab-container-item>-->
+        <mt-tab-container v-model="selected">
+          <mt-tab-container-item id="pending">
+            <cus-loadmore ref="pending"
+                          @loadTop="loadTopFn"
+                          @loadBottom="loadBottomFn"
+                          :loadmore="false"
+                          :topStatus="topStatus">
+              <cus-cell class="multiple"
+                        @click.native="toDetailFn(item.Id)"
+                        :key="item.Id"
+                        :title="'订单批次:'+ item.Id"
+                        v-for="item in pending"
+                        is-link>
+                <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
+                <div class="mint-cell-sub-title" slot="title">创建日期: {{item['Created']}}</div>
+              </cus-cell>
+            </cus-loadmore>
+          </mt-tab-container-item>
 
-      </mt-tab-container>
+        </mt-tab-container>
 
+      </div>
     </div>
 
   </div>
@@ -179,8 +157,22 @@
     z-index: 1;
   }
 
-  #app .mint-content.install {
-    top: 3.8rem;
+  #app {
+    > div {
+      overflow: hidden;
+
+      > .wrapper {
+        position: absolute;
+        width: 100%;
+        top: $header-height;
+        bottom: 0;
+        overflow: scroll;
+
+        &.install {
+          top: 4rem;
+        }
+      }
+    }
   }
 
   div.mint-indicator-wrapper {

@@ -38,7 +38,7 @@ class ValidatorPlug {
         for (var m in modifiers) {
           let ms = m.split('|');
           for (var i in ms) {
-            let flag = regexs[ms[i]].test(value);
+            let flag = regexs[ms[i]].test(value) || !value;
             if (flag) {
               KND.Util.removeClass(el, 'error');
               break;

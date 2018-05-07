@@ -6,11 +6,11 @@ $status-bar-height: 1rem;
       border-top: $status-bar-height solid $theme-color;
       height: 2.4rem + $status-bar-height;
 
-      &~.mint-content {
+      &~.wrapper {
         top: 2.4rem + $status-bar-height;
 
         &.install {
-          top: 3.8rem + $status-bar-height;
+          top: 4rem + $status-bar-height;
         }
       }
     }

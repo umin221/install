@@ -4,30 +4,33 @@
       <fallback slot="left"></fallback>
     </mt-header>
 
-    <div class="mint-content install-container">
-      <cus-field label="房号" tag="房号" class="disable"
-                 :value="assets['Street Address 4']"></cus-field>
-      <cus-field label="产品条形码" tag="产品条形码"
-                 v-model="assets['Serial Number']"
-                 v-valid.require>
-        <div class="xs-icon icon-scan" @click="toScanFn"></div>
-      </cus-field>
-      <cus-field label="锁体型号"  tag="锁体型号"
-                 :value="assets['KL Product Model No Lock Body']"
-                 v-valid.require
-                 @click.native="showLovFn('body')"
-                 is-link></cus-field>
+    <div class="wrapper">
 
-      <cus-field label="面板型号"  tag="面板型号"
-                 :value="assets['KL Product Model No Panel']"
-                 v-valid.require
-                 @click.native="showLovFn('panel')"
-                 is-link></cus-field>
+      <div class="mint-content install-container">
+        <cus-field label="房号" tag="房号" class="disable"
+                   :value="assets['Street Address 4']"></cus-field>
+        <cus-field label="产品条形码" tag="产品条形码"
+                   v-model="assets['Serial Number']"
+                   v-valid.require>
+          <div class="xs-icon icon-scan" @click="toScanFn"></div>
+        </cus-field>
+        <cus-field label="锁体型号"  tag="锁体型号"
+                   :value="assets['KL Product Model No Lock Body']"
+                   v-valid.require
+                   @click.native="showLovFn('body')"
+                   is-link></cus-field>
 
-      <button-group>
-        <mt-button class="single"
-                   @click.native="saveFn">保存</mt-button>
-      </button-group>
+        <cus-field label="面板型号"  tag="面板型号"
+                   :value="assets['KL Product Model No Panel']"
+                   v-valid.require
+                   @click.native="showLovFn('panel')"
+                   is-link></cus-field>
+
+        <button-group>
+          <mt-button class="single"
+                     @click.native="saveFn">保存</mt-button>
+        </button-group>
+      </div>
     </div>
 
     <!--popup-->

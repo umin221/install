@@ -12,39 +12,41 @@
       <mt-button v-show="!isEdit && !isSelect" @click.native="submitFn" slot="right" >提交</mt-button>
     </mt-header>
 
-    <div class="mint-content assets" :class="{read: !editable}">
-      <mt-navbar v-model="selected">
-        <mt-tab-item class="xs-icon"
-                     v-for="(item, index) in building"
-                     :key="index"
-                     :id="index"
-                     @click.native="getLayerFn(item.BuildingNum)">{{item.BuildingName}}</mt-tab-item>
-        <span class="edit-class xs-icon icon-edit" @click="editBuildingFn(layer[0])"></span>
-      </mt-navbar>
-      <div style="height: 5px"></div>
-      <lazy :time="450">
-        <div style="background: white;margin-bottom: 5px;"  v-for="(floor, index) in layers"  :key="index" >
-          <mt-cell-swipe :right="[{
-                          content: '删除',
-                          style: { background: 'red', color: '#fff' },
-                          handler: () => deleteBuildingFn(floor)
-                        }]">
-            <div slot="title" class="list-text"><span class="list-text-span">{{floor[0]['Street Address 3']}}</span></div>
-            <span class="edit-class xs-icon icon-edit" @click="editFloorFn(floor)"></span>
-          </mt-cell-swipe>
-          <div class="assets-div co-flex co-wp">
-            <span v-for="(room, index) in floor"
-                  :class="{'active': room['Serial Number'], 'selected': room['selected'], 'modify': room['local']}"
-                  :key="index"
-                  @click="roomFn(room)">{{room['Street Address 4']}}</span>
+    <div class="wrapper">
+      <div class="mint-content assets" :class="{read: !editable}">
+        <mt-navbar v-model="selected">
+          <mt-tab-item class="xs-icon"
+                       v-for="(item, index) in building"
+                       :key="index"
+                       :id="index"
+                       @click.native="getLayerFn(item.BuildingNum)">{{item.BuildingName}}</mt-tab-item>
+          <span class="edit-class xs-icon icon-edit" @click="editBuildingFn(layer[0])"></span>
+        </mt-navbar>
+        <div style="height: 5px"></div>
+        <lazy :time="450">
+          <div style="background: white;margin-bottom: 5px;"  v-for="(floor, index) in layers"  :key="index" >
+            <mt-cell-swipe :right="[{
+                            content: '删除',
+                            style: { background: 'red', color: '#fff' },
+                            handler: () => deleteBuildingFn(floor)
+                          }]">
+              <div slot="title" class="list-text"><span class="list-text-span">{{floor[0]['Street Address 3']}}</span></div>
+              <span class="edit-class xs-icon icon-edit" @click="editFloorFn(floor)"></span>
+            </mt-cell-swipe>
+            <div class="assets-div co-flex co-wp">
+              <span v-for="(room, index) in floor"
+                    :class="{'active': room['Serial Number'], 'selected': room['selected'], 'modify': room['local']}"
+                    :key="index"
+                    @click="roomFn(room)">{{room['Street Address 4']}}</span>
+            </div>
           </div>
-        </div>
-      </lazy>
+        </lazy>
 
-      <button-group>
-        <mt-button class="single"
-                   @click.native="addFloorFn">新增楼层</mt-button>
-      </button-group>
+        <button-group>
+          <mt-button class="single"
+                     @click.native="addFloorFn">新增楼层</mt-button>
+        </button-group>
+      </div>
     </div>
 
     <mt-actionsheet
