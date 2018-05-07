@@ -258,9 +258,11 @@ class DataHandle {
         Promise.all(tasks).then(result => {
           console.log(result);
           MessageBox.alert(`成功提交${result.length}条安装记录！`, '恭喜');
+          KND.Event.emit('submitHook');
           Indicator.process(false);
         }).catch(err => {
           console.error(err);
+          KND.Event.emit('submitHook');
           Indicator.process(false);
         });
       } else {

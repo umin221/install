@@ -84,6 +84,17 @@
   const NAMESPACE = 'assets';
   export default {
     name: NAMESPACE,
+    created() {
+      let me = this;
+      KND.Event.bind('submitHook', data => {
+        // 查询本地缓存安装记录
+        me.queryLocalInstallRecord(result => {
+          installRecords = result;
+          // 当前资产 更新标记
+          me.updateAssets++;
+        });
+      });
+    },
     activated() {
       let me = this;
       // 刷新当前页
@@ -133,7 +144,9 @@
         // 底部推出菜单操作
         sheetVisible: false,
         // 底部推出菜单操作对象
-        sheetObject: ''
+        sheetObject: '',
+        // 当前资产 更新标记
+        updateAssets: 0
       };
     },
     computed: {
@@ -150,6 +163,8 @@
       layers() {
         let me = this;
         let layer = me.layer;
+        // 当前资产 更新标记
+        me.updateAssets++;
         layers = {};
         maxFloor = 0;
         for (let i = 0, len = layer.length; i < len; i++) {
@@ -163,7 +178,7 @@
           if (record) {
             let sn = KND.Util.parse(record.data)['Serial Number'];
             room['Serial Number'] = sn;
-            if (record.state === 'pending') room['local'] = true;
+            room['local'] = record.state === 'pending';
           }
           // 选择模式 不显示已移交房号，不显示未绑定条码房号
           if (me.isSelect) {
