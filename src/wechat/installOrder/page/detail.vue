@@ -98,9 +98,9 @@
               </li>
               <div class="butLi"
                    v-if="showTaskData(taskData)">
-                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Close Reject'" @click.stop="closeTask(taskData)" class="batchClose"></span>
-                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Close Reject'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="addTask(taskData)" class="batchAdd"></span>
-                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Close Reject'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="addTask(taskData)" class="batchAdd"></span>
+                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Approved' || taskData['Calculated Activity Status'] === 'Close Reject'" @click.stop="closeTask(taskData)" class="batchClose"></span>
+                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Approved' || taskData['Calculated Activity Status'] === 'Close Reject'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="addTask(taskData)" class="batchAdd"></span>
+                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Approved' || taskData['Calculated Activity Status'] === 'Close Reject'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="addTask(taskData)" class="batchAdd"></span>
                   <span style="width:60px;text-align: right;">{{taskData.Status}}</span>
               </div>
               <div class="content-div" style="margin-top: 20px"
@@ -1039,7 +1039,7 @@
           /* if ((item['KL Detail Type LIC'] === 'Transfer Summary') && self.detailData['KL Delivery Sales Type'] !== '工程') {
             return;
           }*/
-          if (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Rejected') { // 汇总节点未开始、已驳回的时候 开启节点
+          if (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Rejected' || item['Calculated Activity Status'] === 'Declined') { // 汇总节点未开始、已驳回、审批驳回的时候 开启节点
             /*
             * 批次汇总开启节点
             * */
@@ -1056,7 +1056,8 @@
                     method: 'POST',
                     data: {
                       'body': {
-                        'ProcessName': 'KL Install Task Start Action Workflow',
+                        // 'ProcessName': 'KL Install Task Start Action Workflow',
+                        'ProcessName': 'KL Install Task Submit For Approval Workflow',
                         'RowId': item.Id
                       }
 
@@ -1098,7 +1099,7 @@
         }
           // 跳转批次详情、编辑
         //  && (item['Calculated Activity Status'] === 'Draft' || item['Calculated Activity Status'] === 'Rejected')
-        if (userInfo['Id'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'Declined') && fItem['Calculated Activity Status'] === 'In Progress') { // 汇总节点是否开启  未开始=Not Started、草稿=Planning(设定计划)、审批驳回=Declined 要编辑提交 并且有权限的人才可做此操作
+        if (userInfo['Id'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'Declined') && (fItem['Calculated Activity Status'] === 'In Progress' || fItem['Calculated Activity Status'] === 'Close Reject' || fItem['Calculated Activity Status'] === 'Approved')) { // 汇总节点是否开启  未开始=Not Started、草稿=Planning(设定计划)、审批驳回=Declined 要编辑提交 并且有权限的人才可做此操作
           this.clear();
           var itemTask = KND.Util.toArray(fItem['KL Installation Task'])[0];
           this.getTaskType(itemTask);

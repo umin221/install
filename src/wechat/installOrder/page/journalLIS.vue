@@ -190,6 +190,7 @@
           name: 'updateLIS',
           query: {
             type: 'add',
+            amount: item['Completed Install Amount'],
             anName: item['Contact Login Name'],
             id: item.Id
           }

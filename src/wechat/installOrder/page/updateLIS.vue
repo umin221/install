@@ -9,10 +9,8 @@
                    v-model="anName"></cus-field>
       </div>
       <div :class="{'readonly':read}">
-        <cus-field label="完成数量" tag="完成数量"
-                   type="number"
-                   v-valid.require
-                   v-model="line['Completed Install Amount']"></cus-field>
+        <cus-field label="完成数量"
+                   v-model="amount"></cus-field>
         <cus-field label="抽查数量"
                    type="number"
                    v-model="line['Spot Check Amount']"></cus-field>
@@ -68,11 +66,13 @@
       let param = this.$route.query;
       this.id = this.itemTask.Id;
       this.anName = param.anName;
+      this.amount = param.amount;
     },
     data: () => {
       return {
         id: '',
         anName: '',
+        amount: '',
         type: 'add', // add 新增 / edit 编辑 / read 只读
         titleVal: '真锁安装抽样',
         line: {},
@@ -112,7 +112,7 @@
         tools.valid.call(this, () => {
           var lineObj = self.line;
           if (lineObj['Spot Check Amount']) { // 抽查数量有值 判断不能大于完成数量
-            if (parseInt(lineObj['Spot Check Amount'], 10) > parseInt(lineObj['Completed Install Amount'], 10)) {
+            if (parseInt(lineObj['Spot Check Amount'], 10) > parseInt(self.amount, 10)) {
               Toast('抽查数量不能大于完成数量！');
               return;
             }
@@ -142,7 +142,7 @@
                 data: {
                   'Id': self.itemTask.Id, // 默认ID
                   'Activity Id': self.itemTask['Activity UID'],
-                  'Completed Install Amount': lineObj['Completed Install Amount'], // 新增批次返回的ID
+                  'Completed Install Amount': self.amount, // 新增批次返回的ID
                   'Spot Check Amount': lineObj['Spot Check Amount'], // 新增批次返回的ID
                   'Qualified Amount': lineObj['Qualified Amount'], // 新增批次返回的ID
                   'Unqualified Solve Amount': lineObj['Unqualified Solve Amount'], // 新增批次返回的ID
@@ -151,7 +151,6 @@
                 },
                 success: function(data) {
                   if (!data.ERROR) {
-                    lineObj['Completed Install Amount'] = '';
                     lineObj['Spot Check Amount'] = '';
                     lineObj['Qualified Amount'] = '';
                     lineObj['Unqualified Solve Amount'] = '';
