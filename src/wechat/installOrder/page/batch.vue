@@ -25,7 +25,7 @@
                    v-model="batchName"></cus-field>
         <cus-field label="计划数量" tag="计划数量"
                    placeholder="请输入"
-                   v-valid.require
+                   v-valid.require.number
                    type="number"
                    v-model="batchNum"></cus-field>
       </div>

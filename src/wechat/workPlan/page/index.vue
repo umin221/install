@@ -41,9 +41,9 @@
         </ul>
       </div>
       <div class="planList">
-        <mt-cell-swipe  v-for="(item, index) in currentDayData" :key="index"
+        <mt-cell-swipe  v-for="(item, index) in currentDayData" :key="index" ref="body"
           @click.native="toDetail(index)"
-          class="planListItem"
+          class="planListItem lock-line-cell enable"
           :title="item.Type"
           :label="item['KL Detail Type']"
           :right="operation(item, item.Id, index)">
@@ -52,7 +52,7 @@
             <p class="text">{{item.Status}}</p>
           </div>
         </mt-cell-swipe>
-        
+
       </div>
       </div>
       <mt-datetime-picker

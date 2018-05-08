@@ -8,8 +8,9 @@
     </mt-header>
     <div class="mint-content zsBatch">
       <div :class="{'readonly':read}">
-        <cus-field :label="nextText"
+        <cus-field :label="nextText" :tag="nextText"
                    type="number"
+                   v-valid.number
                    :class="heartVisible"
                    v-model="line['Completed Install Amount']"></cus-field>
         <cus-field label="备注说明"
@@ -166,7 +167,7 @@
         var self = this;
         var lineObj = self.line;
         if (!lineObj['Completed Install Amount']) {
-          Toast('完成数量不能为空！');
+          Toast('数量不能为空！');
           return;
         }
         MessageBox({

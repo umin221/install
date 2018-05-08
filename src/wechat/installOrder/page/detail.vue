@@ -9,12 +9,23 @@
       </mt-button>
     </mt-header>
     <div class="mint-content mint-content-datail" :data-len="len">
-      <div class="readonly">
-        <mt-field label="订单编码" :value="detailData['Order Number']"></mt-field>
-        <mt-field label="项目名称" :value="detailData['KL Agreement Opportunity Name']"></mt-field>
-        <mt-field label="销售类型" :value="detailData['KL Delivery Sales Type']"></mt-field>
-        <mt-field label="安装数量" :value="detailData['KL Install Amount'] || 0"></mt-field>
-        <mt-field label="地址" :value="detailData['KL Delivery Country'] + detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery County'] + detailData['KL Delivery Address']"></mt-field>
+      <div class="disable">
+        <cus-field
+          label="订单编码"
+          :value="detailData['Order Number']"></cus-field>
+        <cus-field
+          label="项目名称"
+          :value="detailData['KL Agreement Opportunity Name']"></cus-field>
+        <cus-field
+          label="销售类型"
+          :value="detailData['KL Delivery Sales Type']"></cus-field>
+        <cus-field
+          label="安装数量"
+          :value="detailData['KL Install Amount'] || 0"></cus-field>
+        <cus-field
+          label="地址"
+          :value="detailData['KL Delivery Country'] + detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery County'] + detailData['KL Delivery Address']"
+          is-link></cus-field>
         <div slot="title" class="mint-content-div enable">
           <div class="mint-content-xt" @click="punchClock">打卡</div>
           <div class="mint-content-xt" @click="butXttd">协同团队</div>
@@ -92,21 +103,23 @@
                 taskData['KL Detail Type LIC'] === 'Substitution Lock Trans Return'">
                 <span>{{taskData['Planned Completion']}}</span>
                 <span>{{taskData.Status}}</span>
+                <span v-if="taskData['KL Detail Type LIC'] === 'Ship From Door Factory' && taskData['Calculated Activity Status'] != 'Not Started'">{{taskData['KL Shipped Time']}}</span>
               </li>
               <li style="margin-right: 8px" v-if="taskData['KL Detail Type LIC'] === 'Ship From Door Factory' && taskData['Calculated Activity Status'] === 'Not Started'">
                 <span class="mt-switch"><mt-switch v-model="shipmentVal"  @click.native.stop="shipment(taskData)"></mt-switch></span>
               </li>
               <div class="butLi"
                    v-if="showTaskData(taskData)">
-                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Approved' || taskData['Calculated Activity Status'] === 'Close Reject'" @click.stop="closeTask(taskData)" class="batchClose"></span>
-                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Approved' || taskData['Calculated Activity Status'] === 'Close Reject'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="addTask(taskData)" class="batchAdd"></span>
-                  <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Approved' || taskData['Calculated Activity Status'] === 'Close Reject'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="addTask(taskData)" class="batchAdd"></span>
-                  <span style="width:60px;text-align: right;">{{taskData.Status}}</span>
+                <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Close Reject'" @click.stop="closeTask(taskData)" class="batchClose"></span>
+                <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Close Reject'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="addTask(taskData)" class="batchAdd"></span>
+                <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Close Reject'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="addTask(taskData)" class="batchAdd"></span>
+                <span v-show="taskData['Calculated Activity Status'] === 'Approved'" @click.stop="batchSta(taskData)" class="batchSta">开始处理</span>
+                <span style="width:60px;text-align: right;">{{taskData.Status}}</span>
               </div>
               <div class="content-div" style="margin-top: 20px"
-                v-if="showTaskData(taskData)"
-                 v-for="(itemTask, index) in upList(taskData['KL Installation Task'])" :key="index"
-                 @click.stop="updateDoor(itemTask,taskData)">
+                   v-if="showTaskData(taskData)"
+                   v-for="(itemTask, index) in upList(taskData['KL Installation Task'])" :key="index"
+                   @click.stop="updateDoor(itemTask,taskData)">
                 <mt-cell-swipe is-link>
                   <div class="readonly enable">
                     <mt-field label="批次" class="itemTaskId" :value="itemTask.Id"  @click.native.stop="taskClick(itemTask,taskData)"></mt-field>
@@ -125,12 +138,12 @@
                               class="itemTask"
                               v-if="itemTask['KL Property Contact Id']"
                               :value="itemTask['KL Property Contact Cellular Phone']+'/'+itemTask['KL Property Contact Work Phone']"></mt-field>
-                   <!-- <mt-field label="合格/完成数量"
-                      v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
-                      taskData['KL Detail Type LIC'] === 'Check Before Trans Summary'"
-                      :value="itemTask['KL Qualified Amount']+'/'+itemTask['KL Completed Install Amount']">
-                      <span v-if="itemTask['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
-                    </mt-field>-->
+                    <!-- <mt-field label="合格/完成数量"
+                       v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
+                       taskData['KL Detail Type LIC'] === 'Check Before Trans Summary'"
+                       :value="itemTask['KL Qualified Amount']+'/'+itemTask['KL Completed Install Amount']">
+                       <span v-if="itemTask['Calculated Activity Status'] === 'In Progress'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
+                     </mt-field>-->
                     <mt-field label="时间" :value="new Date(itemTask['Created']).format('yyyy-MM-dd')"></mt-field>
                     <mt-field label="状态" :value="itemTask.Status"></mt-field>
                   </div>
@@ -227,12 +240,12 @@
       content: '\A152';
       color: red;
     }
-     .itemTask .batchClose {
-       position: absolute;
-       width: 45px;
-       right: -15px;
-       top: -14px;
-       text-align: center;
+    .itemTask .batchClose {
+      position: absolute;
+      width: 45px;
+      right: -15px;
+      top: -14px;
+      text-align: center;
     }
     .butLi .batchAdd::before{
       font-family: "kinlong-icon" !important;
@@ -240,6 +253,13 @@
       font-size: 1rem;
       content: '\A153';
       color: #356DFC;
+    }
+    .butLi .batchSta {
+      width: 60px!important;
+      text-align: center!important;
+      padding: 0px 10px;
+      border-radius: 10px;
+      border: 1px solid #0772c1;
     }
     .crm-zyList .content {
       position: relative;
@@ -478,7 +498,11 @@
   import api from '../api/api';
   import { MessageBox, Toast } from 'mint-ui';
   import toggle from 'public/components/cus-toggle';
+  import Vue from 'vue';
+  import vp from 'public/plugin/validator';
+  import cusField from 'public/components/cus-field';
   import lockLine from '../../transferOrder/components/cusLockLine';
+  Vue.use(vp);
   let userInfo = {};
   let geocoder = '';
   // mapp
@@ -487,7 +511,7 @@
   const NameSpace = 'detail';
   export default {
     name: 'detail',
-    components: {toggle, lockLine},
+    components: {toggle, lockLine, cusField},
     created() {
       let me = this;
       me.id = me.$route.query.id;
@@ -835,10 +859,10 @@
                   },
                   success: function(data) {
                     self.detail();
-                    Toast({
-                      message: '已发起安装替代锁申请，销售审批通过后进行安装。',
+                    /* Toast({
+                      message: '',
                       duration: 5000
-                    });
+                    });*/
                   }
                 });
               }
@@ -1032,7 +1056,7 @@
           * Check Before Trans Summary 移交前自检汇总
           * Transfer Summary 移交汇总
           * */
-         // self.$router.push('batch');
+          // self.$router.push('batch');
           /*
           *零星工程的移交汇总 不走批次
           * */
@@ -1088,6 +1112,36 @@
           }
         }
       },
+      batchSta(item) {
+        var self = this;
+        if (userInfo['Id'] === item['Primary Owner Id']) {
+          MessageBox({
+            title: '提示',
+            message: ' 是否开始处理?',
+            showCancelButton: true
+          }).then(action => {
+            if (action === 'confirm') {
+              console.log('abc');
+              api.get({
+                key: 'getTaskAdd',
+                method: 'POST',
+                data: {
+                  'body': {
+                    'ProcessName': 'KL Install Task Start Action Workflow',
+                    'RowId': item.Id
+                  }
+
+                },
+                success: function(data) {
+                  self.detail();
+                }
+              });
+            }
+          });
+        } else {
+          Toast('不是任务责任人不可操作！');
+        }
+      },
       taskClick(item, fItem) { // 子任务数据集事件
         var self = this;
         /**
@@ -1097,9 +1151,9 @@
         if ((fItem['KL Detail Type LIC'] === 'Transfer Summary') && self.detailData['KL Delivery Sales Type'] !== '工程') {
           return;
         }
-          // 跳转批次详情、编辑
+        // 跳转批次详情、编辑
         //  && (item['Calculated Activity Status'] === 'Draft' || item['Calculated Activity Status'] === 'Rejected')
-        if (userInfo['Id'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'Declined') && (fItem['Calculated Activity Status'] === 'In Progress' || fItem['Calculated Activity Status'] === 'Close Reject' || fItem['Calculated Activity Status'] === 'Approved')) { // 汇总节点是否开启  未开始=Not Started、草稿=Planning(设定计划)、审批驳回=Declined 要编辑提交 并且有权限的人才可做此操作
+        if (userInfo['Id'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'Declined') && (fItem['Calculated Activity Status'] === 'In Progress' || fItem['Calculated Activity Status'] === 'Close Reject')) { // 汇总节点是否开启  未开始=Not Started、草稿=Planning(设定计划)、审批驳回=Declined 要编辑提交 并且有权限的人才可做此操作
           this.clear();
           var itemTask = KND.Util.toArray(fItem['KL Installation Task'])[0];
           this.getTaskType(itemTask);

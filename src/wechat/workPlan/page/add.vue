@@ -6,8 +6,8 @@
 <template>
   <div id="add-plan">
       <mt-header fixed :title="headTitle">
-      <fallback slot="left"></fallback>
-    </mt-header>
+        <fallback slot="left" @click.native="back"></fallback>
+      </mt-header>
       <div class="mint-content add-plan">
         <mt-cell title="工作类型" class="borderBottom">
           <span>日常活动</span>
@@ -20,8 +20,8 @@
         </mt-cell>
          <mt-cell title="开始时间" class="borderBottom" is-link  @click.native='openStartTime'><span>{{initDate()}} {{startPickerValue}}</span></mt-cell>
          <mt-cell title="结束时间" is-link @click.native='openEndTime'><span>{{initDate()}} {{endPickerValue}}</span></mt-cell>
-              <button-group class="singBtn" v-if='saveBtn'>
-        <mt-button class="submitBtn" type="primary" 
+        <button-group v-if='saveBtn'>
+        <mt-button class="single"
                    @click.native="handleSave">保存</mt-button>
         </button-group>
       </div>
@@ -38,9 +38,9 @@
       </mt-datetime-picker>
       <!--工作描述-->
       <mt-popup position="bottom" v-model="showWorkDescript">
-         <menuBox  
+         <menuBox
           @my-enter="workDescriptEnter"
-          @my-cancel="workDescriptCancel" 
+          @my-cancel="workDescriptCancel"
           vk='Value' :type='"workDescript"'  :slots="workDescript"></menuBox>
       </mt-popup>
 
@@ -111,6 +111,18 @@
         'setStartHour'
       ]),
       ...mapActions('app', ['getLov']),
+      // 返回
+      back() {
+        console.log('');
+        this.$router.push({
+          path: '/',
+          query: {
+            year: this.$route.query.year,
+            month: this.$route.query.month,
+            day: this.$route.query.day
+          }
+        });
+      },
       // 切换全天
       changeSwitch(val) {
         if (event.target.checked) {
@@ -223,7 +235,7 @@
               MessageBox('提示', '新建计划成功').then(action => {
                 this.setStartPicker('');
                 this.setEndPicker('00');
-                self.$router.back();
+                self.back();
               });
             }
           }

@@ -26,7 +26,7 @@
         <cus-field label="安装数量" tag="安装数量"
                    placeholder="请输入"
                    type="number"
-                   v-valid.require
+                   v-valid.require.number
                    v-model="batchNum"></cus-field>
         <mt-cell title="是否委外" :class="heartVisible">
           <mt-switch v-model="box1"></mt-switch>

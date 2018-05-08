@@ -5,11 +5,14 @@
 */
 <template>
   <div id="add-plan">
-      <mt-header fixed :title="headTitle">
+    <mt-header fixed :title="headTitle">
+      <fallback slot="left" @click.native="back"></fallback>
+    </mt-header>
+      <!--<mt-header fixed :title="headTitle">
         <div class="cus-fallback" slot="left">
            <mt-button @click="back"><i class="xs-icon icon-back"></i></mt-button>
 	      </div>
-    </mt-header>
+    </mt-header>-->
       <div class="mint-content add-plan">
         <mt-cell title="工作类型" class="borderBottom">
           <span>日常活动</span>
@@ -21,8 +24,8 @@
          <mt-cell title="计划结束时间" class="borderBottom"><span >{{initDateEnd()}}</span></mt-cell>
          <mt-cell title="实际开始时间" is-link class="borderBottom" @click.native='openStartTime'><span>{{initDate()}} {{ACstartPickerValue}}</span></mt-cell>
          <mt-cell title="实际结束时间" is-link @click.native='openEndTime'><span>{{initDate()}} {{ACendPickerValue}}</span></mt-cell>
-              <button-group class="singBtn">
-        <mt-button class="submitBtn" type="primary" v-if='saveBtn'
+              <button-group>
+        <mt-button class="submitBtn" v-if='saveBtn'
                    @click.native="handleSave">更新</mt-button>
         </button-group>
       </div>
