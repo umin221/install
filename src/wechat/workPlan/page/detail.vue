@@ -6,7 +6,7 @@
 <template>
   <div id="add-plan">
     <mt-header fixed :title="headTitle">
-      <fallback slot="left" @click.native="back"></fallback>
+      <fallback slot="left"></fallback>
     </mt-header>
       <!--<mt-header fixed :title="headTitle">
         <div class="cus-fallback" slot="left">
@@ -67,14 +67,18 @@
     },
     created() {
       // 判断是否显示更新按钮
-      var yaer = this.$route.query.year;
-      var month = this.$route.query.month;
-      var day = this.$route.query.day;
+      var yaer = this.newYear;
+      var month = this.newMonth;
+      var day = this.newDay;
       if (month < 10) month = `0${month}`;
       if (day < 10) day = `0${day}`;
-      var time = new Date(yaer + '-' + month + '-' + day).getTime();
+      var time = new Date(yaer + '/' + month + '/' + day).getTime();
+      console.log('=1==' + time);
       var date = new Date();
-      var nowTime = new Date(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()).getTime();
+      var dayeNew = date.getFullYear() + '/' + (date.getMonth() + 1) + '/' + date.getDate();
+      console.log('=1==' + dayeNew);
+      var nowTime = new Date(dayeNew).getTime();
+      console.log('=2==' + nowTime);
       var today = new Date().getHours();
       this.startPickerHour = today;
       console.log(nowTime <= time);
@@ -97,7 +101,7 @@
         'ACendPickerValue',
         'startHour'
       ]),
-      ...mapState('index', ['currentDayData'])
+      ...mapState('index', ['newYear', 'newMonth', 'newDay', 'currentDayData'])
     },
     methods: {
       ...mapActions(NAMESPACE, [
@@ -109,31 +113,19 @@
         'setCurrentDayData'
       ]),
       ...mapActions('app', ['getLov']),
-      // 返回
-      back() {
-        console.log('');
-        this.$router.push({
-          path: '/',
-          query: {
-            year: this.$route.query.year,
-            month: this.$route.query.month,
-            day: this.$route.query.day
-          }
-        });
-      },
       // 处理计划开始时间
       initDateStart() {
         var time = this.currentDayData[this.$route.query.index]['Planned'].replace(/\d+\/\d+\/\d+\s/, '');
-        return this.$route.query.year + '-' + this.$route.query.month + '-' + this.$route.query.day + ' ' + time;
+        return this.newYear + '-' + this.newMonth + '-' + this.newDay + ' ' + time;
       },
       // 处理计划结束时间
       initDateEnd() {
         var time = this.currentDayData[this.$route.query.index]['Planned Completion'].replace(/\d+\/\d+\/\d+\s/, '');
-        return this.$route.query.year + '-' + this.$route.query.month + '-' + this.$route.query.day + ' ' + time;
+        return this.newYear + '-' + this.newMonth + '-' + this.newDay + ' ' + time;
       },
       // 格式化年月日
       initDate() {
-        return this.$route.query.year + '-' + this.$route.query.month + '-' + this.$route.query.day;
+        return this.newYear + '-' + this.newMonth + '-' + this.newDay;
       },
       // 描述字段
       desc() {
@@ -174,10 +166,10 @@
       // 更新状态
       handleSave() {
         var self = this;
-        var year = this.$route.query.year;
-        var month = this.$route.query.month;
+        var year = this.newYear;
+        var month = this.newMonth;
         if (month < 10) month = `0${month}`;
-        var day = this.$route.query.day;
+        var day = this.newDay;
         if (day < 10) day = `0${day}`;
         var id = '';
         id = this.currentDayData[this.$route.query.index]['Id'];

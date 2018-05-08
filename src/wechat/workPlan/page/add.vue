@@ -6,7 +6,7 @@
 <template>
   <div id="add-plan">
       <mt-header fixed :title="headTitle">
-        <fallback slot="left" @click.native="back"></fallback>
+        <fallback slot="left"></fallback>
       </mt-header>
       <div class="mint-content add-plan">
         <mt-cell title="工作类型" class="borderBottom">
@@ -106,7 +106,7 @@
         'endPickerValue',
         'startHour'
       ]),
-      ...mapState('index', ['currentDayData'])
+      ...mapState('index', ['newYear', 'newMonth', 'newDay', 'currentDayData'])
     },
     methods: {
       ...mapActions(NAMESPACE, [
@@ -117,18 +117,6 @@
         'setStartHour'
       ]),
       ...mapActions('app', ['getLov']),
-      // 返回
-      back() {
-        console.log('');
-        this.$router.push({
-          path: '/',
-          query: {
-            year: this.$route.query.year,
-            month: this.$route.query.month,
-            day: this.$route.query.day
-          }
-        });
-      },
       // 切换全天
       changeSwitch(val) {
         var self = this;
@@ -147,7 +135,7 @@
       },
       // 获取路由参数 年、月、日
       initDate() {
-        return this.$route.query.year + '-' + this.$route.query.month + '-' + this.$route.query.day;
+        return this.newYear + '-' + this.newMonth + '-' + this.newDay;
       },
       // 点击选开始时间
       openStartTime() {
@@ -226,10 +214,10 @@
       // 保存
       handleSave() {
         var self = this;
-        var year = this.$route.query.year;
-        var month = this.$route.query.month;
+        var year = this.newYear;
+        var month = this.newMonth;
         if (month < 10) month = `0${month}`;
-        var day = this.$route.query.day;
+        var day = this.newDay;
         if (day < 10) day = `0${day}`;
         var id = '';
         if (this.$route.path === '/edit') {
@@ -281,7 +269,7 @@
               MessageBox('提示', '新建计划成功').then(action => {
                 this.setStartPicker('');
                 this.setEndPicker('00');
-                self.back();
+                KND.Util.back();
               });
             }
           }

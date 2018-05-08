@@ -69,14 +69,14 @@
   </div>
 </template>
 <script>
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import { DatetimePicker, CellSwipe, MessageBox } from 'mint-ui';
 
   const NAMESPACE = 'index';
 
   export default {
     components: {DatetimePicker, CellSwipe},
-    name: 'date',
+    name: NAMESPACE,
     data() {
       return {
         headTitle: '工作计划',
@@ -108,10 +108,11 @@
     },
     created() {
       var self = this;
+      console.dir('00000');
       var date = '';
-      if (this.$route.query.year) {
-        date = new Date(this.formatDate(this.$route.query.year, this.$route.query.month, this.$route.query.day));
-        self.initData(this.formatDate(this.$route.query.year, this.$route.query.month, 1), true);
+      if (this.newYear) {
+        date = new Date(this.formatDate(self.newYear, self.newMonth, self.newDay));
+        self.initData(this.formatDate(self.newYear, self.newMonth, 1), true);
       } else {
         date = new Date();
         self.initData(self.formatDate(date.getFullYear(), date.getMonth() + 1, 1), true);
@@ -125,11 +126,29 @@
       this.getCurrentDayData(m + '/' + d + '/' + date.getFullYear());
       self.startGetData(self.formatDate(date.getFullYear(), date.getMonth() + 1, 1));
     },
+    activated() {
+      console.dir('1111');
+      var self = this;
+      var date = '';
+      if (this.newYear) {
+        date = new Date(this.formatDate(self.newYear, self.newMonth, self.newDay));
+      } else {
+        date = new Date();
+      }
+      // 给定DatetimePicker组件默认值
+      self.pickerValue = date.getFullYear() + '-' + date.getMonth() + 1 + '-' + 1;
+      let m = date.getMonth() + 1;
+      if (m < 10) m = `0${m}`;
+      let d = date.getDate();
+      if (d < 10) d = `0${d}`;
+      this.getCurrentDayData(m + '/' + d + '/' + date.getFullYear());
+    },
     computed: {
-      ...mapState(NAMESPACE, ['currentYear', 'currentMonth', 'currentDay', 'firstWeek', 'listData', 'currentDayData'])
+      ...mapState(NAMESPACE, ['newYear', 'newMonth', 'newDay', 'currentYear', 'currentMonth', 'currentDay', 'firstWeek', 'listData', 'currentDayData'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['setYear', 'setMonth', 'setDay', 'setWeek', 'getListData', 'setCurrentDayData', 'getCurrentDayData', 'deletePlan']),
+      ...mapMutations(NAMESPACE, ['setNewYear', 'setNewMonth', 'setNewDay']),
       // 去掉年月日
       formatDateTime(time) {
         return time.replace(/\d+\/\d+\/\d+\s/, '');
@@ -158,13 +177,14 @@
       },
       // 新建计划
       createPlan() {
+        var currentYear = this.currentYear;
+        var currentMonth = this.currentMonth;
+        var day = this.selectIndex - (this.beforeSpaces.length - 1);
+        this.setNewYear(currentYear);
+        this.setNewMonth(currentMonth);
+        this.setNewDay(day);
         this.$router.push({
-          path: './add',
-          query: {
-            year: this.currentYear,
-            month: this.currentMonth,
-            day: this.selectIndex - (this.beforeSpaces.length - 1)
-          }
+          path: './add'
         });
       },
       operation(item, id, index) {
@@ -176,6 +196,12 @@
           }
         });
         if (item['Status INT'] === 'Not Started') {
+          var currentYear = this.currentYear;
+          var currentMonth = this.currentMonth;
+          var day = this.selectIndex - (this.beforeSpaces.length - 1);
+          this.setNewYear(currentYear);
+          this.setNewMonth(currentMonth);
+          this.setNewDay(day);
           return [
             {
               content: '编辑',
@@ -184,10 +210,7 @@
                 this.$router.push({
                   path: './edit',
                   query: {
-                    index: index,
-                    year: this.currentYear,
-                    month: this.currentMonth,
-                    day: this.selectIndex - (this.beforeSpaces.length - 1)
+                    index: index
                   }
                 });
               }
@@ -211,13 +234,16 @@
       },
       // 跳转详情
       toDetail(index) {
+        var currentYear = this.currentYear;
+        var currentMonth = this.currentMonth;
+        var day = this.selectIndex - (this.beforeSpaces.length - 1);
+        this.setNewYear(currentYear);
+        this.setNewMonth(currentMonth);
+        this.setNewDay(day);
         this.$router.push({
           path: './detail',
           query: {
-            index: index,
-            year: this.currentYear,
-            month: this.currentMonth,
-            day: this.selectIndex - (this.beforeSpaces.length - 1)
+            index: index
           }
         });
       },
@@ -342,9 +368,9 @@
       },
       // 上一個月&下一个月   传入当前年份和月份
       pickPreNext(year, month, num) {
-        this.$route.query.year = '';
-        this.$route.query.month = '';
-        this.$route.query.day = '';
+        this.setNewYear('');
+        this.setNewMonth('');
+        this.setNewDay('');
         this.daysUL = [];
         this.isSelected = [];
         this.selectIndex = '';

@@ -14,6 +14,9 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
+        newYear: '',
+        newMonth: '',
+        newDay: '',
         currentYear: 1970,   // 年份
         currentMonth: 1,  // 月份
         currentDay: 1,    // 日期
@@ -92,6 +95,15 @@ export default new Vuex.Store({
         }
       },
       mutations: {
+        setNewYear(state, year) {
+          state.newYear = year;
+        },
+        setNewMonth(state, month) {
+          state.newMonth = month;
+        },
+        setNewDay(state, day) {
+          state.newDay = day;
+        },
         currentYear(state, year) {
           state.currentYear = year;
         },
