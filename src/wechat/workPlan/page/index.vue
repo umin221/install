@@ -470,13 +470,26 @@
       // 是否显示红点
       isHavePlan(day, index) {
         var noArray = this.alldayData[index - this.beforeSpaces.length];
-        if (day !== 'spaces' && noArray && noArray.length > 0 && noArray.indexOf('Done') > -1 && noArray.indexOf('Not Started') === -1) {
+        /* if (day !== 'spaces' && noArray && noArray.length > 0 && noArray.indexOf('Done') > -1 && noArray.indexOf('Not Started') === -1) {
           return 'red';
         } else if (day !== 'spaces' && noArray && noArray.length > 0 && noArray.indexOf('Not Started') > -1) {
           return 'flag';
         } else {
           return 'none';
+        }*/
+        /*
+        * 2018/05/08
+        * qjm
+        * 修改内容：工作计划还会存在其他的工作任务 会同步到工作计划中，之前判断的的逻辑只是工作计划中的状态
+        * */
+        var val = 'none';
+        if (day !== 'spaces' && noArray && noArray.length > 0) {
+          val = 'flag';
         }
+        if (day !== 'spaces' && noArray && noArray.length > 0 && noArray.indexOf('Done') > -1 && noArray.indexOf('Not Started') === -1) {
+          val = 'red';
+        }
+        return val;
       }
     },
     mounted() {

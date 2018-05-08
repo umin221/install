@@ -28,13 +28,15 @@
       <mt-datetime-picker
         ref="startPicker"
         type="time"
+        class="datetime"
+        :startHour="startPickerHour"
         @confirm="startPickerConfirm">
       </mt-datetime-picker>
       <mt-datetime-picker
         ref="endPicker"
         type="time"
-        @confirm="endPickerConfirm"
-        :startHour="startHour">
+        :startHour="startHour"
+        @confirm="endPickerConfirm">
       </mt-datetime-picker>
       <!--工作描述-->
       <mt-popup position="bottom" v-model="showWorkDescript">
@@ -62,6 +64,9 @@
     data() {
       return {
         headTitle: '新建计划',
+        startPickerHour: '00',
+        startPickerMinutes: '00',
+        newTimes: new Date(), // 当前年月日
         showWorkDescript: false,
         showWorkType: false, // 项目类型是否显示
         workDescript: [
@@ -73,6 +78,7 @@
     },
     created() {
       var self = this;
+      self.newTimes = self.newTimes.getFullYear() + '-' + (self.newTimes.getMonth() + 1) + '-' + self.newTimes.getDate() ; // 当前年月日
       if (this.$route.path === '/edit') {
         this.headTitle = '编辑计划详情';
         this.setWorkDesc({
@@ -125,8 +131,16 @@
       },
       // 切换全天
       changeSwitch(val) {
+        var self = this;
         if (event.target.checked) {
-          this.setStartPicker('00:00');
+          var today = new Date().getHours();
+          var minutes = new Date().getMinutes();
+          console.dir(self.newTimes + ' ' + today + ':' + minutes);
+          if (self.newTimes === self.initDate()) { // 选择当前时间以后
+            this.setStartPicker(today + ':' + (minutes + 1));
+          } else {
+            this.setStartPicker('00:00');
+          }
           this.setEndPicker('23:59');
         }
         this.setDayAll(event.target.checked);
@@ -137,14 +151,35 @@
       },
       // 点击选开始时间
       openStartTime() {
+        var self = this;
         if (this.allDay) {
           Toast('你选择了全天');
           return;
+        }
+        var today = new Date().getHours();
+        var minutes = new Date().getMinutes();
+        console.dir(self.newTimes + ' ' + today + ':' + minutes);
+        if (self.newTimes === self.initDate()) { // 选择当前时间以后
+          self.startPickerHour = today;
+          self.startPickerMinutes = minutes;
+        } else {
+          self.startPickerHour = '00';
+          self.startPickerMinutes = '00';
         }
         this.$refs.startPicker.open();
       },
       // 确定开始时间
       startPickerConfirm(date) {
+        var self = this;
+        var today = new Date().getHours();
+        var minutes = new Date().getMinutes();
+        console.dir(self.newTimes + ' ' + today + ':' + minutes);
+        if (self.newTimes === self.initDate()) { // 选择当前时间以后
+          if (date < (today + ':' + (minutes + 1))) {
+            Toast('开始时间必须大于当前时间');
+            return;
+          }
+        }
         this.setStartPicker(date);
         // 限制结束时间只能是开始时间之后
         date.replace(/^\d{2}/, (val, index) => {
@@ -219,6 +254,17 @@
         if (this.endPickerValue === '') {
           Toast('请选择计划结束时间');
           return;
+        }
+        if (this.startPickerValue) {
+          var today = new Date().getHours();
+          var minutes = new Date().getMinutes();
+          console.dir(self.newTimes + ' ' + today + ':' + minutes);
+          if (self.newTimes === self.initDate()) { // 选择当前时间以后
+            if (self.startPickerValue < (today + ':' + (minutes + 1))) {
+              Toast('开始时间必须大于当前时间');
+              return;
+            }
+          }
         }
         api.get({
           key: 'add',

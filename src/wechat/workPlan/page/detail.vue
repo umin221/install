@@ -32,13 +32,15 @@
       <mt-datetime-picker
         ref="startPicker"
         type="time"
+        :endHour="startPickerHour"
         @confirm="startPickerConfirm">
       </mt-datetime-picker>
       <mt-datetime-picker
         ref="endPicker"
         type="time"
         @confirm="endPickerConfirm"
-        :startHour="startHour">
+        :startHour="startHour"
+        :endHour="startPickerHour">
       </mt-datetime-picker>
 
   </div>
@@ -59,6 +61,7 @@
     data() {
       return {
         headTitle: '更新计划',
+        startPickerHour: '00',
         saveBtn: true // 是否显示保存按钮
       };
     },
@@ -72,6 +75,8 @@
       var time = new Date(yaer + '-' + month + '-' + day).getTime();
       var date = new Date();
       var nowTime = new Date(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()).getTime();
+      var today = new Date().getHours();
+      this.startPickerHour = today;
       console.log(nowTime <= time);
       if (this.currentDayData[this.$route.query.index]['Status INT'] === 'Not Started' && nowTime <= time) {
         this.saveBtn = true;
@@ -193,7 +198,7 @@
         var StartedTime = month + '/' + day + '/' + year + ' ' + this.ACstartPickerValue + ':00';
         var DoneTime = month + '/' + day + '/' + year + ' ' + this.ACendPickerValue + ':00';
         if (new Date(StartedTime).getTime() > new Date().getTime() || new Date(DoneTime) > new Date().getTime()) {
-          Toast('实际开始时间和实际结束时间都不能在当前时间之后');
+          Toast('实际开始时间和实际结束时间都不能大于当前时间');
           return;
         }
         api.get({
