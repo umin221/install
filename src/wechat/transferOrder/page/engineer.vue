@@ -6,8 +6,8 @@
                 :show="true">
 
       <cus-loadmore ref="result"
-                  :loadBottom="loadBottomFn"
-                  :topStatus="topStatus">
+                    :refresh="false"
+                    @loadBottom="loadBottomFn">
         <mt-cell class="multiple"
                  v-for="item in result"
                  @click.native="selectFn(item)"
@@ -59,8 +59,7 @@
     components: {cusLoadmore, cusSearch, cusCell},
     data: () => {
       return {
-        value: '',
-        topStatus: ''
+        value: ''
       };
     },
     computed: {
