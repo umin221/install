@@ -67,7 +67,7 @@
        * @param {String} val 搜索值
        */
       searchFn(val) {
-        loader.call(this, true);
+        loader.call(this);
       },
       /**
        * To detail

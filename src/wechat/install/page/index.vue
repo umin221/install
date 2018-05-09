@@ -15,26 +15,20 @@
 
       <div class="mint-content">
 
-        <mt-tab-container v-model="selected">
-          <mt-tab-container-item id="pending">
-            <cus-loadmore ref="pending"
-                          @loadTop="loadTopFn"
-                          @loadBottom="loadBottomFn"
-                          :loadmore="false"
-                          :topStatus="topStatus">
-              <cus-cell class="multiple"
-                        @click.native="toDetailFn(item.Id)"
-                        :key="item.Id"
-                        :title="'订单批次:'+ item.Id"
-                        v-for="item in pending"
-                        is-link>
-                <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
-                <div class="mint-cell-sub-title" slot="title">创建日期: {{item['Created']}}</div>
-              </cus-cell>
-            </cus-loadmore>
-          </mt-tab-container-item>
-
-        </mt-tab-container>
+        <cus-loadmore ref="pending"
+                      @loadTop="loadTopFn"
+                      @loadBottom="loadBottomFn"
+                      :loadmore="false">
+          <cus-cell class="multiple"
+                    @click.native="toDetailFn(item.Id)"
+                    :key="item.Id"
+                    :title="'订单批次:'+ item.Id"
+                    v-for="item in pending"
+                    is-link>
+            <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
+            <div class="mint-cell-sub-title" slot="title">创建日期: {{item['Created']}}</div>
+          </cus-cell>
+        </cus-loadmore>
 
       </div>
     </div>
@@ -57,7 +51,7 @@
       mode: mode,
       list: 'pending',
       callback: () => {
-        me.$refs['pending']['onBottomLoaded']();
+        me.$refs['pending']['onTopLoaded']();
       }
     });
   };
@@ -82,10 +76,6 @@
     },
     data: () => {
       return {
-        // 活跃tab
-        selected: 'pending',
-        // 下拉状态
-        topStatus: ''
       };
     },
     computed: {

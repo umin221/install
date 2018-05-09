@@ -28,6 +28,9 @@
   export default {
     name: 'search',
     components: {cusLoadmore, cusSearch, cusCell},
+    created() {
+      this.setTask({installTask: [], list: 'result'});
+    },
     data: () => {
       return {
         value: '',

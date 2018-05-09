@@ -6,7 +6,7 @@
 
     <div class="mint-content">
       <div>
-        <mt-field label="联系电话" placeholder="请输入电话" type="tel" tag="电话"
+        <mt-field label="联系电话" placeholder="请输入电话" type="number" tag="电话"
                   v-model="contact['Login Name']"
                   v-valid.require.phone
                   @change="findContactFn"></mt-field>

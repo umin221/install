@@ -25,32 +25,28 @@
         <mt-cell title="是否带天地" v-if="isVP || isLockBody">
           <mt-switch v-model="flag"></mt-switch>
         </mt-cell>
-        <cus-field :label="`数量(${line['KL Agreement Item Quantity']})`" tag="数量"
+        <cus-field :label="`数量(${line['KL Agreement Item Quantity'] || ''})`" tag="数量"
                    type="number"
                    v-valid.require.number
                    v-model="line['Quantity Requested']"></cus-field>
         <cus-field label="门材质" tag="门材质"
                    @click.native="showLovFn('KL Door Material Quality')"
                    v-model="line['KL Door Material Quality']"
-                   v-valid.require
                    is-link></cus-field>
         <cus-field label="门厚(cm)" tag="门厚"
                    v-if="isVP || isLockBody"
                    v-valid.require
                    v-model="line['KL Door Thickness']"></cus-field>
         <cus-field label="锁芯中心距门内距(cm)" type="number" tag="锁芯中心距门内距"
-                   v-valid.require
                    v-model="line['KL Lock Core Distance']"></cus-field>
         <cus-field label="锁舌导向板规格" tag="锁舌导向板规格"
                    @click.native="showLovFn('KL Guide Plate Specification')"
                    v-if="isVP || isLockBody"
-                   v-valid.require
                    v-model="line['KL Guide Plate Specification']"
                    is-link></cus-field>
         <cus-field label="门扣板规格" tag="门扣板规格"
                    @click.native="showLovFn('KL Gate Plate Specification')"
                    v-if="isVP || isLockBody"
-                   v-valid.require
                    v-model="line['KL Gate Plate Specification']"
                    is-link></cus-field>
         <cus-field label="滑盖丝印" tag="滑盖丝印"
@@ -66,7 +62,6 @@
                    v-model="line['KL Color Card Screen Printing']"
                    is-link></cus-field>
         <cus-field label="配件要求" tag="配件要求"
-                   v-valid.require
                    v-model="line['KL Parts Requirement']"></cus-field>
         <cus-field label="备注"
                    type="textarea"
