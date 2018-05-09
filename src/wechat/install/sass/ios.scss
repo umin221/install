@@ -22,6 +22,10 @@ $status-bar-height: 1rem;
 
     .cus-search {
       border-top: $status-bar-height solid #d9d9d9;
+
+      .mint-search-list {
+        padding-top: 2.2rem + $status-bar-height;
+      }
     }
   }
 }

@@ -21,7 +21,7 @@
         <cus-field label="合作伙伴负责人" placeholder="请输入负责人" tag="负责人"
                    @click.native="selectEngineerFn"
                    v-valid.require
-                   v-model="select['Last Name'] || form['KL Partner Owner Name']"
+                   v-model="select['KL Employee Full Name'] || form['KL Partner Owner Name']"
                    is-link></cus-field>
         <cus-field label="联系电话" placeholder="请输入电话" type="tel" tag="电话"
                    :edit=!read
@@ -62,9 +62,13 @@
         <title-group>联系人列表</title-group>
         <empty v-show="!form.User || !form.User.length"></empty>
         <mt-cell-swipe class="multiple"
-                 v-for="item in form.User"
+                 v-for="(item, index) in form.User"
                  :key="item.Id"
-                 :right="swiperBtn"
+                 :right="isValid ? [{
+                                 content: '删除',
+                                 style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
+                                 handler: () => deleteUser({item, index})
+                               }] : []"
                  @click.native="toContact(item)"
                  is-link>
           <div class="mint-cell-title" slot="title">姓名: {{item['Last Name']}}</div>
@@ -98,13 +102,6 @@
   import cusCity from 'public/components/cus-select-city';
   // use plugin
   Vue.use(vp);
-
-  // Swiper button
-  let _swiperBtn = [{
-    content: '删除',
-    style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
-    handler: () => this.$messagebox('delete')
-  }];
 
   /**
    * 附件上传
@@ -204,9 +201,6 @@
         let type = this.type;
         return type === 'add' || (type === 'edit' && this.state === 'invalid');
       },
-      swiperBtn() {
-        return this.state === 'valid' ? _swiperBtn : [];
-      },
       /**
        * 根据当前状态和类型判断标题展示
        * 新建&重新启用界面复用 仅标题不一样
@@ -224,7 +218,7 @@
     },
     methods: {
       ...mapActions('app', ['upload', 'queryMedias']),
-      ...mapActions(NAMESPACE, ['findPartnerById', 'findPartner', 'addPartner', 'updateSyn', 'pushMedia', 'queryApprovalList']),
+      ...mapActions(NAMESPACE, ['findPartnerById', 'findPartner', 'addPartner', 'updateSyn', 'pushMedia', 'queryApprovalList', 'deleteUser']),
       toContact(contact) {
         this.$router.push({
           name: 'contact',

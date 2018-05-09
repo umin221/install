@@ -53,7 +53,7 @@
           'Login Name': '', // 电话号码
           'First Name': '.', // 固定
           'KL Type': '委外人员', // 固定 联系人类型
-          'User Type': '售后', // 固定 用户类型
+          'User Type': '委外人员', // 固定 用户类型
           'KL Outsource Password': '' // 密码
         },
         disable: false

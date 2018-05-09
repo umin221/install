@@ -9,7 +9,7 @@
       <div class="mint-content install-container">
         <cus-field label="房号" tag="房号" class="disable"
                    :value="assets['Street Address 4']"></cus-field>
-        <cus-field label="产品条形码" tag="产品条形码"
+        <cus-field label="产品条形码" tag="产品条形码" :data-value="serial"
                    v-model="assets['Serial Number']"
                    v-valid.require>
           <div class="xs-icon icon-scan" @click="toScanFn"></div>
@@ -76,6 +76,8 @@
             let body = me.body[0] || {};
             me.assets['KL Product Model No Panel'] = panel['KL Product Model No Cal'];
             me.assets['KL Product Model No Lock Body'] = body['KL Product Model No Cal'];
+            // product id，优先取 KL Final Product Id
+            body['KL Final Product Id'] = body['KL Final Product Id'] || body['Product Id'];
             me.assets['Product Id'] = body['KL Final Product Id'];
           }
         }
@@ -92,6 +94,13 @@
         showBox: false,
         lovType: ''
       };
+    },
+    computed: {
+      serial() {
+        let a = this.assets;
+        a['Serial Number'] = a['Serial Number'].replace(/[\u4e00-\u9fa5]/g, '');
+        return a['Serial Number'];
+      }
     },
     methods: {
       ...mapActions(NAMESPACE, ['queryOrderLines', 'installOrderAssets']),

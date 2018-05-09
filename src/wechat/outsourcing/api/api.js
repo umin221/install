@@ -153,10 +153,13 @@ let apiList = {
    */
   updateSyn: option => {
     let partner = option.data;
-    partner['ListOfCUT Address'] = {
-      'CUT Address': partner['CUT Address']
-    };
-    delete option.data['CUT Address'];
+    // 更新地址
+    if (partner['CUT Address']) {
+      partner['ListOfCUT Address'] = {
+        'CUT Address': partner['CUT Address']
+      };
+      delete option.data['CUT Address'];
+    }
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/Synchronize',

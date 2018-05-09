@@ -100,6 +100,10 @@ export default new Vuex.Store({
             'Main Phone Number': '',
             'CUT Address': {Province: ''}
           };
+        },
+        // 设置联系人
+        setUsers(state, users) {
+          state.form.User = users;
         }
       },
       actions: {
@@ -158,6 +162,37 @@ export default new Vuex.Store({
             data: partner,
             success: success
           });
+        },
+        /**
+         * 删除委外联系人
+         * @param {Object} item 必填 联系人对象
+         */
+        deleteUser({state, commit}, {item, index}) {
+          let form = state.form;
+          let users = [];
+          let partner;
+          for (let i in form.User) {
+            let u = form.User[i];
+            if (u.Id === item.Id) continue;
+            users.push(u);
+          };
+          partner = {
+            Id: form.Id,
+            ListOfUser: {
+              User: users
+            }
+          };
+          api.get({
+            key: 'updateSyn',
+            data: partner,
+            success: data => {
+              tools.success(data, {
+                successTips: '更新成功'
+              });
+              commit('setUsers', users);
+            }
+          });
+
         },
         /**
          * 更新委外团队信息
