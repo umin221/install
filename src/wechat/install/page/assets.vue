@@ -371,7 +371,7 @@
         let room = this.sheetObject;
         // this.$router.push('detail');
         tools.cordova.scan(result => {
-          room['Serial Number'] = result.text;
+          room.serial = result.text;
           this.$router.push({
             name: 'detail',
             query: {

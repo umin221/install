@@ -51,8 +51,8 @@
     data() {
       return {
         remember: [],
-        username: '13899997777',
-        password: '123',
+        username: '', // 15899999999 13899997777
+        password: '',
         showLogin: false
       };
     },

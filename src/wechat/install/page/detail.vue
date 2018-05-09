@@ -9,8 +9,9 @@
       <div class="mint-content install-container">
         <cus-field label="房号" tag="房号" class="disable"
                    :value="assets['Street Address 4']"></cus-field>
-        <cus-field label="产品条形码" tag="产品条形码" :data-value="serial"
-                   v-model="assets['Serial Number']"
+        <cus-field label="产品条形码" tag="产品条形码"
+                   :data-value="serial"
+                   v-model="assets['serial']"
                    v-valid.require>
           <div class="xs-icon icon-scan" @click="toScanFn"></div>
         </cus-field>
@@ -97,9 +98,10 @@
     },
     computed: {
       serial() {
-        let a = this.assets;
-        a['Serial Number'] = a['Serial Number'].replace(/[\u4e00-\u9fa5]/g, '');
-        return a['Serial Number'];
+        let assets = this.assets;
+        let serial = assets['serial'];
+        if (serial) assets['serial'] = serial.replace(/[\u4e00-\u9fa5]/g, '');
+        return serial;
       }
     },
     methods: {
@@ -112,7 +114,7 @@
           this.installOrderAssets({
             data: {
               'Id': assets['Id'],
-              'Serial Number': assets['Serial Number'],
+              'Serial Number': assets['serial'],
               'Product Id': assets['Product Id'],
               'KL Product Model No Lock Body': assets['KL Product Model No Lock Body'],
               'KL Product Model No Panel': assets['KL Product Model No Panel']
@@ -126,7 +128,7 @@
       toScanFn() {
         let me = this;
         tools.cordova.scan(result => {
-          me.assets['Serial Number'] = result.text;
+          me.assets['serial'] = result.text;
         });
       },
       // 选择确认
