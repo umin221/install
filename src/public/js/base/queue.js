@@ -50,11 +50,11 @@ class Queue {
     status = 'running';
     task.success = data => {
       me.dequeue();
-      success(data);
+      if (success) success(data);
     };
     task.error = err => {
       me.dequeue();
-      error(err);
+      if (error) error(err);
     };
 
     // start loading

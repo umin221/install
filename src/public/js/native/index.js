@@ -242,6 +242,9 @@ import queue from '../base/queue';
         let data = cache.get(option.url);
         if (data) {
           option.success(data);
+          setTimeout(() => {
+            Indicator.close();
+          }, 200);
         } else {
           let success = option.success;
           option.success = data => {
@@ -261,7 +264,7 @@ import queue from '../base/queue';
      */
     ajax(option) {
       let me = this;
-      option.execute = (task) => me[task.cache ? 'cache' : 'online'](task);
+      option.execute = task => me[task.cache ? 'cache' : 'online'](task);
       queue.queue(option);
     }
 

@@ -66,6 +66,8 @@ class ValidatorPlug {
       rule: /^(.+?)\((.+)\)$/,
       // 数字
       number: /^[0-9]+$/,
+      // 非负数
+      nonNegative: /^\d+(\.{0,1}\d+){0,1}$/,
       /**
        * @descrition:邮箱规则
        * 1.邮箱以a-z、A-Z、0-9开头，最小长度为1.
@@ -106,7 +108,8 @@ class ValidatorPlug {
         number: `${tag}必须是数字`,
         email: `${tag}格式不正确`,
         fax: `${tag}格式错误`,
-        phone: `${tag}格式错误`
+        phone: `${tag}格式错误`,
+        nonNegative: `${tag}不能是负数`
       };
       return errMsgs[type];
     };

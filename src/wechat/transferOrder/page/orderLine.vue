@@ -35,9 +35,10 @@
                    is-link></cus-field>
         <cus-field label="门厚(cm)" tag="门厚"
                    v-if="isVP || isLockBody"
-                   v-valid.require
+                   v-valid.nonNegative
                    v-model="line['KL Door Thickness']"></cus-field>
         <cus-field label="锁芯中心距门内距(cm)" type="number" tag="锁芯中心距门内距"
+                   v-valid.nonNegative
                    v-model="line['KL Lock Core Distance']"></cus-field>
         <cus-field label="锁舌导向板规格" tag="锁舌导向板规格"
                    @click.native="showLovFn('KL Guide Plate Specification')"
@@ -113,7 +114,7 @@
             return item['Parent'] === type;
           });
           mapp.option['KL Product Model No'] = model;
-          // 填充产品名称
+          // 填充产品型号
           me.line['KL Product Model No'] = model[0].Value;
         }
       });
