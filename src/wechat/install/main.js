@@ -51,6 +51,12 @@ FastClick.attach(document.body);
 router.beforeEach((to, from, next) => {
   let fromName = from.name;
   let fromLogin = fromName === 'login';
+  if (config.back === false) {
+    // 启用页面返回
+    config.back = true;
+    next(false);
+    return;
+  };
   // 物理返回直接返回系统桌面
   if ((fromName === 'index' || fromLogin) && to.name === 'login') {
     if (fromLogin || to.query.login !== true) {

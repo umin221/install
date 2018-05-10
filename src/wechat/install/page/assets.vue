@@ -371,13 +371,18 @@
         let room = this.sheetObject;
         // this.$router.push('detail');
         tools.cordova.scan(result => {
-          room.serial = result.text;
-          this.$router.push({
-            name: 'detail',
-            query: {
-              room: JSON.stringify(room)
-            }
-          });
+          if (result.text) {
+            room.serial = result.text;
+            this.$router.push({
+              name: 'detail',
+              query: {
+                room: JSON.stringify(room)
+              }
+            });
+          } else {
+            // 禁用页面返回
+            config.back = false;
+          }
         });
       },
       /**
