@@ -2,7 +2,7 @@
   <div>
     <div>
       <mt-header fixed title="退入申请详情">
-        <fallback slot="left"></fallback>
+        <fallback slot="left" v-if="option !== 'approval'"></fallback>
         <mt-button slot="right" @click.native="toApprovalsave">审批记录</mt-button>
       </mt-header>
 
@@ -31,10 +31,10 @@
                    @click.native="submitFn('Approved')">确认</mt-button>
         toApproval
       </button-group>
-      <button-group v-if="(orderEntry['Status LIC'] === 'Draft'||orderEntry['Status LIC'] === 'Rejected')&&option !== 'approval'">
-        <mt-button class="single"
-                   @click.native="submitApproval">提交</mt-button>
-      </button-group>
+      <!--<button-group v-if="(orderEntry['Status LIC'] === 'Draft'||orderEntry['Status LIC'] === 'Rejected')&&option !== 'approval'">-->
+        <!--<mt-button class="single"-->
+                   <!--@click.native="submitApproval">提交</mt-button>-->
+      <!--</button-group>-->
     </div>
   </div>
 </template>

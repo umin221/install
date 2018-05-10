@@ -37,6 +37,7 @@
         </a>
         <!--isProject-->
       </div>
+
       <!--<mt-cell class="require"-->
                 <!--title="工程替代锁所属项目"-->
                 <!--:value="project['KL Agreement Opportunity Name']"-->
@@ -76,11 +77,12 @@ import { CellSwipe, Toast, DatetimePicker } from 'mint-ui';
 import buttonGroup from 'public/components/cus-button-group';
 import numBox from '../components/number-box.vue';
 import cusCell from 'public/components/cus-cell';
+import cusField from '../../../public/components/cus-field';
 
 const NAMESPACE = 'add';
 
 export default {
-  components: {CellSwipe, buttonGroup, DatetimePicker, numBox, cusCell},
+  components: {CellSwipe, buttonGroup, DatetimePicker, numBox, cusCell, cusField},
   data() {
     return {
       isProject: false,
@@ -89,15 +91,24 @@ export default {
   },
   created() {
     let me = this;
+    let query = me.$route.query;
+    if (query.id && !me.id) {
+      console.log(query);
+      me.setId(query.id);
+      me.Description = query.Description;
+    } else {
+      me.Description = KND.Session.get('DescriptionUse') || '';
+      KND.Session.remove('DescriptionUse');
+    }
     me.isProjected();
   },
   computed: {
-    ...mapState(NAMESPACE, ['partList', 'project', 'descript']),
+    ...mapState(NAMESPACE, ['partList', 'project', 'id']),
     ...mapState('selectParts', ['selected'])
   },
   methods: {
     ...mapActions(NAMESPACE, ['setPartList', 'setProject', 'setTime', 'setDescript', 'setpartNum', 'deletePart', 'addServiceOrder']),
-    ...mapMutations(NAMESPACE, ['initSelect']),
+    ...mapMutations(NAMESPACE, ['initSelect', 'setId']),
     /*
     * 左滑 删除
     * */
@@ -114,12 +125,14 @@ export default {
     * 跳转 配件选择
     * */
     selectPart() {
+      KND.Session.set('DescriptionUse', this.Description);
       this.$router.push('./selectParts');
     },
     /*
     * 跳转 项目选择
     * */
     selectProject() {
+      KND.Session.set('DescriptionUse', this.Description);
       this.$router.push('./selectProject');
     },
     /*

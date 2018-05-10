@@ -71,7 +71,8 @@ export default new Vuex.Store({
       namespaced: true,
       state: {
         partList: [],
-        project: {}
+        project: {},
+        id: ''
       },
       actions: {
         /* 设置配件列表
@@ -130,11 +131,43 @@ export default new Vuex.Store({
               form.callBack('保存成功');
             }
           });
+        },
+        getOrderEntry({state, commit}, {id, callback}) {
+          api.get({
+            key: 'getOrderEntry',
+            data: {
+              id
+            },
+            success: function(data) {
+              console.log(data);
+              let orderdetail = data['SiebelMessage']['Order Entry - Orders'];
+              if (orderdetail) {
+                let orderItem = KND.Util.toArray(orderdetail['Order Entry - Line Items']);
+                if (!orderItem) {
+                  orderItem = [];
+                }
+                commit('setOrderEntry', {data: orderdetail, list: orderItem});
+                if (callback) {
+                  callback(orderdetail);
+                }
+              }
+            }
+          });
         }
       },
       mutations: {
         selectProduct(state, select) {                    // 确认选择的配件
+          if (state.partList.length) {
+            for (let i = 0;i < state.partList.length;i++) {
+              if (select.Id === state.partList[i].Id) {
+                return;
+              }
+            }
+          }
           state.partList.push(select);
+        },
+        setId(state, id) {
+          state.id = id;
         },
         project(state, data) {
           state.project = data;
@@ -153,6 +186,7 @@ export default new Vuex.Store({
       namespaced: true,
       state: {
         result: [],
+        result1: [],
         selected: [],
         returnSelect: []
       },
@@ -166,13 +200,22 @@ export default new Vuex.Store({
                 api.get({
                   key: 'getProduct',
                   data: {
-                    // val: val.value,
+                    val: val.value,
+                    ParentId: val.ParentId,
+                    // type: val.type,
                     id: data.Id
                   },
                   success: function(data) {
                     let Catalog = KND.Util.toArray(data.SiebelMessage['Catalog Category']);
-                    if (Catalog) {
-                      commit('setProduct', Catalog);
+                    if (Catalog.length) {
+                      // commit('setProduct', {data: Catalog, item: val.value});
+                      // let name = val.value === '1' ? 'setProduct' : 'setProduct1';
+                      if (val.value === '1') {
+                        commit('setProduct', Catalog);
+                      }
+                      if (val.callback) {
+                        val.callback(Catalog);
+                      }
                     }
                   }
                 });
@@ -180,6 +223,29 @@ export default new Vuex.Store({
             }
           });
         }
+        // getProduct({state, commit}, val) {
+        //   api.get({
+        //     key: 'getPrice',
+        //     success: function(data) {
+        //       state.priceId = data.Id;
+        //       if (data.Id) {
+        //         api.get({
+        //           key: 'getProduct',
+        //           data: {
+        //             // val: val.value,
+        //             id: data.Id
+        //           },
+        //           success: function(data) {
+        //             let Catalog = KND.Util.toArray(data.SiebelMessage['Catalog Category']);
+        //             if (Catalog) {
+        //               commit('setProduct', Catalog);
+        //             }
+        //           }
+        //         });
+        //       }
+        //     }
+        //   });
+        // }
       },
       mutations: {
         count(state, val) {
@@ -190,21 +256,24 @@ export default new Vuex.Store({
           }
         },
         setProduct(state, data) {
-          state.result = [];
-          state.selected = [];
-          for (let i = 0; i < data.length; i++) {
-            if (data[i].Product) {
-              if (KND.Util.isArray(data[i].Product)) {
-                state.result = state.result.concat(data[i].Product);
-              } else {
-                state.result.push(data[i].Product);
-              }
-            }
-          }
-          for (let i = 0; i < state.result.length;i++) {
-            state.selected.push(false);
-          }
+          state['result1'] = data;
         },
+        // setProduct(state, data) {
+        //   state.result = [];
+        //   state.selected = [];
+        //   for (let i = 0; i < data.length; i++) {
+        //     if (data[i].Product) {
+        //       if (KND.Util.isArray(data[i].Product)) {
+        //         state.result = state.result.concat(data[i].Product);
+        //       } else {
+        //         state.result.push(data[i].Product);
+        //       }
+        //     }
+        //   }
+        //   for (let i = 0; i < state.result.length;i++) {
+        //     state.selected.push(false);
+        //   }
+        // },
         initSelected(state) {
           state.selected = [];
           for (let i = 0; i < state.result.length;i++) {

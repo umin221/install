@@ -90,6 +90,8 @@ export default {
   created() {
     let me = this;
     me.isProjected();
+    me.Description = KND.Session.get('DescriptionBack') || '';
+    KND.Session.remove('DescriptionBack');
   },
   computed: {
     ...mapState(NAMESPACE, ['partList', 'project', 'descript']),
@@ -114,12 +116,14 @@ export default {
     * 跳转 配件选择
     * */
     selectPart() {
+      KND.Session.set('DescriptionBack', this.Description);
       this.$router.push('./selectParts');
     },
     /*
     * 跳转 项目选择
     * */
     selectProject() {
+      KND.Session.set('DescriptionBack', this.Description);
       this.$router.push('./selectProject');
     },
     /*

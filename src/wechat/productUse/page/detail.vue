@@ -2,7 +2,7 @@
   <div>
     <div>
       <mt-header fixed title="领用申请详情">
-        <fallback slot="left"></fallback>
+        <fallback slot="left" v-if="option !== 'approval'"></fallback>
         <mt-button slot="right" @click.native="toApprovalsave">审批记录</mt-button>
       </mt-header>
 
@@ -30,15 +30,15 @@
         <mt-button class="single"
                    @click.native="submitFn('Approved')">确认</mt-button>
       </button-group>
-      <button-group v-if="(orderEntry['Status LIC'] === 'Draft'||orderEntry['Status LIC'] === 'Rejected') && option !== 'approval'">
-        <mt-button class="single"
-                   @click.native="submitApproval">提交</mt-button>
-      </button-group>
+      <!--<button-group v-if="(orderEntry['Status LIC'] === 'Draft'||orderEntry['Status LIC'] === 'Rejected') && option !== 'approval'">-->
+        <!--<mt-button class="single"-->
+                   <!--@click.native="submitApproval">编辑</mt-button>-->
+      <!--</button-group>-->
     </div>
   </div>
 </template>
 <script>
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import { Toast } from 'mint-ui';
   import api from '../api/api';
   const NameSpace = 'detail';
@@ -50,7 +50,6 @@
       let param = this.$route.query;
       me.option = param.option; // 区分从哪跳转到详情页
       me.id = param.Id;
-      console.log(param);
       if (this.option === 'approval') {
         this.is_option = true;
         this.InboxItemId = param.InboxItemId;
@@ -84,6 +83,7 @@
     methods: {
       ...mapActions(NameSpace, ['getOrderEntry']),
       ...mapActions('add', ['toApproval']),
+      ...mapMutations('add', ['selectProduct', 'initSelect', 'setId']),
       toDate(time) {
         if (time) {
           return KND.Util.format(time, 'yyyy-MM-dd hh:mm:ss');
@@ -133,7 +133,7 @@
                 method: 'POST',
                 data: {
                   'body': {
-                    'Object Id': '',
+                    'Object Id': me.id,
                     'InboxItemId': '1-2BSRCRZL',
                     'InboxTaskId': '1-2BSRCRZM',
                     'ActionLIC': type,
@@ -156,13 +156,32 @@
       },
       submitApproval() {
         let me = this;
-        let form = {
-          callBack: data => {
-            Toast(data);
-            me.$router.go(-1);
+//        selectProduct initSelect
+        me.initSelect();
+        me.setId('');
+        for (let i = 0; i < me.lineItems.length; i++) {
+          me.selectProduct({
+            'KL Translated Name': me.lineItems[i]['KL Product Name Join'],
+            'Name': me.lineItems[i].Product,
+            'num': me.lineItems[i]['Quantity Requested'],
+            'KL Product Series Code': me.lineItems[i]['KL Product Series Code'],
+            'Id': me.lineItems[i]['Product Id']
+          });
+        }
+        me.$router.push({
+          name: 'add',
+          query: {
+            id: me.id,
+            Description: me.orderEntry['Description']
           }
-        };
-        me.toApproval({id: me.orderEntry.Id, form});
+        });
+//        let form = {
+//          callBack: data => {
+//            Toast(data);
+//            me.$router.go(-1);
+//          }
+//        };
+//        me.toApproval({id: me.orderEntry.Id, form});
       }
     },
     components: {Toast}

@@ -31,6 +31,28 @@ let apiList = {
     };
   },
   getProduct: option => {
+    // let model = '';
+    // model = 'AND [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*"';
+    let oneCatalog = '';
+    if (option.data.val === '1') {
+      oneCatalog = 'AND [Catalog Category.Sequence Number] = "1"';
+    } else {
+      oneCatalog = 'AND [Catalog Category.Sequence Number] = "' + option.data.val + '" AND [Catalog Category.Parent Category Id] = "' + option.data.ParentId + '"';
+    }
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base Catalog Category (Content Management)',
+          'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '"' + oneCatalog,
+          'ViewMode': 'Group'
+        }
+      }
+    };
+    // 产品目录
+  },
+/*  getProduct: option => {
     // let model = 'AND ([Product.Name] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Description] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*")';
     let id = option.data.id;
     delete option.data.id;
@@ -46,7 +68,7 @@ let apiList = {
       }
     };
     // 产品目录
-  },
+  },*/
   getPrice: option => {
     return {
       method: 'get',
