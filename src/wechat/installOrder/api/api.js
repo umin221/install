@@ -216,7 +216,8 @@ let apiList = {
   getSearch: option => {
     return {
       method: 'get',
-      url: 'data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] ~LIKE "' + option.data.val + '*" AND [User Type]<>LookupValue("CONTACT_USER_TYPE", "Sales") &PageSize=10&StartRowNum=0'
+      url: 'data/KL Contact Interface BO/Contact/?searchspec = [User Type]<>LookupValue("CONTACT_USER_TYPE", "Sales") AND ([Work Phone %23] ~LIKE "' + option.data.val + '*" OR [Cellular Phone %23] ~LIKE "' + option.data.val + '*") &PageSize=10&StartRowNum=0'
+      // url: 'data/KL Contact Interface BO/Contact/?searchspec=[Work Phone %23] ~LIKE "' + option.data.val + '*" AND [User Type]<>LookupValue("CONTACT_USER_TYPE", "Sales") &PageSize=10&StartRowNum=0'
     };
   },
   setPlan: option => { // 批次详细计划提交

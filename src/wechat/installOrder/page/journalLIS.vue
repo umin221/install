@@ -4,7 +4,7 @@
       <fallback slot="left"></fallback>
     </mt-header>
     <div class="mint-content journal">
-      <div class="crm-zyList" v-for="(item, index) in processDate" :key="index" v-show="journalVal">
+      <div class="crm-zyList" v-for="(item, index) in processDate" :key="index">
         <ul class="content">
           <li class="bd-radius">
             <span class="icon"></span>
@@ -13,7 +13,7 @@
             <span class="journalName">{{item['Contact Login Name']}}</span>
           </li>
           <div class="content-div">
-            <span class="content-div-span" @click="addJounal(item)">抽样</span>
+            <span class="content-div-span" @click="addJounal(item)" v-show="journalVal">抽样</span>
             <div>安装人员：<span style="color: #0772c1">{{item['Contact Login Name']}}</span></div>
             <div>完成数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
             <div>合格数量/异常数量：{{item['Qualified Amount']}}/{{item['Unqualified Amount']}}</div>
@@ -21,24 +21,6 @@
             <div>异常描述：{{item['Unqualified Desc']}}</div>
             <div>异常跟进描述：{{item['Unqualified Solve Desc']}}</div>
           </div>
-        </ul>
-      </div>
-      <div class="crm-zyList" v-for="(item, index) in processDate" :key="index" v-show="!journalVal">
-        <ul class="content">
-          <li class="bd-radius">
-            <span class="icon"></span>
-          </li>
-          <li style="color: #888;line-height: 40px;font-size: 0.9rem;">{{new Date(item['Install Date']).format('yyyy-MM-dd')}}
-            <span class="journalName">{{item['Contact Login Name']}}</span>
-          </li>
-          <div class="content-div">
-            <div>完成数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
-            <div>备注说明：{{item['Unqualified Solve Desc']}}</div>
-          </div>
-          <attach :attach="attach.list"
-                  :edit="read"
-                  :title="title">
-          </attach>
         </ul>
       </div>
     </div>
@@ -116,10 +98,10 @@
       let param = this.$route.query;
       this.id = this.itemTask.Id;
       this.type = param.type;
-      if (this.type === 'updateDoorNext') {
-        this.journalVal = false;
-      } else {
+      if (this.type) {
         this.journalVal = true;
+      } else {
+        this.journalVal = false;
       }
       this.getJournal();
     },

@@ -476,11 +476,15 @@ export default new Vuex.Store(Object.extend(true, sto, {
     batch: {
       namespaced: true,
       state: {
-        pcObj: {} // 批次保存时 存store
+        pcObj: {}, // 批次保存时 存store
+        isStatus: false // 当前状态是否可选委外联系人
       },
       mutations: {
         clear(state) {
           state.pcObj = {};
+        },
+        setIsStatus(state, val) {
+          state.isStatus = val;
         }
       },
       actions: {

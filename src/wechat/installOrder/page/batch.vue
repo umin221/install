@@ -289,7 +289,7 @@
           this.$router.push({
             name: 'detailPlan',
             query: {
-              type: 'add',
+              type: 'edit',
               planType: planType,
               id: self.id,
               item: obj

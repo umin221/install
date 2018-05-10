@@ -140,6 +140,26 @@
             mapp.option['KL Detail Type'] = KND.Util.toArray(data.items);
           }
         });
+      } else if (self.type === 'edit') {
+        self.titleVal = '详细计划详情';
+        // 取 lov 门材质
+        self.getLov({
+          data: {
+            'Type': 'TODO_TYPE',
+            'Parent Value': self.planType
+          },
+          success: data => {
+            mapp.option['KL Detail Type'] = KND.Util.toArray(data.items);
+          }
+        });
+        self.planObj['Id'] = self.planItem['Id'];
+        self.id = self.planItem['Parent Activity Id'];
+        self.planObj['KL Detail Type'] = self.planItem['KL Detail Type'];
+        self.planObj['Planned'] = self.planItem['Planned'];
+        self.planObj['Planned Completion'] = self.planItem['Planned Completion'];
+        self.planObj['Description'] = self.planItem['Description'];
+        self.Planned = new Date(self.planItem['Planned']).format('yyyy-MM-dd hh:mm:ss');
+        self.PlannedCompletion = new Date(self.planItem['Planned Completion']).format('yyyy-MM-dd hh:mm:ss');
       } else {
         self.titleVal = '详细计划详情';
         self.editable = false;

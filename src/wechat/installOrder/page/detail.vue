@@ -585,7 +585,7 @@
     methods: {
       ...mapActions('app', ['getLov']),
       ...mapMutations('index', ['setTaskIndex']),
-      ...mapMutations('batch', ['clear']),
+      ...mapMutations('batch', ['clear', 'setIsStatus']),
       ...mapMutations('sporadic', ['clObjList']),
       ...mapMutations('engineer', ['delEngineer']),
       ...mapMutations(NameSpace, ['setOrderId', 'setTaskDataST', 'setLockBody', 'setPanels', 'setDetailData', 'setIsOutside']),
@@ -929,6 +929,7 @@
             }
             self.clear();
             self.setIsOutside(true);
+            self.setIsStatus(false);
             this.$router.push({
               name: 'zsBatch',
               query: {
@@ -1153,7 +1154,7 @@
         }
         // 跳转批次详情、编辑
         //  && (item['Calculated Activity Status'] === 'Draft' || item['Calculated Activity Status'] === 'Rejected')
-        if (userInfo['Id'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'Declined') && (fItem['Calculated Activity Status'] === 'In Progress' || fItem['Calculated Activity Status'] === 'Close Reject')) { // 汇总节点是否开启  未开始=Not Started、草稿=Planning(设定计划)、审批驳回=Declined 要编辑提交 并且有权限的人才可做此操作
+        if (userInfo['Id'] === item['Primary Owner Id'] && (item['Calculated Activity Status'] === 'Not Started' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'Declined' || item['Calculated Activity Status'] === 'Partner Assigned' || item['Calculated Activity Status'] === 'HQ Reject') && (fItem['Calculated Activity Status'] === 'In Progress' || fItem['Calculated Activity Status'] === 'Close Reject')) { // 汇总节点是否开启  未开始=Not Started、草稿=Planning(设定计划)、审批驳回=Declined、总部驳回=HQ Reject、委外已分配=Partner Assigned 要编辑提交 并且有权限的人才可做此操作
           this.clear();
           var itemTask = KND.Util.toArray(fItem['KL Installation Task'])[0];
           this.getTaskType(itemTask);
@@ -1173,6 +1174,7 @@
                 self.setShowZs(false);
               }
               self.setIsOutside(true);
+              self.setIsStatus(false);
               this.$router.push({
                 name: 'zsBatch',
                 query: {
