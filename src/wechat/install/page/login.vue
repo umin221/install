@@ -76,8 +76,8 @@
         tools.valid.call(me, () => {
           me.queryUserInfo({
             data: {
-              'Login Name': me.username,
-              'KL Outsource Password': me.password
+              'Login Name': me.username.trim(),
+              'KL Outsource Password': me.password.trim()
             },
             success: user => {
               // 缓存用户进入APP首页

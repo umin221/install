@@ -6,7 +6,6 @@ let apiList = {
    */
   queryInstallTask: option => {
     return {
-      method: 'post',
       url: 'service/EAI Siebel Adapter/Query',
       data: {
         'body': {
@@ -19,7 +18,31 @@ let apiList = {
           }, 'KL Installation Task')}`,
           'ViewMode': 'All', // 选填 固定 All
           'StartRowNum': '0',
-          'PageSize': '50'
+          'PageSize': '100'
+        }
+      }
+    };
+  },
+
+  /**
+   * 查询安装员的安装批次
+   * @param option
+   */
+  queryEmpInstallTask: option => {
+    return {
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base KL Installation Task',
+          'SearchSpec': `(${KND.Util.condition2D({
+            'Calculated Activity Status': ['In Progress', 'Approved'] // 状态是 进行中 & 审批通过 的批次
+          }, 'KL Installation Task', ' OR ')}) AND ${KND.Util.condition({
+            'KL Detail Type LIC': 'Lock Installation', // 真锁批次
+            'Primary Owner Id': option.data.id // 员工id
+          }, 'KL Installation Task')}`,
+          'StartRowNum': '0',
+          'PageSize': '100'
+          // 'SearchSpec': '[KL Installation Task.KL Detail Type LIC]="Lock Installation" AND [KL Installation Task.Primary Owner Id]="1-2BSANMMF" AND ([KL Installation Task.Calculated Activity Status]="In Progress" OR [KL Installation Task.Calculated Activity Status]="Approved")'
         }
       }
     };
@@ -233,9 +256,54 @@ let apiList = {
    * @returns {{method: string, url: string}}
    */
   queryUserInfo: option => {
+    let me = this;
+    let data = option.data;
+    let error = option.error;
+    let success = option.success;
     return {
       method: 'get',
-      url: `data/KL User/User/?searchspec=${KND.Util.condition(option.data)}&PageSize=2&StartRowNum=0`
+      url: `data/KL User/User/?searchspec=${KND.Util.condition(data)}&PageSize=2&StartRowNum=0`,
+      error: err => {
+        console.log(err);
+        console.log(error);
+        // 员工登陆
+        me.a.get({
+          key: 'queryEmployeeInfo',
+          data: data,
+          success: result => {
+            apiList['queryInstallTask'] = apiList['queryEmpInstallTask'];
+            // 设置userID
+            KND.Native.userID = data['Login Name'];
+            // 获取员工信息
+            KND.Native.getUserInfo(info => {
+              console.log(info);
+              success({items: info});
+            });
+          },
+          error: err => {
+            console.log(err);
+            error(err);
+          }
+        });
+      }
+    };
+  },
+
+  /**
+   * 工程师登陆
+   * @param option
+   * @returns
+   */
+  queryEmployeeInfo: option => {
+    let data = option.data;
+    return {
+      url: 'https://www.kinlong.cn/sso/users/access/',
+      data: {
+        'X-Idaas-Rest-Subject-Type': 'USERCREDENTIAL',
+        'X-Idaas-Rest-Subject-Username': data['Login Name'],
+        'X-Idaas-Rest-Subject-Password': data['KL Outsource Password'],
+        'X-Idaas-Rest-New-Token-Type-To-Create': 'USERTOKEN'
+      }
     };
   }
 

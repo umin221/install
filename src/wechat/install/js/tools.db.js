@@ -356,7 +356,9 @@ class Cache {
           data: JSON.stringify(data),
           create_date: now()
         }).then(result => {
-          let installTask = util.toArray(data.SiebelMessage && data.SiebelMessage.Contact['KL Installation Task']);
+          let batchs = data.SiebelMessage;
+          batchs = batchs && (batchs.Contact || batchs);
+          let installTask = util.toArray(batchs['KL Installation Task']);
           console.log('批次缓存完成...');
           resolve(installTask);
         });
