@@ -17,7 +17,7 @@
           <mt-tab-container-item id="tab-container1">
             <div class="mt-Detail-info">
               <div>产品条形码：{{serviceDetail['KL SN']}} <a href="javascript:void(0);" class="detail-call"></a></div>
-              <div>产品型号：{{serviceDetail['KL Product Model']}}</div>
+              <div>产品型号：{{serviceDetail['KL Lock Body Model']}} {{serviceDetail['KL Lock Model']}}</div>
               <div>申请时间：{{serviceDetail['Created']}}</div>
               <div>预约时间：{{serviceDetail['KL Customer Appointment Time']}}</div>
               <div>

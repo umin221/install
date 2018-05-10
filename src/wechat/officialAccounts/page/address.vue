@@ -108,9 +108,10 @@
         });
       },
       deleteAddr(Id, type) {
-        console.log(Id);
-        let me = this;
-        me.deleteAddress({Id, type});
+        MessageBox.confirm('确认删除该地址', '提示').then(action => {
+          let me = this;
+          me.deleteAddress({Id, type});
+        });
       },
       setDefault(Id) {
         let me = this;

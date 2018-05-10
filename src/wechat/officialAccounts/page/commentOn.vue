@@ -57,7 +57,7 @@
                  type="textarea"
                  :attr="{ maxlength: 250 }"
                  v-model="comments"
-                 placeholder="请输入意见与反馈,最多输入200字..."></mt-field>
+                 placeholder="请输入意见与反馈,最多输入250字..."></mt-field>
       <button-group v-if="!type">
         <mt-button class="single" @click.native="submit">提交</mt-button>
       </button-group>
