@@ -74,6 +74,63 @@ export default new Vuex.Store({
           });
         }
       }
+    },
+    detail: {
+      namespaced: true,
+      state: {
+        DestinationList: [],
+        SourceList: []
+      },
+      mutations: {
+        setData(state, {dataList, list}) {
+          state[list] = dataList;
+        },
+        addData(state, {dataList, list}) {
+          state[list].push(...dataList);
+        },
+        setManager(state, isManager) {
+          mapps = config.mapp['detail'];
+        },
+        setTeam(state, isTeam) {
+          state.isTeam = isTeam;
+          // 清空列表数据
+          state.DestinationList = [];
+          state.SourceList = [];
+        }
+      },
+      actions: {
+        getDetail({state, commit}, {data, more, callback, error}) {
+          let status = data['Status'];
+          let mapp = mapps[status] || {};
+          // 搜索时，没有状态
+          let list = mapp['list'] || 'result';
+
+          data['Status'] = mapp['status'];
+          console.log(data);
+          api.get({
+            key: 'getDetail',
+            data: data,
+            paging: {
+              StartRowNum: more ? state[list].length : 0,
+              PageSize: PAGESIZE
+            },
+            success: function(data) {
+              console.log(data);
+              let productList = KND.Util.toArray(data['items']);
+              if (productList) {
+                commit(more ? 'addData' : 'setData', {
+                  dataList: productList,
+                  list: list
+                });
+              }
+              if (callback) {
+                callback(productList);
+              }
+            },
+            error
+          });
+        }
+      }
     }
   }
 });

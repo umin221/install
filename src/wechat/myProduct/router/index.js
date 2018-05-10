@@ -22,5 +22,11 @@ export default new Router({
     component(resolve) {
       require(['../page/search'], resolve);
     }
+  }, {
+    path: '/detail', // 详情明细
+    name: 'detail',
+    component(resolve) {
+      require(['../page/detail'], resolve);
+    }
   }]
 });

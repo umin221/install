@@ -26,7 +26,8 @@
             <cus-cell class="multiple"
                       v-for="(item, index) in PartsList"
                       :key="item.Id"
-                      :title="'配件型号:'+ item['KL Prod Model No']">
+                      @click.native="toDetail(item['Inventory Location ID'],item['Product ID'])"
+                      :title="'配件型号:'+ item['KL Prod Model No']" is-link>
               <div slot="after" style="color: #A2BBFC">{{item.Type}}</div>
               <div class="mint-cell-sub-title" slot="title">配件名称：{{item['KL Product Name Join']}}</div>
               <div class="mint-cell-sub-title" slot="title">库存量：{{item['KL Inventory Qty']}}</div>
@@ -44,7 +45,8 @@
             <cus-cell class="multiple"
                       v-for="(item, index) in badPartsList"
                       :key="item.Id"
-                      :title="'配件型号:'+ item['KL Prod Model No']">
+                      @click.native="toDetail(item['Inventory Location ID'],item['Product ID'])"
+                      :title="'配件型号:'+ item['KL Prod Model No']" is-link>
               <div slot="after" style="color: #A2BBFC">{{item.Type}}</div>
               <div class="mint-cell-sub-title" slot="title">配件名称：{{item['KL Product Name Join']}}</div>
               <div class="mint-cell-sub-title" slot="title">库存量：{{item['KL Inventory Qty']}}</div>
@@ -121,6 +123,15 @@
           },
           more: true
         }, param.list, 'onBottomLoaded');
+      },
+      toDetail(InvId, ProductId) {
+        this.$router.push({
+          name: 'detail',
+          query: {
+            InvID: InvId,
+            ProductId: ProductId
+          }
+        });
       }
     },
     components: {loadmore, cusHeader, cusCell}

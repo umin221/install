@@ -26,6 +26,15 @@ let ApiList = {
         }
       }
     };
+  },
+  getDetail: option => {
+    console.log(option.data);
+    let searchspec = option.data.Status + '= "' + option.data.InvID + '" AND Product ID = "' + option.data.ProductId + '"';
+    delete option.data;
+    return {
+      method: 'GET',
+      url: 'data/FS Inventory Transaction/FS Inventory Transaction/?searchspec=' + searchspec + '&PageSize= ' + option.paging.PageSize + '&StartRowNum=' + option.paging.StartRowNum
+    };
   }
 };
 
