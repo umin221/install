@@ -391,29 +391,35 @@ export default new Vuex.Store({
           } else {
             state.processDate = [{Note: '暂无数据'}];
           }
+          if (form.Action) {
+            let Action = KND.Util.toArray(form.Action);
+            let Action1 = [];
+            for (let i = 0;i < Action.length;i++) {
+              if (Action[i]['KL Detail Type'] === '派工') {
+                Action1.push(Action[i]);
+              }
+            }
+            state.Action = systemSort(Action1, 'Created')[0];
+          }
           if (state.role === 'custom') {
             if (form.Owner === state.meg['Emp #'] || !form.Owner) {
               if ((form['KL Status LIC'] === 'Not Started' || form['KL Status LIC'] === 'To Be Assigned') && form['SR Type'] === '上门维修') {
                 state.BtnStatu = 'status4';
               }
-              if (form.Action) {
-                let Action = KND.Util.isArray(form.Action) ? form.Action[0] : form.Action;
-                state.Action = Action;
-              }
             }
           } else {
             if (form.Action) {
-              let Action = KND.Util.isArray(form.Action) ? form.Action[0] : form.Action;
-              if (Action['Status INT'] === 'Not Started') {
+              // let Action = KND.Util.isArray(form.Action) ? form.Action[0] : form.Action;
+              if (state.Action['Status INT'] === 'Not Started') {
                 state.BtnStatu = 'status1';
-              } else if (Action['Status INT'] === 'Accepted') {
+              } else if (state.Action['Status INT'] === 'Accepted') {
                 state.BtnStatu = 'status2';
-              } else if (Action['Status INT'] === 'Appointed' || Action['Status INT'] === 'Departed' || Action['Status INT'] === 'Arrived') {
+              } else if (state.Action['Status INT'] === 'Appointed' || state.Action['Status INT'] === 'Departed' || state.Action['Status INT'] === 'Arrived') {
                 state.BtnStatu = 'status3';
-              } else if (Action['Status INT'] === 'Done') {
+              } else if (state.Action['Status INT'] === 'Done') {
                 state.BtnStatu = '';
               }
-              state.Action = Action;
+              console.log(state.Action);
             } else {
               state.BtnStatu = '';
             }

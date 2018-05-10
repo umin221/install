@@ -11,19 +11,19 @@
 
       <div class="mint-content service-detail">
         <div class="detail-title">
-          <div class="mt-Detail-title">服务单编号：{{ServiceRequest['SR Number']}}<span class="user-state">{{Action['Status']}}</span></div>
-          <div v-if="role === 'install'" class="mt-Detail-title" >优先级：{{ServiceRequest['Priority']}}</div>
-          <div class="mt-Detail-title">联系人：{{ServiceRequest['Contact Last Name']}}</div>
-          <div v-if="role === 'custom'"   class="mt-Detail-title">服务类型：{{ServiceRequest['SR Type']}}</div>
-          <div class="mt-Detail-title">联系电话：
+          <div class="mt-Detail-title"><span class="label-title">服务单编号</span>{{ServiceRequest['SR Number']}}<span class="user-state">{{Action['Status']}}</span></div>
+          <div class="mt-Detail-title"><span class="label-title">联系电话</span>
             <a href="javascript:void(0);"
                class="detail-call i"
-              @click="call = !call">
-            <i class="xs-icon icon-call"
-                  style="font-size: 0.75rem">
-              {{ServiceRequest['KL Contact Mobile Phone']||ServiceRequest['Contact Business Phone']}}
+               @click="call = !call">
+              <i class="xs-icon icon-call"
+                 style="font-size: 0.75rem">
+                {{ServiceRequest['KL Contact Mobile Phone']||ServiceRequest['Contact Business Phone']}}
               </i>
             </a></div>
+          <div v-if="role === 'install'" class="mt-Detail-title" ><span class="label-title">优先级</span>{{ServiceRequest['Priority']}}</div>
+          <div class="mt-Detail-title"><span class="label-title">联系人</span>{{ServiceRequest['Contact Last Name']}}</div>
+          <div v-if="role === 'custom'"   class="mt-Detail-title"><span class="label-title"> 服务类型</span>{{ServiceRequest['SR Type']}}</div>
         </div>
         <div class="detail-content">
           <mt-navbar v-model="active">
@@ -32,19 +32,18 @@
           <mt-tab-container v-model="active">
             <mt-tab-container-item id="tab-container1" class="marginB">
               <div class="mt-Detail-info">
-                <div>产品条形码：<a href="javascript:void(0);" class="detail-call">{{ServiceRequest['KL SN']}}</a></div>
-                <div>产品型号：{{ServiceRequest['KL Product Model']}}</div>
-                <div>申请时间：{{toDate(ServiceRequest['Created'])}}</div>
-                <div>客户预约时间：{{toDate(ServiceRequest['KL Customer Appointment Time'])}}</div>
-                <div>实际预约时间：{{toDate(Action['Planned'])}}</div>
-                <div>地址：
-                  {{ServiceRequest['KL Province']}}
+                <div><span>客户预约时间</span>{{toDate(ServiceRequest['KL Customer Appointment Time'])}}</div>
+                <!--<div><span>实际预约时间</span>{{toDate(Action['Planned'])}}</div>-->
+                <div><span>用户故障说明</span>{{ServiceRequest['Sub-Area']}}</div>
+                <div><span>产品条形码</span><a href="javascript:void(0);" class="detail-call">{{ServiceRequest['KL SN']}}</a></div>
+                <div><span>产品型号</span>{{ServiceRequest['KL Lock Body Model']}} {{ServiceRequest['KL Lock Model']}}</div>
+                <div><span>申请时间</span>{{toDate(ServiceRequest['Created'])}}</div>
+                <div><span>地址</span>{{ServiceRequest['KL Province']}}
                   {{ServiceRequest['KL City']}}
                   {{ServiceRequest['KL Town']}}
                   {{ServiceRequest['KL Address']}}
                 </div>
-                <div>用户故障说明：{{ServiceRequest['Sub-Area']}}</div>
-                <div>问题说明：
+                <div><span>问题说明</span>
                   <p class="Description">
                     {{ServiceRequest['Description']||ServiceRequest['Complaint Description']}}
                   </p>
@@ -69,16 +68,16 @@
                           label="故障记录"
                           @ck="showAttach({id:item.Id, index:index, type:'Problem Record',len:ProblemRecord[index].list.length})">
                     <ul class="failure-record">
-                      <li>产品序列号：{{item['KL SN']}}</li>
+                      <li><span>产品序列号</span>{{item['KL SN']}}</li>
                       <!--<li>详细地址：-->
                         <!--{{ServiceRequest['KL Province']}}-->
                         <!--{{ServiceRequest['KL City']}}-->
                         <!--{{ServiceRequest['KL Town']}}-->
                         <!--{{ServiceRequest['KL Address']}}-->
                       <!--</li>-->
-                      <li>产品类型：{{item['KL Product Model']}}</li>
-                      <li>故障描述：{{item['KL Responsbility']}}</li>
-                      <li>故障现象：{{item['SR Rootcause']}}</li>
+                      <li><span>产品类型</span>{{item['KL Product Model']}}</li>
+                      <li><span>故障描述</span>{{item['KL Responsbility']}}</li>
+                      <li><span>故障现象</span>{{item['SR Rootcause']}}</li>
                       <attach ioName="KL Service Request Attachment IO" ref="attach"
                               :attach="ProblemRecord[index].list"
                               :edit="ProblemRecord[index].edit"
@@ -116,8 +115,6 @@
                   </toggle>
                 </div>
               </toggle>
-
-
               <toggle
                 v-if="ServiceRequest['Action']"
                 :type="true"
@@ -126,16 +123,16 @@
                   <toggle :title="false"
                           label="故障记录">
                     <ul class="failure-record">
-                      <li>产品序列号：{{ServiceRequest['KL SN']}}</li>
-                      <li>详细地址：
+                      <li><span>产品序列号</span>{{ServiceRequest['KL SN']}}</li>
+                      <li><span>详细地址</span>
                         {{ServiceRequest['KL Province']}}
                         {{ServiceRequest['KL City']}}
                         {{ServiceRequest['KL Town']}}
                         {{ServiceRequest['KL Address']}}
                       </li>
-                      <li>产品类型：{{ServiceRequest['KL Product Model']}}</li>
-                      <li>故障描述：{{ServiceRequest['KL Responsbility']}}</li>
-                      <li>故障现象：{{ServiceRequest['SR Rootcause']}}</li>
+                      <li><span>产品类型</span>{{ServiceRequest['KL Product Model']}}</li>
+                      <li><span>故障描述</span>{{ServiceRequest['KL Responsbility']}}</li>
+                      <li><span>故障现象</span>{{ServiceRequest['SR Rootcause']}}</li>
                       <attach ioName="KL Service Request Attachment IO" ref="attach"
                               :attach="attach1.list"
                               :edit="attach1.edit"
@@ -154,7 +151,7 @@
                       <div v-if="orderEntry['Order Entry - Line Items']">
                         <div  v-for="(item, index) in orderEntryItem">
                           <div class="enter-order">
-                            <div>{{item['KL Warranty Flag'] === "N" ? "保内": "保外"}}</div>
+                            <div>{{item['KL Warranty Flag'] === "Y" ? "保内": "保外"}}</div>
                             <div>{{item['KL Product Name Join']}}</div>
                             <div>{{item['Quantity Requested']}}</div>
                           </div>
@@ -291,28 +288,6 @@
         </mt-cell>-->
 
         <div class="work-order">
-          <!--父服务请求标题-->
-          <sr-title :srNum="ServiceRequest['SR Number']"
-                    :name="ServiceRequest['Contact Last Name']"
-                    :iscomple="ServiceRequest['KL Parent SR Complete Flag'] === 'Y'"></sr-title>
-          <!--父服务请求-->
-          <div class="parent-work-order" v-if="!ServiceRequest['KL Parent SR Complete Flag']">
-            <!--父服务请求 记录故障-->
-            <mt-cell class="xs-icon icon-saver" title="记录故障">
-              <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause']"
-                         @click="fillIn(ServiceRequest.Id)">已填写</mt-button>
-              <mt-button v-else-if="Action['Status INT']==='Arrived' && !ServiceRequest['SR Rootcause']"
-                         @click="clickPosition('comEnter')">填写</mt-button>
-              <mt-button v-else style="background: gainsboro">填写</mt-button>
-            </mt-cell>
-            <!--父服务请求 完工确认-->
-            <mt-cell class="xs-icon icon-finish" title="完工确认">
-              <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause'] && !ServiceRequest['KL Parent SR Complete Flag']"
-                         @click.native="clickPosition('failureRecord')">填写</mt-button>
-              <mt-button v-else style="background: gainsboro">填写</mt-button>
-            </mt-cell>
-          </div>
-
           <!--子服务请求-->
           <div class="child-work-order"
                 v-for="(item, index) in allChildService">
@@ -337,10 +312,32 @@
               </mt-cell>
             </div>
           </div>
+
+          <!--父服务请求标题-->
+          <sr-title :srNum="ServiceRequest['SR Number']"
+                    :name="ServiceRequest['Contact Last Name']"
+                    :iscomple="ServiceRequest['KL Parent SR Complete Flag'] === 'Y'"></sr-title>
+          <!--父服务请求-->
+          <div class="parent-work-order" v-if="!ServiceRequest['KL Parent SR Complete Flag']">
+            <!--父服务请求 记录故障-->
+            <mt-cell class="xs-icon icon-saver" title="记录故障">
+              <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause']"
+                         @click="fillIn(ServiceRequest.Id)">已填写</mt-button>
+              <mt-button v-else-if="Action['Status INT']==='Arrived' && !ServiceRequest['SR Rootcause']"
+                         @click="clickPosition('comEnter')">填写</mt-button>
+              <mt-button v-else style="background: gainsboro">填写</mt-button>
+            </mt-cell>
+            <!--父服务请求 完工确认-->
+            <mt-cell class="xs-icon icon-finish" title="完工确认">
+              <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause'] && !ServiceRequest['KL Parent SR Complete Flag']"
+                         @click.native="clickPosition('failureRecord')">填写</mt-button>
+              <mt-button v-else style="background: gainsboro">填写</mt-button>
+            </mt-cell>
+          </div>
         </div>
         <!--再记一单&&结束工单-->
         <mt-cell class="completeEnd">
-          <mt-button @click.native="moreOrder" style="margin-right: 10px;">再记一单</mt-button>
+          <mt-button @click.native="moreOrder" style="margin-right: 1rem;">再记一单</mt-button>
           <mt-button v-if="Action['Status INT']==='Arrived'"
                       @click.native="clickPosition('end')">结束</mt-button>
           <mt-button v-else style="background: gainsboro">确认</mt-button>
@@ -683,15 +680,17 @@
         }
       },
       moreOrder() {
-        let me = this;
-        let params = {
-          parentId: me.ServiceRequest['Id'],
-          contactId: me.ServiceRequest['Contact Id'],
-          lastName: me.ServiceRequest['Contact Last Name'],
-          locationId: me.ServiceRequest['Personal Location Id'],
-          srNumber: me.ServiceRequest['SR Number']
-        };
-        me.addChildService(params);
+        MessageBox.confirm('新建后无法删除，是否再记一单', '提示').then(action => {
+          let me = this;
+          let params = {
+            parentId: me.ServiceRequest['Id'],
+            contactId: me.ServiceRequest['Contact Id'],
+            lastName: me.ServiceRequest['Contact Last Name'],
+            locationId: me.ServiceRequest['Personal Location Id'],
+            srNumber: me.ServiceRequest['SR Number']
+          };
+          me.addChildService(params);
+        });
       },
       fillIn(id) {
         let me = this;
@@ -820,6 +819,11 @@
           .detail-call{
             @include remove-decoration();
           }
+          .label-title{
+            display: inline-block;
+            width: 5rem;
+            color: grey;
+          }
         }
       }
       .detail-content{
@@ -879,6 +883,12 @@
                 padding-left: 0.5rem;
                 div{
                   line-height: 1.5rem;
+                  span{
+                    display: inline-block;
+                    width: 5rem;
+                    font-size: 0.7rem;
+                    color: gray;
+                  }
                   .detail-call{
                     @include remove-decoration();
                   }
@@ -889,7 +899,6 @@
                     word-break: break-all;
                     overflow: hidden;
                     font-size: 0.75rem;
-                    color: gray;
                   }
                 }
               }
@@ -928,7 +937,6 @@
       .work-order{
         max-height: 12rem;
         overflow: auto;
-        min-height: 5rem;
         .parent-work-order{
         }
       }
@@ -939,11 +947,11 @@
         .mint-cell-wrapper{
           .mint-cell-value{
             width: 100%;
-            -webkit-justify-content: space-evenly;
-            justify-content:space-evenly;
-            -moz-box-pack: space-evenly;
-            -webkit--moz-box-pack:space-evenly;
-            box-pack:space-evenly;
+            -webkit-justify-content: center;
+            justify-content:center;
+            -moz-box-pack: center;
+            -webkit--moz-box-pack:center;
+            box-pack:center;
           }
         }
         /*border-radius: 0 0 0.5rem 0.5rem;*/
@@ -969,6 +977,11 @@
     li{
       line-height: 1.5rem;
       font-size: 0.65rem;
+      span{
+        display: inline-block;
+        width: 4rem;
+        color: grey;
+      }
     };
   }
   .enter-order {

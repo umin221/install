@@ -286,7 +286,7 @@ let ApiList = {
         'Priority': option.data.form.Priority,
         'Description': option.data.form.ProductFlag,
         'SR Type': option.data.form.SR_TYPE,
-        'CEM Planned Start Date': option.data.form.Start_Date || '',
+        'KL Customer Appointment Time': option.data.form.Start_Date || '',
         'KL SN': option.data.form.KL_SN || '',
         'KL Product Model': option.data.form.KL_Product_Model,
         'KL Cutoff Date': option.data.form.KL_Cutoff_Date,

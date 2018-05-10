@@ -72,9 +72,12 @@
                    :value="SR_AREA"
                    @click.native="getLov('SR_AREA','')"
                    placeholder="请选择" is-link></cus-field>
-        <cus-field class=" margin-right"
-                   label="故障分级"
-                   :value="Priority"></cus-field>
+        <mt-cell class="mint-field margin-right"
+                  title="故障分级"
+                  :value="Priority"></mt-cell>
+        <!--<cus-field class=" margin-right"-->
+                   <!--label="故障分级"-->
+                   <!--:value="Priority"></cus-field>-->
         <mt-field class="block"
                   label="客服说明"
                   v-model="ProductFlag"
@@ -176,7 +179,8 @@
   import menuBox from '../../../public/components/cus-menu';
   import cusField from '../../../public/components/cus-field';
   Vue.use(vp);
-  let today = new Date();
+  let t = new Date().getTime() + 3600000;
+  let today = new Date(t);
   //  import { MessageBox } from 'mint-ui';
   let isMunicipality = function(...args) {
     let me = this;

@@ -102,7 +102,7 @@
     <mt-header fixed title="选择配件" style="z-index: 2">
       <fallback slot="left"></fallback>
     </mt-header>
-    <div class="mint-content" style="height:100%">
+    <div class="mint-content" style="height:80%">
       <empty v-show="!result1.length"></empty>
       <mt-navbar v-model="selectId"
                  v-if="result1.length">
@@ -213,7 +213,7 @@
       </cus-loadmore>
     </cus-search>-->
     </div>
-    <button-group>
+    <button-group style="z-index: 3000">
       <mt-button class="single" @click.native="selectEnter">确认</mt-button>
     </button-group>
   </div>
@@ -256,6 +256,32 @@
 //        }
 //      });
     },
+    activated() {
+      let me = this;
+      if (!me.returnSelect.length) {
+        me.type = this.$route.query.type;
+        me.getProduct({
+          value: '1',
+          callback: function(data) {
+            me.toChild(data[0].Id, '2');
+            me.selectId = data[0].Id;
+            for (let i = 0; i < data.length;i++) {
+//            Vue.set(me.value[data[i].Id], data[i].Id, 0);
+              me.value[data[i].Id] = 0;
+            }
+            for (let key in me.arr) {
+              if (me.arr[key].length) {
+                for (let i = 0;i < me.arr[key].length; i++) {
+                  if (me.arr[key][i].select) {
+                    me.arr[key][i].select = false;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    },
     components: {cusLoadmore, cusSearch, cusCell, toggle, srTitle},
     data: () => {
       return {
@@ -270,7 +296,8 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['result1', 'selected', 'returnSelect'])
+      ...mapState(NAMESPACE, ['result1', 'selected']),
+      ...mapState('saveFault', ['returnSelect'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['getProduct']),
@@ -371,7 +398,6 @@
     right: 0;
   }
   .searchTrans{
-    margin-bottom: 45px;
     background-color: white !important;
     .mint-navbar{
       flex-direction:column;
