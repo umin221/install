@@ -111,7 +111,10 @@
       // 不同批次或订单，清除楼栋
       if (refresh) {
         KND.Session.remove('refreshAssets');
-        if (me.$parent.transitionName === 'turn-on') me.editable = false;
+        if (me.$parent.transitionName === 'turn-on') {
+          me.editable = false;
+          me.selected = 0;
+        }
         // 清空楼栋
         me.clearLayer();
         // 清空选中房号

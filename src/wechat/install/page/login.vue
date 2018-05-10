@@ -31,6 +31,14 @@
   import cusField from 'public/components/cus-field';
   import buttonGroup from 'public/components/cus-button-group';
 
+  // 缓存登陆id，后续使用此账号提交数据
+  let setUser = user => {
+    let userID = KND.Util.parse(user)['Login Name'];
+    KND.Native.userID = userID;
+    KND.Session.set('userID', userID);
+    KND.Session.set('userInfo', user);
+  };
+
   let NAMESPACE = 'login';
   export default {
     name: NAMESPACE,
@@ -40,7 +48,7 @@
         success: result => {
           if (result.length) {
             // 获取缓存用户进入APP首页
-            KND.Session.set('userInfo', result[0].data);
+            setUser(result[0].data);
             me.$router.push('index');
           } else {
             me.showLogin = true;
@@ -51,8 +59,8 @@
     data() {
       return {
         remember: [],
-        username: '', // 15899999999 13899997777
-        password: '',
+        username: '15899999999', // 15899999999 13899997777
+        password: '123',
         showLogin: false
       };
     },
@@ -73,7 +81,7 @@
             },
             success: user => {
               // 缓存用户进入APP首页
-              KND.Session.set('userInfo', JSON.stringify(user));
+              setUser(JSON.stringify(user));
               me.$router.push('index');
             },
             error: err => {

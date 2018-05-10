@@ -5,6 +5,7 @@
  */
 import axios from 'axios';
 import cache from '../lib/cache';
+import queue from '../base/queue';
 
 (function(context) {
   // 工具类
@@ -53,14 +54,12 @@ import cache from '../lib/cache';
       util.log('获取用户信息 ' + userID);
       let user = util.parse(session.get('userInfo'));
       if (user && user['Login Name'] === userID) {
-        Indicator.close();
         callback(user);
       } else {
         this.ajax({
           method: 'get',
           url: 'data/KL Employee Interface BO/Employee/?searchspec=[Login Name] = "' + userID + '" &PageSize=2&StartRowNum=0',
           success: data => {
-            Indicator.close();
             session.set('userInfo', JSON.stringify(data.items));
             callback(data.items);
           }
@@ -192,12 +191,6 @@ import cache from '../lib/cache';
      * @param {Object} option 必填 ajax setting
      */
     online(option) {
-      // loading
-      if (option.loading !== false) {
-        Indicator.open({
-          spinnerType: 'fading-circle'
-        });
-      };
       let auth = config.authorization;
       // post data
       let setting = Object.extend(true, {
@@ -213,7 +206,6 @@ import cache from '../lib/cache';
       };
       // get data
       axios(setting).then(response => {
-        Indicator.close();
         let data = response.data;
         // Error 字段判断是否存在系统异常
         if (data.ERROR) {
@@ -224,7 +216,6 @@ import cache from '../lib/cache';
         // callback
         option.success(response.data);
       }).catch(error => {
-        Indicator.close();
         if (option.error) {
           option.error(error);
         } else {
@@ -269,7 +260,9 @@ import cache from '../lib/cache';
      * @param {Object} option 必填 ajax setting
      */
     ajax(option) {
-      this[option.cache ? 'cache' : 'online'](option);
+      let me = this;
+      option.execute = (task) => me[task.cache ? 'cache' : 'online'](task);
+      queue.queue(option);
     }
 
   }; let native = context['Native'] = new Native();

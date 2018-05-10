@@ -66,8 +66,6 @@
           user = info;
           // 获取数据
           this.loadBottomFn();
-          // 缓存登陆id，后续使用此账号提交数据
-          KND.Session.set('userID', info['Login Name']);
         }
       } else {
         this.$router.replace({

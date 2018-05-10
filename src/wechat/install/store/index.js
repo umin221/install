@@ -114,6 +114,7 @@ export default {
          * 获取批次下所有楼栋
          */
         queryBuilding({commit, dispatch}, option) {
+          let selected = option.selected || 0;
           let setting = {
             key: 'queryBuilding',
             data: option.data,
@@ -125,7 +126,7 @@ export default {
                 });
               } else {
                 building = KND.Util.toArray(data.SiebelMessage.Building);
-                let index = option.selected || 0;
+                let index = building.length > selected ? selected : 0;
                 // 默认获取第一栋信息
                 dispatch('getLayer', {
                   'Original Order Id': option.data.OrderId,
