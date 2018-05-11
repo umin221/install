@@ -35,7 +35,7 @@
           type: Boolean,
           default: true
         },
-        value: String,
+        value: '',
         isLink: Boolean,
         state: String,
         attr: Object
