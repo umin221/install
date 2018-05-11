@@ -26,6 +26,7 @@
                     v-for="item in pending"
                     is-link>
             <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
+            <div class="mint-cell-sub-title" slot="title">批次名称: {{item['KL Task Batch Name']}}</div>
             <div class="mint-cell-sub-title" slot="title">创建日期: {{item['Created']}}</div>
           </cus-cell>
         </cus-loadmore>
@@ -45,8 +46,10 @@
   let user = {};
   let loader = function(mode) {
     let me = this;
+    let isEmp = !!user['KL Primary Position Type LIC'];
     // 获取批次列表
     me.queryInstallTask({
+      key: isEmp ? 'queryEmpInstallTask' : 'queryInstallTask',
       data: {id: user.Id},
       mode: mode,
       list: 'pending',

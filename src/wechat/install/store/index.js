@@ -59,9 +59,9 @@ export default {
          * @param {Function} callback 选填 处理回调
          * @param {Function} error 选填 错误回调
          */
-        queryInstallTask({state, commit, dispatch}, {data, mode, list, callback}) {
+        queryInstallTask({state, commit, dispatch}, {key, data, mode, list, callback}) {
           cache.invoke({
-            key: 'queryInstallTask',
+            key: key,
             data: data,
             mode: mode,
             success: data => {

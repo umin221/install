@@ -29,6 +29,7 @@ let apiList = {
    * @param option
    */
   queryEmpInstallTask: option => {
+    let success = option.success;
     return {
       url: 'service/EAI Siebel Adapter/Query',
       data: {
@@ -37,13 +38,21 @@ let apiList = {
           'SearchSpec': `(${KND.Util.condition2D({
             'Calculated Activity Status': ['In Progress', 'Approved'] // 状态是 进行中 & 审批通过 的批次
           }, 'KL Installation Task', ' OR ')}) AND ${KND.Util.condition({
-            'KL Detail Type LIC': 'Lock Installation', // 真锁批次
+            'KL Detail Type LIC': 'Lock Installation Batch', // 真锁批次
             'Primary Owner Id': option.data.id // 员工id
           }, 'KL Installation Task')}`,
           'StartRowNum': '0',
           'PageSize': '100'
           // 'SearchSpec': '[KL Installation Task.KL Detail Type LIC]="Lock Installation" AND [KL Installation Task.Primary Owner Id]="1-2BSANMMF" AND ([KL Installation Task.Calculated Activity Status]="In Progress" OR [KL Installation Task.Calculated Activity Status]="Approved")'
         }
+      },
+      success: result => {
+        // 统一委外获取回调
+        let data = result.SiebelMessage;
+        result.SiebelMessage = {
+          Contact: data
+        };
+        success(result);
       }
     };
   },

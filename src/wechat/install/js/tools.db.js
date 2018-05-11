@@ -357,7 +357,7 @@ class Cache {
           create_date: now()
         }).then(result => {
           let batchs = data.SiebelMessage;
-          batchs = batchs && (batchs.Contact || batchs);
+          batchs = batchs && batchs.Contact;
           let installTask = util.toArray(batchs['KL Installation Task']);
           console.log('批次缓存完成...');
           resolve(installTask);
@@ -512,6 +512,13 @@ class Cache {
     setting.mode === 'refresh' ? getRemoteData() : helper.queryStrict('batch', {}, result => {
       result.length ? setting.success(filter(result)) : getRemoteData();
     });
+  };
+
+  /**
+   * 员工查询批次
+   */
+  queryEmpInstallTask(setting) {
+    this.queryInstallTask(setting);
   };
 
   /**
