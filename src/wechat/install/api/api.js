@@ -265,7 +265,6 @@ let apiList = {
    * @returns {{method: string, url: string}}
    */
   queryUserInfo: option => {
-    let me = this;
     let data = option.data;
     let error = option.error;
     let success = option.success;
@@ -274,9 +273,8 @@ let apiList = {
       url: `data/KL User/User/?searchspec=${KND.Util.condition(data)}&PageSize=2&StartRowNum=0`,
       error: err => {
         console.log(err);
-        console.log(error);
         // 员工登陆
-        me.a.get({
+        get({
           key: 'queryEmployeeInfo',
           data: data,
           success: result => {

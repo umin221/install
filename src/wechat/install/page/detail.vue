@@ -11,6 +11,7 @@
                    :value="assets['Street Address 4']"></cus-field>
         <cus-field label="产品条形码" tag="产品条形码"
                    :data-value="serial"
+                   :attr="{ maxlength: 20 }"
                    v-model="assets['serial']"
                    v-valid.require>
           <div class="xs-icon icon-scan" @click="toScanFn"></div>
@@ -59,6 +60,7 @@
       let me = this;
       let param = me.$route.query;
       me.assets = KND.Util.parse(param.room);
+      me.assets['serial'] = me.assets['serial'] || me.assets['Serial Number'];
       // 获取订单行
       this.queryOrderLines({
         data: {

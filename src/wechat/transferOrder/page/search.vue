@@ -3,12 +3,12 @@
   <div class="search">
     <cus-search v-model="value"
                 :show="true"
-                placeholder="请输入工程名称或负责人">
+                placeholder="请输入工程名称或合同编号">
 
         <cus-loadmore ref="result"
-                      :loadBottom="loadBottomFn"
+                      @loadBottom="loadBottomFn"
                       :emptyTips="false"
-                      :topStatus="topStatus">
+                      :refresh="false">
             <cus-cell class="multiple"
                       :key="item.id"
                       :title="'合同编号:'+ item['Agree Number']"
@@ -37,8 +37,7 @@
     let param = {
       data: {
         'Agree Number': exp, // 项目编号
-        'Opportunity Name': exp, // 项目名称
-        'Setter': exp
+        'Opportunity Name': exp // 项目名称
       },
       more: args.pop(),
       callback: (data) => {
@@ -55,8 +54,7 @@
     components: {cusLoadmore, cusSearch, cusCell},
     data: () => {
       return {
-        value: '',
-        topStatus: ''
+        value: ''
       };
     },
     computed: {

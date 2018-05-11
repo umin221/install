@@ -10,6 +10,8 @@ let envConfig = {};
 // 项目配置
 let config;
 let name;
+// 是否生产标记
+let production = process.env.NODE_ENV === 'production';
 
 /**
  * 环境配置
@@ -30,7 +32,8 @@ switch (env) {
     envConfig.authorization = 'ACCOUNT'; // 认证模式 认证密码
 };
 
-config = Object.assign(envConfig, dev, process.env.NODE_ENV === 'production' ? prod : {}, project);
+config = Object.assign(envConfig, dev, production ? prod : {}, project);
+config.isProduction = production;
 name = config['name'];
 
 global['config'] = config;
