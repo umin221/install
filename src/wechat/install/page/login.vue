@@ -55,12 +55,17 @@
           }
         }
       });
+
+      if (!config.isProduction) {
+        me.username = 'IE01'; // 15899999999 13899997777
+        me.password = 'Asdf2017';
+      }
     },
     data() {
       return {
         remember: [],
-        username: '15899999999', // 15899999999 13899997777
-        password: '123',
+        username: '',
+        password: '',
         showLogin: false
       };
     },
