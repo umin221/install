@@ -38,7 +38,7 @@
         <lock-line title="委外安装员" @click="addInstaller('')">
           <mt-cell-swipe v-for="(installer, index) in installerList" class="lock-line-cell enable" ref="body" :key=index>
             <div class="co-flex co-jc" slot="title">
-              <span class="co-f1">{{installer['Last Name']}}</span>
+              <span class="co-f1">{{installer['Last Name']}}/{{installer['KL Outsource Password']}}</span>
               <span class="co-f1">{{installer['Work Phone #']}}</span>
             </div>
           </mt-cell-swipe>

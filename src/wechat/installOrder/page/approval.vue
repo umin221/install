@@ -4,7 +4,7 @@
       <fallback slot="left"></fallback>
     </mt-header>
     <div class="mint-content journal editable">
-      <div class="lock-line" :class="{'disable': !editable}">
+      <div class="lock-line">
         <lock-line :title="item['Item Type Display Name']" v-for="(item, index) in processDate" :key="index">
           <div class="crm-zyList" v-for="(itemTask, index) in upList(item['UInbox Item Task'])" :key="index">
             <ul class="content">
@@ -20,6 +20,12 @@
               <div class="content-div">
                 <div>审批意见：{{itemTask['KL Request Description']}}</div>
               </div>
+              <div class="singleBnt" v-if="is_show(itemTask)">
+                <div class="single"
+                           @click="submitFn(itemTask, 'Rejected')">驳回</div>
+                <div class="single" style="margin-left: 20px"
+                           @click="submitFn(itemTask, 'Approved')">确认</div>
+              </div>
             </ul>
           </div>
         </lock-line>
@@ -29,7 +35,6 @@
 </template>
 <style lang="scss">
   .journal {
-    background: white;
     .lock-line {
       margin-top: 10px;
 
@@ -43,9 +48,28 @@
     .icon-add-circle:before {
       content: ''!important;
     }
+    .singleBnt {
+      text-align: center;
+      height: 30px;
+      margin-top: 10px;
+      color: #5a5a5a;
+      font-size: 0.7rem;
+    }
+    .singleBnt .single {
+     width: 85px;
+     left: 10px;
+     float: left;
+     text-align: center;
+     border: 1px solid #00599f;
+     border-radius: 5px;
+    }
     /*流程*/
     .crm-zyList {
       overflow: hidden;
+      background: white;
+    }
+    .xs-icon {
+      margin-top:10px;
     }
     .crm-zyList ul {
       padding-left: 0;
@@ -92,6 +116,7 @@
 <script type="application/javascript">
   import api from '../api/api';
   import lockLine from '../components/cusLockLine';
+  let userInfo = {};
   export default {
     name: 'approval',
     created() {
@@ -101,6 +126,10 @@
       this.id = param.id;
       this.type = param.type;
       this.getApproval();
+      KND.Native.getUserInfo((info) => {
+        userInfo = info;
+        console.log(userInfo);
+      });
     },
     data: () => {
       return {
@@ -124,6 +153,13 @@
       upList(obj) {
         return KND.Util.toArray(obj);
       },
+      is_show(itemTask) {
+        if (userInfo['Id'] === itemTask['Task Owner Id'] && itemTask['Active Flag'] === 'Y') {
+          return true;
+        } else {
+          return false;
+        }
+      },
       getApproval() {
         var self = this;
         api.get({ // 提交数据
@@ -142,6 +178,58 @@
             }
           }
         });
+      },
+      submitFn(itemTask, type) {
+        var self = this;
+        if (type === 'Approved') {
+          api.get({
+            key: 'setApproval',
+            method: 'POST',
+            data: {
+              'body': {
+                'Object Id': itemTask['Item Object Id'],
+                'InboxItemId': itemTask['Item Id'],
+                'InboxTaskId': itemTask['Id'],
+                'ActionLIC': type,
+                'KL Request Description': '',
+                'ProcessName': 'KL Install Task Approval Action Main Workflow'
+              }
+            },
+            success: function(data) {
+              if (!data.ERROR) {
+                Toast('审批成功');
+                self.getApproval();
+              }
+            }
+          });
+        } else {
+          MessageBox.prompt('请填写驳回原因').then(({ value, action }) => {
+            if (value) {
+              api.get({
+                key: 'setApproval',
+                method: 'POST',
+                data: {
+                  'body': {
+                    'Object Id': itemTask['Item Object Id'],
+                    'InboxItemId': itemTask['Item Id'],
+                    'InboxTaskId': itemTask['Id'],
+                    'ActionLIC': type,
+                    'KL Request Description': value,
+                    'ProcessName': 'KL Install Task Approval Action Main Workflow'
+                  }
+                },
+                success: function(data) {
+                  if (!data.ERROR) {
+                    Toast('审批成功');
+                    self.getApproval();
+                  }
+                }
+              });
+            } else {
+              Toast('请填写驳回原因');
+            }
+          });
+        }
       }
     }
   };
