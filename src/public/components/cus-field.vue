@@ -6,6 +6,7 @@
       :value="currentValue"
       :state="state"
       :type="type"
+      :attr="attr"
       @change="changeFn"
       @input="handleInput">
       <slot></slot>
@@ -36,7 +37,8 @@
         },
         value: String,
         isLink: Boolean,
-        state: String
+        state: String,
+        attr: Object
       },
       data() {
         return {
