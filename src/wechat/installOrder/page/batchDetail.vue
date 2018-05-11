@@ -42,6 +42,7 @@
       <div class="lock-line" v-show="is_plan"  :class="{'disable': !editable}">
         <lock-line title="详细计划">
           <mt-cell-swipe v-for="(line, index) in planList" class="lock-line-cell enable" ref="body"
+                         :class="{'active': colorCla(line)}"
                          @click.native="addPlanList(line)"
                          :key=index
                          is-link>
@@ -77,6 +78,9 @@
       margin-top: 2.5rem;
       width: 100%;
       text-align: center;
+    }
+    .active {
+      background: #d7ded8!important;
     }
     .numCla input {
       color: #0772c1!important;
@@ -205,6 +209,14 @@
         if (self.detailData['KL Detail Type LIC'] === 'Lock Installation Batch' && self.detailData['KL Delivery Sales Type'] === '工程' && self.is_User && self.detailData['Calculated Activity Status'] !== 'Completed') {
           return 'numCla';
         }
+      },
+      colorCla(item) {
+        var self = this;
+        var is_date = false;
+        if (self.is_User && (self.detailData['Calculated Activity Status'] === 'In Progress' || self.detailData['Calculated Activity Status'] === 'Approved') && !item['Started']) { // 判断是否可以编辑完成时间 审批通过、进行中 && 当前负责人&& 完成时间为空才能修改
+          is_date = true;
+        }
+        return is_date;
       },
       addPlanList(item) {
         var self = this;

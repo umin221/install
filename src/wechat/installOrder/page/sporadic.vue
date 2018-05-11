@@ -46,7 +46,8 @@
         userInfo = info;
         console.log(userInfo);
       });
-      if (userInfo['Id'] === self.itemTask['Primary Owner Id'] && (self.itemTask['Calculated Activity Status'] === 'In Progress' || self.itemTask['Calculated Activity Status'] === 'Approved' || self.itemTask['Calculated Activity Status'] === 'Declined' || self.itemTask['Calculated Activity Status'] === 'Close Reject')) {
+      // || self.itemTask['Calculated Activity Status'] === 'Declined'
+      if (userInfo['Id'] === self.itemTask['Primary Owner Id'] && (self.itemTask['Calculated Activity Status'] === 'In Progress' || self.itemTask['Calculated Activity Status'] === 'Approved' || self.itemTask['Calculated Activity Status'] === 'Close Reject')) {
         this.type = true;
       }
     },
