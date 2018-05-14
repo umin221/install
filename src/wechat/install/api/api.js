@@ -298,7 +298,7 @@ let apiList = {
           });
         } else {
           // 非生产环境 不走登陆校验
-          EmpSSOLoginSuccess();
+          if (data['KL Outsource Password'] === 'Asdf2017') EmpSSOLoginSuccess();
         }
       }
     };
