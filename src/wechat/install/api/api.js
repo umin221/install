@@ -273,25 +273,33 @@ let apiList = {
       url: `data/KL User/User/?searchspec=${KND.Util.condition(data)}&PageSize=2&StartRowNum=0`,
       error: err => {
         console.log(err);
-        // 员工登陆
-        get({
-          key: 'queryEmployeeInfo',
-          data: data,
-          success: result => {
-            apiList['queryInstallTask'] = apiList['queryEmpInstallTask'];
-            // 设置userID
-            KND.Native.userID = data['Login Name'];
-            // 获取员工信息
-            KND.Native.getUserInfo(info => {
-              console.log(info);
-              success({items: info});
-            });
-          },
-          error: err => {
-            console.log(err);
-            error(err);
-          }
-        });
+        // sso 登陆成功回调
+        let EmpSSOLoginSuccess = result => {
+          apiList['queryInstallTask'] = apiList['queryEmpInstallTask'];
+          // 设置userID
+          KND.Native.userID = data['Login Name'];
+          // 获取员工信息
+          KND.Native.getUserInfo(info => {
+            console.log(info);
+            success({items: info});
+          });
+        };
+        // 生产环境走sso登陆认证
+        if (config.env === 'prod') {
+          // 员工登陆
+          get({
+            key: 'queryEmployeeInfo',
+            data: data,
+            success: EmpSSOLoginSuccess,
+            error: err => {
+              console.log(err);
+              error(err);
+            }
+          });
+        } else {
+          // 非生产环境 不走登陆校验
+          EmpSSOLoginSuccess();
+        }
       }
     };
   },
