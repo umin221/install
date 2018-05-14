@@ -153,18 +153,6 @@
   #app {
     > div {
       overflow: hidden;
-
-      > .wrapper {
-        position: absolute;
-        width: 100%;
-        top: $header-height;
-        bottom: 0;
-        overflow: scroll;
-
-        &.install {
-          top: 4rem;
-        }
-      }
     }
   }
 

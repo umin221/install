@@ -164,7 +164,7 @@ export default new Router({
     path: '/orderLine', // 锁体&面板
     name: 'orderLine',
     component(resolve) {
-      require(['../page/orderLine'], resolve);
+      require(['../../transferOrder/page/orderLine'], resolve);
     }
   }, { // 订单行 其他配件
     path: '/fitting',
