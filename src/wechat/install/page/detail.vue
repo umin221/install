@@ -59,8 +59,9 @@
     created() {
       let me = this;
       let param = me.$route.query;
-      me.assets = KND.Util.parse(param.room);
-      me.assets['serial'] = me.assets['serial'] || me.assets['Serial Number'];
+      let room = KND.Util.parse(param.room);
+      room.serial = room['serial'] || room['Serial Number'];
+      me.assets = room;
       // 获取订单行
       this.queryOrderLines({
         data: {
@@ -113,15 +114,19 @@
         let me = this;
         tools.valid.call(me, () => {
           let assets = me.assets;
-          this.installOrderAssets({
-            data: {
-              'Id': assets['Id'],
-              'Serial Number': assets['serial'],
-              'Product Id': assets['Product Id'],
-              'KL Product Model No Lock Body': assets['KL Product Model No Lock Body'],
-              'KL Product Model No Panel': assets['KL Product Model No Panel']
-            }
-          });
+          if (/[A-Za-z0-9]+$/.test(assets['serial'])) {
+            this.installOrderAssets({
+              data: {
+                'Id': assets['Id'],
+                'Serial Number': assets['serial'],
+                'Product Id': assets['Product Id'],
+                'KL Product Model No Lock Body': assets['KL Product Model No Lock Body'],
+                'KL Product Model No Panel': assets['KL Product Model No Panel']
+              }
+            });
+          } else {
+            Toast('条码必须包含字母或数字');
+          }
         });
       },
       /**

@@ -9,7 +9,7 @@
       <mt-button slot="right"
                  v-show="isSelect"
                  @click.native="selectAll = true;">全选</mt-button>
-      <mt-button v-show="!isEdit && !isSelect" @click.native="submitFn" slot="right" >提交</mt-button>
+      <mt-button v-show="!isEdit && !isSelect && hasLocalInstallRecords" @click.native="submitFn" slot="right" >提交</mt-button>
     </mt-header>
 
     <div class="wrapper">
@@ -80,8 +80,6 @@
   let layers = {};
   // 当前最高楼层
   let maxFloor = 0;
-  // 本地扫码记录
-  let installRecords = {};
 
   const NAMESPACE = 'assets';
   export default {
@@ -91,7 +89,7 @@
       KND.Event.bind('submitHook', data => {
         // 查询本地缓存安装记录
         me.queryLocalInstallRecord(result => {
-          installRecords = result;
+          me.installRecords = result;
           // 当前资产 更新标记
           me.updateAssets++;
         });
@@ -131,7 +129,7 @@
         if (config.offline) {
           // 查询本地缓存安装记录
           me.queryLocalInstallRecord(result => {
-            installRecords = result;
+            me.installRecords = result;
           });
         }
       }
@@ -151,7 +149,9 @@
         // 底部推出菜单操作对象
         sheetObject: '',
         // 当前资产 更新标记
-        updateAssets: 0
+        updateAssets: 0,
+        // 安装记录
+        installRecords: ''
       };
     },
     computed: {
@@ -162,48 +162,63 @@
       isEdit() {
         return this.mode === 'edit';
       },
+      // 检测本地记录，控制提交按钮显示隐藏
+      hasLocalInstallRecords() {
+        let rc = this.installRecords;
+        let flag = false;
+        for (let r in rc) {
+          if (rc[r].state === 'pending') {
+            flag = true;
+            break;
+          }
+        }
+        return flag;
+      },
       /**
        * 重构楼层信息&标记选中状态
        */
       layers() {
         let me = this;
         let layer = me.layer;
+        let installRecords = me.installRecords;
         // 当前资产 更新标记
         me.updateAssets++;
         layers = {};
-        maxFloor = 0;
-        for (let i = 0, len = layer.length; i < len; i++) {
-          // 房号
-          let room = layer[i];
-          // 本地扫码记录
-          let record = installRecords[room.Id];
-          // 楼层
-          let floor = parseInt(room['KL Floor Number'], 10);
-          // 增加本地扫码标记
-          if (record) {
-            let sn = KND.Util.parse(record.data)['Serial Number'];
-            room['Serial Number'] = sn;
-            room['local'] = record.state === 'pending';
-          }
-          // 选择模式 不显示已移交房号，不显示未绑定条码房号
-          if (me.isSelect) {
-            if (room['Install Date'] || !room['Serial Number']) continue;
+        if (layer.length) {
+          maxFloor = 0;
+          for (let i = 0, len = layer.length; i < len; i++) {
+            // 房号
+            let room = layer[i];
+            // 本地扫码记录
+            let record = installRecords[room.Id];
+            // 楼层
+            let floor = parseInt(room['KL Floor Number'], 10);
+            // 增加本地扫码标记
+            if (record) {
+              let sn = KND.Util.parse(record.data)['Serial Number'];
+              room['Serial Number'] = sn;
+              room['local'] = record.state === 'pending';
+            }
+            // 选择模式 不显示已移交房号，不显示未绑定条码房号
+            if (me.isSelect) {
+              if (room['Install Date'] || !room['Serial Number']) continue;
+            };
+            // 房号标记
+            room = me.markFn(layer[i]);
+            // 楼层分组
+            layers[floor] = layers[floor] || [];
+            layers[floor].push(room);
+            // 更新最高楼层
+            if (floor > maxFloor) maxFloor = floor;
           };
-          // 房号标记
-          room = me.markFn(layer[i]);
-          // 楼层分组
-          layers[floor] = layers[floor] || [];
-          layers[floor].push(room);
-          // 更新最高楼层
-          if (floor > maxFloor) maxFloor = floor;
-        };
-        // 清空全选操作
-        me.selectAll = false;
-        // 房号排序
-        for (let i in layers) {
-          let floor = layers[i];
-          floor.sort((a, b) => a['KL Room Number'] > b['KL Room Number']);
-        };
+          // 清空全选操作
+          me.selectAll = false;
+          // 房号排序
+          for (let i in layers) {
+            let floor = layers[i];
+            floor.sort((a, b) => a['KL Room Number'] > b['KL Room Number']);
+          };
+        }
         return layers;
       }
     },
