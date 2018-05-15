@@ -14,7 +14,11 @@
         <span class="xs-icon"
           :class="{'icon-delete': edit}"
           @click="deleteFn($index)"></span>
-        <img :src="convertImgSrc(item)"
+        <span v-if="convertType(item['AgreeFileExt'])" class="content pdf xs-icon"
+              :class="convertType(item['AgreeFileExt'])"
+              :data-src="convertImgSrc(item)"
+              @click="previewFileFn(item)"></span>
+        <img v-else :src="convertImgSrc(item)"
              @click="previewImageFn($index)"/>
       </div>
     </div>
@@ -37,13 +41,15 @@
   import titleGroup from '../../cus-title-group';
   let downloadFromSiebel = (`${config.proxy}/webchat/api/external/downloadattachment?url=${config.attachServer}/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess`);
   let downloadFromWechat = (`${config.proxy}/webchat/api/local/downloadmedia?appNO=${config.appNo}&media_id=`);
+  // 附件类型转换
+  const EXT2TYPE = {doc: 'doc', docx: 'doc', xls: 'xls', xlsx: 'xls', pdf: 'pdf', jpg: ''};
 
   export default {
     name: 'cus-attach',
     props: {
       attach: {
         type: Array,
-        default: []
+        default: data => []
       },
       edit: Boolean,
       title: String,
@@ -98,18 +104,29 @@
           return i.serverId;
         });
       },
+      // 附件类型
+      convertType(exp) {
+        return EXT2TYPE[exp];
+      },
+      // 附件预览地址
       convertImgSrc(item) {
         item.src = encodeURI(item.serverId ? (downloadFromWechat + item.serverId) : (`${downloadFromSiebel}&IOName=${this.ioName}&Object Id=${item.Id}&ProcessName=KL Attachment Query Process`));
         return item.src;
+      },
+      previewFileFn(item) {
+        KND.Native.previewFile({
+          url: item.src,
+          name: item.AgreeFileName,
+          size: item.AgreeFileSize
+        });
       },
       /**
        * 预览图片
        */
       previewImageFn(index) {
-        let arr = Array.prototype.map.call(this.attach, item => {
+        let arr = Array.prototype.filter.call(this.attach, item => {
           return item.src;
         });
-        console.log(arr);
         KND.Native.previewImage({
           current: arr[index],
           urls: arr
@@ -145,6 +162,32 @@
           position: absolute;
           top: -8px;
           right: 2px;
+
+          &.content.xs-icon {
+            position: static;
+            display: inline-block;
+            font-size: 2rem;
+          }
+
+          &.pdf:before {
+            content: '\A179';
+            color: #f23827;
+          }
+
+          &.xls:before {
+            content: '\A180';
+            color: #37a146;
+          }
+
+          &.doc:before {
+            content: '\A181';
+            color: #2f7bff;
+          }
+
+          &.ppt:before {
+            content: '\A182';
+            color: #ff8a00;
+          }
         }
 
         img {

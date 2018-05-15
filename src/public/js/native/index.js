@@ -123,8 +123,18 @@ import queue from '../base/queue';
      */
     previewImage(option) {
       wx.previewImage(Object.assign({
-        urls: ['http://n.sinaimg.cn/translate/653/w400h253/20180322/0sp9-fyskeue4878551.jpg']
+        urls: []
       }, option));
+    };
+
+    /**
+     * 预览文件
+     * @param {String} option.url 必填 需要预览文件的地址(必填，可以使用相对路径)
+     * @param {String} option.name 选填 需要预览文件的文件名(不填的话取url的最后部分)
+     * @param {String} option.size 必填 需要预览文件的字节大小 1048576
+     */
+    previewFile(option) {
+      wx.previewFile(option);
     };
 
     /**
@@ -292,6 +302,10 @@ import queue from '../base/queue';
     // 查看地图
     native.openLocation = option => {
       console.log('打开企业微信查看地图');
+    };
+    // 预览文件
+    native.previewFile = option => {
+      console.log(option);
     };
   };
 

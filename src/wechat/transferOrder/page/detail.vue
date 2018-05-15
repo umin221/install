@@ -37,6 +37,11 @@
                  is-link></mt-cell>
       </div>
 
+      <attach ioName="KL Agreement Attachment IO" title="合同附件" ref="attach"
+              :attach="form['KL Agreement Attachment']"
+              :edit="false">
+      </attach>
+
       <div class="install-order" v-show="!isPending">
         <title-group>安装订单</title-group>
         <mt-cell-swipe class="multiple"
@@ -71,11 +76,12 @@
   import cusField from 'public/components/cus-field';
   import titleGroup from 'public/components/cus-title-group';
   import toggle from 'public/components/cus-toggle';
+  import attach from 'public/components/cus-attach';
 
   const NAMESPACE = 'detail';
   export default {
     name: NAMESPACE,
-    components: {cusField, titleGroup, toggle},
+    components: {cusField, titleGroup, toggle, attach},
     // 初始化
     created() {
       let me = this;
