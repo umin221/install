@@ -54,7 +54,19 @@ class Queue {
     };
     task.error = err => {
       me.dequeue();
-      if (error) error(err);
+      if (error) {
+        error(err);
+      } else {
+        let message = err.response && err.response.data.ERROR;
+        // 屏蔽空数据报错
+        if (message === 'There is no data for the requested resource') return;
+        console.error(err);
+        Toast({
+          message: message || '获取数据失败',
+          position: 'bottom',
+          duration: 4000
+        });
+      }
     };
 
     // start loading

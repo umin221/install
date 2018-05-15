@@ -216,7 +216,8 @@
           query: {
             line: JSON.stringify(line),
             type: line['KL Product Type LIC'] || type,
-            editable: this.editable
+            editable: me.editable,
+            holeType: me.order['KL Hole Type']
           }
         });
       },
@@ -324,7 +325,8 @@
             query: {
               line: JSON.stringify(line),
               type: line['KL Product Type LIC'],
-              editable: this.editable
+              editable: me.editable,
+              holeType: me.order['KL Hole Type']
             }
           });
         });

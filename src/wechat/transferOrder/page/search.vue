@@ -16,6 +16,7 @@
                       v-for="item in result"
                       is-link>
               <div class="mint-cell-sub-title" slot="title">工程: {{item['Lead Name']}}</div>
+              <div v-if="isTeam" class="mint-cell-sub-title" slot="title">负责人: {{item['Project Owner Name']}}</div>
               <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
           </cus-cell>
         </cus-loadmore>
@@ -44,6 +45,8 @@
         me.$refs.result[event](data.length);
       }
     };
+    // 负责人
+    if (me.isTeam) param.data['Project Owner Name'] = exp;
     // 获取团队列表
     me.getTransferOrder(param);
   };
@@ -58,7 +61,7 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['result'])
+      ...mapState(NAMESPACE, ['result', 'isTeam'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['getTransferOrder']),

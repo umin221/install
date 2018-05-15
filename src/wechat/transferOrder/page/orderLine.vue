@@ -27,18 +27,21 @@
         </mt-cell>
         <cus-field :label="`数量(${line['KL Agreement Item Quantity'] || ''})`" tag="数量"
                    type="number"
+                   :class="{disable: !holeType}"
                    v-valid.require.number
                    v-model="line['Quantity Requested']"></cus-field>
         <cus-field label="门材质" tag="门材质"
                    @click.native="showLovFn('KL Door Material Quality')"
                    v-model="line['KL Door Material Quality']"
+                   v-if="isVP || isLockBody"
                    is-link></cus-field>
         <cus-field label="门厚(cm)" tag="门厚"
-                   v-if="isVP || isLockBody"
+                   v-if="isVP || isPanel"
                    v-valid.nonNegative
                    v-model="line['KL Door Thickness']"></cus-field>
         <cus-field label="锁芯中心距门内距(cm)" type="number" tag="锁芯中心距门内距"
                    v-valid.nonNegative
+                   v-if="isVP || isLockBody"
                    v-model="line['KL Lock Core Distance']"></cus-field>
         <cus-field label="锁舌导向板规格" tag="锁舌导向板规格"
                    @click.native="showLovFn('KL Guide Plate Specification')"
@@ -156,6 +159,13 @@
       me.type = param.type;
       // 当前页面是否可编辑
       me.editable = param.editable;
+      /**
+       * 开孔方式
+       * 为现场开孔时 => 订单行参数由安装工程师填充
+       * 为门厂开孔时 => 订单行转门厂后由门厂技术填充
+       * 不传此参数时 => 订单行参数必填，并且数量不可修改
+       */
+      me.holeType = param.holeType;
       // 无id，代表是新增，默认携带参数 面板 VP00301 / 锁体 VP00302
       me.isAdd = !line.Id;
       // 订单行默认参数
@@ -185,7 +195,8 @@
         isLockBody: false, // 是否锁体
         isFalseLock: false, // 是否假锁
         isFitting: false, // 是否配件
-        isVP: false // 是否VP003 锁体 或者 面板
+        isVP: false, // 是否VP003 锁体 或者 面板
+        holeType: '' // 开孔方式
       };
     },
     computed: {

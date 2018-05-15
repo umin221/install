@@ -63,7 +63,7 @@ let apiList = {
       data: {
         'body': {
           'OutputIntObjectName': 'KL Install Delivery IO',
-          'SearchSpec': '[Project.Id]="' + option.data.id + '" AND [MACD FS Agreement Item.KL Product Division Name]="海贝斯事业部"' // '[Project.Status]="' + option.data.Status + '"',
+          'SearchSpec': '[Project.Id]="' + option.data.id + '"' // '[Project.Status]="' + option.data.Status + '"',
         }
       }
     };

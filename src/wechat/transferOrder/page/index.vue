@@ -37,6 +37,7 @@
                      is-link>
               <div slot="after">{{item['Status']}}</div>
               <div class="mint-cell-sub-title" slot="title">工程名称: {{item['Opportunity Name']}}</div>
+              <div v-if="isTeam" class="mint-cell-sub-title" slot="title">负责人: {{item['Project Owner Name']}}</div>
               <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
             </cus-cell>
           </cus-loadmore>
@@ -56,6 +57,7 @@
                      v-for="item in process"
                      is-link>
               <div class="mint-cell-sub-title" slot="title">工程名称: {{item['Opportunity Name']}}</div>
+              <div v-if="isTeam" class="mint-cell-sub-title" slot="title">负责人: {{item['Project Owner Name']}}</div>
               <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
             </cus-cell>
           </cus-loadmore>
@@ -76,6 +78,7 @@
                       is-link>
               <div slot="after">{{item['Status']}}</div>
               <div class="mint-cell-sub-title" slot="title">工程名称: {{item['Opportunity Name']}}</div>
+              <div v-if="isTeam" class="mint-cell-sub-title" slot="title">负责人: {{item['Project Owner Name']}}</div>
               <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
             </cus-cell>
           </cus-loadmore>
