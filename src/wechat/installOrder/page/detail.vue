@@ -103,7 +103,7 @@
                 taskData['KL Detail Type LIC'] === 'Substitution Lock Trans Return'">
                 <span>{{taskData['Planned Completion']}}</span>
                 <span>{{taskData.Status}}</span>
-                <span v-if="taskData['KL Detail Type LIC'] === 'Ship From Door Factory' && taskData['Calculated Activity Status'] != 'Not Started'">{{taskData['KL Shipped Time']}}</span>
+                <span v-if="taskData['KL Detail Type LIC'] === 'Ship From Door Factory' && taskData['Calculated Activity Status'] != 'Not Started'">{{new Date(taskData['KL Shipped Time']).format('yyyy-MM-dd hh:mm:ss')}}</span>
               </li>
               <li style="margin-right: 8px" v-if="taskData['KL Detail Type LIC'] === 'Ship From Door Factory' && taskData['Calculated Activity Status'] === 'Not Started'">
                 <span class="mt-switch"><mt-switch v-model="shipmentVal"  @click.native.stop="shipment(taskData)"></mt-switch></span>
@@ -893,17 +893,34 @@
             showCancelButton: true
           }).then(action => {
             if (action === 'confirm') {
-              api.get({ // 更改按钮状态
-                key: 'getUPStatus',
-                method: 'POST',
-                data: {
-                  'body': {
-                    'ProcessName': 'KL Install Task Complete Action Workflow',
-                    'RowId': item.Id
-                  }
-                },
+              var timeS = new Date().format('MM/dd/yyyy hh:mm:ss');
+              console.dir(timeS);
+              var parma = {
+                'Id': item.Id,
+                'KL Shipped Time': timeS
+              };
+              api.get({ // 更新发运时间
+                key: 'getUPData',
+                method: 'PUT',
+                data: parma,
                 success: function(data) {
-                  self.detail();
+                  if (!data.ERROR) {
+                    api.get({ // 更改按钮状态
+                      key: 'getUPStatus',
+                      method: 'POST',
+                      data: {
+                        'body': {
+                          'ProcessName': 'KL Install Task Complete Action Workflow',
+                          'RowId': item.Id
+                        }
+                      },
+                      success: function(data) {
+                        self.detail();
+                      }
+                    });
+                  } else {
+                    Toast('发运失败！');
+                  }
                 }
               });
             } else {

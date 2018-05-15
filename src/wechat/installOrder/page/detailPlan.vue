@@ -249,12 +249,8 @@
       openCompletion(picker, key) {
         this.timeKey = key;
         var self = this;
-        if (key === 'Started') {
-          self.pickerVisibleEnd = today;
-        }
-        if (key === 'Done') {
-          self.pickerVisibleEnd = new Date(self.Started);
-        }
+        console.dir('=====' + today);
+        self.pickerVisibleEnd = today;
         self.$refs[picker].open();
       },
       handleChangePlan(value) {

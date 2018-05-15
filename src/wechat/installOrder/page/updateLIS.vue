@@ -114,7 +114,7 @@
         var self = this;
         tools.valid.call(this, () => {
           var lineObj = self.line;
-          if (lineObj['Spot Check Amount']) { // 抽查数量有值 判断不能大于完成数量
+          /* if (lineObj['Spot Check Amount']) { // 抽查数量有值 判断不能大于完成数量
             if (parseInt(lineObj['Spot Check Amount'], 10) > parseInt(self.amount, 10)) {
               Toast('抽查数量不能大于完成数量！');
               return;
@@ -130,6 +130,44 @@
             var numC = parseInt(lineObj['Spot Check Amount'], 10) - parseInt(lineObj['Qualified Amount'], 10);
             if (parseInt(lineObj['Unqualified Solve Amount'], 10) > numC) {
               Toast('异常处理数量不合理，不能大于抽查数量与合格数量的差值！');
+              return;
+            }
+          }*/
+
+          if (lineObj['Spot Check Amount']) { // 抽查数量有值 判断不能大于完成数量
+            if (parseInt(lineObj['Spot Check Amount'], 10) > parseInt(lineObj['Completed Install Amount'], 10)) {
+              Toast('抽查数量不能大于完成数量！');
+              return;
+            }
+          }
+          if (lineObj['Qualified Amount']) { // 合格数量有值
+            if (!lineObj['Spot Check Amount']) {
+              Toast('请填写抽查数量!');
+              return;
+            }
+            if (parseInt(lineObj['Qualified Amount'], 10) > parseInt(lineObj['Spot Check Amount'], 10)) {
+              Toast('合格数量不能大于抽查数量！');
+              return;
+            }
+          }
+          if (lineObj['Unqualified Solve Amount']) {
+            if (!lineObj['Spot Check Amount']) {
+              Toast('请填写抽查数量!');
+              return;
+            }
+            if (!lineObj['Qualified Amount']) {
+              Toast('请填写合格数量！');
+              return;
+            }
+            var numC = parseInt(lineObj['Spot Check Amount'], 10) - parseInt(lineObj['Qualified Amount'], 10);
+            if (parseInt(lineObj['Unqualified Solve Amount'], 10) > numC) {
+              Toast('异常处理数量不合理，不能大于抽查数量与合格数量的差值！');
+              return;
+            }
+          }
+          if (lineObj['Spot Check Amount'] && lineObj['Qualified Amount']) {
+            if ((lineObj['Spot Check Amount'] !== lineObj['Qualified Amount']) && (!lineObj['Unqualified Solve Amount'] || !lineObj['Unqualified Desc'])) {
+              Toast('请填写异常处理数量与异常处理描述！');
               return;
             }
           }
