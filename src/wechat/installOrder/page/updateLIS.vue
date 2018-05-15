@@ -4,13 +4,13 @@
       <fallback slot="left"></fallback>
     </mt-header>
     <div class="mint-content zsBatch">
-      <div class="read">
+      <div class="readonly">
         <cus-field label="安装人员"
                    v-model="anName"></cus-field>
-      </div>
-      <div :class="{'readonly':read}">
         <cus-field label="完成数量"
                    v-model="amount"></cus-field>
+      </div>
+      <div :class="{'readonly':read}">
         <cus-field label="抽查数量" tag="抽查数量"
                    type="number"
                    v-valid.number
@@ -67,7 +67,7 @@
     name: 'updateLIS',
     created() {
       let param = this.$route.query;
-      this.id = this.itemTask.Id;
+      this.id = param.id;
       this.anName = param.anName;
       this.amount = param.amount;
     },
@@ -181,7 +181,7 @@
                 key: 'setJourna',
                 method: 'PUT',
                 data: {
-                  'Id': self.itemTask.Id, // 默认ID
+                  'Id': self.id, // 默认ID
                   'Activity Id': self.itemTask['Activity UID'],
                   'Completed Install Amount': self.amount, // 新增批次返回的ID
                   'Spot Check Amount': lineObj['Spot Check Amount'], // 新增批次返回的ID
@@ -208,7 +208,7 @@
                         Status = KND.Util.toArray(data.items)[0].Value;
                         var parma = {};
                         parma.Status = Status;
-                        parma.Id = self.id;
+                        parma.Id = self.itemTask.Id;
                         api.get({ // 提交数据
                           key: 'getUPData',
                           method: 'PUT',

@@ -110,7 +110,7 @@
               </li>
               <div class="butLi"
                    v-if="showTaskData(taskData)">
-                <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Close Reject'" @click.stop="closeTask(taskData)" class="batchClose"></span>
+                <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Close Reject'" @click.stop="closeTask(taskData, false)" class="batchClose"></span>
                 <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Close Reject'" v-if="taskData['KL Detail Type LIC'] !== 'Transfer Summary'" @click.stop="addTask(taskData)" class="batchAdd"></span>
                 <span v-show="taskData['Calculated Activity Status'] === 'In Progress' || taskData['Calculated Activity Status'] === 'Close Reject'" v-if="taskData['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="addTask(taskData)" class="batchAdd"></span>
                 <span v-show="taskData['Calculated Activity Status'] === 'Approved'" @click.stop="batchSta(taskData)" class="batchSta">开始处理</span>
@@ -127,8 +127,8 @@
                     <mt-field label="已完成/计划"
                               class="itemTask"
                               :value="itemTask['KL Completed Install Amount']+'/'+itemTask['KL Install Amount Requested']">
-                      <span v-if="showClose(itemTask)" @click.stop="closeTask(itemTask)" class="batchClose"></span>
-                      <span v-if="(itemTask['Calculated Activity Status'] === 'In Progress' || itemTask['Calculated Activity Status'] === 'Close Reject') && itemTask['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(itemTask)" class="batchClose"></span>
+                      <span v-if="showClose(itemTask)" @click.stop="closeTask(itemTask, true)" class="batchClose"></span>
+                      <span v-if="(itemTask['Calculated Activity Status'] === 'HQ Reject' || itemTask['Calculated Activity Status'] === 'Declined' || itemTask['Calculated Activity Status'] === 'Planning' || itemTask['Calculated Activity Status'] === 'In Progress' || itemTask['Calculated Activity Status'] === 'Close Reject') && itemTask['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(itemTask, true)" class="batchClose"></span>
                     </mt-field>
                     <mt-field label="物业联系人"
                               class="itemTask"
@@ -706,7 +706,7 @@
         }
       },
       showClose(item) {
-        var val = (item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Close Reject') && item['KL Detail Type LIC'] !== 'Transfer Summary';
+        var val = (item['Calculated Activity Status'] === 'HQ Reject' || item['Calculated Activity Status'] === 'Declined' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Close Reject') && item['KL Detail Type LIC'] !== 'Transfer Summary';
         console.dir(val);
         return val;
       },
@@ -970,17 +970,37 @@
           Toast('不是任务责任人不可操作！');
         }
       },
-      closeTask(item) { // 关闭当前批次
+      closeTask(item, closeVal) { // 关闭当前批次
         console.dir(item);
         var self = this;
         // 跳转关闭页面更新状态
         if (userInfo['Id'] === item['Primary Owner Id']) {
-          self.$router.push({
-            name: 'updateState',
-            query: {
-              id: item.Id
-            }
-          });
+          if (closeVal && item['KL Completed Install Amount'] === item['KL Install Amount Requested']) {
+            api.get({
+              key: 'getUPStatus',
+              method: 'POST',
+              data: {
+                'body': {
+                  'ProcessName': 'KL Install Task Complete Action Workflow',
+                  'KL Close Reason': self.value,
+                  'RowId': self.id
+                }
+              },
+              success: function(data) {
+                if (!data.ERROR) {
+                  Toast('提交成功');
+                  KND.Util.back();
+                }
+              }
+            });
+          } else {
+            self.$router.push({
+              name: 'updateState',
+              query: {
+                id: item.Id
+              }
+            });
+          }
         } else {
           Toast('不是任务责任人不可操作！');
         }
