@@ -27,9 +27,10 @@
                       v-for="(item, index) in PartsList"
                       :key="item.Id"
                       @click.native="toDetail(item['Inventory Location ID'],item['Product ID'])"
-                      :title="'配件型号:'+ item['KL Prod Model No']" is-link>
-              <div slot="after" style="color: #A2BBFC">{{item.Type}}</div>
+                      :title="'配件代码:'+ item['Product Name']" is-link>
+            <div slot="after" style="color: #A2BBFC">{{item.Type}}</div>
               <div class="mint-cell-sub-title" slot="title">配件名称：{{item['KL Product Name Join']}}</div>
+              <div class="mint-cell-sub-title" slot="title">配件型号: {{item['KL Prod Model No']}}</div>
               <div class="mint-cell-sub-title" slot="title">库存量：{{item['KL Inventory Qty']}}</div>
               <div class="mint-cell-sub-title" slot="title" v-show="isTeam">负责人：{{item['KL Primary Employee Full Name']}}</div>
             </cus-cell>
@@ -46,9 +47,10 @@
                       v-for="(item, index) in badPartsList"
                       :key="item.Id"
                       @click.native="toDetail(item['Inventory Location ID'],item['Product ID'])"
-                      :title="'配件型号:'+ item['KL Prod Model No']" is-link>
+                      :title="'配件代码:'+ item['Product Name']" is-link>
               <div slot="after" style="color: #A2BBFC">{{item.Type}}</div>
               <div class="mint-cell-sub-title" slot="title">配件名称：{{item['KL Product Name Join']}}</div>
+              <div class="mint-cell-sub-title" slot="title">配件型号: {{item['KL Prod Model No']}}</div>
               <div class="mint-cell-sub-title" slot="title">库存量：{{item['KL Inventory Qty']}}</div>
               <div class="mint-cell-sub-title" slot="title" v-show="isTeam">负责人：{{item['KL Primary Employee Full Name']}}</div>
             </cus-cell>

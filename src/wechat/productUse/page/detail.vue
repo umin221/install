@@ -21,6 +21,7 @@
                 :key="index">
             <div class="mt-Detail-title">配件编码：{{item.Product}}</div>
             <div class="mt-Detail-title">配件名称：{{item['KL Product Name Join']}}</div>
+            <div class="mt-Detail-title">实际退入/申请数量：{{item['Extended Quantity']}}/{{item['Quantity Requested']}}</div>
           </div>
         </div>
       </div>
