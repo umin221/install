@@ -10,7 +10,7 @@
       <div class="workbench">
         <div class="co-flex co-ver co-jsa"
              @click="getUrl(item.id)"
-             v-for="(item, index) in listObj"
+             v-for="(item, index) in list"
              :key="index">
           <span class="xs-icon" :class="item.icon"></span>
           <span v-text="item.vul"></span>
@@ -24,12 +24,31 @@
 <script type="es6">
   import {mapState} from 'vuex';
 
+  // 功能
+  let r2f = {
+    engineer: {workPlan: true, transferOrder: true, installOrder: true, serviceOrder: true, orderForms: true, myProduct: true, productUse: true, productBack: true, outsourcing: true},
+    factory: {installOrder: true},
+    agent: {serviceOrder: true},
+    default: {workPlan: true}
+  };
+  // 职位
+  let rc = {
+    'Field Service Engineer': 'engineer', // 安装工程师
+    'Field Service Manager': 'engineer', // 安装主管
+    'Agent': 'agent', // 客服
+    'Agent Manager': 'agent', // 客服主管
+    'Door Factory Engineer': 'factory', // 门厂技术
+    'Door Factory Manager': 'factory' // 门厂技术主管
+  };
+
   const NameSpace = 'index';
   export default {
     name: NameSpace,
-    created: () => {
+    activated() {
+      let me = this;
       KND.Native.getUserInfo((userInfo) => {
         console.log(userInfo);
+        me.role = rc[userInfo['KL Primary Position Type LIC']];
       });
     },
     data: () => {
@@ -46,11 +65,19 @@
           {'id': 'productUse', 'vul': '配件领用', 'icon': 'use'},
           {'id': 'productBack', 'vul': '配件退入', 'icon': 'transfer'},
           {'id': 'outsourcing', 'vul': '委外人员管理', 'icon': 'out'}
-        ]
+        ],
+        role: ''
       };
     },
     computed: {
-      ...mapState(NameSpace, ['value'])
+      ...mapState(NameSpace, ['value']),
+      list() {
+        let list = this.listObj;
+        let role = this.role || 'default';
+        return Array.prototype.filter.call(list, i => {
+          return r2f[role][i.id];
+        });
+      }
     },
     methods: {
       getUrl(id) {
