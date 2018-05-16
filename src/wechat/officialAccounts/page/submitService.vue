@@ -126,9 +126,19 @@
         }
       });
       if (!me.callPhone) {
-        me.getContact(function(data) {
-          me.lastName = data['Last Name']; // 名字
-          me.callPhone = data['Cellular Phone #']; // 电话
+        me.getContact({
+          callback: function(data) {
+            me.lastName = data['Last Name']; // 名字
+            me.callPhone = data['Cellular Phone #']; // 电话
+          },
+          noneback: function() {
+            me.$router.push({
+              name: 'telValidate',
+              query: {
+                backName: 'telValidate'
+              }
+            });
+          }
         });
       }
     },

@@ -7,7 +7,11 @@
           <span class="user-state" v-else>暂未派工</span>
         </div>
         <div class="mt-Detail-title">维修工程师：{{serviceDetail['KL Owner Full Name']}}</div>
-        <div class="mt-Detail-title">联系电话：<a href="javascript:void(0);" class="detail-call">{{serviceDetail['Owner Phone']}}</a></div>
+        <div class="mt-Detail-title">联系电话：
+          <a href="javascript:void(0);" class="detail-call">
+          {{serviceDetail['Primary Owner Cell Phone']|| serviceDetail['Primary Owner Work Phone']}}
+          </a>
+        </div>
       </div>
       <div class="detail-content">
         <mt-navbar v-model="active">

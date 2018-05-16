@@ -39,7 +39,8 @@
           {'id': 'myRepair', 'vul': '我的报修', 'icon': 'plan'},
           {'id': 'personal', 'vul': '个人中心', 'icon': 'transfer'},
           {'id': 'repairPolicy', 'vul': '报修政策', 'icon': 'install'},
-          {'id': 'engineer', 'vul': '工程师通道', 'icon': 'service'}
+          {'id': 'engineer', 'vul': '工程师通道', 'icon': 'service'},
+          {'id': 'telValidate', 'vul': '电话报修', 'icon': 'service'}
         ]
       };
     },

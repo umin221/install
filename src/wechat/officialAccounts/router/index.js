@@ -100,5 +100,11 @@ export default new Router({
     component(resolve) {
       require(['../page/scanSn'], resolve);
     }
+  }, {
+    path: '/telValidate', // 手机验证
+    name: 'telValidate',
+    component(resolve) {
+      require(['../page/telValidate'], resolve);
+    }
   }]
 });
