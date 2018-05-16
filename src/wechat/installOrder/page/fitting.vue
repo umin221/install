@@ -95,7 +95,7 @@
       },
       // 产品名称 menu box
       productName() {
-        if (this.agreementItem['Id']) this.line['KL Agreement Item Id'] = this.agreementItem['Id']; // this.agreementItem['Id']; // 面板：1-DGFJM0  锁体：1-2BS58K4I
+        // if (this.agreementItem['Id']) this.line['KL Agreement Item Id'] = this.agreementItem['Id']; // this.agreementItem['Id']; // 面板：1-DGFJM0  锁体：1-2BS58K4I
         return this.agreementItem['KL Product Model No'];
       },
       // 是否带天地 switch
