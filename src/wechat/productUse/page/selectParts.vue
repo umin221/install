@@ -1,9 +1,9 @@
 <template>
-  <div class="searchTrans">
+  <div class="">
     <mt-header fixed title="选择配件" style="z-index: 2">
       <fallback slot="left"></fallback>
     </mt-header>
-    <div class="mint-content" style="height:100%">
+    <div class="mint-content searchTrans">
       <empty v-show="!result1.length"></empty>
       <mt-navbar v-model="selectId"
                  v-if="result1.length">
@@ -14,7 +14,7 @@
           <span v-if="value[item.Id]">{{value[item.Id]}}</span>
         </mt-tab-item>
       </mt-navbar>
-      <mt-tab-container style="background-color: #F8F8F8;min-height: 100%"
+      <mt-tab-container style="background-color: #F8F8F8;"
                         v-model="selectId"
                         v-if="result1.length">
         <mt-tab-container-item v-for="(item, index) in result1"
@@ -67,10 +67,11 @@
           </toggle>
         </mt-tab-container-item>
       </mt-tab-container>
+      <button-group>
+        <mt-button class="single"
+                   @click.native="selectEnter">确认</mt-button>
+      </button-group>
     </div>
-    <button-group>
-      <mt-button class="single" @click.native="selectEnter">确认</mt-button>
-    </button-group>
   </div>
 </template>
 <script type="es6">
@@ -79,12 +80,14 @@
   import cusSearch from 'public/components/cus-search';
   import cusCell from 'public/components/cus-cell';
   import toggle from '../components/detail-toggle';
+  import buttonGroup from 'public/components/cus-button-group';
   import Vue from 'vue';
 
   const NAMESPACE = 'selectParts';
   export default {
     name: NAMESPACE,
     created() {
+      console.log('配件领用');
       let me = this;
       me.type = this.$route.query.type;
       me.getProduct({
@@ -98,7 +101,7 @@
           }
         }});
     },
-    components: {cusLoadmore, cusSearch, cusCell, toggle},
+    components: {cusLoadmore, cusSearch, cusCell, toggle, buttonGroup},
     data: () => {
       return {
         selectId: '',
@@ -194,60 +197,60 @@
   };
 </script>
 <style lang="scss">
-  .selectIcon {
-    position: absolute;
-    top: 0;
-    right: 0;
-  }
-  .searchTrans{
-    margin-bottom: 45px;
-    background-color: white !important;
-    .mint-navbar{
-      flex-direction:column;
-      width: 20%;
-      a{
-        background-image: linear-gradient(0deg, #d9d9d9, #d9d9d9 1%, transparent 0%);
-        padding: 1rem 0;
-        position: relative;
-        span{
-          position: absolute;
-          width: 1.1rem;
-          height: 1.1rem;
-          background-color: #00599f;
-          top: -5px;
-          right: -5px;
-          z-index:1;
-          border-radius: 50%;
-          color: white;
-          text-align: center;
-          line-height: 1rem;
-        }
-      }
-
-    }
-    .mint-tab-container{
+    .selectIcon {
       position: absolute;
-      background-color: white;
-      width: 80%;
-      top:0;
-      left: 20%;
-      .mint-tab-container-wrap{
-        display: block;
-        .productTitle{
-          padding: 0.8rem;
-          text-align: center;
-          color: #777;
-          font-size: 18px;
+      top: 0;
+      right: 0;
+    }
+    .searchTrans {
+      margin-bottom: 45px;
+      background-color: white !important;
+      .mint-navbar {
+        flex-direction: column;
+        width: 20%;
+        a {
+          background-image: linear-gradient(0deg, #d9d9d9, #d9d9d9 1%, transparent 0%);
+          padding: 1rem 0;
+          position: relative;
+          span {
+            position: absolute;
+            width: 1.1rem;
+            height: 1.1rem;
+            background-color: #00599f;
+            top: -5px;
+            right: -5px;
+            z-index: 1;
+            border-radius: 50%;
+            color: white;
+            text-align: center;
+            line-height: 1rem;
+          }
         }
-        /*.mint-tab-container-item{*/
-        /*.mint-checklist*/
-        /*}*/
+
+      }
+      .mint-tab-container {
+        position: absolute;
+        background-color: white;
+        width: 80%;
+        top: 0;
+        left: 20%;
+        .mint-tab-container-wrap {
+          display: block;
+          .productTitle {
+            padding: 0.8rem;
+            text-align: center;
+            color: #777;
+            font-size: 18px;
+          }
+          /*.mint-tab-container-item{*/
+          /*.mint-checklist*/
+          /*}*/
+        }
       }
     }
-  }
-  .no-bar::-webkit-scrollbar {
-    display:none
-  }
+    .no-bar::-webkit-scrollbar {
+      display: none
+    }
 </style>
 
 <!--<template>-->
