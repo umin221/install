@@ -32,6 +32,12 @@ export default new Router({
       require(['../page/detail'], resolve);
     }
   }, {
+    path: '/execution', // 订单执行
+    name: 'execution',
+    component(resolve) {
+      require(['../page/execution'], resolve);
+    }
+  }, {
     path: '/clock', // 打卡记录
     name: 'clock',
     component(resolve) {

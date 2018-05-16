@@ -9,7 +9,7 @@
         <mt-field label="申请人" :value="appData['Party Name']"></mt-field>
         <mt-field label="类型" :value="appData['Item Type Display Name']"></mt-field>
         <mt-field label="提交日期" :value="new Date(appDataTask['Start Time']).format('yyyy-MM-dd')"></mt-field>
-        <mt-field label="订单详情" class="enable numCla" @click.native="toDetailFn" :value="orderId"></mt-field>
+        <mt-field label="订单详情" class="numCla"><span class="enable" @click="toDetailFn">{{orderId}}</span></mt-field>
       </div>
       <div class="readonly" style="margin-top: 10px">
         <mt-field label="批次">
@@ -17,9 +17,8 @@
         </mt-field>
        <!-- <mt-field label="计划开始日期"  :value="start_Date" v-show="is_plan"></mt-field>
         <mt-field label="计划完成日期" :value="end_Date" v-show="is_plan"></mt-field>-->
-        <mt-field label="计划数量" class="enable" :class="showNum()"
-                  @click.native="editBuildingFn">
-          <span>{{batchNum}}</span>
+        <mt-field label="计划数量" :class="showNum()">
+          <span class="enable" @click="editBuildingFn">{{batchNum}}</span>
         </mt-field>
         <mt-field label="完成数量"
                   v-show="!is_plan"
@@ -82,7 +81,7 @@
     .active {
       background: #d7ded8!important;
     }
-    .numCla input {
+    .numCla .enable {
       color: #0772c1!important;
     }
     .icon-add-circle:before {

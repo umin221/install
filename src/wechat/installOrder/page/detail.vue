@@ -27,6 +27,7 @@
           :value="detailData['KL Delivery Country'] + detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery County'] + detailData['KL Delivery Address']"
           is-link></cus-field>
         <div slot="title" class="mint-content-div enable">
+          <div class="mint-content-xt" @click="executionFn" v-show="executionShow()">订单执行</div>
           <div class="mint-content-xt" @click="punchClock">打卡</div>
           <div class="mint-content-xt" @click="butXttd">协同团队</div>
         </div>
@@ -550,8 +551,8 @@
       ...mapState(NameSpace, ['orderId', 'taskDataST']),
       ...mapState('index', ['taskIndex']),
       isConfirming() {
-        let status = this.detailData.Status;
-        return !status || status === '门厂工程师确认中';
+        let status = this.detailData['Calculated Order Status'];
+        return !status || status === 'In Confirming';
       },
       // 订单行
       group() {
@@ -629,6 +630,15 @@
             console.dir(self.taskDataST);
           }
         });
+      },
+      executionShow() {
+        var self = this;
+        var isVal = false;
+        // 是否门厂安装锁体 === Y && 职位 === 门厂技术员 ||  职位 === 安装员  处理中状态=In Installing,Sales Confirmed
+        if ((self.detailData['Calculated Order Status'] === 'In Installing' || self.detailData['Calculated Order Status'] === 'Sales Confirmed') && self.detailData['KL Delivery Check Box 1'] === 'Y' && (userInfo['KL Primary Position Type LIC'] === 'Door Factory Engineer' || userInfo['KL Primary Position Type LIC'] === 'Field Service Engineer')) {
+          return true;
+        }
+        return isVal;
       },
       rightLine(index, item) {
         if (index === (item.length - 1)) {
@@ -722,6 +732,15 @@
             }
           },
           success: function(data) {
+          }
+        });
+      },
+      executionFn() {
+        let me = this;
+        this.$router.push({
+          name: 'execution',
+          query: {
+            id: me.id
           }
         });
       },
@@ -975,31 +994,49 @@
         var self = this;
         // 跳转关闭页面更新状态
         if (userInfo['Id'] === item['Primary Owner Id']) {
-          if (closeVal && item['KL Completed Install Amount'] === item['KL Install Amount Requested']) {
+          if (item['Calculated Activity Status'] === 'HQ Reject' || item['Calculated Activity Status'] === 'Declined' || item['Calculated Activity Status'] === 'Planning') { // 在计划没有提交通过的时候关闭走忽略
             api.get({
               key: 'getUPStatus',
               method: 'POST',
               data: {
                 'body': {
-                  'ProcessName': 'KL Install Task Complete Action Workflow',
-                  'KL Close Reason': self.value,
-                  'RowId': self.id
+                  'ProcessName': 'KL Install Task Ignore Action Workflow',
+                  'RowId': item.Id
                 }
               },
               success: function(data) {
                 if (!data.ERROR) {
-                  Toast('提交成功');
-                  KND.Util.back();
+                  Toast('关闭成功');
                 }
               }
             });
           } else {
-            self.$router.push({
-              name: 'updateState',
-              query: {
-                id: item.Id
-              }
-            });
+            if (closeVal && item['KL Completed Install Amount'] === item['KL Install Amount Requested']) {
+              api.get({
+                key: 'getUPStatus',
+                method: 'POST',
+                data: {
+                  'body': {
+                    'ProcessName': 'KL Install Task Complete Action Workflow',
+                    'KL Close Reason': self.value,
+                    'RowId': item.Id
+                  }
+                },
+                success: function(data) {
+                  if (!data.ERROR) {
+                    Toast('关闭成功');
+                    KND.Util.back();
+                  }
+                }
+              });
+            } else {
+              self.$router.push({
+                name: 'updateState',
+                query: {
+                  id: item.Id
+                }
+              });
+            }
           }
         } else {
           Toast('不是任务责任人不可操作！');
