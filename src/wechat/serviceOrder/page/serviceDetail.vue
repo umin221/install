@@ -664,8 +664,10 @@
           this.$router.push({
             name: 'saveFault',
             query: {
-              id: this.ServiceRequest['Id'],
-              type: 'parent'
+              Service: this.ServiceRequest,
+              id: this.ServiceRequest.Id,
+              type: 'parent',
+              name: 'serviceDetail'
             }
           });
         }
@@ -718,8 +720,10 @@
         me.$router.push({
           name: 'saveFault',
           query: {
-            id: child['Id'],
-            type: 'child'
+            Service: child,
+            id: child.Id,
+            type: 'child',
+            name: 'serviceDetail'
           }
         });
       },

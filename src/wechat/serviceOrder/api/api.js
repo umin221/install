@@ -68,8 +68,15 @@ let ApiList = {
   },
   getServiceR: option => {
     return {
-      method: 'get',
-      url: 'data/KL Service Request Interface BO/Service Request/' + option.data.Id
+      method: 'post',
+      // url: 'data/KL Service Request Interface BO/Service Request/' + option.data.Id
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base KL Service Request Interface BO',
+          'SearchSpec': '[Service Request.Id]= "' + option.data.Id + '"'
+        }
+      }
     };
   // 通过ID查询服务请求
   },
@@ -421,27 +428,43 @@ let ApiList = {
     // 下拉二级
   },
   getProduct: option => {
-    // let model = '';
-    // model = 'AND [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*"';
-    let oneCatalog = '';
-    if (option.data.val === '1') {
-      oneCatalog = 'AND [Catalog Category.Sequence Number] = "1"';
-    } else {
-      oneCatalog = 'AND [Catalog Category.Sequence Number] = "' + option.data.val + '" AND [Catalog Category.Parent Category Id] = "' + option.data.ParentId + '"';
+    let model = '';
+    if (option.data.val) {
+      model = 'AND ([KL FS Invloc Product.KL Product Name Join] ~LIKE "*' + option.data.val + '*" OR [KL FS Invloc Product.Product Name] ~LIKE "*' + option.data.val + '*")';
     }
     return {
-      method: 'post',
       url: 'service/EAI Siebel Adapter/Query',
       data: {
         'body': {
-          'OutputIntObjectName': 'Base Catalog Category (Content Management)',
-          'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '"' + oneCatalog,
-          'ViewMode': 'Group'
+          'OutputIntObjectName': 'Base KL FS InvLoc Product',
+          'SearchSpec': '[KL FS Invloc Product.KL Inventory Product Status]=LookupValue("KL_PROD_STATUS", "Parts")' + model,
+          'ViewMode': 'Personal'
         }
       }
     };
-    // 产品目录
   },
+  // getProduct: option => {
+  //   // let model = '';
+  //   // model = 'AND [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*"';
+  //   let oneCatalog = '';
+  //   if (option.data.val === '1') {
+  //     oneCatalog = 'AND [Catalog Category.Sequence Number] = "1"';
+  //   } else {
+  //     oneCatalog = 'AND [Catalog Category.Sequence Number] = "' + option.data.val + '" AND [Catalog Category.Parent Category Id] = "' + option.data.ParentId + '"';
+  //   }
+  //   return {
+  //     method: 'post',
+  //     url: 'service/EAI Siebel Adapter/Query',
+  //     data: {
+  //       'body': {
+  //         'OutputIntObjectName': 'Base Catalog Category (Content Management)',
+  //         'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '"' + oneCatalog,
+  //         'ViewMode': 'Group'
+  //       }
+  //     }
+  //   };
+  //   // 产品目录
+  // },
 /*  getProduct: option => {
     console.log(option.data);
     let model = '';
@@ -510,6 +533,51 @@ let ApiList = {
               }
             }
           }
+        }
+      }
+    };
+  },
+  deleteOrderEntry: option => {
+    return {
+      method: 'delete',
+      url: 'data/Order Entry/Order Entry - Orders/' + option.data.id,
+      data: {
+        body: {}
+      }
+    };
+  },
+  deleteOrderline: option => {
+    return {
+      method: 'delete',
+      url: 'data/Order Entry/Order Entry - Orders/' + option.data.EntryId + '/Order Entry - Line Items/' + option.data.LineId,
+      data: {
+        body: {}
+      }
+    };
+  },
+  getOrderDetail: option => {
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base Order Entry',
+          'SearchSpec': '[Order Entry - Orders.Id]= "' + option.data.id + '"'
+        }
+      }
+    };
+    // 详情
+  },
+  toSubmitOrder: option => {
+    let id = option.data['Object Id'];
+    delete option.data['Object Id'];
+    return {
+      method: 'POST',
+      url: 'service/Workflow Process Manager/RunProcess',
+      data: {
+        'body': {
+          'Object Id': id, // 领料订单Id
+          'ProcessName': 'KL Service Order Submit Process'  // Workflow名字
         }
       }
     };

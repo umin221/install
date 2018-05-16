@@ -14,14 +14,15 @@
         <div class="servesParts">
           <div class="Parts" v-for="(item, index) in returnSelect">
             <mt-cell-swipe class="lock-line-cell enable"
-                           :right="getSwipeBtn(index)">
+                           :right="getSwipeBtn(index, item)">
               <mt-switch
-                v-model="switchStatus[index]">
-                {{switchStatus[index]?"保内":"保外"}}
+                v-model="switchStatus[index]"
+                @change="changeSwitch(item.isBn)">
+                {{switchStatus[index]?'保内': '保外'}}
               </mt-switch>
               <div class="TranslatedLine">
                 <div>配件代码： {{item['Name']}}</div>
-                <div style="width: 70%;">配件名称： {{item['KL Translated Name']}}</div>
+                <div style="width: 65%;">配件名称： {{item['KL Translated Name']}}</div>
                 <div class="toRed">￥{{item['List Price']}}</div>
                 <num-box :index="index" :type="switchStatus[index]" @input="productNumber"></num-box>
               </div>
@@ -89,16 +90,64 @@ export default {
   created() {
     let me = this;
     let service = me.$route.query;
-    let serviceId = service.id;
+    console.log(service);
+    me.serviceId = service.id;
+    me.Service = service.Service;
     me.serviceType = service.type;
-    if (serviceId) {
+    console.log(me.returnSelect);
+//    let isBn = me.Service['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
+//    me.setIsBn(isBn);
+//    let EntryOrders = KND.Util.toArray(service.Service['Order Entry - Orders']);
+//    if (me.returnSelect.length) {
+//      for (let i = 0;i < EntryOrders.length;i++) {
+//        if (EntryOrders[i]['Status LIC'] === 'Draft') {
+//          me.EntryOrdersId = EntryOrders[i].Id;
+//          let LineItems = KND.Util.toArray(EntryOrders[i]['Order Entry - Line Items']);
+//          for (let j = 0; j < LineItems.length; j++) {
+//            me.switchStatus.push(LineItems[j]['KL Warranty Flag'] === 'Y');
+//            me.selectProduct({
+//              'Name': LineItems[j].Product,
+//              'num': parseInt(LineItems[j]['Quantity Requested'], 0),
+//              'KL Translated Name': LineItems[j]['KL Product Name Join'],
+//              'List Price': LineItems[j]['Adjusted List Price - Display'],
+//              'Id': LineItems[j]['Product Id']
+//            });
+//          }
+//          return;
+//        }
+//      }
+//    }
+    if (me.serviceId) {
       me.getServiceR({
-        Id: serviceId,
+        Id: me.serviceId,
         callback: function(data) {
-          me.Service = data;
-          if (!me.isBn) {
+          me.Service = data['SiebelMessage']['Service Request'];
+          if (service.Service.Id) {
             let isBn = me.Service['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
             me.setIsBn(isBn);
+          }
+          let EntryOrders = KND.Util.toArray(me.Service['Order Entry - Orders']);
+          if (EntryOrders.length) {
+            for (let i = 0;i < EntryOrders.length;i++) {
+              if (EntryOrders[i]['Status LIC'] === 'Draft') {
+                me.EntryOrdersId = EntryOrders[i].Id;
+                let LineItems = KND.Util.toArray(EntryOrders[i]['Order Entry - Line Items']);
+                if (LineItems.length) {
+                  for (let j = 0; j < LineItems.length; j++) {
+                    me.switchStatus.push(LineItems[j]['KL Warranty Flag'] === 'Y');
+                    me.selectProduct({
+                      Name: LineItems[j].Product,
+                      num: parseInt(LineItems[j]['Quantity Requested'], 0),
+                      'KL Translated Name': LineItems[j]['KL Product Name Join'],
+                      'List Price': LineItems[j]['Adjusted List Price - Display'],
+                      Id: LineItems[j]['Product Id'],
+                      saveId: LineItems[j]['Id']
+                    });
+                  }
+                }
+                return;
+              }
+            }
           }
         }
       });
@@ -124,6 +173,61 @@ export default {
       }
     });
   },
+  activated() {
+//    let me = this;
+//    let service = me.$route.query;
+//    if (service.Service.Id) {
+//      me.setA({
+//        data: service,
+//        type: 'dataService'
+//      });
+//      me.serviceType = me.dataService.type;
+//      me.Service = me.dataService.Service;
+//      let isBn = me.Service['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
+//      me.setIsBn(isBn);
+//      let type = me.serviceType === 'child' ? 'KL Child SR Order' : 'Order Entry - Orders';
+//      let EntryOrders = KND.Util.toArray(service.Service[type]);
+//      if (EntryOrders.length) {
+//        for (let i = 0; i < EntryOrders.length; i++) {
+//          if (EntryOrders[i]['Status'] === '草稿') {
+//            me.EntryOrdersId = EntryOrders[i].Id;
+//            if (!me.returnSelect.length) {
+//              me.getOrderDetail({
+//                id: me.EntryOrdersId
+//  //            callback: function(data) {
+//  //              for (let i = 0; i < data.length;i++) {
+//  //                me.switchStatus.push(data[i]['KL Warranty Flag'] === 'Y');
+//  //              }
+//  //            }
+//              });
+//              return;
+//            }
+//          }
+//        }
+//      }
+//    } else {
+//      me.switchStatus = [];
+//      for (let i = 0;i < me.returnSelect.length;i++) {
+//        if (me.isBn === '保内') {
+//          me.switchStatus.push(true);
+//        } else {
+//          me.switchStatus.push(false);
+//        }
+//      }
+//    }
+//    me.getLov({
+//      type: 'KL_SR_ATT_TYPE',
+//      parent: '',
+//      success: function(data) {
+//        let items = data.items;
+//        for (let i = 0; i < items.length;i++) {
+//          if (items[i].Name === 'Job Sheet') {
+//            me.val = items[i].Value;
+//          }
+//        }
+//      }
+//    });
+  },
   data: () => {
     return {
       isSwitch: false,
@@ -138,15 +242,12 @@ export default {
       allFee: 0,
       one: 1,
       Service: {},
-      attach: { // 附件
-        list: [],
-        edit: true,
-        title: '相关附件'
-      }
+      EntryOrdersId: '',
+      serviceId: ''
     };
   },
   computed: {
-    ...mapState(NAMESPACE, ['isBn', 'returnSelect']),
+    ...mapState(NAMESPACE, ['isBn', 'returnSelect', 'dataService', 'attach']),
     ...mapState('searchTrans', ['priceId', 'selected']),
     ...mapState('detail', ['ServiceRequest']),
     Product() {
@@ -162,6 +263,7 @@ export default {
       }
       if (len) {
         for (let i = 0;i < len;i++) {
+          console.log(me.returnSelect.length);
           if (!me.switchStatus[i]) {
             me.allFee += me.returnSelect[i].num * parseFloat(me.returnSelect[i]['List Price'], 0);
           }
@@ -171,8 +273,8 @@ export default {
     }
   },
   methods: {
-    ...mapActions(NAMESPACE, ['addServiceOrder', 'getServiceR']),
-    ...mapMutations(NAMESPACE, ['setIsBn', 'ProductNum', 'deleteProduct', 'initSelect']),
+    ...mapActions(NAMESPACE, ['addServiceOrder', 'getServiceR', 'getOrderDetail', 'upDateOrderStatu', 'deleteOrderEntry', 'backDone']),
+    ...mapMutations(NAMESPACE, ['setIsBn', 'ProductNum', 'deleteProduct', 'initSelect', 'selectProduct', 'setA', 'setSelectBn']),
     ...mapActions('app', ['getLov', 'upload']),
     ...mapMutations('searchTrans', ['initSelected', 'deleteSelected']),
     ...mapMutations('detail', ['setPartner']),
@@ -187,22 +289,23 @@ export default {
       let me = this;
       me.ProductNum({num, val});
     },
-    getSwipeBtn(item) {
+    getSwipeBtn(index, item) {
       return [{
         content: '删除',
         style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
-        handler: () => this.deleteFn(item)
+        handler: () => this.deleteFn(index, item)
       }];
     },
-    deleteFn(item) {
-      this.deleteProduct(item);
+    deleteFn(index, item) {
+      let me = this;
+      me.deleteProduct(index);
     },
     submit() {
       let me = this;
-      if (!me.attach.list.length) {
-        Toast('请上传相关的维修单据');
-        return;
-      }
+//      if (!me.attach.list.length) {
+//        Toast('请上传相关的维修单据');
+//        return;
+//      }
       MessageBox.confirm('确认提交，数据一经提交不可修改。', '提示').then(action => {
         let lineItems = [];
         let obj = {};
@@ -212,12 +315,13 @@ export default {
             me.$refs.attach.getServerIds(),
             id,
             function(data) {
+              let key = !me.EntryOrdersId ? 'addServiceOrder' : 'deleteOrderEntry';
               for (let i = 0;i < me.returnSelect.length; i++) {
                 obj = {
                   'Id': i + 1,
                   'Product': me.returnSelect[i].Name, // 产品编码
                   'Quantity Requested': me.returnSelect[i].num, // 数量
-                  'KL Warranty Flag': me.switchStatus[i] ? 'Y' : 'N'
+                  'KL Warranty Flag': me.returnSelect[i].isBn ? 'Y' : 'N'
                 };
                 lineItems.push(obj);
               }
@@ -234,32 +338,61 @@ export default {
                 // 订单行
                 lineItems: lineItems,
                 // 订单头
+                EntryOrdersId: me.EntryOrdersId,
                 ServiceRequestId: me['Service'].Id,   // 服务请求ID
                 priceId: me.priceId,      // 价格列表ID
                 warrantyFlag: me.isBn === '保内' ? 'Y' : 'N',    // 订单头是否保内
-                contactId: me['Service']['Contact Id'], // 联系人Id
-                assetId: me['Service']['Asset Id'], // 资产Id
+                contactId: me['ServiceRequest']['Contact Id'], // 联系人Id
+                assetId: me['ServiceRequest']['Asset Id'], // 资产Id
                 srNum: me['Service']['SR Number'],
                 parentId: me.ServiceRequest.Id,
                 type: me.serviceType,
+                key: key,
                 callBack: function(data) {
                   KND.Session.set('popupVisible', 'popupVisible');
                   me.setPartner(data);
                   me.$router.go(-1);
                   _upload('', true);
+                },
+                error: function() {
+                  me.getServiceR({
+                    Id: me.Service.Id,
+                    callback: function(data) {
+                      me.Service = data['SiebelMessage']['Service Request'];
+                      let EntryOrders = KND.Util.toArray(me.Service['Order Entry - Orders']);
+                      if (EntryOrders.length) {
+                        for (let i = 0;i < EntryOrders.length;i++) {
+                          if (EntryOrders[i]['Status LIC'] === 'Draft') {
+                            me.EntryOrdersId = EntryOrders[i].Id;
+                            return;
+                          }
+                        }
+                      }
+                    }
+                  });
                 }
               };
-              if (me.Service['Product Warranty Flag'] !== isBn && !lineItems.length) {
+              console.log(obj);
+              if (me.Service['Product Warranty Flag'] !== isBn || !lineItems.length) {
                 me.upDateOrderStatu({
                   Id: me.ServiceRequest.Id,
                   type: isBn,
-                  callback: obj.callBack
+                  callback: function(data) {
+//                    if (lineItems.length) {
+//                      me[key](obj);
+//                    } else {
+                    if (key === 'deleteOrderEntry') {
+                      me[key](obj);
+                    } else {
+                      me.backDone(obj);
+                    }
+//                    }
+                  }
                 });
               } else {
-                me.addServiceOrder(obj);
+                me[key](obj);
               }
-            }
-          );
+            });
         };
         uploadAttach(me['Service'].Id);
       });
@@ -279,6 +412,7 @@ export default {
             me.switchStatus.push(false);
           }
         }
+//        me.setSelectBn(val[0] === '保内');
         me.setIsBn(val[0]);
       } else {
         me.fee = val[0] === '工作时间' ? 100 : 150;
@@ -293,6 +427,9 @@ export default {
       } else {
         me.slots[0].values = ['工作时间', '其他时间'];
       }
+    },
+    changeSwitch(is) {
+      console.log(is);
     }
   },
   watch: {

@@ -162,29 +162,29 @@
       if (status) {
         me.status = status;
       }
-      if (serviceType === 'save') {
-        me.getServiceR({
-          Id: serviceId,
-          callback: function(data) {
-            me.SerialNumber = data['Serial Number'];
-            me.SR_ROOTCAUSE = data['SR Rootcause'];
-            me.AssetNumber = data['Asset Number'];
-            me.KL_SR_RESP = data['KL Responsbility'];
-            me.repairDetails = data['Repair Details'];
-            me.KL_LOCK_BODY_MODEL = data['KL Lock Body Model'];
-            me.KL_LOCK_MODEL = data['KL Lock Model'];
-            me.status = data['Status'];
-            if (me.SerialNumber) {
-              me.sarech();
-            }
-            if (data['KL Parent SR Complete Flag'] || data['KL Status LIC'] === 'Completed') {
+      me.getServiceR({
+        Id: serviceId,
+        callback: function(data) {
+          let datas = data['SiebelMessage']['Service Request'];
+          me.SerialNumber = datas['Serial Number'];
+          if (me.SerialNumber) {
+            me.sarech();
+          }
+          if (serviceType === 'save') {
+            me.SR_ROOTCAUSE = datas['SR Rootcause'];
+            me.KL_SR_RESP = datas['KL Responsbility'];
+            me.repairDetails = datas['Repair Details'];
+            me.KL_LOCK_BODY_MODEL = datas['KL Lock Body Model'];
+            me.KL_LOCK_MODEL = datas['KL Lock Model'];
+            me.status = datas['Status'];
+            if (datas['KL Parent SR Complete Flag'] || datas['KL Status LIC'] === 'Completed') {
               me.isSubmit = false;
             }
             me.queryMedias({
               data: {
                 'IOName': 'KL Service Request Attachment IO',
                 'SearchSpec': {
-                  'Service Request Attachment.Activity Id': data.Id,
+                  'Service Request Attachment.Activity Id': datas.Id,
                   'Service Request Attachment.KL SR Att Type': 'LookupValue("KL_SR_ATT_TYPE", "Problem Record")'
                 }
               },
@@ -196,8 +196,8 @@
               }
             });
           }
-        });
-      }
+        }
+      });
       me.getLov({
         type: 'KL_LOCK_MODEL',
         success: data => {

@@ -206,9 +206,9 @@ export default new Vuex.Store({
           }
         },
         setSn(state, data) {
-          if (data) {
+          if (data.length) {
             state.form['KL_Product_Model'] = data[0]['KL Product Model'] || ''; // 产品类型
-            state.form['KL_Cutoff_Date'] = KND.Util.format(data[0]['Install Date'], 'yyyy-MM-dd hh:mm:ss') || '';  // 移交日期
+            state.form['KL_Cutoff_Date'] = data[0]['Install Date'] ? KND.Util.format(data[0]['Install Date'], 'yyyy-MM-dd hh:mm:ss') : '';
             state.form['Cutoff_Date'] = data[0]['Install Date'] || '';
             state.form['Product_Warranty_Flag'] = data[0]['KL Warranty Flag'];  // 保修期限
           } else {
@@ -806,7 +806,8 @@ export default new Vuex.Store({
           // if (val === '2') {
           //   console.log(this);
           // } else {
-          state['result1'] = data;
+          // state['result1'] = data;
+          state['result'] = data;
           // }
           // state.selected = [];
           // state.result = [];
@@ -835,38 +836,55 @@ export default new Vuex.Store({
         }
       },
       actions: {
-        getProduct({state, commit}, val) {
+        getProduct({state, commit}, {val, callback}) {
           api.get({
-            key: 'getPrice',
+            key: 'getProduct',
+            data: {
+              val
+            },
             success: function(data) {
-              state.priceId = data.Id;
-              if (data.Id) {
-                api.get({
-                  key: 'getProduct',
-                  data: {
-                    val: val.value,
-                    ParentId: val.ParentId,
-                    // type: val.type,
-                    id: data.Id
-                  },
-                  success: function(data) {
-                    let Catalog = KND.Util.toArray(data.SiebelMessage['Catalog Category']);
-                    if (Catalog.length) {
-                      // commit('setProduct', {data: Catalog, item: val.value});
-                      // let name = val.value === '1' ? 'setProduct' : 'setProduct1';
-                      if (val.value === '1') {
-                        commit('setProduct', Catalog);
-                      }
-                      if (val.callback) {
-                        val.callback(Catalog);
-                      }
-                    }
-                  }
-                });
+              let product = KND.Util.toArray(data.SiebelMessage['KL FS Invloc Product']);
+              if (product) {
+                commit('setProduct', product);
+                if (callback) {
+                  callback(product);
+                }
               }
             }
           });
         }
+        // getProduct({state, commit}, val) {
+        //   api.get({
+        //     key: 'getPrice',
+        //     success: function(data) {
+        //       state.priceId = data.Id;
+        //       if (data.Id) {
+        //         api.get({
+        //           key: 'getProduct',
+        //           data: {
+        //             val: val.value,
+        //             ParentId: val.ParentId,
+        //             // type: val.type,
+        //             id: data.Id
+        //           },
+        //           success: function(data) {
+        //             let Catalog = KND.Util.toArray(data.SiebelMessage['Catalog Category']);
+        //             if (Catalog.length) {
+        //               // commit('setProduct', {data: Catalog, item: val.value});
+        //               // let name = val.value === '1' ? 'setProduct' : 'setProduct1';
+        //               if (val.value === '1') {
+        //                 commit('setProduct', Catalog);
+        //               }
+        //               if (val.callback) {
+        //                 val.callback(Catalog);
+        //               }
+        //             }
+        //           }
+        //         });
+        //       }
+        //     }
+        //   });
+        // }
       }
 /*      mutations: {
         count(state, val) {
@@ -1059,15 +1077,25 @@ export default new Vuex.Store({
     saveFault: {                     // 完成工单
       namespaced: true,
       state: {
-        isBn: '保内',
-        returnSelect: []
+        isBn: '',
+        returnSelect: [],
+        dataService: {},
+        attach: { // 附件
+          list: [],
+          edit: true,
+          title: '相关附件'
+        }
       },
       mutations: {
         setIsBn(state, value) {
           state.isBn = value;
         },
+        setSelectBn(state, value) {
+          for (let i = 0; i < state.returnSelect.length; i++) {
+            state.returnSelect[i].isBn = value;
+          }
+        },
         selectProduct(state, select) {                    // 确认选择的配件
-          console.log(select);
           if (state.returnSelect.length) {
             for (let i = 0;i < state.returnSelect.length;i++) {
               if (select.Id === state.returnSelect[i].Id) {
@@ -1075,10 +1103,12 @@ export default new Vuex.Store({
               }
             }
           }
+          select.isBn = (state.isBn === '保内');
           state.returnSelect.push(select);
         },
         initSelect(state) {
           state.returnSelect = [];
+          state.attach.list = [];
         },
         ProductNum(state, {num, val}) {
           let arr = state.returnSelect[num];
@@ -1087,6 +1117,12 @@ export default new Vuex.Store({
         },
         deleteProduct(state, index) {
           state.returnSelect.splice(index, 1);
+        },
+        setA(state, {data, type}) {
+          state[type] = data;
+        },
+        setSelect(state, {index, val}) {
+          state.returnSelect[index].select = val;
         }
       },
       actions: {
@@ -1097,32 +1133,58 @@ export default new Vuex.Store({
               form
             },
             success: function(data) {
-              if (form.type === 'child') {
-                api.get({
-                  key: 'serviceDone',
-                  data: {
-                    'Object Id': form.ServiceRequestId
-                  },
-                  success: function(data) {
-                    form.callBack(data);
-                  },
-                  error: function(data) {
-                    console.log(data);
-                  }
-                });
-              } else {
-                dispatch('upDateOrderStatu', {
-                  Id: form.parentId,
-                  callback: form.callBack
-                });
-              }
-            },
-            error: function(data) {
-              console.log(data);
+              api.get({
+                key: 'toSubmitOrder',
+                data: {
+                  'Object Id': data.PrimaryRowId
+                },
+                success: function(data) {
+                  dispatch('backDone', form);
+                  // if (form.type === 'child') {
+                  //   api.get({
+                  //     key: 'serviceDone',
+                  //     data: {
+                  //       'Object Id': form.ServiceRequestId
+                  //     },
+                  //     success: function(data) {
+                  //       form.callBack(data);
+                  //     }
+                  //     // error: function(data) {
+                  //     //   console.log(data);
+                  //     // }
+                  //   });
+                  // } else {
+                  //   dispatch('upDateOrderStatu', {
+                  //     Id: form.parentId,
+                  //     callback: form.callBack
+                  //   });
+                  // }
+                },
+                error: function(error) {
+                  let message = error.response && error.response.data.ERROR;
+                  Toast(message);
+                  form.error();
+                }
+              });
             }
           });
         },
-        upDateOrderStatu({commit}, {Id, type, callback}) {
+        deleteOrderEntry({commit, dispatch}, form) {
+          api.get({
+            key: form.key,
+            data: {
+              id: form.EntryOrdersId
+            },
+            success: function(data) {
+              if (form.lineItems.length) {
+                dispatch('addServiceOrder', form);
+              } else {
+                dispatch('backDone', form);
+              }
+            }
+          });
+        },
+        upDateOrderStatu({commit, dispatch}, {Id, type, callback}) {
           let datas = {Id: Id};
           if (!type) {
             datas['KL Parent SR Complete Flag'] = 'Y';
@@ -1135,9 +1197,7 @@ export default new Vuex.Store({
             success: function(data) {
               // form.callBack(data);
               callback(data);
-            },
-            error: function(data) {
-              console.log(data);
+              // dispatch('backDone', form);
             }
           });
         },
@@ -1154,6 +1214,62 @@ export default new Vuex.Store({
               console.log('error');
             }
           });
+        },
+        getOrderDetail({state, commit}, {id, callback}) {
+          api.get({
+            key: 'getOrderDetail',
+            data: {
+              id
+            },
+            success: function(data) {
+              let EntryOrders = KND.Util.toArray(data.SiebelMessage['Order Entry - Orders']['Order Entry - Line Items']);
+              if (EntryOrders.length) {
+                for (let i = 0; i < EntryOrders.length;i++) {
+                  commit('selectProduct', {
+                    'Name': EntryOrders[i].Product,
+                    'num': parseInt(EntryOrders[i]['Quantity Requested'], 0),
+                    'KL Translated Name': EntryOrders[i]['KL Product Name Join'],
+                    'List Price': EntryOrders[i]['Adjusted List Price - Display'],
+                    'Id': EntryOrders[i]['Product Id'],
+                    'isBn': (EntryOrders[i]['KL Warranty Flag'] === 'Y')
+                  });
+                }
+                // callback(EntryOrders);
+              }
+            }
+          });
+        },
+        deleteOrderline({commit, dispatch}, {EntryId, LineId}) {
+          api.get({
+            key: 'deleteOrderline',
+            data: {
+              EntryId,
+              LineId
+            },
+            success: function(data) {
+            }
+          });
+        },
+        backDone({commit, dispatch}, form) {
+          if (form.type === 'child') {
+            api.get({
+              key: 'serviceDone',
+              data: {
+                'Object Id': form.ServiceRequestId
+              },
+              success: function(data) {
+                form.callBack(data);
+              }
+              // error: function(data) {
+              //   console.log(data);
+              // }
+            });
+          } else {
+            dispatch('upDateOrderStatu', {
+              Id: form.parentId,
+              callback: form.callBack
+            });
+          }
         }
       }
     }
