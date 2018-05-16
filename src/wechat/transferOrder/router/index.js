@@ -70,5 +70,11 @@ export default new Router({
     component(resolve) {
       require(['../page/fitting'], resolve);
     }
+  }, { // 门厂选择
+    path: '/doorFactory',
+    name: 'doorFactory',
+    component(resolve) {
+      require(['../page/doorFactory'], resolve);
+    }
   }]
 });

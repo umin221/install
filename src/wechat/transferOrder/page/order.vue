@@ -11,10 +11,18 @@
       <!--detail-->
       <div class="mint-content order" :class="{'disable': !editable}" :data-len="len">
         <div>
-          <mt-cell title="开孔方式"
+          <cus-field label="开孔方式" tag="开孔方式"
+                   v-valid.require
                    @click.native="showLovFn('KL Hole Type')"
                    :value="order['KL Hole Type']"
-                   is-link></mt-cell>
+                   is-link></cus-field>
+          <cus-field label="门厂名称" tag="门厂名称"
+                   v-if="isDoorFactoryOpen"
+                   v-valid.require
+                   @click.native="$router.push('doorFactory')"
+                   :data-value="factory"
+                   :value="order['KL Delivery Partner Name']"
+                   is-link></cus-field>
           <mt-cell title="是否门厂安装锁体" v-show="isProject && isDoorFactoryOpen">
             <mt-switch v-model="box1"></mt-switch>
           </mt-cell>
@@ -68,8 +76,13 @@
 
 <script type="es6">
   import {mapState, mapActions, mapMutations} from 'vuex';
+  import Vue from 'vue';
+  import vp from 'public/plugin/validator';
   import menuBox from 'public/components/cus-menu.vue';
+  import cusField from 'public/components/cus-field';
   import lockLine from '../components/cusLockLine';
+  // use plugin
+  Vue.use(vp);
 
   let NAMESPACE = 'order';
   // mapp
@@ -77,11 +90,12 @@
 
   export default {
     name: NAMESPACE,
-    components: {lockLine, menuBox},
+    components: {lockLine, menuBox, cusField},
     created() {
       let me = this;
       let query = me.$route.query;
-      let order = KND.Util.parse(KND.Session.get('order') || query.order);
+      let sOrder = KND.Session.get('order');
+      let order = KND.Util.parse(sOrder || query.order);
 
       // 是否工程订单 工程/零星
       me.isProject = query.salesType === '工程';
@@ -99,6 +113,14 @@
           'Order Header Id': me.order.Id
         });
       };
+      // 会话无订单信息，清空门厂选择
+      if (!sOrder) {
+        this.selFactory('');
+      };
+    },
+    beforeDestroy() {
+      // 缓存订单
+      KND.Session.set('order', JSON.stringify(this.order));
     },
     data() {
       return {
@@ -126,6 +148,7 @@
     },
     computed: {
       ...mapState('index', ['isTeam', 'isEngineer']),
+      ...mapState('doorFactory', ['select']),
       ...mapState(NAMESPACE, ['order', 'lines']),
       // 安装人员 并且 非查看团队的， 状态不是 草稿 或者 驳回的订单 可编辑
       editable() {
@@ -186,12 +209,22 @@
           me[g.group].push(line);
         };
         return lines.length;
+      },
+      factory() {
+        // 更换门厂
+        let select = this.select;
+        if (!select) return;
+        let name = select.Name;
+        this.order['KL Delivery Partner Id'] = select.Id;
+        this.order['KL Delivery Partner Name'] = name;
+        return name;
       }
     },
     methods: {
       ...mapActions(NAMESPACE, ['save', 'update', 'queryLines', 'runProcess', 'delete']),
       ...mapActions('app', ['getLov']),
       ...mapMutations(NAMESPACE, ['setOrder']),
+      ...mapMutations('doorFactory', ['selFactory']),
       getRows(type) {
         return this[type];
       },
@@ -209,8 +242,6 @@
         let path = line['KL Product Type LIC'] === 'Other' ? 'fitting' : 'orderLine';
         // 填充订单id，保存编辑行时需要
         line['Order Header Id'] = me.order.Id;
-        // 缓存订单
-        KND.Session.set('order', JSON.stringify(me.order));
         me.$router.push({
           path: path,
           query: {
@@ -238,16 +269,19 @@
         };
         let me = this;
         let order = me.order;
-        if (order.Id) {
-          delete order['Link'];
-          me.update({
-            data: order,
-            success: callback
-          });
-        } else {
-          // me.save({data: order});
-          MessageBox('保存失败，订单不存在！');
-        }
+        // 表单验证
+        tools.valid.call(this, () => {
+          if (order.Id) {
+            delete order['Link'];
+            me.update({
+              data: order,
+              success: callback
+            });
+          } else {
+            // me.save({data: order});
+            MessageBox('保存失败，订单不存在！');
+          }
+        });
       },
       // 选择确认
       enter(values, type) {

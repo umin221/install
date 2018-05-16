@@ -38,7 +38,7 @@
       </div>
 
       <attach ioName="KL Agreement Attachment IO" title="合同附件" ref="attach"
-              :attach="form['KL Agreement Attachment']"
+              :attach="getAttach()"
               :edit="false">
       </attach>
 
@@ -181,6 +181,10 @@
             Toast('非草稿状态不允许删除');
           }
         });
+      },
+      // 合同附件
+      getAttach() {
+        return KND.Util.toArray(this.form['KL Agreement Attachment']);
       }
     }
   };

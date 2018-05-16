@@ -440,6 +440,59 @@ export default new Vuex.Store({
           });
         }
       }
+    },
+
+    /**
+     * 更改门厂
+     */
+    doorFactory: {
+      namespaced: true,
+      state: {
+        result: [],
+        select: {
+          'Name': '请选择'
+        }
+      },
+      mutations: {
+        setFactory(state, factory) {
+          state.result = factory;
+        },
+        addFactory(state, factory) {
+          state.result.push(...factory);
+        },
+        selFactory(state, factory = {'Name': '请选择'}) {
+          state.select = factory;
+        }
+      },
+      actions: {
+        /**
+         * 查找门厂
+         * @param {Object} data 必填 查询条件 键值对
+         */
+        findFactory({state, commit}, {data, more, callback}) {
+          api.get({
+            key: 'findDoorFactory',
+            data: data,
+            paging: {
+              StartRowNum: more ? state.result.length : 0,
+              PageSize: PAGESIZE
+            },
+            success: data => {
+              let factory = KND.Util.toArray(data.SiebelMessage['Channel Partner']);
+              commit(more ? 'addFactory' : 'setFactory', factory);
+              if (callback) {
+                callback(factory);
+              }
+            },
+            error: error => {
+              if (callback) {
+                callback();
+              };
+              console.log(error);
+            }
+          });
+        }
+      }
     }
   }
 });

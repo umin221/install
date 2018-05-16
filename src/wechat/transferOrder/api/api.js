@@ -149,6 +149,31 @@ let apiList = {
   },
 
   /**
+   * 查找门厂
+   * @param {String} option.data.Name 必填 模糊匹配 门厂名字
+   * @param {String} option.paging.StartRowNum 必填 翻页参数
+   * @param {String} option.paging.PageSize 必填 翻页参数
+   */
+  findDoorFactory: option => {
+    let paging = option.paging;
+    let condition = KND.Util.condition({'KL Partner Status': 'Active', 'KL Partner Type': '门厂'}, 'Channel Partner');
+    // 门厂名称过滤
+    if (option.data.Name) condition += ` AND [Channel Partner.Name] LIKE '*${option.data.Name}*'`;
+    return {
+      url: 'service/EAI Siebel Adapter/QueryPage',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'KL Channel Partner',
+          'SearchSpec': condition,
+          'ViewMode': 'All',
+          'StartRowNum': paging.StartRowNum,
+          'PageSize': paging.PageSize
+        }
+      }
+    };
+  },
+
+  /**
    * 更新安装交接单状态 已拒绝/已交接
    * @param {Object} option.data 必填 需要更新的实体字段
    * @returns {{method: string, url: string}}
