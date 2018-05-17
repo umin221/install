@@ -81,23 +81,23 @@
       <div v-show="read && state !== 'pending'">
         <title-group>联系人列表</title-group>
         <empty v-show="!form.User || !form.User.length"></empty>
-        <mt-cell-swipe class="multiple"
+        <mt-cell class="multiple"
                  v-for="(item, index) in form.User"
                  :key="item.Id"
-                 :right="isValid ? [{
-                                 content: item['KL Status'] === '失效' ? '活动' : '失效',
-                                 style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
-                                 handler: () => deleteUser({item, index})
-                               }] : []"
                  @click.native="toContact(item)"
                  is-link>
+          <!--:right="isValid ? [{-->
+          <!--content: item['KL Status'] === '失效' ? '活动' : '失效',-->
+          <!--style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },-->
+          <!--handler: () => deleteUser({item, index})-->
+          <!--}] : []"-->
 
           <div class="mint-cell-title co-flex" slot="title">
             <span class="co-f1">姓名: {{item['Last Name']}}</span>
             <span class="co-f1" style="text-align: right;">{{item['KL Status']}}</span>
           </div>
           <div class="mint-cell-sub-title" slot="title">登录账号: {{item['Login Name']}}</div>
-        </mt-cell-swipe>
+        </mt-cell>
       </div>
 
       <!--buttons-->
@@ -172,6 +172,7 @@
       data: {
         MediaId: serverIds,
         Id: id,
+        Comment: '',
         IOName: 'KL Channel Partner Attachments'
       },
       success: callback

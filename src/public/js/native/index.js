@@ -280,7 +280,7 @@ import queue from '../base/queue';
     // 上传
     native.uploadImage = option => {
       util.invoke(option.success, {
-        serverId: '3Powe2mmxCACbK8lUOIpfroUMDUl3aX2ecFFNXGZc43OymPcoJio49bVNh4pFDLn6',
+        serverId: '1TOHofOG7v0KB1mUi3DWENYMlrDwxK5EuYZueY48rD-hR6WDNa4qgwJbjD5Yg10uC',
         errMsg: 'uploadImage:ok'
       });
     };
@@ -303,6 +303,10 @@ import queue from '../base/queue';
     };
     // 预览文件
     native.previewFile = option => {
+      console.log(option);
+    };
+    // 预览图片
+    native.previewImage = option => {
       console.log(option);
     };
   };

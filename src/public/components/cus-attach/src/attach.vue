@@ -124,8 +124,10 @@
        * 预览图片
        */
       previewImageFn(index) {
-        let arr = Array.prototype.filter.call(this.attach, item => {
-          return item.src;
+        let arr = [];
+        Array.prototype.map.call(this.attach, item => {
+          if (item.src) arr.push(item.src);
+          return false;
         });
         KND.Native.previewImage({
           current: arr[index],
