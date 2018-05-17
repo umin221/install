@@ -22,7 +22,7 @@
                  v-valid.require
                  placeholder="请输入验证码"></cus-field>
       <cus-field label="真实姓名" tag="真实姓名"
-                 v-model="name"
+                 v-model="contactName"
                  class="require mar-right"
                  v-valid.require
                  placeholder="请输入真实姓名"></cus-field>
@@ -36,9 +36,11 @@
   </div>
 </template>
 <script>
-//  import {mapActions} from 'vuex';
+  import {mapState, mapActions} from 'vuex';
   import cusField from '../../../public/components/cus-field';
   import Vue from 'vue';
+  import md5 from 'js-md5';
+  import api from '../api/api';
   import validateVp from 'public/plugin/validator';
 //  import { Toast } from 'mint-ui';
   let phoneReg = new RegExp('^[1][3,4,5,7,8][0-9]{9}$');
@@ -55,16 +57,17 @@
     data: () => {
       return {
         phoneNumber1: '',
-        name: '',
+        contactName: '',
         validate: '',
         curCount: 120,
         isSend: false
       };
     },
     computed: {
+      ...mapState(NameSpace, ['obj'])
     },
     methods: {
-//      ...mapActions(NameSpace, ['toTelValidate']),
+      ...mapActions(NameSpace, ['toTelValidate']),
       toValidate() {
         let me = this;
         if (me.phoneNumber1) {
@@ -72,7 +75,27 @@
             Toast('手机号码格式错误');
             return;
           } else {
-//            me.toTelValidate();
+            var num = '';
+            for (var i = 0; i < 4; i++) {
+              num += Math.floor(Math.random() * 10);
+            }
+            var message = '【坚朗海贝斯】您的验证码：' + num + '，请在2分钟内完成输入。如非本人操作，请忽略此条信息。详情咨询客服4009319898！';
+            var ACCOUNT = 'gdjlwj';
+            var PASSWORD = 'Net263gdjl';
+            var timestamp = me.getTs(8);
+            var pswd = md5(ACCOUNT + PASSWORD + timestamp);
+            console.dir(pswd);
+            var obj = {
+              account: ACCOUNT,
+              timestamp: timestamp,
+              pswd: pswd,
+              msg: encodeURI(message),
+              phoneNumber: me.phoneNumber1,
+              number: num
+            };
+            console.dir('===========');
+            console.dir(obj);
+            me.toTelValidate(obj);
           }
         } else {
           Toast('请输入手机号码');
@@ -81,8 +104,59 @@
         me.isSend = true;
         interValObj = window.setInterval(me.contM, 1000);
       },
+      pad(num, n) {
+        var len = num.toString().length;
+        while (len < n) {
+          num = '0' + num;
+          len++;
+        }
+        return num;
+      },
+      getTs(timeZone) {
+        var self = this;
+        var timestamp = Date.parse(new Date()) / 1000;
+        if (typeof (timeZone) === 'number') {
+          timestamp = parseInt(timestamp, 10) + parseInt(timeZone, 10) * 60 * 60;
+        }
+        var time = new Date(timestamp * 1000);
+        var ymdhis = '';
+        ymdhis += time.getUTCFullYear();
+        ymdhis += self.pad((time.getUTCMonth() + 1), 2);
+        ymdhis += self.pad(time.getUTCDate(), 2);
+        ymdhis += self.pad(time.getUTCHours(), 2);
+        ymdhis += self.pad(time.getUTCMinutes(), 2);
+        ymdhis += self.pad(time.getUTCSeconds(), 2);
+        return ymdhis;
+      },
       submit() {
+        var self = this;
+        if (!self.isSend) { // 超时
+          Toast('请重新获取验证码');
+          return;
+        }
         tools.valid.call(this, () => {
+          if (self.obj.phoneNumber === self.phoneNumber1 && self.obj.number === self.validate) {
+            api.get({ // 更改状态
+              key: 'setWXphone',
+              method: 'POST',
+              data: {
+                'body': {
+                  'ProcessName': 'KL WeChat Contact Binding Process',
+                  'Open Id': self.openId,
+                  'Contact Name': self.contactName,
+                  'Contact Phone': self.phoneNumber1
+                }
+              },
+              success: function(data) {
+                if (!data.ERROR) {
+                  Toast('绑定成功');
+                  KND.Util.back();
+                }
+              }
+            });
+          } else {
+            Toast('请输入正确验证码');
+          }
         });
       },
       contM() {

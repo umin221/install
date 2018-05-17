@@ -32,6 +32,24 @@ let ApiList = {
       }
     };
   },
+  getMsg: option => {
+    var data = KND.Util.param(option.data);
+    return {
+      method: 'POST',
+      url: 'https://120.27.244.164/msg/HttpBatchSendSM',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'dataType': 'json'
+      },
+      data: data
+    };
+  },
+  setWXphone: option => {
+    return {
+      method: 'POST',
+      url: 'service/Workflow Process Manager/RunProcess'
+    };
+  },
   getAsset: option => {
     return {
       method: 'get',

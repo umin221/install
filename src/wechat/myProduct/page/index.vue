@@ -28,11 +28,12 @@
                       :key="item.Id"
                       @click.native="toDetail(item['Inventory Location ID'],item['Product ID'])"
                       :title="'配件代码:'+ item['Product Name']" is-link>
-            <div slot="after" style="color: #A2BBFC">{{item.Type}}</div>
+            <div slot="after" style="color: #0772c1">{{item.Type}}</div>
               <div class="mint-cell-sub-title" slot="title">配件名称：{{item['KL Product Name Join']}}</div>
               <div class="mint-cell-sub-title" slot="title">配件型号: {{item['KL Prod Model No']}}</div>
               <div class="mint-cell-sub-title" slot="title">库存量：{{item['KL Inventory Qty']}}</div>
               <div class="mint-cell-sub-title" slot="title" v-show="isTeam">负责人：{{item['KL Primary Employee Full Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">配件描述：{{item['KL Product Description']}}</div>
             </cus-cell>
           </loadmore>
         </mt-tab-container-item>
@@ -48,11 +49,12 @@
                       :key="item.Id"
                       @click.native="toDetail(item['Inventory Location ID'],item['Product ID'])"
                       :title="'配件代码:'+ item['Product Name']" is-link>
-              <div slot="after" style="color: #A2BBFC">{{item.Type}}</div>
+              <div slot="after" style="color: #0772c1">{{item.Type}}</div>
               <div class="mint-cell-sub-title" slot="title">配件名称：{{item['KL Product Name Join']}}</div>
               <div class="mint-cell-sub-title" slot="title">配件型号: {{item['KL Prod Model No']}}</div>
               <div class="mint-cell-sub-title" slot="title">库存量：{{item['KL Inventory Qty']}}</div>
               <div class="mint-cell-sub-title" slot="title" v-show="isTeam">负责人：{{item['KL Primary Employee Full Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">配件描述：{{item['KL Product Description']}}</div>
             </cus-cell>
           </loadmore>
         </mt-tab-container-item>

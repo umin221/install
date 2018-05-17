@@ -21,6 +21,7 @@
                 :key="index">
             <div class="mt-Detail-title">配件编码：{{item.Product}}</div>
             <div class="mt-Detail-title">配件名称：{{item['KL Product Name Join']}}</div>
+            <div class="mt-Detail-title">配件描述：{{item['KL Product Description']}}</div>
             <div class="mt-Detail-title" v-if="orderEntry['Status LIC'] !== 'Closed'">申请数量：{{item['Quantity Requested']}}</div>
             <div class="mt-Detail-title" v-if="orderEntry['Status LIC'] === 'Closed'">实际领用/申请数量：{{item['Extended Quantity']}}/{{item['Quantity Requested']}}</div>
           </div>

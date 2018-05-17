@@ -356,6 +356,8 @@ let ApiList = {
     if (name) {
       specName += '[Last Name] ~LIKE "*' + name + '*" OR ([KL Parent Service Region Name] ~LIKE "*' + name + '*" OR [Service Region] ~LIKE "*' + name + '*") AND';
     };
+    // 过滤离职人员
+    specName += ' [KL CRM User Flag] = "Y" AND ';
     return {
       method: 'get',
       url: 'data/KL Employee Interface BO/Employee/?searchspec=' + specName + '(' + specPosi.join(' OR ') + ')&' + KND.Util.param(option.paging)

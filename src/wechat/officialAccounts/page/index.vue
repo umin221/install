@@ -20,7 +20,7 @@
 </template>
 
 <script type="es6">
-  import {mapState} from 'vuex';
+  import {mapState, mapMutations} from 'vuex';
   const NameSpace = 'index';
   export default {
     name: NameSpace,
@@ -48,7 +48,12 @@
       ...mapState(NameSpace, ['value'])
     },
     methods: {
+      ...mapMutations('telValidate', ['clObj']),
       getUrl(id) {
+        var self = this;
+        if (id === 'telValidate') {
+          self.clObj();
+        }
         this.$router.push(id);
       }
     }

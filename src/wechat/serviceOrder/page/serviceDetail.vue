@@ -355,6 +355,7 @@
   import close from '../components/close';
   import cusCall from 'public/components/cus-call';
   import toggle from '../components/detail-toggle';
+  import buttonGroup from 'public/components/cus-button-group';
   import dateControl from '../components/dateControl';
   import srTitle from '../components/srOrder-title';
   // name
@@ -540,6 +541,11 @@
           me.endTime = new Date(val.selectDay + ' ' + me.endTime + ':00').format('MM/dd/yyyy hh:mm:ss');
           if (myDate > me.starTime) {
             Toast('预约时间必须大于当前时间');
+            me.showBox2 = false;
+            return;
+          }
+          if (me.starTime >= me.endTime) {
+            Toast('结束时间要大于开始时间');
             me.showBox2 = false;
             return;
           }
@@ -780,7 +786,7 @@
         }
       }
     },
-    components: {close, dateControl, toggle, cusCall, srTitle}
+    components: {close, dateControl, toggle, buttonGroup, cusCall, srTitle}
   };
 </script>
 <style lang="scss">
@@ -795,17 +801,14 @@
   }
   @mixin remove-decoration (){
     text-decoration: none;
-    color: lightblue;
+    color: #0772c1;
   }
   .marginB{
     margin-bottom: 40px;
     padding: 0!important;
   }
   .service-continer{
-    position: relative;
-    height:100%;
     .service-detail{
-      height: 84%;
       .detail-title{
         position: relative;
         padding: 0.5rem;

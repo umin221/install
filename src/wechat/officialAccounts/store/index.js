@@ -552,6 +552,40 @@ export default new Vuex.Store({
           });
         }
       }
+    },
+    telValidate: {
+      namespaced: true,
+      state: {
+        obj: {}
+      },
+      mutations: {
+        clObj(state) {
+          state.obj = {};
+        }
+      },
+      actions: {
+        toTelValidate({state}, obj) {
+          state.obj = obj; // 存 发送验证码的手机号码与随机码
+          api.get({
+            key: 'getMsg',
+            data: {
+              account: obj.account,
+              ts: obj.timestamp,
+              pswd: obj.pswd,
+              mobile: obj.phoneNumber,
+              msg: obj.msg,
+              needstatus: true,
+              resptype: 'json'
+            },
+            success: data => {
+              console.log(data);
+            },
+            error: data => {
+              console.log(data);
+            }
+          });
+        }
+      }
     }
   }
 });

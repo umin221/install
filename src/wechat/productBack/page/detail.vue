@@ -13,7 +13,7 @@
           <div class="mt-Detail-title"><span class="name">工程替代锁所属项目：</span><span class="val">{{orderEntry['KL Install Order Opty Name']}}</span></div>
           <div class="mt-Detail-title"><span class="name">申请领用时间：</span><span class="val">{{orderEntry['Order Date']}}</span></div>
           <div class="mt-Detail-title"><span class="name">领用说明：</span><span class="val">{{orderEntry['Description']}}</span></div>
-          <div class="mt-Detail-title"><span class="name">状态：</span><span class="val" style="color: lightblue;">{{orderEntry['Status']}}</span></div>
+          <div class="mt-Detail-title"><span class="name">状态：</span><span class="val" style="color: #0772c1;">{{orderEntry['Status']}}</span></div>
         </div>
         <div class="detail-content">
           <div class="item"
@@ -21,7 +21,9 @@
                 :key="index">
             <div class="mt-Detail-title">配件编码：{{item.Product}}</div>
             <div class="mt-Detail-title">配件名称：{{item['KL Product Name Join']}}</div>
-            <div class="mt-Detail-title">实际退入/申请数量：{{item['Extended Quantity']}}/{{item['Quantity Requested']}}</div>
+            <div class="mt-Detail-title">配件描述：{{item['KL Product Description']}}</div>
+            <div class="mt-Detail-title" v-if="orderEntry['Status LIC'] !== 'Closed'">申请数量：{{item['Quantity Requested']}}</div>
+            <div class="mt-Detail-title" v-if="orderEntry['Status LIC'] === 'Closed'">实际退入/申请数量：{{item['Extended Quantity']}}/{{item['Quantity Requested']}}</div>
           </div>
         </div>
       </div>
