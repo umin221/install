@@ -1,6 +1,11 @@
 <template>
   <div>
     <div class="mint-content">
+      <cus-field label="真实姓名" tag="真实姓名"
+                 v-model="contactName"
+                 class="require mar-right"
+                 v-valid.require
+                 placeholder="请输入真实姓名"></cus-field>
       <cus-field label="手机号码" tag="手机号码"
                    class="require mar-right"
                  v-model="phoneNumber1"
@@ -21,11 +26,6 @@
                  class="require mar-right"
                  v-valid.require
                  placeholder="请输入验证码"></cus-field>
-      <cus-field label="真实姓名" tag="真实姓名"
-                 v-model="contactName"
-                 class="require mar-right"
-                 v-valid.require
-                 placeholder="请输入真实姓名"></cus-field>
       <div style="font-size: 0.65rem;text-align: center;margin-top: 20px"><span>绑定手机号将绑定你的微信，仅支持手机号绑定</span></div>
       <div style="display: flex;justify-content: center;margin-top: 30px">
         <mt-button type="primary"
@@ -79,6 +79,7 @@
             for (var i = 0; i < 4; i++) {
               num += Math.floor(Math.random() * 10);
             }
+            console.log(num);
             var message = '【坚朗海贝斯】您的验证码：' + num + '，请在2分钟内完成输入。如非本人操作，请忽略此条信息。详情咨询客服4009319898！';
             var ACCOUNT = 'gdjlwj';
             var PASSWORD = 'Net263gdjl';

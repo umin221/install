@@ -15,7 +15,7 @@
           :value="detailData['Order Number']"></cus-field>
         <cus-field
           label="项目名称"
-          :value="detailData['KL Agreement Opportunity Name']"></cus-field>
+          :value="detailData['KL Agreement Opportunity Name']" is-link></cus-field>
         <cus-field
           label="销售类型"
           :value="detailData['KL Delivery Sales Type']"></cus-field>
