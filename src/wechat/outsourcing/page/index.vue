@@ -7,7 +7,7 @@
         <i class="xs-icon icon-search"></i>
       </mt-button>
       <!--<router-link :to="toAdd" >-->
-      <mt-button v-if="isManager" @click.native="toDetailFn" slot="right">
+      <mt-button @click.native="toDetailFn" slot="right">
         <i class="xs-icon icon-add"></i>
       </mt-button>
       <!--</router-link>-->
@@ -145,7 +145,7 @@
         let query = typeof id === 'string' ? {
           // detail
           type: 'read',
-          state: this.isManager ? this.selected : 'valid',
+          state: this.selected,
           id: id
         } : {
           // create

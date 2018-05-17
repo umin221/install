@@ -40,9 +40,6 @@
         me.$refs.result['onBottomLoaded'](data.length);
       }
     };
-    if (!this.isManager) {
-      param.data.type = 'pending';
-    }
     // 获取团队列表
     me.getPartners(param);
   };

@@ -113,7 +113,7 @@ let apiList = {
     partner['ListOfCUT Address'] = {
       'CUT Address': partner['CUT Address']
     };
-    delete option.data['CUT Address'];
+    delete partner['CUT Address'];
     return {
       method: 'post',
       url: 'service/Workflow Process Manager/RunProcess/',

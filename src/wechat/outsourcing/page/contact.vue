@@ -18,6 +18,10 @@
         <mt-field label="登陆密码" placeholder="请输入密码" tag="密码"
                   v-valid.require
                   v-model="contact['KL Outsource Password']"></mt-field>
+
+        <mt-cell title="是否启用">
+          <mt-switch v-model="enable"></mt-switch>
+        </mt-cell>
       </div>
 
       <button-group>
@@ -58,6 +62,17 @@
         },
         disable: false
       };
+    },
+    computed: {
+      // 联系人启用/失效
+      enable: {
+        get() {
+          return this.contact['KL Status'] === '活动';
+        },
+        set(flag) {
+          this.contact['KL Status'] = flag ? '活动' : '失效';
+        }
+      }
     },
     methods: {
       ...mapActions(NAMESPACE, ['findContact', 'upsertContact']),

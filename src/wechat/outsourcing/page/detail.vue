@@ -4,8 +4,8 @@
     <!--header-->
     <mt-header fixed :title="title">
       <fallback slot="left"></fallback>
-      <mt-button v-show="read && isValid && isManager" slot="right"
-                 @click="type = 'edit'">编辑</mt-button>
+      <!--<mt-button v-show="read && isValid && isManager" slot="right"-->
+                 <!--@click="type = 'edit'">编辑</mt-button>-->
       <mt-button v-show="!read && isValid" slot="right"
                  @click="updateFn">完成</mt-button>
     </mt-header>
@@ -18,11 +18,26 @@
                    :edit=!read
                    v-valid.require
                    v-model="form['Name']"></cus-field>
-        <cus-field label="合作伙伴负责人" placeholder="请输入负责人" tag="负责人"
+        <cus-field label="公司/个人"
+                   :edit=!read
+                   v-model="form['KL Partner Type 2']"
+                   @click.native="showLovFn('KL Partner Type 2')"
+                   :is-link="!read"></cus-field>
+        <cus-field label="负责人" placeholder="请输入负责人" tag="负责人"
                    @click.native="selectEngineerFn"
                    v-valid.require
                    v-model="select['KL Employee Full Name'] || form['KL Partner Owner Name']"
-                   is-link></cus-field>
+                   :is-link="!read"></cus-field>
+        <cus-field label="证件类型" tag="证件类型"
+                   :edit=!read
+                   v-valid.require
+                   v-model="form['KL Partner Credentials Type']"
+                   @click.native="showLovFn('KL Partner Credentials Type')"
+                   :is-link="!read"></cus-field>
+        <cus-field label="证件号码" placeholder="请输入证件号码" tag="证件号码" type="number"
+                   :edit=!read
+                   v-valid.require
+                   v-model="form['KL Partner Credentials Number']"></cus-field>
         <cus-field label="联系电话" placeholder="请输入电话" type="tel" tag="电话"
                    :edit=!read
                    v-valid.require.phone
@@ -32,11 +47,16 @@
                    placeholder="请选择"
                    :value="city"
                    v-valid.require
-                   is-link></cus-field>
+                   :is-link="!read"></cus-field>
         <cus-field label="详细地址" placeholder="请输入地址" tag="地址"
                    :edit=!read
                    v-valid.require
                    v-model="form['CUT Address']['Street Address']"></cus-field>
+        <cus-field label="规模"
+                   :edit=!read
+                   v-model="form['KL Partner Scale']"
+                   @click.native="showLovFn('KL Partner Scale')"
+                   :is-link="!read"></cus-field>
       </div>
 
       <attach ioName="KL Channel Partner Attachments" title="合同附件" ref="attach"
@@ -65,13 +85,17 @@
                  v-for="(item, index) in form.User"
                  :key="item.Id"
                  :right="isValid ? [{
-                                 content: '删除',
+                                 content: item['KL Status'] === '失效' ? '活动' : '失效',
                                  style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
                                  handler: () => deleteUser({item, index})
                                }] : []"
                  @click.native="toContact(item)"
                  is-link>
-          <div class="mint-cell-title" slot="title">姓名: {{item['Last Name']}}</div>
+
+          <div class="mint-cell-title co-flex" slot="title">
+            <span class="co-f1">姓名: {{item['Last Name']}}</span>
+            <span class="co-f1" style="text-align: right;">{{item['KL Status']}}</span>
+          </div>
           <div class="mint-cell-sub-title" slot="title">登录账号: {{item['Login Name']}}</div>
         </mt-cell-swipe>
       </div>
@@ -90,6 +114,15 @@
 
     <cus-city :showCity="showCity" @input="setCityFn"></cus-city>
 
+    <!--popup-->
+    <mt-popup v-model="showBox" position="bottom">
+      <menu-box vk="Value"
+                @my-enter="enter"
+                @my-cancel="showBox=false"
+                :type="lovType"
+                :slots="slots"></menu-box>
+    </mt-popup>
+
   </div>
 </template>
 
@@ -99,9 +132,25 @@
   import vp from 'public/plugin/validator';
   import titleGroup from 'public/components/cus-title-group';
   import cusField from 'public/components/cus-field';
+  import menuBox from 'public/components/cus-menu.vue';
   import cusCity from 'public/components/cus-select-city';
   // use plugin
   Vue.use(vp);
+  let mapp = config.mapp;
+
+  let getLov = function() {
+    let me = this;
+    let lovs = mapp.lovs;
+
+    for (let l in lovs) {
+      me.getLov({
+        type: lovs[l],
+        success: data => {
+          mapp.option[l] = data.items;
+        }
+      });
+    };
+  };
 
   /**
    * 附件上传
@@ -132,6 +181,7 @@
   const NAMESPACE = 'detail';
   export default {
     name: NAMESPACE,
+    components: {titleGroup, cusField, cusCity, menuBox},
     // 初始化
     created() {
       let me = this;
@@ -166,6 +216,8 @@
           }
         });
       }
+      // 拉取lov列表
+      getLov.call(this);
     },
     data: () => {
       return {
@@ -181,6 +233,11 @@
           list: [],
           edit: false
         },
+        slots: [
+          {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
+        ],
+        showBox: false,
+        lovType: '',
         records: '' // 审批记录
       };
     },
@@ -217,7 +274,7 @@
       }
     },
     methods: {
-      ...mapActions('app', ['upload', 'queryMedias']),
+      ...mapActions('app', ['upload', 'queryMedias', 'getLov']),
       ...mapActions(NAMESPACE, ['findPartnerById', 'findPartner', 'addPartner', 'updateSyn', 'pushMedia', 'queryApprovalList', 'deleteUser']),
       toContact(contact) {
         this.$router.push({
@@ -310,9 +367,21 @@
       // Select person in charge
       selectEngineerFn() {
         this.$router.push('engineer');
+      },
+      // 选择对话框
+      showLovFn(type) {
+        this.lovType = type;
+        this.showBox = true;
+        // 选择产品的 value-key 为 KL Product Model No ， 其他为 Value
+        this.slots[0].values = mapp.option[type];
+      },
+      // 选择确认
+      enter(values, type) {
+        this.showBox = false;
+        // 选择填充
+        this.form[type] = values[0]['Value'];
       }
-    },
-    components: {titleGroup, cusField, cusCity}
+    }
   };
 </script>
 
