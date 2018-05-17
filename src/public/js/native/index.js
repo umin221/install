@@ -122,9 +122,7 @@ import queue from '../base/queue';
      * @param {Array} option.urls 必填 需要预览的图片http链接列表
      */
     previewImage(option) {
-      wx.previewImage(Object.assign({
-        urls: []
-      }, option));
+      wx.previewImage(option);
     };
 
     /**
