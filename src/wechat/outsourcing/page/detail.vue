@@ -12,7 +12,7 @@
 
     <!--create detail edit-->
     <div class="mint-content wide-form">
-      <div :class="{'readonly': read}">
+      <div class="form" :class="{'readonly': read}">
         <cus-field label="合作伙伴名称" placeholder="请输入名称" tag="名称"
                    @change="checkNameExistFn"
                    :edit=!read
@@ -77,8 +77,8 @@
         <mt-cell class="multiple"
                        v-for="item in records"
                        :key="item.state">
-          <div class="mint-cell-title" slot="title">{{item['Party Name'] +' '+ item['Action']}}</div>
-          <div class="mint-cell-sub-title" slot="title">{{item['Created']}}</div>
+          <div class="mint-cell-title" slot="title">审批人：{{item['Task Owner Full Name']}}</div>
+          <div class="mint-cell-sub-title" slot="title">{{new Date(item['Created']).format('yyyy-MM-dd hh:mm')}}</div>
         </mt-cell>
       </div>
 
@@ -193,7 +193,7 @@
           me.queryApprovalList({
             data: {id: param.id},
             success: data => {
-              this.records = KND.Util.toArray(data.SiebelMessage['UInbox Item']);
+              this.records = KND.Util.toArray(data.SiebelMessage['UInbox Item']['UInbox Item Task']);
             }
           });
         };
@@ -441,8 +441,10 @@
 
 <style lang="scss">
   .wide-form {
-    .mint-cell-title {
-      width: 130px;
+    .form {
+      .mint-cell-title {
+        width: 130px;
+      }
     }
 
     .multiple {
