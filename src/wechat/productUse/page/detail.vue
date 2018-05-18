@@ -61,7 +61,9 @@
       me.getOrderEntry({
         id: me.id,
         callback: data => {
-          if (data['Status LIC'] === 'Draft' || data['Status LIC'] === 'Rejected' || data['Status LIC'] === 'Awaiting Approval') {
+          // 2018/5/18 只有审批中才需要审批 其他状态没有审批
+          // if (data['Status LIC'] === 'Draft' || data['Status LIC'] === 'Rejected' || data['Status LIC'] === 'Awaiting Approval') {
+          if (data['Status LIC'] === 'Awaiting Approval') {
             me.is_but = true;
           } else {
             me.is_but = false;
@@ -124,7 +126,18 @@
             success: function(data) {
               if (!data.ERROR) {
                 Toast('审批成功');
-                me.getBatch(me.id);
+                me.getOrderEntry({
+                  id: me.id,
+                  callback: data => {
+                    // 2018/5/18 只有审批中才需要审批 其他状态没有审批
+                    // if (data['Status LIC'] === 'Draft' || data['Status LIC'] === 'Rejected' || data['Status LIC'] === 'Awaiting Approval') {
+                    if (data['Status LIC'] === 'Awaiting Approval') {
+                      me.is_but = true;
+                    } else {
+                      me.is_but = false;
+                    }
+                  }
+                });
               }
             }
           });
@@ -147,7 +160,18 @@
                 success: function(data) {
                   if (!data.ERROR) {
                     Toast('审批成功');
-                    me.getOrderEntry({id: me.id});
+                    me.getOrderEntry({
+                      id: me.id,
+                      callback: data => {
+                        // 2018/5/18 只有审批中才需要审批 其他状态没有审批
+                        // if (data['Status LIC'] === 'Draft' || data['Status LIC'] === 'Rejected' || data['Status LIC'] === 'Awaiting Approval') {
+                        if (data['Status LIC'] === 'Awaiting Approval') {
+                          me.is_but = true;
+                        } else {
+                          me.is_but = false;
+                        }
+                      }
+                    });
                   }
                 }
               });

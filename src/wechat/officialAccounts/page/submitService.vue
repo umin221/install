@@ -1,7 +1,6 @@
 <template>
-  <div style="background-color: #ebebeb;">
+  <div>
     <div class="mint-content submitService">
-      <div class="addform">
         <mt-cell title="产品品牌"
                  placeholder="请选择"
                  :value="brand"></mt-cell>
@@ -55,7 +54,6 @@
                 :edit="attach.edit"
                 title="相关照片">
         </attach>
-      </div>
       <mt-datetime-picker
         ref="picker1"
         v-model="pickerVisible"
@@ -82,6 +80,7 @@
 <script>
   import {mapState, mapActions, mapMutations} from 'vuex';
   import Vue from 'vue';
+  import cusField from 'public/components/cus-field';
   import { Toast } from 'mint-ui';
   import menuBox from 'public/components/cus-menu';
   import vp from 'public/plugin/validator';
@@ -128,10 +127,12 @@
       if (!me.callPhone) {
         me.getContact({
           callback: function(data) {
+            console.dir('====1===');
             me.lastName = data['Last Name']; // 名字
             me.callPhone = data['Cellular Phone #']; // 电话
           },
           noneback: function() {
+            console.dir('====2===');
             me.$router.push({
               name: 'telValidate',
               query: {
@@ -315,12 +316,11 @@
         });
       }
     },
-    components: {menuBox, vp}
+    components: {menuBox, vp, cusField}
   };
 </script>
 <style lang="scss">
   .submitService{
-    .addform{
       background-color: #ffffff;
       margin-bottom: 2rem;
 
@@ -351,7 +351,6 @@
     .datetime>.picker>.picker-items>.picker-slot:nth-child(5){
       display: none;
     }
-  }
   .requisite>.mint-cell-wrapper>.mint-cell-title>.mint-cell-text:before{
     content: '*';
     color: red;

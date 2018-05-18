@@ -165,6 +165,10 @@ export default {
       }
       if (me.partList.length) {
         for (let i = 0;i < me.partList.length; i++) {
+          if (me.partList[i].num < 1) {
+            Toast('请填写正确的数量');
+            return;
+          }
           obj = {
             'Id': i + 1,
             'Product': me.partList[i]['Product Name'], // 产品编码

@@ -16,8 +16,8 @@
                   :title="'服务单编号:'+ item['SR Number']"
                   @click.native="toDetail(item['SR Number'], item['Id'])"
                   is-link>
-          <div slot="after" style="color: #A2BBFC">{{item['Status']}}</div>
-          <div class="mint-cell-sub-title" slot="title">申请日期：{{item['Created']}}</div>
+          <div slot="after" style="color: #0772c1">{{item['Status']}}</div>
+          <div class="mint-cell-sub-title" slot="title">申请日期：{{toDate(item['Created'])}}</div>
           <div class="mint-cell-sub-title" slot="title">产品类型：{{item['KL Product Model']}}</div>
         </cus-cell>
       </div>
@@ -60,6 +60,13 @@
             srId: Id
           }
         });
+      },
+      toDate(time) {
+        if (time) {
+          return KND.Util.format(time, 'yyyy-MM-dd hh:mm:ss');
+        } else {
+          return '';
+        }
       }
     },
     components: {menuBox, cusCell}

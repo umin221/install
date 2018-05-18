@@ -61,7 +61,7 @@ export default new Vuex.Store({
             }
           });
         },
-        getContact({commit}, callback) {
+        getContact({commit}, fn) {
           let openId = KND.Util.getParam('openid');
           console.log(openId);
           api.get({
@@ -79,7 +79,7 @@ export default new Vuex.Store({
                     commit('addressBack', CUTAddress[i]);
                   }
                 }
-                callback(Contact[0]);
+                fn.callback(Contact[0]);
               }
             },
             error: data => {

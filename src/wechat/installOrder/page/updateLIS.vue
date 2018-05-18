@@ -135,7 +135,7 @@
           }*/
 
           if (lineObj['Spot Check Amount']) { // 抽查数量有值 判断不能大于完成数量
-            if (parseInt(lineObj['Spot Check Amount'], 10) > parseInt(lineObj['Completed Install Amount'], 10)) {
+            if (parseInt(lineObj['Spot Check Amount'], 10) > parseInt(self.amount, 10)) {
               Toast('抽查数量不能大于完成数量！');
               return;
             }

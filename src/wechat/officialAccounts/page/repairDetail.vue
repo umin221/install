@@ -6,12 +6,21 @@
           <span class="user-state" v-if="serviceDetail.Action">{{serviceDetail.Status}}</span>
           <span class="user-state" v-else>暂未派工</span>
         </div>
-        <div class="mt-Detail-title">维修工程师：{{serviceDetail['KL Owner Full Name']}}</div>
-        <div class="mt-Detail-title">联系电话：
+        <div class="mt-Detail-title" v-if="serviceDetail.Action">维修工程师：{{serviceDetail.Action['Primary Owned By']}}</div>
+        <!--<div class="mt-Detail-title" v-if="serviceDetail.Action">联系电话：
           <a href="javascript:void(0);" class="detail-call">
-          {{serviceDetail['Primary Owner Cell Phone']|| serviceDetail['Primary Owner Work Phone']}}
+          {{serviceDetail.Action['Primary Owner Cell Phone'] || serviceDetail.Action['Primary Owner Work Phone']}}
           </a>
-        </div>
+        </div>-->
+        <div class="mt-Detail-title" v-if="serviceDetail.Action"><span class="label-title">联系电话</span>
+          <a href="javascript:void(0);"
+             class="detail-call i"
+             @click="call = !call">
+            <i class="xs-icon icon-call"
+               style="font-size: 0.75rem">
+              {{serviceDetail.Action['Primary Owner Cell Phone'] || serviceDetail.Action['Primary Owner Work Phone']}}
+            </i>
+          </a></div>
       </div>
       <div class="detail-content">
         <mt-navbar v-model="active">
@@ -22,8 +31,8 @@
             <div class="mt-Detail-info">
               <div>产品条形码：{{serviceDetail['KL SN']}} <a href="javascript:void(0);" class="detail-call"></a></div>
               <div>产品型号：{{serviceDetail['KL Lock Body Model']}} {{serviceDetail['KL Lock Model']}}</div>
-              <div>申请时间：{{serviceDetail['Created']}}</div>
-              <div>预约时间：{{serviceDetail['KL Customer Appointment Time']}}</div>
+              <div>申请时间：{{toDate(serviceDetail['Created'])}}</div>
+              <div>预约时间：{{toDate(serviceDetail['KL Customer Appointment Time'])}}</div>
               <div>
                 <div>地址：</div>
                 <p style="color: grey;font-size: 14px;line-height: 0">
@@ -51,7 +60,7 @@
                 </li>
                 <li style="margin-right: 8px">{{item.Note}}</li>
                 <div class="content-div">
-                  <div>{{item.Created}}</div>
+                  <div>{{toDate(item.Created)}}</div>
                 </div>
               </ul>
             </div>
@@ -59,6 +68,8 @@
         </mt-tab-container>
       </div>
     </div>
+    <!--打电话-->
+    <cus-call v-if="serviceDetail.Action" :number="serviceDetail.Action['Primary Owner Cell Phone'] || serviceDetail.Action['Primary Owner Work Phone']" v-model="call"></cus-call>
     <button-group v-if="serviceDetail.Action">
       <mt-button class="single"
                  @click.native="toComment(false)"
@@ -71,6 +82,7 @@
 </template>
 <script>
   import {mapState, mapActions} from 'vuex';
+  import cusCall from 'public/components/cus-call';
   import toggle from '../components/detail-toggle';
   //
   const NameSpace = 'detail';
@@ -97,6 +109,7 @@
     data: () => {
       return {
         active: 'tab-container1',
+        call: false,
         attach: { // 附件
           list: [],
           edit: false,
@@ -110,6 +123,13 @@
     methods: {
       ...mapActions('app', ['queryMedias']),
       ...mapActions(NameSpace, ['getServiceDetail']),
+      toDate(time) {
+        if (time) {
+          return KND.Util.format(time, 'yyyy-MM-dd hh:mm:ss');
+        } else {
+          return '';
+        }
+      },
       toComment(type) {
         let me = this;
         me.$router.push({
@@ -122,13 +142,13 @@
         });
       }
     },
-    components: {toggle}
+    components: {toggle, cusCall}
   };
 </script>
 <style lang="scss">
   @mixin remove-decoration (){
     text-decoration: none;
-    color: lightblue;
+    color: #0772c1;
   }
   .service-continer {
     position: relative;

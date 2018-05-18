@@ -310,6 +310,14 @@ export default {
         let lineItems = [];
         let obj = {};
         let isBn = me.isBn === '保内' ? 'Y' : 'N';
+        if (me.returnSelect.length > 0) {
+          for (let i = 0;i < me.returnSelect.length; i++) {
+            if (me.returnSelect[i].num < 1) {
+              Toast('维修配件请填写正确的数量');
+              return;
+            }
+          }
+        }
         let uploadAttach = id => {
           _upload.call(me,
             me.$refs.attach.getServerIds(),

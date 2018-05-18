@@ -635,9 +635,9 @@
       executionShow() {
         var self = this;
         var isVal = false;
-        // 是否门厂安装锁体 === Y && 职位 === 门厂技术员 ||  职位 === 安装员  处理中状态=In Installing,Sales Confirmed
-        // (self.detailData['Calculated Order Status'] === 'In Installing' || self.detailData['Calculated Order Status'] === 'Sales Confirmed')
-        if ((self.detailData['Calculated Order Status'] === 'In Installing' || self.detailData['Calculated Order Status'] === 'Sales Confirmed') && ((self.detailData['KL Delivery Check Box 1'] === 'Y' && userInfo['KL Primary Position Type LIC'] === 'Door Factory Engineer') || userInfo['KL Primary Position Type LIC'] === 'Field Service Engineer')) {
+        // 职位 === 安装员  处理中状态=In Installing,Sales Confirmed
+        // if ((self.detailData['Calculated Order Status'] === 'In Installing' || self.detailData['Calculated Order Status'] === 'Sales Confirmed') && ((self.detailData['KL Delivery Check Box 1'] === 'Y' && userInfo['KL Primary Position Type LIC'] === 'Door Factory Engineer') || userInfo['KL Primary Position Type LIC'] === 'Field Service Engineer')) {
+        if ((self.detailData['Calculated Order Status'] === 'In Installing' || self.detailData['Calculated Order Status'] === 'Sales Confirmed') && (userInfo['KL Primary Position Type LIC'] === 'Field Service Engineer' || userInfo['KL Primary Position Type LIC'] === 'Field Service Manager')) {
           return true;
         }
         return isVal;

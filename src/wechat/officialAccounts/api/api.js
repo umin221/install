@@ -36,7 +36,8 @@ let ApiList = {
     var data = KND.Util.param(option.data);
     return {
       method: 'POST',
-      url: 'https://120.27.244.164/msg/HttpBatchSendSM',
+      url: 'https://www.kinlong.cn/msg/HttpBatchSendSM',
+      // url: 'http://120.27.244.164/msg/HttpBatchSendSM',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         'dataType': 'json'

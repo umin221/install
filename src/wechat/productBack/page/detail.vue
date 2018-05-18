@@ -32,7 +32,6 @@
                    @click.native="submitFn('Rejected')">驳回</mt-button>
         <mt-button class="single"
                    @click.native="submitFn('Approved')">确认</mt-button>
-        toApproval
       </button-group>
       <!--<button-group v-if="(orderEntry['Status LIC'] === 'Draft'||orderEntry['Status LIC'] === 'Rejected')&&option !== 'approval'">-->
         <!--<mt-button class="single"-->
@@ -64,7 +63,9 @@
         id: me.id,
         callback: data => {
           console.log(data);
-          if (data['Status LIC'] === 'Draft' || data['Status LIC'] === 'Rejected' || data['Status LIC'] === 'Awaiting Approval') {
+          // 2018/5/18 只有审批中才需要审批 其他状态没有审批
+          // if (data['Status LIC'] === 'Draft' || data['Status LIC'] === 'Rejected' || data['Status LIC'] === 'Awaiting Approval') {
+          if (data['Status LIC'] === 'Awaiting Approval') {
             me.is_but = true;
           } else {
             me.is_but = false;
@@ -123,7 +124,19 @@
             success: function(data) {
               if (!data.ERROR) {
                 Toast('审批成功');
-                me.getBatch(me.id);
+                me.getOrderEntry({
+                  id: me.id,
+                  callback: data => {
+                    console.log(data);
+                    // 2018/5/18 只有审批中才需要审批 其他状态没有审批
+                    // if (data['Status LIC'] === 'Draft' || data['Status LIC'] === 'Rejected' || data['Status LIC'] === 'Awaiting Approval') {
+                    if (data['Status LIC'] === 'Awaiting Approval') {
+                      me.is_but = true;
+                    } else {
+                      me.is_but = false;
+                    }
+                  }
+                });
               }
             }
           });
@@ -146,7 +159,19 @@
                 success: function(data) {
                   if (!data.ERROR) {
                     Toast('审批成功');
-                    me.getOrderEntry({id: me.id});
+                    me.getOrderEntry({
+                      id: me.id,
+                      callback: data => {
+                        console.log(data);
+                        // 2018/5/18 只有审批中才需要审批 其他状态没有审批
+                        // if (data['Status LIC'] === 'Draft' || data['Status LIC'] === 'Rejected' || data['Status LIC'] === 'Awaiting Approval') {
+                        if (data['Status LIC'] === 'Awaiting Approval') {
+                          me.is_but = true;
+                        } else {
+                          me.is_but = false;
+                        }
+                      }
+                    });
                   }
                 }
               });
