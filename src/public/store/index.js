@@ -42,11 +42,14 @@ export const app = {
      * 获取企业微信&微信公众号 js sdk 权限
      */
     getAuthority({state}, option) {
+      let appNo = config.appNo;
+      // 企业微信 与 公众号 非同一个认证接口
+      let url = appNo === 'wechat' ? `${config.host}/weixin-service/authorized/permission` : `${proxy}/webchat/api/local/permission`;
       // app 无需权限认证
       if (config.offline) return;
       ajax({
         method: 'get',
-        url: (`${proxy}/webchat/api/local/permission?url=${encodeURIComponent(location.href.split('#')[0])}&appNO=${config.appNo}`),
+        url: (`${url}?url=${encodeURIComponent(location.href.split('#')[0])}&appNO=${appNo}`),
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
@@ -96,15 +99,18 @@ export const app = {
      * @param {Function} option['error'] 选填 失败回调
      */
     upload({state}, option) {
+      let appNo = config.appNo;
       let data = option.data;
       let MediaId = data.MediaId;
+      // 企业微信 与 公众号 非同一个上传接口
+      let url = appNo === 'wechat' ? `${config.host}/weixin-service/authorized/upload_attachment` : `${proxy}/webchat/api/external/uploadattachment`;
       option.success = option.success || (data => console.log(data));
       option.error = option.error || (data => console.log(data));
       // 提交 siebel
       let push = (media) => {
         ajax({
           method: 'get',
-          url: (`${proxy}/webchat/api/external/uploadattachment?url=${attachServer}/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess&IOName=${data.IOName}&Object Id=${data.Id}&Comment=${data.Comment || ''}&ProcessName=KL Attachment Upload Process&appNO=${config.appNo}&mediaID=${media}`),
+          url: (`${url}t?url=${attachServer}/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess&IOName=${data.IOName}&Object Id=${data.Id}&Comment=${data.Comment || ''}&ProcessName=KL Attachment Upload Process&appNO=${appNo}&mediaID=${media}`),
           success: result => {
             console.log(result);
             run(MediaId.pop(), result);
