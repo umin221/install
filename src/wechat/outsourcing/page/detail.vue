@@ -4,8 +4,8 @@
     <!--header-->
     <mt-header fixed :title="title">
       <fallback slot="left"></fallback>
-      <!--<mt-button v-show="read && isValid && isManager" slot="right"-->
-                 <!--@click="type = 'edit'">编辑</mt-button>-->
+      <mt-button v-show="read && isValid" slot="right"
+                 @click="type = 'edit'">编辑</mt-button>
       <mt-button v-show="!read && isValid" slot="right"
                  @click="updateFn">完成</mt-button>
     </mt-header>
@@ -59,7 +59,12 @@
                    :is-link="!read"></cus-field>
       </div>
 
-      <attach ioName="KL Channel Partner Attachments" title="合同附件" ref="attach"
+      <attach ioName="KL Channel Partner Attachments" title="资质附件" ref="qualified"
+              :attach="attach.list"
+              :edit="!read">
+      </attach>
+
+      <attach ioName="KL Channel Partner Attachments" title="合同附件" ref="contract"
               :attach="attach.list"
               :edit="!read">
       </attach>
@@ -154,29 +159,17 @@
 
   /**
    * 附件上传
-   * @param {Array} serverIds 企业微信临时素材id => mediaId
-   * @param {String} id 业务id
+   * @param {String} data.MediaId 企业微信临时素材id => mediaId
+   * @param {String} data.Comment 附件类型
+   * @param {String} data.Id 业务id
    */
-  let _upload = function(serverIds, id) {
-    // 成功回调
-    let callback = data => {
-      tools.success(data, {
-        back: true,
-        successTips: '提交成功'
-      });
-      // 标记列表刷新
-      KND.Session.set('refresh', 'pending,valid');
-    };
+  let _upload = function(data, callback) {
+    data.IOName = 'KL Channel Partner Attachments';
     // 上传附件
-    serverIds ? this.upload({
-      data: {
-        MediaId: serverIds,
-        Id: id,
-        Comment: '',
-        IOName: 'KL Channel Partner Attachments'
-      },
+    data.MediaId ? this.upload({
+      data: data,
       success: callback
-    }) : callback(id);
+    }) : callback(data.Id);
   };
 
   const NAMESPACE = 'detail';
@@ -308,9 +301,33 @@
         tools.valid.call(me, () => {
           // 提交图片
           let uploadAttach = id => {
-            _upload.call(me, me.$refs.attach.getServerIds(), id);
-            // 标记列表刷新
-            KND.Session.set('refresh', 'pending');
+            let tasks = [
+              // 上传资质文件
+              new Promise((resolve, reject) => {
+                _upload.call(me, {
+                  MediaId: me.$refs.qualified.getServerIds(), Comment: '合作伙伴文件', Id: id
+                }, resolve);
+              }),
+              // 上传合同文件
+              new Promise((resolve, reject) => {
+                _upload.call(me, {
+                  MediaId: me.$refs.contract.getServerIds(), Comment: '合作伙伴文件', Id: id
+                }, resolve);
+              })
+            ];
+            // 启动上传任务
+            Promise.all(tasks).then(result => {
+              // 成功回调
+              tools.success(result, {
+                back: true,
+                successTips: '提交成功'
+              });
+              // 标记列表刷新
+              KND.Session.set('refresh', 'pending,valid');
+            }).catch(err => {
+              Toast('附件上传失败');
+              console.error(err);
+            });
           };
           // 重新启用委外团队
           if (me.state === 'invalid') {
@@ -336,7 +353,33 @@
         tools.valid.call(me, () => {
           me.updateSyn({
             success: data => {
-              _upload.call(me, me.$refs.attach.getServerIds(), data.PrimaryRowId);
+              let tasks = [
+                // 上传资质文件
+                new Promise((resolve, reject) => {
+                  _upload.call(me, {
+                    MediaId: me.$refs.qualified.getServerIds(), Comment: '合作伙伴文件', Id: data.PrimaryRowId
+                  }, resolve);
+                }),
+                // 上传合同文件
+                new Promise((resolve, reject) => {
+                  _upload.call(me, {
+                    MediaId: me.$refs.contract.getServerIds(), Comment: '合作伙伴文件', Id: data.PrimaryRowId
+                  }, resolve);
+                })
+              ];
+              // 启动上传任务
+              Promise.all(tasks).then(result => {
+                // 成功回调
+                tools.success(result, {
+                  back: true,
+                  successTips: '提交成功'
+                });
+                // 标记列表刷新
+                KND.Session.set('refresh', 'pending,valid');
+              }).catch(err => {
+                Toast('附件上传失败');
+                console.error(err);
+              });
               // 标记列表刷新
               KND.Session.set('refresh', 'valid');
             }

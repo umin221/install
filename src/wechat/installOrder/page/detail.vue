@@ -155,6 +155,7 @@
         </div>
       </div>
       <button-group v-show="isConfirming">
+        <mt-button @click.native="rollbackFn">退回</mt-button>
         <mt-button @click.native="submitFn">确认提交</mt-button>
       </button-group>
     </div>
@@ -590,7 +591,7 @@
       ...mapMutations('sporadic', ['clObjList']),
       ...mapMutations('engineer', ['delEngineer']),
       ...mapMutations(NameSpace, ['setOrderId', 'setTaskDataST', 'setLockBody', 'setPanels', 'setDetailData', 'setIsOutside']),
-      ...mapActions(NameSpace, ['getTaskType', 'deleteOrderLine', 'setShowZs']),
+      ...mapActions(NameSpace, ['getTaskType', 'deleteOrderLine', 'setShowZs', 'rollback', 'submit']),
       getRows(type) {
         return this[type];
       },
@@ -1432,22 +1433,14 @@
           }
         }
       },
+      // 退回安装订单
+      rollbackFn() {
+        this.rollback(this.detailData.Id);
+      },
       // 提交安装订单
       submitFn() {
-        api.get({
-          key: 'submit',
-          data: {
-            id: this.detailData.Id
-          },
-          success(data) {
-            tools.success(data, {
-              back: true,
-              successTips: '提交成功'
-            });
-          }
-        });
+        this.submit(this.detailData.Id);
       },
-
       // 右滑删除
       getSwipeBtn(line, index) {
         return this.isConfirming ? [{

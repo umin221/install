@@ -149,7 +149,10 @@ export default new Vuex.Store(Object.extend(true, sto, {
         getTaskType({state}, itemTask) {
           state.itemTask = itemTask;
         },
-        // 门厂技术提交订单
+        /**
+         * 门厂技术提交订单
+         * @param {String} id 必填 订单id
+         */
         submit({state}, id) {
           api.get({
             key: 'submit',
@@ -165,7 +168,25 @@ export default new Vuex.Store(Object.extend(true, sto, {
           });
         },
         /**
+         * 门厂技术退回订单
+         * @param {String} id 必填 订单id
+         */
+        rollback({state}, id) {
+          api.get({
+            key: 'rollback',
+            data: {
+              id: id
+            },
+            success: result => {
+              tools.success(result, {
+                back: true
+              });
+            }
+          });
+        },
+        /**
          * 删除订单行
+         * @param {String} id 必填 订单id
          */
         deleteOrderLine({commit}, id) {
           api.get({
@@ -181,9 +202,7 @@ export default new Vuex.Store(Object.extend(true, sto, {
         }
       }
     },
-    /**
-     * 指派安装工程师
-     */
+    // 指派安装工程师
     engineer: {
       namespaced: true,
       state: {

@@ -368,6 +368,23 @@ let apiList = {
       method: 'delete',
       url: 'data/Order Entry - Line Items/Order Entry - Line Items/' + option.data.id
     };
+  },
+
+  /**
+   * 门厂技术退回订单到安装工程师
+   * @param {String} option.data.id 必填 订单id
+   * @returns {{url: string}}
+   */
+  rollback: option => {
+    return {
+      url: 'service/Workflow Process Manager/RunProcess',
+      data: {
+        'body': {
+          'ProcessName': 'KL Install Order Door Factory Return To Install Engineer Process',
+          'Object Id': option.data.id
+        }
+      }
+    };
   }
 };
 

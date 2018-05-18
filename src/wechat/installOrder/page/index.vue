@@ -120,11 +120,12 @@
     created() {
       var self = this;
       KND.Native.getUserInfo((info) => {
+        let userPos = info['KL Primary Position Type LIC'];
         self.userInfo = info;
         self.setInfoUser(info);
         console.log(self.userInfo);
-        self.setManager(info['KL Primary Position Type LIC'] === 'Field Service Manager');
-        if (self.userInfo['KL Primary Position Type LIC'] === 'Door Factory Engineer') {
+        self.setManager(userPos === 'Field Service Manager');
+        if (userPos === 'Door Factory Engineer' || userPos === 'Door Factory Manager') {
           self.tabVal = 'pending';
           self.tabStatus = '待处理';
           self.selected = 'pending';
@@ -132,7 +133,6 @@
           self.tabVal = 'process';
           self.tabStatus = '处理中';
           self.selected = 'process';
-
         }
         // 获取安装订单数据
         this.loadBottomFn({
