@@ -78,6 +78,7 @@
   import toggle from 'public/components/cus-toggle';
   import attach from 'public/components/cus-attach';
 
+  let mapp = config.mapp;
   const NAMESPACE = 'detail';
   export default {
     name: NAMESPACE,
@@ -97,7 +98,7 @@
     },
     data: () => {
       return {
-        k2v: config.mapp.k2v
+        k2v: mapp.k2v
       };
     },
     computed: {
@@ -150,8 +151,8 @@
       // 跳转到安装订单详情，未提交前未交接单的订单详情，交接后为安装订单的订单详情
       toOrderFn(item) {
         let status = item['Calculated Order Status'];
-        // 无状态 或者 状态 为 草稿，已驳回时
-        if (!status || status === 'Rejected' || status === 'Draft' || status === 'In Confirming') {
+        // 无状态 或者 状态 为 草稿，已驳回，门厂技术退回时
+        if (!status || status === 'In Confirming' || mapp.editOrderStatus.indexOf(status) !== -1) {
           // 安装订单编辑
           let me = this;
           delete item['Link'];

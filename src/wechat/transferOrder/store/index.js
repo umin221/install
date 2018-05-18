@@ -373,14 +373,15 @@ export default new Vuex.Store({
          * 更新安装订单
          */
         update({state}, setting) {
-          setting.key = 'updateOrder';
+          let param = KND.Util.mappDTO(setting.data, ['Id', 'KL Hole Type', 'KL Delivery Partner Id', 'KL Delivery Partner Name', 'KL Delivery Check Box 1', 'KL Delivery Check Box 2']);
           // 现场改孔， 清除门厂信息
           if (setting.data['KL Hole Type'] === '现场改孔') {
-            delete setting.data['KL Delivery Partner Id'];
-            delete setting.data['KL Delivery Partner Name'];
+            delete param['KL Delivery Partner Id'];
+            delete param['KL Delivery Partner Name'];
           };
+          setting.key = 'updateOrder';
+          setting.data = param;
           // 更新订单不操作订单行
-          delete setting.data['Order Entry - Line Items'];
           setting.success = setting.success || (data => {
             tools.success(data);
           });

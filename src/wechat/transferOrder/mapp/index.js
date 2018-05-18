@@ -38,5 +38,7 @@ config.mapp = {
     'VP003': {group: 'VP003', label: '智能锁虚拟产品'},
     'False Lock': {group: 'falseLock', label: '假锁'},
     'Other': {group: 'others', label: '其他'}
-  }
+  },
+  // 可编辑订单状态
+  'editOrderStatus': ['Draft', 'Rejected', 'Door Factory Return']
 };

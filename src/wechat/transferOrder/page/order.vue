@@ -153,7 +153,7 @@
       // 安装人员 并且 非查看团队的， 状态不是 草稿 或者 驳回的订单 可编辑
       editable() {
         let status = this.order['Calculated Order Status'];
-        return (!status || status === 'Draft' || status === 'Rejected') && !this.isTeam && this.isEngineer;
+        return (!status || mapp.editOrderStatus.indexOf(status) !== -1) && !this.isTeam && this.isEngineer;
       },
       // 是否门厂开孔
       isDoorFactoryOpen() {

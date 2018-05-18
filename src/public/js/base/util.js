@@ -314,6 +314,21 @@
       return platform;
     };
 
+    /**
+     * DTO 对象 转换
+     */
+    mappDTO(target, image) {
+      let obj = {};
+      if (this.isArray(image)) {
+        for (let i in image) {
+          obj[image[i]] = target[image[i]];
+        }
+      } else {
+        for (let i in image) obj[i] = target[i];
+      }
+      return obj;
+    };
+
   };
 
   /**

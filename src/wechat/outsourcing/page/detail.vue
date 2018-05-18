@@ -4,8 +4,8 @@
     <!--header-->
     <mt-header fixed :title="title">
       <fallback slot="left"></fallback>
-      <mt-button v-show="read && isValid" slot="right"
-                 @click="type = 'edit'">编辑</mt-button>
+      <!--<mt-button v-show="read && isValid" slot="right"-->
+                 <!--@click="type = 'edit'">编辑</mt-button>-->
       <mt-button v-show="!read && isValid" slot="right"
                  @click="updateFn">完成</mt-button>
     </mt-header>
@@ -60,12 +60,12 @@
       </div>
 
       <attach ioName="KL Channel Partner Attachments" title="资质附件" ref="qualified"
-              :attach="attach.list"
+              :attach="attach.qualified"
               :edit="!read">
       </attach>
 
       <attach ioName="KL Channel Partner Attachments" title="合同附件" ref="contract"
-              :attach="attach.list"
+              :attach="attach.contract"
               :edit="!read">
       </attach>
 
@@ -206,7 +206,14 @@
             }
           },
           success: data => {
-            this.attach.list = KND.Util.toArray(data['SiebelMessage']['KL Channel Partner Attachment']);
+            let qualified = [];
+            let contract = [];
+            let list = KND.Util.toArray(data['SiebelMessage']['KL Channel Partner Attachment']);
+            Array.prototype.map.call(list, i => {
+              i['Comment'] === '资质文件' ? qualified.push(i) : contract.push(i);
+            });
+            this.attach.qualified = qualified;
+            this.attach.contract = contract;
           }
         });
       }
@@ -224,7 +231,10 @@
           }]
         },
         attach: { // 附件
-          list: [],
+          // 资质附件
+          qualified: [],
+          // 合同附件
+          contract: [],
           edit: false
         },
         slots: [
@@ -305,13 +315,13 @@
               // 上传资质文件
               new Promise((resolve, reject) => {
                 _upload.call(me, {
-                  MediaId: me.$refs.qualified.getServerIds(), Comment: '合作伙伴文件', Id: id
+                  MediaId: me.$refs.qualified.getServerIds(), Comment: '资质文件', Id: id
                 }, resolve);
               }),
               // 上传合同文件
               new Promise((resolve, reject) => {
                 _upload.call(me, {
-                  MediaId: me.$refs.contract.getServerIds(), Comment: '合作伙伴文件', Id: id
+                  MediaId: me.$refs.contract.getServerIds(), Comment: '合同文件', Id: id
                 }, resolve);
               })
             ];
@@ -357,13 +367,13 @@
                 // 上传资质文件
                 new Promise((resolve, reject) => {
                   _upload.call(me, {
-                    MediaId: me.$refs.qualified.getServerIds(), Comment: '合作伙伴文件', Id: data.PrimaryRowId
+                    MediaId: me.$refs.qualified.getServerIds(), Comment: '资质文件', Id: data.PrimaryRowId
                   }, resolve);
                 }),
                 // 上传合同文件
                 new Promise((resolve, reject) => {
                   _upload.call(me, {
-                    MediaId: me.$refs.contract.getServerIds(), Comment: '合作伙伴文件', Id: data.PrimaryRowId
+                    MediaId: me.$refs.contract.getServerIds(), Comment: '合同文件', Id: data.PrimaryRowId
                   }, resolve);
                 })
               ];
