@@ -110,7 +110,7 @@ export const app = {
       let push = (media) => {
         ajax({
           method: 'get',
-          url: (`${url}t?url=${attachServer}/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess&IOName=${data.IOName}&Object Id=${data.Id}&Comment=${data.Comment || ''}&ProcessName=KL Attachment Upload Process&appNO=${appNo}&mediaID=${media}`),
+          url: (`${url}?url=${attachServer}/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess&IOName=${data.IOName}&Object Id=${data.Id}&Comment=${data.Comment || ''}&ProcessName=KL Attachment Upload Process&appNO=${appNo}&mediaID=${media}`),
           success: result => {
             console.log(result);
             run(MediaId.pop(), result);

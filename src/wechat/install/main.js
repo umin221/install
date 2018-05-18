@@ -9,7 +9,6 @@ import Vuex from 'vuex';
 import router from './router';
 import 'public/js/base/main';
 import 'public/js/base/mint';
-import 'public/js/base/event';
 import 'public/js/lib/fastclick';
 import './sass/ios.scss';
 import fallback from 'public/components/cus-fallback';

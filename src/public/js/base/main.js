@@ -15,6 +15,8 @@ import './vc'; // VConsole
 
 // Inject Global Css
 import 'public/sass/index.scss';
+// Inject Global Event Control
+import 'public/js/base/event';
 
 // Object extend
 Object.extend = require('node.extend');

@@ -12,7 +12,7 @@
 
     <!--create detail edit-->
     <div class="mint-content wide-form">
-      <div class="form" :class="{'readonly': read}">
+      <div class="normal-form" :class="{'readonly': read}">
         <cus-field label="合作伙伴名称" placeholder="请输入名称" tag="名称"
                    @change="checkNameExistFn"
                    :edit=!read
@@ -441,12 +441,6 @@
 
 <style lang="scss">
   .wide-form {
-    .form {
-      .mint-cell-title {
-        width: 130px;
-      }
-    }
-
     .multiple {
       .mint-cell-title {
         font-size: $font-size-small;

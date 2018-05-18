@@ -5,7 +5,7 @@
     </mt-header>
 
     <div class="mint-content">
-      <div v-show="!showLocationPicker">
+      <div>
         <mt-cell v-for="(l, index) in list"
                  :key="index"
                  :title="l.title"
@@ -13,10 +13,6 @@
                  is-link></mt-cell>
         <cus-call number="13522229999" v-model="call"></cus-call>
       </div>
-
-      <iframe v-show="showLocationPicker" id="mapPage" style="position: absolute; top: 0; bottom: 0; left: 0; right: 0;" frameborder=0
-              src="http://apis.map.qq.com/tools/locpicker?search=1&type=1&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77&referer=myapp">
-      </iframe>
     </div>
 
   </div>
@@ -26,6 +22,10 @@
   import {mapActions} from 'vuex';
   import cusCall from 'public/components/cus-call';
 
+  KND.Event.bind('setPosition', data => {
+    console.log(data);
+  });
+
   let NAMESPACE = 'native';
   export default {
     name: NAMESPACE,
@@ -33,7 +33,6 @@
     data() {
       return {
         call: false,
-        showLocationPicker: false,
         list: [{
           title: '查看地图位置',
           fn: () => {
@@ -55,15 +54,7 @@
         }, {
           title: '地图选择位置',
           fn: () => {
-            this.showLocationPicker = true;
-            window.addEventListener('message', function(event) {
-              // 接收位置信息，用户选择确认位置点后选点组件会触发该事件，回传用户的位置信息
-              var loc = event.data;
-              if (loc && loc.module === 'locationPicker') { // 防止其他应用也会向该页面post信息，需判断module是否为'locationPicker'
-                console.log('location', loc);
-                this.showLocationPicker = false;
-              }
-            }, false);
+            this.$router.push('position');
           }
         }, {
           title: '经纬度转位置',

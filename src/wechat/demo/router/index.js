@@ -70,5 +70,11 @@ export default new Router({
     component(resolve) {
       require(['../page/attach'], resolve);
     }
+  }, {
+    path: '/position', // position 选择位置
+    name: 'position',
+    component(resolve) {
+      require(['public/page/position'], resolve);
+    }
   }]
 });
