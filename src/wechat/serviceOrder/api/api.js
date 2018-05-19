@@ -570,7 +570,7 @@ let ApiList = {
     };
     // 详情
   },
-  toSubmitOrder: option => {
+  toSubmitOrder: option => { // 提交完工确认单到EBS
     let id = option.data['Object Id'];
     delete option.data['Object Id'];
     return {

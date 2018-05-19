@@ -28,9 +28,9 @@
     methods: {
       changeFn(type) {
         if (type === 'minus' && this.value - 1) {
-          this.value = this.value - 1;
+          this.value = parseInt(this.value, 10) - 1;
         } else if (type === 'add') {
-          this.value = this.value + 1;
+          this.value = parseInt(this.value, 10) + 1;
         }
         this.$emit('input', this.value, this.index, type);
       }

@@ -382,7 +382,7 @@ export default {
               };
               console.log(obj);
               if (me.Service['Product Warranty Flag'] !== isBn || !lineItems.length) {
-                me.upDateOrderStatu({
+                me.upDateOrderStatu({ // 更新状态
                   Id: me.ServiceRequest.Id,
                   type: isBn,
                   callback: function(data) {

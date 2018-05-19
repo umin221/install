@@ -1127,13 +1127,13 @@ export default new Vuex.Store({
       },
       actions: {
         addServiceOrder({state, commit, dispatch}, form) {
-          api.get({
+          api.get({ // 新增订单 新增成功后调提交接口   失败后后台自动回滚
             key: 'addServiceOrder',
             data: {
               form
             },
             success: function(data) {
-              api.get({
+              api.get({ // 提交接口
                 key: 'toSubmitOrder',
                 data: {
                   'Object Id': data.PrimaryRowId
