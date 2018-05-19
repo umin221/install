@@ -7,7 +7,7 @@
 
   let stack = {};
   let point = {
-    id: KND.Util.now()
+    id: 1526649602787 // KND.Util.now()
   };
 
   class Event {
