@@ -15,7 +15,7 @@
     </mt-header>-->
       <div class="mint-content add-plan">
         <mt-cell title="工作类型" class="borderBottom">
-          <span>日常活动</span>
+          <span>{{descType()}}</span>
         </mt-cell>
         <mt-cell title="工作描述" class="borderBottom">
           <span>{{desc()}}</span>
@@ -126,6 +126,10 @@
       // 格式化年月日
       initDate() {
         return this.newYear + '-' + this.newMonth + '-' + this.newDay;
+      },
+      // 描述字段
+      descType() {
+        return this.currentDayData[this.$route.query.index]['Type'];
       },
       // 描述字段
       desc() {

@@ -509,6 +509,10 @@
         * 修改内容：工作计划还会存在其他的工作任务 会同步到工作计划中，之前判断的的逻辑只是工作计划中的状态
         * */
         var val = 'none';
+        console.log('day:' + day);
+        console.log(noArray);
+       /* console.log(noArray.indexOf('Done'));
+        console.log(noArray.indexOf('Not Started'));*/
         if (day !== 'spaces' && noArray && noArray.length > 0) {
           val = 'flag';
         }
