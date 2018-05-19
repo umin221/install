@@ -371,6 +371,53 @@ export default new Vuex.Store(Object.extend(true, sto, {
         }
       }
     },
+    /**
+     * 委外联系人新增&编辑
+     */
+    contact: {
+      namespaced: true,
+      state: {},
+      actions: {
+        /**
+         * 查找委外联系人
+         * @param {Object} data 必填 查询条件 键值对
+         */
+        findContact({commit}, setting) {
+          setting.key = 'findContact';
+          api.get(setting);
+        },
+        /**
+         * 创建&更新联系人信息
+         * @param {Object} contact 必填 人员信息 键值对
+         */
+        upsertContact({state}, contact) {
+          delete contact.Link;
+          api.get({
+            key: 'upsertContact',
+            data: {
+              partner: {
+                Id: this.state.batch.pcObj['KL Partner Id'],
+                ListOfUser: {
+                  User: contact
+                }
+              }
+            },
+            success: data => {
+              if (data.PrimaryRowId) {
+                Toast({
+                  message: '提交成功'
+                });
+                KND.Util.back();
+              } else {
+                Toast({
+                  message: '提交失败'
+                });
+              }
+            }
+          });
+        }
+      }
+    },
     sign: {
       namespaced: true,
       state: {

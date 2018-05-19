@@ -173,8 +173,8 @@
           self.batchName = self.pcObj['KL Task Batch Name']; // 批次名称
           self.companyId = self.pcObj['KL Partner Id'];
           self.companyName = self.pcObj['KL Partner Name'];
-          self.ContactName = self.pcObj['KL Property Contact Name'];
-          self.ContactWorkPhone = self.pcObj['KL Property Contact Work Phone'];
+          self.ContactName = self.pcObj['KL Partner Contact Name'];
+          self.ContactWorkPhone = self.pcObj['KL Partner Contact Work Phone'] || self.pcObj['KL Property Contact Cellular Phone'];
           self.getPlanList(self.batchCode); // 详细计划
           self.getInstallerList(self.batchCode); // 委外联系人
           self.getQueryMedias(self.batchCode); // 附件
@@ -480,8 +480,8 @@
               self.batchName = data['KL Task Batch Name']; // 数量
               self.companyId = data['KL Partner Id'];
               self.companyName = data['KL Partner Name'];
-              self.ContactName = self.pcObj['KL Property Contact Name'];
-              self.ContactWorkPhone = self.pcObj['KL Property Contact Work Phone'];
+              self.ContactName = data['KL Partner Contact Name'];
+              self.ContactWorkPhone = data['KL Partner Contact Work Phone'] || data['KL Property Contact Cellular Phone'];
               self.getPcObj(data); // 保存store
               if (self.pcObj['Calculated Activity Status'] === 'Declined') {
                 self.butText = '提交';

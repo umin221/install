@@ -26,6 +26,8 @@
     </cus-search>
     <button-group>
       <mt-button class="single"
+                 @click.native="addContactFn">新增联系人</mt-button>
+      <mt-button class="single"
                  @click.native="submitFn">确认授权</mt-button>
     </button-group>
   </div>
@@ -120,6 +122,10 @@
         loader.call(this, {
           more: true
         }, 'onBottomLoaded');
+      },
+      addContactFn() {
+        var self = this;
+        self.$router.push('contact');
       },
       submitFn() {
         var self = this;

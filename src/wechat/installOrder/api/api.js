@@ -253,6 +253,41 @@ let apiList = {
       url: 'service/EAI Siebel Adapter/Query'
     };
   },
+  /**
+   * 查询联系人
+   * @param {Object} option.data 必填 联系人查询条件 键值对
+   * @returns {{method: string, url: string}}
+   */
+  findContact: option => {
+    return {
+      method: 'get',
+      url: 'data/KL User/User/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=2&StartRowNum=0'
+    };
+  },
+  /**
+   * 创建 或 更新联系人
+   * @param {Object} option.data['partner'] 必填 委外厂商信息 键值对
+   * @returns {{method: string, url: string}}
+   */
+  upsertContact: option => {
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Upsert',
+      data: {
+        'body': {
+          'SiebelMessage': {
+            'MessageId': '',
+            'MessageType': 'Integration Object',
+            'IntObjectName': 'Base Channel Partner',
+            'IntObjectFormat': 'Siebel Hierarchical',
+            'ListOfBase Channel Partner': {
+              'Channel Partner': option.data.partner
+            }
+          }
+        }
+      }
+    };
+  },
   selIntaller: option => { // 选择委外安装员保存
     return {
       url: 'service/EAI Siebel Adapter/Synchronize'

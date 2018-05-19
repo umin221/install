@@ -106,6 +106,12 @@ export default new Router({
     component(resolve) {
       require(['../page/installer'], resolve);
     }
+  }, { // 新增联系人
+    path: '/contact',
+    name: 'contact',
+    component(resolve) {
+      require(['../page/contact'], resolve);
+    }
   }, {
     path: '/updateDoor', // 验收更新1
     name: 'updateDoor',
