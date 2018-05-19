@@ -10,7 +10,7 @@
 
       <!--detail-->
       <div class="mint-content order" :class="{'disable': !editable}" :data-len="len">
-        <div>
+        <div class="normal-form">
           <cus-field label="开孔方式" tag="开孔方式"
                    v-valid.require
                    @click.native="showLovFn('KL Hole Type')"
@@ -29,6 +29,15 @@
           <mt-cell title="是否安装替代锁" v-show="isProject">
             <mt-switch v-model="box2"></mt-switch>
           </mt-cell>
+          <cus-field label="省市区" tag="省市区"
+                     @click.native="showCity++"
+                     placeholder="请选择"
+                     :value="area"
+                     v-valid.require></cus-field>
+          <mt-cell title="详细位置"
+                   @click.native="$router.push('position')"
+                   :value="order['KL Delivery Address']"
+                   is-link></mt-cell>
         </div>
 
         <div class="lock-line">
@@ -63,7 +72,8 @@
         </button-group>
 
       </div>
-
+      <!--省市区选择器-->
+      <cus-city :showCity="showCity" :value="area" @input="setCityFn"></cus-city>
       <!--popup-->
       <mt-popup v-model="showBox" position="bottom">
         <menu-box @my-enter="enter" vk="Value"
@@ -81,6 +91,7 @@
   import menuBox from 'public/components/cus-menu.vue';
   import cusField from 'public/components/cus-field';
   import lockLine from '../components/cusLockLine';
+  import cusCity from 'public/components/cus-select-city';
   // use plugin
   Vue.use(vp);
 
@@ -88,9 +99,17 @@
   // mapp
   let mapp = config.mapp;
 
+  /**
+   * 选择地址
+   */
+  let address;
+  KND.Event.bind('setPosition', data => {
+    address = data;
+  });
+
   export default {
     name: NAMESPACE,
-    components: {lockLine, menuBox, cusField},
+    components: {lockLine, menuBox, cusField, cusCity},
     created() {
       let me = this;
       let query = me.$route.query;
@@ -143,7 +162,9 @@
         // 其他配件
         others: [],
         // 是否工程订单 工程/零星
-        isProject: false
+        isProject: false,
+        // 省市区选择器展示
+        showCity: 1
       };
     },
     computed: {
@@ -218,6 +239,21 @@
         this.order['KL Delivery Partner Id'] = select.Id;
         this.order['KL Delivery Partner Name'] = name;
         return name;
+      },
+      // 项目完整地址
+      area() {
+        let f = this.order;
+        if (address) {
+          f['KL Delivery Province'] = address.province || '';
+          f['KL Delivery City'] = address.cityname || '';
+          f['KL Delivery County'] = address.town || '';
+          f['KL Delivery Address'] = address.address;
+          f['KL Lead Address Latitude'] = address.latlng.lat;
+          f['KL Lead Address Longitude'] = address.latlng.lng;
+          // 清空选点地址
+          address = '';
+        }
+        return `${f['KL Delivery Province']} ${f['KL Delivery City']} ${f['KL Delivery County']}`;
       }
     },
     methods: {
@@ -364,6 +400,13 @@
             }
           });
         });
+      },
+      // Set city
+      setCityFn(value) {
+        let f = this.order;
+        f['KL Delivery Province'] = value.KL_PROVINCE;
+        f['KL Delivery City'] = value.KL_CITY;
+        f['KL Delivery County'] = value.KL_TOWN;
       }
     }
   };
@@ -371,6 +414,10 @@
 
 <style lang="scss">
   .order {
+    .mint-field .mint-cell-value {
+      flex: 2;
+    }
+
     .mint-cell {
       .mint-cell-title {
         line-height: 30px;

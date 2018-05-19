@@ -12,18 +12,18 @@
     <!--detail-->
     <div class="mint-content">
       <div class="readonly narrow-form">
-        <cus-field label="合同编号" v-model="form['Agree Number']"></cus-field>
-        <cus-field label="工程名称" v-model="form['Opportunity Name']" isLink></cus-field>
-        <cus-field label="项目地址" v-model="form['Address']" isLink></cus-field>
+        <cus-field label="合同编号" :value="form['Agree Number']"></cus-field>
+        <cus-field label="工程名称" :value="form['Opportunity Name']" :isLink="!!form['Opportunity Name']"></cus-field>
+        <cus-field label="项目地址" :value="form['Address']" :isLink="!!form['Address']"></cus-field>
 
         <toggle>
-          <cus-field label="门厂名称" v-model="form['Partner Name']"></cus-field>
-          <cus-field label="门厂联系人" v-model="form['Partner Contact Name']"></cus-field>
-          <cus-field label="门厂技术员" v-model="form['Door Factory Engineer']"></cus-field>
-          <cus-field label="开孔方式" v-model="form['Hole Type']"></cus-field>
-          <cus-field label="门厂是否安装锁体" v-model="k2v[form['HBS Check Box 1']]"></cus-field>
-          <cus-field label="是否安装替代锁" v-model="k2v[form['HBS Check Box 2']]"></cus-field>
-          <cus-field label="是否销售审批" v-model="k2v[form['Need Approval Flag']]"></cus-field>
+          <cus-field label="门厂名称" :value="form['Partner Name']"></cus-field>
+          <cus-field label="门厂联系人" :value="form['Partner Contact Name']"></cus-field>
+          <cus-field label="门厂技术员" :value="form['Door Factory Engineer']"></cus-field>
+          <cus-field label="开孔方式" :value="form['Hole Type']"></cus-field>
+          <cus-field label="门厂是否安装锁体" :value="k2v[form['HBS Check Box 1']]"></cus-field>
+          <cus-field label="是否安装替代锁" :value="k2v[form['HBS Check Box 2']]"></cus-field>
+          <cus-field label="是否销售审批" :value="k2v[form['Need Approval Flag']]"></cus-field>
         </toggle>
       </div>
 

@@ -76,5 +76,11 @@ export default new Router({
     component(resolve) {
       require(['../page/doorFactory'], resolve);
     }
+  }, { // 地址选择
+    path: '/position',
+    name: 'position',
+    component(resolve) {
+      require(['public/page/position'], resolve);
+    }
   }]
 });
