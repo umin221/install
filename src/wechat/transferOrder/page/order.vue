@@ -29,15 +29,15 @@
           <mt-cell title="是否安装替代锁" v-show="isProject">
             <mt-switch v-model="box2"></mt-switch>
           </mt-cell>
-          <cus-field label="省市区" tag="省市区"
-                     @click.native="showCity++"
-                     placeholder="请选择"
-                     :value="area"
-                     v-valid.require></cus-field>
-          <mt-cell title="详细位置"
-                   @click.native="$router.push('position')"
-                   :value="order['KL Delivery Address']"
-                   is-link></mt-cell>
+          <!--<cus-field label="省市区" tag="省市区"-->
+                     <!--@click.native="showCity++"-->
+                     <!--placeholder="请选择"-->
+                     <!--:value="area"-->
+                     <!--v-valid.require></cus-field>-->
+          <!--<mt-cell title="详细位置"-->
+                   <!--@click.native="$router.push('position')"-->
+                   <!--:value="order['KL Delivery Address']"-->
+                   <!--is-link></mt-cell>-->
         </div>
 
         <div class="lock-line">
@@ -274,8 +274,9 @@
       // 订单行
       toLineFn(line = {}, type) {
         let me = this;
-        // 跳转配件 或 其他订单行(面板、锁体、假锁)
-        let path = line['KL Product Type LIC'] === 'Other' ? 'fitting' : 'orderLine';
+        // 跳转配件 或 其他订单行(面板、锁体、假锁、VP003)
+        let types = ['Lock Body', 'Panel', 'False Lock', 'VP003'];
+        let path = types.indexOf(line['KL Product Type LIC']) === -1 ? 'fitting' : 'orderLine';
         // 填充订单id，保存编辑行时需要
         line['Order Header Id'] = me.order.Id;
         me.$router.push({
