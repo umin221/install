@@ -58,5 +58,11 @@ export default new Router({
     component(resolve) {
       require(['../page/floor'], resolve);
     }
+  }, { // 个人中心
+    path: '/setting',
+    name: 'setting',
+    component(resolve) {
+      require(['../page/setting'], resolve);
+    }
   }]
 });

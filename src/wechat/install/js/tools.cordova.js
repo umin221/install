@@ -14,6 +14,9 @@ class Cordova {
 
   init() {
     this.initEvent();
+    this.app = {
+      version: '*.*.*'
+    };
   };
 
   /**
@@ -43,6 +46,7 @@ class Cordova {
    */
   onDeviceReady() {
     this.getUpdateController();
+    this.getAppVersion();
   };
 
   /**
@@ -50,25 +54,50 @@ class Cordova {
    */
   getUpdateController() {
     let me = this;
-    // check, if update was previously loaded and available for download
-    chcp.isUpdateAvailableForInstallation(function(error, data) {
-      console.log('isUpdateAvailableForInstallation: ' + JSON.stringify(error));
-      if (error) {
+//    upgrade mode
+    let upgrade = config.upgrade;
+//    check, if update was previously loaded and available for download
+//    chcp.isUpdateAvailableForInstallation(function(error, data) {
+//      console.log('isUpdateAvailableForInstallation: ' + JSON.stringify(error));
+//      if (error) {
         chcp.fetchUpdate((error, data) => {
           console.log('fetchUpdate: ' + JSON.stringify(error));
           if (!error) {
-            Indicator.open('正在更新');
-            chcp.installUpdate((error) => {
-              console.log('installUpdate: ' + JSON.stringify(error));
-              if (!error) {
-                me.alert('升级完成，重新启动');
+            console.log('--------发现新版本，准备更新--------');
+            // update
+            let update = () => {
+              Indicator.open('--------正在更新--------');
+              return new Promise((resolve, reject) => {
+                // install update
+                chcp.installUpdate((error) => {
+                  console.log('installUpdate: ' + JSON.stringify(error));
+                  error ? reject(error) : resolve();
+                });
+              });
+            };
+//            默认提示升级
+            if (upgrade === 'default') {
+              me.confirm('发现新版本', result => {
+                if (result === 2) {
+                  update().then(() => {
+                    me.alert('升级完成');
+                  });
+                } else {
+                  console.log('--------取消更新--------');
+                }
+              }, '请确认', ['取消', '更新']);
+//              静默升级 silent
+            } else {
+              update().then(() => {
                 console.log('Update installed!');
-              }
-            });
+              });
+            }
+          } else {
+            console.log('--------没有发现新版本--------');
           }
         });
-      }
-    });
+//      }
+//    });
   };
 
   /**
@@ -109,7 +138,7 @@ class Cordova {
 
   /**
    * 检测当前网络状态
-   * wifi/4g
+   * @return {String} wifi/4g
    */
   checkNetwork() {
     return navigator.connection.type || 'wifi';
@@ -118,9 +147,9 @@ class Cordova {
   /**
    * 提示框
    * @param msg
-   * @param cb
-   * @param title
-   * @param text
+   * @param {Function} cb
+   * @param {String} title
+   * @param {String} text
    */
   alert(msg, cb, title = '提示', text = '确定') {
     if (navigator.notification) {
@@ -133,9 +162,9 @@ class Cordova {
   /**
    * 确认对话框
    * @param msg message
-   * @param cb 回调 按钮角标 例如取消 回调 1， 确认回调 2
-   * @param title
-   * @param text buttonName
+   * @param {Function} cb 回调 按钮角标 例如取消 回调 1， 确认回调 2
+   * @param {String} title
+   * @param {Array} text buttonName
    */
   confirm(msg, cb, title = '提示', text = ['取消', '确认']) {
     if (navigator.notification) {
@@ -144,6 +173,15 @@ class Cordova {
       let flag = confirm(msg);
       cb(flag ? 2 : 1);
     }
-  }
+  };
+
+  /**
+   * 获取当前app版本
+   */
+  getAppVersion() {
+    if (cordova) {
+      cordova.getAppVersion.getVersionNumber().then(version => this.app.version = version);
+    }
+  };
 
 }; tools.cordova = new Cordova();

@@ -33,7 +33,7 @@
       var argArr = Array.prototype.slice.call(arguments, 0);
       if (argArr.length > 0) {
         eventName = argArr.shift();
-        args = argArr.shift();
+        args = argArr.shift() || {};
         pointer = argArr.pop();
         pointer = args.id && !pointer ? args : point;
       } else {

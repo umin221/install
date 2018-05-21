@@ -2,8 +2,9 @@
 <template>
   <div>
     <mt-header fixed title="安装批次列表">
-      <mt-button class="logout" slot="left"
-        @click.native="logoutFn">注销</mt-button>
+      <mt-button slot="left" @click.native="$router.push('setting')">
+        <i class="xs-icon icon-person"></i>
+      </mt-button>
       <mt-button @click.native="toSearchFn" slot="right">
         <i class="xs-icon icon-search"></i>
       </mt-button>
@@ -85,7 +86,7 @@
       ...mapState(NAMESPACE, ['pending', 'completed', 'isManager'])
     },
     methods: {
-      ...mapActions(NAMESPACE, ['queryInstallTask', 'logout']),
+      ...mapActions(NAMESPACE, ['queryInstallTask']),
       // 已失效顶部加载
       loadTopFn() {
         // 获取批次列表
@@ -95,23 +96,6 @@
       loadBottomFn() {
         // 获取批次列表
         loader.call(this);
-      },
-      // 注销登录
-      logoutFn() {
-        let me = this;
-        // 注销用户登录
-        me.logout({
-          success: result => {
-            // 清除用户信息 下次匹配后刷新本地缓存
-            user = {};
-            KND.Session.remove('userInfo');
-            // 重定向到登录
-            me.$router.replace({
-              name: 'login',
-              query: {login: true} // 重定向登陆页必须携带此参数
-            });
-          }
-        });
       },
       // 跳转搜索
       toSearchFn() {
@@ -134,8 +118,8 @@
 </script>
 
 <style lang="scss">
-  .logout {
-    text-indent: 10px;
+  .icon-person:before {
+    content: '\A128';
   }
 
   .tips {

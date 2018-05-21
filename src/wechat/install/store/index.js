@@ -28,6 +28,13 @@ export default {
           cache.invoke({
             key: 'clear'
           });
+        },
+        /**
+         * 注销登录
+         */
+        logout({state}, setting) {
+          setting.key = 'logout';
+          cache.invoke(setting);
         }
       }
     },
@@ -71,13 +78,6 @@ export default {
               if (callback) callback(installTask);
             }
           });
-        },
-        /**
-         * 注销登录
-         */
-        logout({state}, setting) {
-          setting.key = 'logout';
-          cache.invoke(setting);
         }
       }
     },

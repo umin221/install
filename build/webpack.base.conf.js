@@ -4,7 +4,7 @@ const path = require('path');
 const utils = require('./utils');
 const config = require('../config');
 const vueLoaderConfig = require('./vue-loader.conf');
-const mode = process.argv.splice(2).shift();
+const mode = process.argv[2];
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
