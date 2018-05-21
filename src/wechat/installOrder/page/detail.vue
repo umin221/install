@@ -135,10 +135,14 @@
                               class="itemTask"
                               v-if="itemTask['KL Property Contact Id']"
                               :value="itemTask['KL Property Contact Name']"></mt-field>
-                    <mt-field label="移动/工作电话"
+                    <mt-field label="移动电话"
                               class="itemTask"
                               v-if="itemTask['KL Property Contact Id']"
-                              :value="itemTask['KL Property Contact Cellular Phone']+'/'+itemTask['KL Property Contact Work Phone']"></mt-field>
+                              :value="itemTask['KL Property Contact Cellular Phone']"></mt-field>
+                    <mt-field label="工作电话"
+                              class="itemTask"
+                              v-if="itemTask['KL Property Contact Id']"
+                              :value="itemTask['KL Property Contact Work Phone']"></mt-field>
                     <!-- <mt-field label="合格/完成数量"
                        v-if="taskData['KL Detail Type LIC']==='Door Hanging Acc Summary' ||
                        taskData['KL Detail Type LIC'] === 'Check Before Trans Summary'"
@@ -1020,14 +1024,14 @@
                 data: {
                   'body': {
                     'ProcessName': 'KL Install Task Complete Action Workflow',
-                    'KL Close Reason': self.value,
+                    'KL Close Reason': '',
                     'RowId': item.Id
                   }
                 },
                 success: function(data) {
                   if (!data.ERROR) {
                     Toast('关闭成功');
-                    KND.Util.back();
+                    self.detail();
                   }
                 }
               });
