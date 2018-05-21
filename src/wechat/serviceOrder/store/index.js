@@ -145,6 +145,8 @@ export default new Vuex.Store({
         ],
         form: {
           KL_Product_Model: '', // 产品类型
+          KL_LOCK_MODEL: '', // 面板型号
+          KL_LOCK_BODY_MODEL: '', // 锁体型号
           KL_Cutoff_Date: '',  // 移交日期
           Cutoff_Date: '',
           Product_Warranty_Flag: '' // 保修期限
@@ -205,13 +207,22 @@ export default new Vuex.Store({
             state.areaSlots[2].values = [];
           }
         },
+        setType(state, data) {
+          if (data) {
+            state.form[data.type] = data.value || '';
+          }
+        },
         setSn(state, data) {
           if (data.length) {
+            state.form['KL_LOCK_BODY_MODEL'] = data[0]['KL Lock Body Model'] || ''; // 锁体型号
+            state.form['KL_LOCK_MODEL'] = data[0]['KL Lock Model'] || ''; // 面板型号
             state.form['KL_Product_Model'] = data[0]['KL Product Model'] || ''; // 产品类型
             state.form['KL_Cutoff_Date'] = data[0]['Install Date'] ? KND.Util.format(data[0]['Install Date'], 'yyyy-MM-dd hh:mm:ss') : '';
             state.form['Cutoff_Date'] = data[0]['Install Date'] || '';
             state.form['Product_Warranty_Flag'] = data[0]['KL Warranty Flag'];  // 保修期限
           } else {
+            state.form['KL_LOCK_BODY_MODEL'] = ''; // 锁体型号
+            state.form['KL_LOCK_MODEL'] = ''; // 面板型号
             state.form['KL_Product_Model'] = '';
             state.form['KL_Cutoff_Date'] = '';
             state.form['Cutoff_Date'] = '';
@@ -1083,7 +1094,7 @@ export default new Vuex.Store({
         attach: { // 附件
           list: [],
           edit: true,
-          title: '相关附件'
+          title: '维修记录表'
         }
       },
       mutations: {

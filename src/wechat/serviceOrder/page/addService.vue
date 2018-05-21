@@ -30,7 +30,7 @@
                  <!--is-link-->
                  <!--v-model="provinces"></mt-cell>-->
         <cus-field class="require"
-                   @click.native="getLov('CONTACT_TYPE')"
+                   @click.native="getLovType('CONTACT_TYPE')"
                    label="联系人类型"
                    :value="CONTACT_TYPE"
                    placeholder="请选择" is-link></cus-field>
@@ -65,12 +65,12 @@
         <cus-field class="require"
                    label="服务类型"
                    :value="SR_TYPE"
-                   @click.native="getLov('SR_TYPE','')"
+                   @click.native="getLovType('SR_TYPE','')"
                    placeholder="请选择" is-link></cus-field>
         <cus-field class=" require"
                    label="故障现象"
                    :value="SR_AREA"
-                   @click.native="getLov('SR_AREA','')"
+                   @click.native="getLovType('SR_AREA','')"
                    placeholder="请选择" is-link></cus-field>
         <mt-cell class="mint-field margin-right"
                   title="故障分级"
@@ -102,10 +102,17 @@
                     class="textRight" >
             <i class="xs-icon icon-scan" @click="toScan"></i>
           </mt-field>
-          <mt-field label="产品型号"
+          <!--<mt-field label="产品型号"
                     placeholder="客户如提供请输入"
                     v-model="form.KL_Product_Model"
-                    class="textRight"></mt-field>
+                    class="textRight"></mt-field>-->
+          <cus-field label="面板型号"
+                     :value="form.KL_LOCK_MODEL"
+                     @click.native="toLov('KL_LOCK_MODEL')" is-link></cus-field>
+          <cus-field label="锁体型号"
+                     :value="form.KL_LOCK_BODY_MODEL"
+                     @click.native="toLov('KL_LOCK_BODY_MODEL')" is-link></cus-field>
+
           <mt-cell class="mint-field margin-right" title="移交日期"
                    :value="form.KL_Cutoff_Date"></mt-cell>
           <mt-cell class="mint-field margin-right" title="保修期限"
@@ -146,7 +153,12 @@
                   :slots1="slots1"
                   :slots2="slots2"></menu-box1>
       </mt-popup>
-
+      <mt-popup v-model="showBox3" position="bottom">
+        <menu-box @my-enter="enter3" vk="Value"
+                  @my-cancel="showBox3 = false"
+                  :type="lovType"
+                  :slots="slots3"></menu-box>
+      </mt-popup>
       <mt-datetime-picker
         ref="picker1"
         v-model="pickerVisible"
@@ -181,6 +193,7 @@
   Vue.use(vp);
   let t = new Date().getTime() + 3600000;
   let today = new Date(t);
+  let mapp = config.mapp;
   //  import { MessageBox } from 'mint-ui';
   let isMunicipality = function(...args) {
     let me = this;
@@ -224,7 +237,20 @@
   export default {
     name: NameSpace,
     created() {
-      this.setSn();
+      var me = this;
+      me.setSn('');
+      me.getLov({
+        type: 'KL_LOCK_MODEL',
+        success: data => {
+          mapp.option['KL_LOCK_MODEL'] = data.items;
+        }
+      });
+      me.getLov({
+        type: 'KL_LOCK_BODY_MODEL',
+        success: data => {
+          mapp.option['KL_LOCK_BODY_MODEL'] = data.items;
+        }
+      });
     },
     data: () => {
       return {
@@ -233,13 +259,17 @@
         pickerVisible: today,
         showBox: false,
         showBox1: false,
+        showBox3: false,
         lovType: '',
         slots: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
         slots1: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
         slots2: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
+        slots3: [{flex: 1, values: [], className: 'slot1', textAlign: 'center'}],
         Contact_Phone: '',     // 联系电话
         callPhone: '',
         workPhone: '',
+        KL_LOCK_BODY_MODEL: '',
+        KL_LOCK_MODEL: '',
         Contact_Name: '',   // 报修联系人
         Contact_Id: '',     // 客户Id
         Address: '',       // 详细地址
@@ -275,11 +305,18 @@
       }
     },
     methods: {
+      ...mapActions('app', ['getLov']),
       ...mapActions(NameSpace, ['getSearch', 'getValue', 'valueChange', 'getSn', 'addContact', 'upDateContact', 'getLov1']),
-      ...mapMutations(NameSpace, ['removeSearch', 'setSn']),
+      ...mapMutations(NameSpace, ['removeSearch', 'setSn', 'setType']),
       showMore() {
         let me = this;
         me.hideMore = true;
+      },
+      toLov(type) {
+        let me = this;
+        me.lovType = type;
+        me.showBox3 = true;
+        me.slots3[0].values = mapp.option[type];
       },
       showPhone(item) {
         let arrList = [];
@@ -331,6 +368,8 @@
           ProductFlag: me.ProductFlag,
           Start_Date: me.Start_Date,
           KL_SN: me.KL_SN,
+          KL_LOCK_BODY_MODEL: me.form.KL_LOCK_BODY_MODEL,
+          KL_LOCK_MODEL: me.form.KL_LOCK_MODEL,
           KL_Product_Model: me.form.KL_Product_Model,
           KL_Cutoff_Date: me.form.Cutoff_Date,
           Product_Warranty_Flag: me.form.Product_Warranty_Flag,
@@ -346,7 +385,7 @@
         };
         me[submitForm.key](submitForm);
       },
-      getLov(type) {
+      getLovType(type) {
         let me = this;
         me.showBox = true;
         me.lovType = type;
@@ -460,6 +499,16 @@
         me.KL_PROVINCE = values['KL_PROVINCE'];
         me.KL_CITY = values['KL_CITY'];
         me.KL_TOWN = values['KL_TOWN'];
+      },
+      enter3(value, type) {
+        let me = this;
+        this.showBox3 = false;
+        this[type] = value[0]['Value'];
+        var obj = {
+          type: type,
+          value: value[0]['Value']
+        };
+        me.setType(obj);
       },
       editAddress() {
         setAttrButt('addressText', 'textarea');

@@ -49,7 +49,8 @@ let ApiList = {
       }
       SearchSpec = '([Service Request.Owner] = "' + option.data.owner + '" OR [Service Request.Owner] IS NULL) AND (' + parmer + ') AND [Service Request.Parent Service Request Id] IS NULL';
     } else {
-      SearchSpec = '[Service Request.KL Dispatcher Login] = ' + option.data.owner + ' AND [Service Request.Parent Service Request Id] IS NULL';
+      SearchSpec = '([Service Request.KL Dispatcher Login] = ' + option.data.owner + '  OR [Service Request.Owner] = ' + option.data.owner + ' )AND [Service Request.Parent Service Request Id] IS NULL';
+      // SearchSpec = '[Service Request.KL Dispatcher Login] = ' + option.data.owner + ' AND [Service Request.Parent Service Request Id] IS NULL';
     }
     return {
       method: 'post',
@@ -295,7 +296,9 @@ let ApiList = {
         'SR Type': option.data.form.SR_TYPE,
         'KL Customer Appointment Time': option.data.form.Start_Date || '',
         'KL SN': option.data.form.KL_SN || '',
-        'KL Product Model': option.data.form.KL_Product_Model,
+        'KL Lock Body Model': option.data.form.KL_LOCK_BODY_MODEL,
+        'KL Lock Model': option.data.form.KL_LOCK_MODEL,
+        // 'KL Product Model': option.data.form.KL_Product_Model,
         'KL Cutoff Date': option.data.form.KL_Cutoff_Date,
         'Product Warranty Flag': option.data.form.Product_Warranty_Flag,
         'Id': '1',

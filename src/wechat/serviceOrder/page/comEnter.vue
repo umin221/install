@@ -79,6 +79,12 @@
                   v-model="repairDetails"
                   placeholder="详细描述或附加需求..."
                   type="textarea" rows="3"></mt-field>
+        <!--<mt-checklist
+          class="require"
+          title="故障现象"
+          v-model="valueList"
+          :options="optionList">
+        </mt-checklist>-->
         <div>
           <attach ioName="KL Service Request Attachment IO" ref="attach"
                   :attach="attach.list"
@@ -220,6 +226,15 @@
         type: 'SR_ROOTCAUSE',
         success: data => {
           mapp.option['SR_ROOTCAUSE'] = data.items;
+          var items = data.items;
+          for (var i = 0; i < items.length; i++) {
+            var obj = {};
+            obj.label = items[i].Value;
+            obj.value = items[i].Value;
+            me.optionList.push(obj);
+          }
+          console.dir('======');
+          console.dir(me.optionList);
         }
       });
       me.getLov({
@@ -257,6 +272,8 @@
         ProductId: '',    // 产品Id
         KL_LOCK_BODY_MODEL: '',
         KL_LOCK_MODEL: '',
+        valueList: [],
+        optionList: [],
         srId: '',
         addressId: '',
         building: '',
@@ -267,7 +284,7 @@
         attach: { // 附件
           list: [],
           edit: true,
-          title: '相关照片'
+          title: '故障照片'
         }
       };
     },
@@ -305,6 +322,8 @@
                   me.building = data['KL Personal Address Building'];
                   me.floor = data['KL Personal Address Floor'];
                   me.room = data['KL Personal Address Room'];
+                  me.KL_LOCK_BODY_MODEL = data['KL Lock Body Model'];
+                  me.KL_LOCK_MODEL = data['KL Lock Model'];
                 } else {
                   Toast('查无此资产');
                   me.SerialNumber = '';
@@ -366,6 +385,13 @@
             return;
           }
         }
+        console.dir('===' + me.valueList);
+        /* if (me.valueList.length < 1) {
+          Toast('请选择故障现象!');
+          return;
+        } else {
+          me.SR_ROOTCAUSE = me.valueList;
+        }*/
         let uploadAttach = id => {
           _upload.call(me, me.$refs.attach.getServerIds(), id);
         };
@@ -421,7 +447,6 @@
   }
   .addService{
     .addform{
-      background: white;
       .block{
         .mint-cell-wrapper{
           display: block!important;
@@ -432,6 +457,13 @@
             }
           }
         }
+      }
+      .mint-checklist-title {
+        font-size: 0.7rem !important;
+      }
+      .mint-checklist.require .mint-checklist-title:before {
+        content: "*";
+        color: red;
       }
     }
     .textRight{

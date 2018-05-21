@@ -36,7 +36,11 @@
                 <!--<div><span>实际预约时间</span>{{toDate(Action['Planned'])}}</div>-->
                 <div><span>用户故障说明</span>{{ServiceRequest['Sub-Area']}}</div>
                 <div><span>产品条形码</span><a href="javascript:void(0);" class="detail-call">{{ServiceRequest['KL SN']}}</a></div>
+<!--
                 <div><span>产品型号</span>{{ServiceRequest['KL Lock Body Model']}} {{ServiceRequest['KL Lock Model']}}</div>
+-->
+                <div><span>面板型号</span>{{ServiceRequest['KL Lock Model']}}</div>
+                <div><span>锁体型号</span>{{ServiceRequest['KL Lock Body Model']}}</div>
                 <div><span>申请时间</span>{{toDate(ServiceRequest['Created'])}}</div>
                 <div><span>地址</span>{{ServiceRequest['KL Province']}}
                   {{ServiceRequest['KL City']}}
