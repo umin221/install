@@ -86,6 +86,7 @@ export default {
   data() {
     return {
       isProject: false,
+      orderId: '',
       Description: ''
     };
   },
@@ -178,8 +179,14 @@ export default {
             Toast('请填写正确的数量');
             return;
           }
+          var partListId = '';
+          if (me.id && me.partList[i].lineId) { // 编辑并且有行ID
+            partListId = me.partList[i].lineId;
+          } else {
+            partListId = i + 1;
+          }
           obj = {
-            'Id': i + 1,
+            'Id': partListId,
             'Product': me.partList[i].Name, // 产品编码
             'Quantity Requested': me.partList[i].num // 数量
           };

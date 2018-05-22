@@ -12,7 +12,7 @@
         <mt-cell class="require" title="是否保修范围" @click.native="getLov1('bn')" is-link>{{isBn}}</mt-cell>
         <mt-cell title="维修配件"><i class="xs-icon icon-arrow-down"></i></mt-cell>
         <div class="servesParts">
-          <div class="Parts" v-for="(item, index) in returnSelect">
+          <div class="Parts" v-for="(item, index) in returnSelect"  v-if="item['Name'] !== 'AP003'">
             <mt-cell-swipe class="lock-line-cell enable"
                            :right="getSwipeBtn(index, item)">
               <mt-switch
@@ -270,7 +270,7 @@ export default {
           }
         }
       }
-      return me.allFee.toFixed(2);
+      return me.allFee.toFixed(2) || 0;
     }
   },
   methods: {

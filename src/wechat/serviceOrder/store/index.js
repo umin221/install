@@ -144,6 +144,7 @@ export default new Vuex.Store({
           {flex: 1, values: [], className: 'slot3', textAlign: 'center'}
         ],
         form: {
+          AssetNumber: '',
           KL_Product_Model: '', // 产品类型
           KL_LOCK_MODEL: '', // 面板型号
           KL_LOCK_BODY_MODEL: '', // 锁体型号
@@ -214,6 +215,7 @@ export default new Vuex.Store({
         },
         setSn(state, data) {
           if (data.length) {
+            state.form['AssetNumber'] = data[0]['Asset Number'];
             state.form['KL_LOCK_BODY_MODEL'] = data[0]['KL Lock Body Model'] || ''; // 锁体型号
             state.form['KL_LOCK_MODEL'] = data[0]['KL Lock Model'] || ''; // 面板型号
             state.form['KL_Product_Model'] = data[0]['KL Product Model'] || ''; // 产品类型
@@ -221,6 +223,7 @@ export default new Vuex.Store({
             state.form['Cutoff_Date'] = data[0]['Install Date'] || '';
             state.form['Product_Warranty_Flag'] = data[0]['KL Warranty Flag'];  // 保修期限
           } else {
+            state.form['AssetNumber'] = '';
             state.form['KL_LOCK_BODY_MODEL'] = ''; // 锁体型号
             state.form['KL_LOCK_MODEL'] = ''; // 面板型号
             state.form['KL_Product_Model'] = '';

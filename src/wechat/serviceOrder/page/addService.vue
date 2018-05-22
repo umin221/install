@@ -268,6 +268,7 @@
         Contact_Phone: '',     // 联系电话
         callPhone: '',
         workPhone: '',
+        AssetNumber: '',
         KL_LOCK_BODY_MODEL: '',
         KL_LOCK_MODEL: '',
         Contact_Name: '',   // 报修联系人
@@ -378,6 +379,7 @@
           ProductFlag: me.ProductFlag,
           Start_Date: me.Start_Date,
           KL_SN: me.KL_SN,
+          AssetNumber: me.form.AssetNumber,
           KL_LOCK_BODY_MODEL: me.form.KL_LOCK_BODY_MODEL,
           KL_LOCK_MODEL: me.form.KL_LOCK_MODEL,
           KL_Product_Model: me.form.KL_Product_Model,

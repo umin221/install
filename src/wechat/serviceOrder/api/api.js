@@ -298,6 +298,7 @@ let ApiList = {
         'KL City': option.data.form.KL_CITY,
         'KL Town': option.data.form.KL_TOWN,
         'KL Address': option.data.form.Address,
+        'Asset Number': option.data.form.AssetNumber, // 产品ID
         // 'KL Personal Province': option.data.form.KL_PROVINCE,
         // 'Personal City': option.data.form.KL_CITY,
         // 'Personal Town': option.data.form.KL_TOWN,

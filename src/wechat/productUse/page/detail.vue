@@ -33,10 +33,10 @@
         <mt-button class="single"
                    @click.native="submitFn('Approved')">确认</mt-button>
       </button-group>
-      <!--<button-group v-if="(orderEntry['Status LIC'] === 'Draft'||orderEntry['Status LIC'] === 'Rejected') && option !== 'approval'">-->
-        <!--<mt-button class="single"-->
-                   <!--@click.native="submitApproval">编辑</mt-button>-->
-      <!--</button-group>-->
+      <button-group v-if="(orderEntry['Status LIC'] === 'Draft'||orderEntry['Status LIC'] === 'Rejected') && option !== 'approval'">
+        <mt-button class="single"
+                   @click.native="submitApproval">编辑</mt-button>
+      </button-group>
     </div>
   </div>
 </template>
@@ -192,7 +192,8 @@
             'Name': me.lineItems[i].Product,
             'num': me.lineItems[i]['Quantity Requested'],
             'KL Product Series Code': me.lineItems[i]['KL Product Series Code'],
-            'Id': me.lineItems[i]['Product Id']
+            'Id': me.lineItems[i]['Product Id'],
+            'lineId': me.lineItems[i]['Id']
           });
         }
         me.$router.push({
