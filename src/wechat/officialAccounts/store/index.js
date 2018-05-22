@@ -6,7 +6,7 @@ import { app } from 'public/store';
 Vue.use(Vuex);
 
 // 缓存页面
-app.state.alive = ['index'];
+app.state.alive = ['index', 'submit'];
 
 const systemSort = function(array, type) {
   return array.sort(function(a, b) {
@@ -85,6 +85,7 @@ export default new Vuex.Store({
                 Contact = systemSort(Contact, 'Updated');
                 // 保存用户信息
                 commit('setContact', (Contact[0]));
+                // 填充默认地址
                 let CUTAddress = KND.Util.toArray(Contact[0]['CUT Address']);
                 for (let i = 0; i < CUTAddress.length; i++) {
                   if (CUTAddress[i]['SSA Primary Field'] === 'Y') {

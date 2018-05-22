@@ -60,7 +60,7 @@
 </template>
 <script type="es6">
   import {mapState, mapActions, mapMutations} from 'vuex';
-  import menuBox from '../../../public/components/cus-menu.vue';
+  import menuBox from 'public/components/cus-menu.vue';
   import cusCell from 'public/components/cus-cell';
   const NAMESPACE = 'address';
   const INDEX = 'index';

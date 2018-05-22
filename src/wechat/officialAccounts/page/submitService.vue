@@ -16,11 +16,20 @@
                   v-valid.require
                   v-model="lastName"
                   placeholder="请输入联系人"></mt-field>
-        <mt-field label="联系电话" tag="联系电话"
-                  type="number"
-                  v-model="callPhone"
-                  v-valid.require.phone|fax
-                  placeholder="请输入联系电话"></mt-field>
+        <cus-field label="移动电话" tag="移动电话"
+                   type="number"
+                   v-model="callPhone"
+                   @change="changePhone"
+                   v-valid.require.phone
+                   placeholder="请输入手机号">
+          <cus-verify v-show="verify" :phone="callPhone" ref="$verify"></cus-verify>
+        </cus-field>
+        <cus-field label="验证码" tag="验证码"
+                   type="number"
+                   v-if="verify"
+                   v-model="validate"
+                   v-valid.require
+                   placeholder="请输入验证码"></cus-field>
         <mt-cell title="详细地址" tag="详细地址"
                  placeholder="请选择"
                  :value="address"
@@ -81,14 +90,16 @@
   import {mapState, mapActions, mapMutations} from 'vuex';
   import Vue from 'vue';
   import cusField from 'public/components/cus-field';
+  import cusVerify from '../components/cus-verify-code';
   import { Toast } from 'mint-ui';
   import menuBox from 'public/components/cus-menu';
   import vp from 'public/plugin/validator';
   const NAMESPACE = 'submit';
   const INDEX = 'index';
 
+  let util = KND.Util;
   // 用户信息
-  let contact = KND.Util.parse(KND.Session.get('Contact'));
+  let contact = util.parse(KND.Session.get('Contact'));
   let phoneReg = new RegExp('^[A-Za-z0-9]+$');
   let _upload = function(serverIds, id) {
     // 成功回调
@@ -130,6 +141,18 @@
         }
       });
     },
+    activated() {
+      let me = this;
+      // 清空历史信息
+      if (me.$parent.transitionName === 'turn-on') {
+        me.KLSN = '';
+        me.Area = '';
+        me.SubArea = '';
+        me.appointTime = '';
+        me.AppointTime = '';
+        me.ComplaintDescription = '';
+      }
+    },
     data: () => {
       return {
         pickerVisible: new Date(),
@@ -159,7 +182,9 @@
           list: [],
           edit: true,
           title: '相关照片'
-        }
+        },
+        validate: '', // 短信验证码
+        verify: false // 标记是否需要验证码
       };
     },
     computed: {
@@ -183,30 +208,36 @@
           _upload.call(me, me.$refs.attach.getServerIds(), id);
         };
         tools.valid.call(this, () => {
-          let form = {
-            'Address Id': me.form.type === 'add' ? me.form.Id : '', // 如果是用户自己新建了地址，传新建的地址Id,如果只是简单定位，不用传
-            'Appoint Time': me.AppointTime ? me.AppointTime : '', // 用户的预约上门时间
-            'Asset Id': me.AssetId,  // 如果是用户扫码了，并带出了资产，传资产Id，扫不出来，不用传
-            'Province': me.form.Province, // 省
-            'City': me.form.City, // 城市
-            'Town': me.form.County, // 区
-            'Detail Address': me.form['Street Address'], // 详细地址
-            'Contact Name': me.lastName, // 名字
-            'Contact Phone': me.callPhone, // 电话
-            'Area': me.Area, // 故障分类
-            'Sub-Area': me.SubArea, // 故障描述
-            'Complaint Description': me.ComplaintDescription, // 故障详情描述
-            'callback': function(data) {
-              uploadAttach(data['SR Id']);
-              me.$router.push({
-                name: 'myRepair',
-                query: {
-                  ContactId: data['Contact Id']
-                }
-              });
-            }
-          };
-          me.submitService(form);
+          // 校验短信验证码
+          if (!me.verify || me.$refs.$verify.verify(me.validate)) {
+            let form = {
+              'Address Id': me.form.type === 'add' ? me.form.Id : '', // 如果是用户自己新建了地址，传新建的地址Id,如果只是简单定位，不用传
+              'Appoint Time': me.AppointTime ? me.AppointTime : '', // 用户的预约上门时间
+              'Asset Id': me.AssetId,  // 如果是用户扫码了，并带出了资产，传资产Id，扫不出来，不用传
+              'Province': me.form.Province, // 省
+              'City': me.form.City, // 城市
+              'Town': me.form.County, // 区
+              'Detail Address': me.form['Street Address'], // 详细地址
+              'Contact Name': me.lastName, // 名字
+              'Contact Phone': me.callPhone, // 电话
+              'Area': me.Area, // 故障分类
+              'Sub-Area': me.SubArea, // 故障描述
+              'Complaint Description': me.ComplaintDescription, // 故障详情描述
+              'callback': function(data) {
+                uploadAttach(data['SR Id']);
+                me.$router.push({
+                  name: 'myRepair',
+                  query: {
+                    ContactId: data['Contact Id']
+                  }
+                });
+              }
+            };
+            // 提交服务请求
+            me.submitService(form);
+          } else {
+            Toast('验证码错误，请重新输入');
+          }
         });
       },
       serchSn() {
@@ -233,7 +264,7 @@
       },
       handleChange(value) {
         let me = this;
-        me.appointTime = KND.Util.format(value, 'yyyy-MM-dd hh:mm:ss');
+        me.appointTime = util.format(value, 'yyyy-MM-dd hh:mm:ss');
         me.AppointTime = value.format('MM/dd/yyyy hh:mm:ss');
       },
       open(picker) {
@@ -246,7 +277,7 @@
           type: 'SR_AREA',
           parent: '',
           success: function(data) {
-            let items = KND.Util.toArray(data.items);
+            let items = util.toArray(data.items);
             for (let i = 0; i < items.length;i++) {
               me.slots[0].values.push(items[i].Value);
             }
@@ -268,7 +299,7 @@
           type: 'SR_AREA',
           parent: value[0],
           success: function(data) {
-            let items = KND.Util.toArray(data.items);
+            let items = util.toArray(data.items);
             for (let i = 0; i < items.length;i++) {
               me.slots[1].values.push(items[i].Value);
             }
@@ -284,7 +315,7 @@
             me.getAsset({
               num: resultStr,
               callback: function(data) {
-                let datas = KND.Util.toArray(data);
+                let datas = util.toArray(data);
                 let form = {
                   Province: datas[0]['KL Personal Province'],
                   City: datas[0]['Personal City'],
@@ -299,9 +330,13 @@
             });
           }
         });
+      },
+      // 修改号码后需要验证验证码
+      changePhone(val) {
+        this.verify = contact['Cellular Phone #'] !== val;
       }
     },
-    components: {menuBox, vp, cusField}
+    components: {menuBox, vp, cusField, cusVerify}
   };
 </script>
 <style lang="scss">
@@ -336,11 +371,6 @@
     .datetime>.picker>.picker-items>.picker-slot:nth-child(5){
       display: none;
     }
-  .requisite>.mint-cell-wrapper>.mint-cell-title>.mint-cell-text:before{
-    content: '*';
-    color: red;
-    margin-right: 5px;
-  }
   .hideText>.mint-cell-wrapper>.mint-cell-value{
     width: 65%;
     span{

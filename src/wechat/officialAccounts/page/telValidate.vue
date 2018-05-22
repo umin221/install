@@ -10,7 +10,7 @@
                    class="require mar-right"
                  v-model="phoneNumber1"
                  v-valid.require.phone
-                   placeholder="请输入手机号码">
+                   placeholder="请输入手机号">
         <mt-button type="primary"
                    v-if="!isSend"
                    @click.native="toValidate"
