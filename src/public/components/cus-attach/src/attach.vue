@@ -40,7 +40,8 @@
    */
   import titleGroup from '../../cus-title-group';
   let downloadFromSiebel = (`${config.proxy}/webchat/api/external/downloadattachment?url=${config.attachServer}/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess`);
-  let downloadFromWechat = (`${config.proxy}/webchat/api/local/downloadmedia?appNO=${config.appNo}&media_id=`);
+  // 企业微信 与 公众号 非同一个下载接口
+  let downloadFromWechat = config.appNo === 'wechat' ? `${config.host}/weixin-service/authorized/download_media?media_id=` : `${config.proxy}/webchat/api/local/downloadmedia?appNO=${config.appNo}&media_id=`;
   // 附件类型转换
   const EXT2TYPE = {doc: 'doc', docx: 'doc', xls: 'xls', xlsx: 'xls', pdf: 'pdf', jpg: ''};
 

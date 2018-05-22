@@ -25,32 +25,28 @@
   </div>
 </template>
 <script>
-  import {mapState, mapActions, mapMutations} from 'vuex';
+  import {mapState, mapActions} from 'vuex';
   import menuBox from '../../../public/components/cus-menu.vue';
   import cusCell from 'public/components/cus-cell';
-  const NameSpace = 'myRepair';
+  const NAMESPACE = 'myRepair';
+
+  // 用户信息
+  let contact = KND.Util.parse(KND.Session.get('Contact'));
   export default {
-    name: NameSpace,
+    name: NAMESPACE,
     created() {
       let me = this;
-//      me.ContactId = me.$route.query.ContactId;
-      me.getContact(function(data) {
-        if (data) {
-          me.getServiceList({search: 'Contact Id', value: data.Id});
-        }
-      });
+      me.getServiceList({search: 'Contact Id', value: contact.Id});
     },
     data: () => {
       return {
       };
     },
     computed: {
-      ...mapState(NameSpace, ['serviceList'])
+      ...mapState(NAMESPACE, ['serviceList'])
     },
     methods: {
-      ...mapActions(NameSpace, ['getServiceList']),
-      ...mapActions('address', ['getContact']),
-      ...mapMutations(NameSpace, ['']),
+      ...mapActions(NAMESPACE, ['getServiceList']),
       toDetail(srNumber, Id) {
         let me = this;
         me.$router.push({

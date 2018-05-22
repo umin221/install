@@ -1,8 +1,9 @@
 <template>
   <div style="background-color: #ebebeb;">
     <div class="mint-content">
-      <div style="line-height: 5rem;text-align: center;background: #ffffff">
-          微信名称
+      <div class="contact-info co-flex co-ac" style="padding: 0 1rem; min-height: 5rem; background: #ffffff">
+        <div class="co-f1"><img class="headimgurl" :src="contactInfo.headimgurl"/></div>
+        <div class="co-f2" v-text="contactInfo.nickname"></div>
       </div>
       <div class="my-personal">
         <div class="co-flex co-ver co-jsa" @click="toMyDevice">
@@ -21,24 +22,28 @@
     </div>
   </div>
 </template>
-<script>
-//  import {mapState, mapActions, mapMutations} from 'vuex';
+<script type="es6">
+  import {mapActions} from 'vuex';
   import menuBox from 'public/components/cus-menu';
-  const NameSpace = 'personal';
+  const NAMESPACE = 'personal';
   export default {
-    name: NameSpace,
+    name: NAMESPACE,
     created() {
+      let me = this;
+      me.getContactInfo(data => {
+        me.contactInfo = data;
+      });
     },
     data: () => {
       return {
+        contactInfo: {
+          'nickname': '微信名称',
+          'headimgurl': ''
+        }
       };
     },
-    computed: {
-//      ...mapState(NameSpace, [''])
-    },
     methods: {
-//      ...mapActions(NameSpace, ['']),
-//      ...mapMutations(NameSpace, []),
+      ...mapActions(NAMESPACE, ['getContactInfo']),
       submit() {
         this.$router.push('myRepair');
       },
@@ -56,6 +61,18 @@
   };
 </script>
 <style lang="scss">
+  .contact-info {
+    .co-f1 {
+      height: 3.5rem;
+    }
+
+    .headimgurl {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 4px;
+    }
+  }
+
   .my-personal{
     margin-top: 1.5rem;
     background-color: #ffffff;

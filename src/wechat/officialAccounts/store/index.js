@@ -27,6 +27,12 @@ export default new Vuex.Store({
       mutations: {
         addressBack(state, data) {
           state.form = data;
+        },
+        // 设置用户信息
+        setContact(state, contact) {
+          state.Contact = contact;
+          // 缓存用户信息，避免用户刷新页面后丢失
+          KND.Session.set('Contact', JSON.stringify(contact));
         }
       },
       actions: {
@@ -43,6 +49,10 @@ export default new Vuex.Store({
             }
           });
         },
+        /**
+         * 提交报修单
+         * @param {Object} form 报修单信息健值队
+         */
         submitService({commit}, form) {
           api.get({
             key: 'submitService',
@@ -54,14 +64,14 @@ export default new Vuex.Store({
                 Toast('提交成功');
                 form.callback(data);
               }
-            },
-            error: data => {
-              Toast('提交失败');
-              console.log(data);
             }
           });
         },
-        getContact({commit}, fn) {
+        /**
+         * 通过微信openid 获取联系人信息
+         * @param {Function} cb 选填 回调函数
+         */
+        getContact({commit}, cb) {
           let openId = KND.Util.getParam('openid');
           console.log(openId);
           api.get({
@@ -73,13 +83,16 @@ export default new Vuex.Store({
               let Contact = KND.Util.toArray(data.SiebelMessage.Contact);
               if (Contact.length) {
                 Contact = systemSort(Contact, 'Updated');
+                // 保存用户信息
+                commit('setContact', (Contact[0]));
                 let CUTAddress = KND.Util.toArray(Contact[0]['CUT Address']);
                 for (let i = 0; i < CUTAddress.length; i++) {
                   if (CUTAddress[i]['SSA Primary Field'] === 'Y') {
                     commit('addressBack', CUTAddress[i]);
                   }
-                }
-                fn.callback(Contact[0]);
+                };
+                // 回调
+                if (cb) cb(Contact[0]);
               }
             },
             error: data => {
@@ -113,78 +126,66 @@ export default new Vuex.Store({
         }
       }
     },
+    // 个人中心
+    personal: {
+      namespaced: true,
+      actions: {
+        /**
+         * 获取用户昵称，头像
+         */
+        getContactInfo({commit, dispatch}, cb) {
+          let openId = KND.Util.getParam('openid');
+          api.get({
+            key: 'getContactInfo',
+            data: {
+              openId
+            },
+            success: data => {
+              cb(data);
+            },
+            error: data => {
+              console.log(data);
+            }
+          });
+        }
+      }
+    },
     // 地址管理
     address: {
       namespaced: true,
       state: {
-        Contact: [],
-        cutAddress: [],
         localAddress: []
       },
       mutations: {
-        setContact(state, data) {
-          state.Contact = data;
-          if (data['CUT Address']) {
-            state.cutAddress = KND.Util.toArray(data['CUT Address']);
-          } else {
-            state.cutAddress = [];
-          }
-          console.log(state.cutAddress);
-        },
         setLocalAddress(state, {data, index}) {
           if (index) {
             state.localAddress.splice(index - 1, 1, data);
           } else {
             state.localAddress.push(data);
           }
-        },
-        deleteAddress(state, data) {
-          state.localAddress = [];
         }
       },
       actions: {
-        getContact({commit}, callback) {
-          let openId = KND.Util.getParam('openid');
-          console.log(openId);
-          api.get({
-            key: 'getContact',
-            data: {
-              openId
-            },
-            success: function(data) {
-              let Contact = KND.Util.toArray(data.SiebelMessage.Contact);
-              if (Contact.length) {
-                Contact = systemSort(Contact, 'Updated');
-                commit('setContact', Contact[0]);
-                if (callback) {
-                  callback(Contact[0]);
-                }
-              }
-            },
-            error: data => {
-              console.log(data);
-            }
-          });
-        },
-        deleteAddress({commit, dispatch}, {Id, type}) {
+        /**
+         * 删除用户地址
+         * @param {String} id 选填 地址id
+         * @param {Function} cb 选填 回调函数
+         */
+        deleteAddress({commit, dispatch}, {Id, cb}) {
           api.get({
             key: 'deleteAddress',
             data: {
               Id
             },
             success: data => {
-              if (type === 'local') {
-                commit('deleteAddress');
-              } else {
-                dispatch('getContact');
-              }
+              cb(data);
             },
             error: data => {
               console.log(data);
             }
           });
         },
-        setDefaultAddress({commit, dispatch}, {contactId, addressId}) {
+        setDefaultAddress({commit, dispatch}, {contactId, addressId, success}) {
           api.get({
             key: 'setDefaultAddress',
             data: {
@@ -192,11 +193,7 @@ export default new Vuex.Store({
               addressId: addressId
             },
             success: data => {
-              console.log(data);
-              dispatch('getContact');
-            },
-            error: data => {
-              console.log(data);
+              success(data);
             }
           });
         }

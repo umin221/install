@@ -14,32 +14,38 @@
         </cus-cell>
       </div>
       <button-group>
-        <mt-button class="single" v-if="Contact" @click.native="addDevice">添加</mt-button>
+        <mt-button class="single" @click.native="addDevice">添加</mt-button>
       </button-group>
     </div>
   </div>
 </template>
-<script>
-  import {mapState, mapActions} from 'vuex';
+<script type="es6">
+  import {mapActions} from 'vuex';
   import menuBox from '../../../public/components/cus-menu.vue';
   import cusCell from 'public/components/cus-cell';
-  const NameSpace = 'myDevice';
+
+  const NAMESPACE = 'myDevice';
   export default {
-    name: NameSpace,
+    name: NAMESPACE,
     created() {
       let me = this;
-      me.getContact();
+      // 用户信息
+      me.getContact(result => {
+        me.contact = result;
+      });
     },
     data: () => {
       return {
+        contact: ''
       };
     },
     computed: {
-      ...mapState(NameSpace, ['ContactAsset', 'Contact'])
+      ContactAsset() {
+        return KND.Util.toArray(this.contact.Contact_Asset);
+      }
     },
     methods: {
-      ...mapActions(NameSpace, ['getContact']),
-//      ...mapMutations(NameSpace, [''])
+      ...mapActions('index', ['getContact']),
       toDetail(Id) {
         console.log(Id);
         let me = this;
@@ -55,7 +61,7 @@
         me.$router.push({
           name: 'addDevice',
           query: {
-            id: me.Contact ? me.Contact.Id : ''
+            id: me.contact.Id
           }
         });
       }

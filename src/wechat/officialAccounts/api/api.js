@@ -122,7 +122,12 @@ let ApiList = {
       }
     };
   },
-  getContact: option => {           // 获取联系人信息
+  /**
+   * 获取联系人信息
+   * @param {String} option.data['openId'] 用户 openid
+   * @returns {{method: string, url: string}}
+   */
+  getContact: option => {
     return {
       method: 'POST',
       url: 'service/EAI Siebel Adapter/Query',
@@ -293,6 +298,17 @@ let ApiList = {
           'SearchSpec': '[List Of Values.Active]="Y" AND [List Of Values.Language]="CHS" AND [List Of Values.Type] = "' + option.type + '"'
         }
       }
+    };
+  },
+  /**
+   *
+   * @param option
+   * @returns {{method: string, url: *}}
+   */
+  getContactInfo: option => {
+    return {
+      method: 'get',
+      url: `${config.host}/weixin-service/authorized/get_user_info?openid=${option.data.openId}`
     };
   }
 };

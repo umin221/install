@@ -20,7 +20,7 @@
           <mt-badge class="xs-icon icon-delete"
                     style="color: #ffffff;"
                     type="error"
-                    @click.native="deleteAddr(item.Id, 'cutAddr')">删除</mt-badge>
+                    @click.native="deleteAddr(item.Id)">删除</mt-badge>
           <mt-badge class="xs-icon icon-edit"
                     type="success"
                     @click.native="editAddr(item.Id)">编辑</mt-badge>
@@ -42,7 +42,7 @@
           <mt-badge class="xs-icon icon-delete"
                     style="color: #ffffff;"
                     type="error"
-                    @click.native="deleteAddr(item.Id, 'local')">删除</mt-badge>
+                    @click.native="deleteAddr(item.Id)">删除</mt-badge>
           <mt-badge class="xs-icon icon-edit"
                     type="success"
                     @click.native="editAddr(item.Id, index+1)">编辑</mt-badge>
@@ -58,34 +58,44 @@
     </div>
   </div>
 </template>
-<script>
+<script type="es6">
   import {mapState, mapActions, mapMutations} from 'vuex';
   import menuBox from '../../../public/components/cus-menu.vue';
   import cusCell from 'public/components/cus-cell';
-  const NameSpace = 'address';
+  const NAMESPACE = 'address';
+  const INDEX = 'index';
+
   export default {
-    name: NameSpace,
+    name: NAMESPACE,
     created() {
       let me = this;
-      me.getContact();
+      // 用户信息
+      me.getContact(result => {
+        me.contact = result;
+      });
     },
     data: () => {
       return {
-        isActive: ''
+        isActive: '',
+        contact: ''
       };
     },
     computed: {
-      ...mapState(NameSpace, ['cutAddress', 'Contact', 'localAddress'])
+      ...mapState(NAMESPACE, ['localAddress']),
+      cutAddress() {
+        return KND.Util.toArray(this.contact['CUT Address']);
+      }
     },
     methods: {
-      ...mapActions(NameSpace, ['getContact', 'deleteAddress', 'setDefaultAddress']),
-      ...mapMutations('index', ['addressBack']),
+      ...mapActions(NAMESPACE, ['deleteAddress', 'setDefaultAddress']),
+      ...mapActions(INDEX, ['getContact']),
+      ...mapMutations(INDEX, ['addressBack']),
       toAddAddress() {
         let me = this;
         me.$router.push({
           name: 'addAddress',
           query: {
-            ContactId: me.Contact ? me.Contact.Id : '',
+            ContactId: me.contact.Id,
             type: 'add'
           }
         });
@@ -107,15 +117,31 @@
           }
         });
       },
-      deleteAddr(Id, type) {
+      deleteAddr(Id) {
         MessageBox.confirm('确认删除该地址', '提示').then(action => {
           let me = this;
-          me.deleteAddress({Id, type});
+          me.deleteAddress({
+            Id,
+            cb() {
+              me.getContact(result => {
+                me.contact = result;
+              });
+            }
+          });
         });
       },
       setDefault(Id) {
         let me = this;
-        me.setDefaultAddress({contactId: me.Contact.Id, addressId: Id});
+        me.setDefaultAddress({
+          contactId: me.contact.Id,
+          addressId: Id,
+          success: data => {
+            me.getContact(result => {
+              Toast('设置成功');
+              me.contact = result;
+            });
+          }
+        });
       }
     },
     components: {menuBox, cusCell}

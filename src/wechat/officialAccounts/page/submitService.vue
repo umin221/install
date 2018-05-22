@@ -77,14 +77,18 @@
     </div>
   </div>
 </template>
-<script>
+<script type="es6">
   import {mapState, mapActions, mapMutations} from 'vuex';
   import Vue from 'vue';
   import cusField from 'public/components/cus-field';
   import { Toast } from 'mint-ui';
   import menuBox from 'public/components/cus-menu';
   import vp from 'public/plugin/validator';
-  const NameSpace = 'index';
+  const NAMESPACE = 'submit';
+  const INDEX = 'index';
+
+  // 用户信息
+  let contact = KND.Util.parse(KND.Session.get('Contact'));
   let phoneReg = new RegExp('^[A-Za-z0-9]+$');
   let _upload = function(serverIds, id) {
     // 成功回调
@@ -108,10 +112,11 @@
   let t = new Date().getTime() + 3600000;
   Vue.use(vp);
   export default {
-    name: NameSpace,
+    name: NAMESPACE,
     created() {
       let me = this;
-      me.openId = KND.Util.getParam('openid');
+      me.lastName = contact['Last Name']; // 名字
+      me.callPhone = contact['Cellular Phone #']; // 电话
       me.getLov({
         type: 'KL_SR_ATT_TYPE',
         parent: '',
@@ -124,24 +129,6 @@
           }
         }
       });
-      if (!me.callPhone) {
-        me.getContact({
-          callback: function(data) {
-            console.dir('====1===');
-            me.lastName = data['Last Name']; // 名字
-            me.callPhone = data['Cellular Phone #']; // 电话
-          },
-          noneback: function() {
-            console.dir('====2===');
-            me.$router.push({
-              name: 'telValidate',
-              query: {
-                backName: 'telValidate'
-              }
-            });
-          }
-        });
-      }
     },
     data: () => {
       return {
@@ -156,7 +143,7 @@
         KLSN: '',              // 条形码
         brand: '坚朗海贝斯',  // 品牌
         lastName: '',         // 联系人
-        callPhone: '',        // 联系电话
+        callPhone: '',         // 联系电话
 //        Province: '',         // 省
 //        City: '',              // 城市
 //        Town: '',              // 区
@@ -168,7 +155,6 @@
         appointTime: '',
         AppointTime: '',      // 用户的预约上门时间
         AssetId: '',           // 如果是用户扫码了，并带出了资产，传资产Id，扫不出来，不用传
-        openId: '',
         attach: { // 附件
           list: [],
           edit: true,
@@ -177,7 +163,7 @@
       };
     },
     computed: {
-      ...mapState(NameSpace, ['Contact', 'cutAddress', 'form']),
+      ...mapState(INDEX, ['cutAddress', 'form']),
       address() {
         let me = this;
         if (me.form.Id) {
@@ -189,8 +175,8 @@
     },
     methods: {
       ...mapActions('app', ['upload']),
-      ...mapActions(NameSpace, ['getLov', 'submitService', 'getContact', 'getAsset']),
-      ...mapMutations(NameSpace, ['addressBack']),
+      ...mapActions(INDEX, ['getLov', 'submitService', 'getAsset']),
+      ...mapMutations(INDEX, ['addressBack']),
       submit() {
         let me = this;
         let uploadAttach = id => {
@@ -210,7 +196,6 @@
             'Area': me.Area, // 故障分类
             'Sub-Area': me.SubArea, // 故障描述
             'Complaint Description': me.ComplaintDescription, // 故障详情描述
-            'Open Id': me.openId, // 微信端的OpenId
             'callback': function(data) {
               uploadAttach(data['SR Id']);
               me.$router.push({

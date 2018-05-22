@@ -73,7 +73,7 @@ import queue from '../base/queue';
      * IM02 IE01
      */
     getUserID() {
-      return session.get('userID') || 'IM02' || util['getParam']('userID');
+      return session.get('userID') || util['getParam']('userID') || 'GUESTERM';
     };
 
     /**
@@ -280,7 +280,7 @@ import queue from '../base/queue';
     // 上传
     native.uploadImage = option => {
       util.invoke(option.success, {
-        serverId: '1TOHofOG7v0KB1mUi3DWENYMlrDwxK5EuYZueY48rD-hR6WDNa4qgwJbjD5Yg10uC',
+        serverId: 'q2RIe0kWOZSukuItUMEHvepbWIPuGhPllvwxOfl8CcSi2788CnicvQECHxjdyyjd',
         errMsg: 'uploadImage:ok'
       });
     };

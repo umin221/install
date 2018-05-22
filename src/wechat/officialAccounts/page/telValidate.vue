@@ -151,7 +151,8 @@
               success: function(data) {
                 if (!data.ERROR) {
                   Toast('绑定成功');
-                  KND.Util.back();
+                  let path = KND.Session.get('nextPage');
+                  self.$router.replace(path);
                 }
               }
             });

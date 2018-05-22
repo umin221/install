@@ -20,13 +20,20 @@
 </template>
 
 <script type="es6">
-  import {mapState, mapMutations} from 'vuex';
-  const NameSpace = 'index';
+  import {mapState, mapActions, mapMutations} from 'vuex';
+  const NAMESPACE = 'index';
+
+  // 用户信息
+  let contact;
+  // 需要绑定手机的页面
+  let validPage = ['submitService', 'myRepair', 'personal'];
   export default {
-    name: NameSpace,
+    name: NAMESPACE,
     created() {
-      let openId = KND.Util.getParam('openid');
-      console.log(openId);
+      // 获取用户信息
+      this.getContact(result => {
+        contact = result;
+      });
     },
     mounted() {
       Indicator.close();
@@ -39,22 +46,29 @@
           {'id': 'myRepair', 'vul': '我的报修', 'icon': 'plan'},
           {'id': 'personal', 'vul': '个人中心', 'icon': 'transfer'},
           {'id': 'repairPolicy', 'vul': '报修政策', 'icon': 'install'},
-          {'id': 'engineer', 'vul': '工程师通道', 'icon': 'service'},
-          {'id': 'telValidate', 'vul': '电话报修', 'icon': 'service'}
+          {'id': 'engineer', 'vul': '工程师通道', 'icon': 'service'}
+//          {'id': 'telValidate', 'vul': '用户绑定', 'icon': 'service'}
         ]
       };
     },
     computed: {
-      ...mapState(NameSpace, ['value'])
+      ...mapState(NAMESPACE, ['value'])
     },
     methods: {
+      ...mapActions(NAMESPACE, ['getContact']),
       ...mapMutations('telValidate', ['clObj']),
       getUrl(id) {
         var self = this;
         if (id === 'telValidate') {
           self.clObj();
         }
-        this.$router.push(id);
+        if (!contact && validPage.indexOf(id) !== -1) {
+          Toast('请先绑定手机号码');
+          KND.Session.set('nextPage', id);
+          this.$router.push('telValidate');
+        } else {
+          this.$router.push(id);
+        }
       }
     }
   };
