@@ -20,7 +20,7 @@
 </template>
 
 <script type="es6">
-  import {mapState, mapActions, mapMutations} from 'vuex';
+  import {mapState, mapActions} from 'vuex';
   const NAMESPACE = 'index';
 
   // 用户信息
@@ -56,12 +56,7 @@
     },
     methods: {
       ...mapActions(NAMESPACE, ['getContact']),
-      ...mapMutations('telValidate', ['clObj']),
       getUrl(id) {
-        var self = this;
-        if (id === 'telValidate') {
-          self.clObj();
-        }
         if (!contact && validPage.indexOf(id) !== -1) {
           Toast('请先绑定手机号码');
           KND.Session.set('nextPage', id);

@@ -32,8 +32,21 @@ let ApiList = {
       }
     };
   },
-  getMsg: option => {
-    var data = KND.Util.param(option.data);
+  /**
+   * 发送短信
+   * @param {String} option.data.account 必填 短信平台账号
+   * @param {String} option.data.ts 必填 时间戳
+   * @param {String} option.data.pswd 必填 短信平台账号 + 密码 + 时间戳
+   * @param {String} option.data.mobile 必填 电话号码
+   * @param {String} option.data.msg 必填 短信内容，发送前 encodeURI 编码
+   * @returns {{method: string, url: string}}
+   */
+  sendMsg: option => {
+    let data = option.data;
+    // 构造默认参数
+    data.needstatus = true;
+    data.resptype = 'json';
+
     return {
       method: 'POST',
       url: 'https://www.kinlong.cn/msg/HttpBatchSendSM',
@@ -42,7 +55,7 @@ let ApiList = {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         'dataType': 'json'
       },
-      data: data
+      data: KND.Util.param(data)
     };
   },
   setWXphone: option => {

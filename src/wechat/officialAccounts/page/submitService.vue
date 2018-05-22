@@ -16,13 +16,13 @@
                   v-valid.require
                   v-model="lastName"
                   placeholder="请输入联系人"></mt-field>
-        <cus-field label="移动电话" tag="移动电话"
+        <cus-field label="手机号码" tag="手机号码"
                    type="number"
                    v-model="callPhone"
                    @change="changePhone"
                    v-valid.require.phone
                    placeholder="请输入手机号">
-          <cus-verify v-show="verify" :phone="callPhone" ref="$verify"></cus-verify>
+          <cus-verify v-show="verify" :mobile="callPhone" ref="$verify"></cus-verify>
         </cus-field>
         <cus-field label="验证码" tag="验证码"
                    type="number"
@@ -37,20 +37,20 @@
                  class="requisite hideText"
                  v-valid.require
                  is-link></mt-cell>
-        <mt-cell title="故障现象" tag="故障现象"
+        <cus-field label="故障现象" tag="故障现象"
                  placeholder="请选择"
                  :value="SubArea"
                  class="requisite"
                  v-valid.require
                  @click.native="showAreaBox"
-                 is-link></mt-cell>
-        <mt-cell title="预约时间" tag="预约时间"
+                 is-link></cus-field>
+        <cus-field label="预约时间" tag="预约时间"
                  placeholder="请选择"
                  :value="appointTime"
                  class="requisite"
                  v-valid.require
                  @click.native="open('picker1')"
-                 is-link></mt-cell>
+                 is-link></cus-field>
         <mt-field label="问题说明"
                   type="textarea"
                   class="mint-textarea"
@@ -207,37 +207,40 @@
         let uploadAttach = id => {
           _upload.call(me, me.$refs.attach.getServerIds(), id);
         };
-        tools.valid.call(this, () => {
-          // 校验短信验证码
-          if (!me.verify || me.$refs.$verify.verify(me.validate)) {
-            let form = {
-              'Address Id': me.form.type === 'add' ? me.form.Id : '', // 如果是用户自己新建了地址，传新建的地址Id,如果只是简单定位，不用传
-              'Appoint Time': me.AppointTime ? me.AppointTime : '', // 用户的预约上门时间
-              'Asset Id': me.AssetId,  // 如果是用户扫码了，并带出了资产，传资产Id，扫不出来，不用传
-              'Province': me.form.Province, // 省
-              'City': me.form.City, // 城市
-              'Town': me.form.County, // 区
-              'Detail Address': me.form['Street Address'], // 详细地址
-              'Contact Name': me.lastName, // 名字
-              'Contact Phone': me.callPhone, // 电话
-              'Area': me.Area, // 故障分类
-              'Sub-Area': me.SubArea, // 故障描述
-              'Complaint Description': me.ComplaintDescription, // 故障详情描述
-              'callback': function(data) {
-                uploadAttach(data['SR Id']);
-                me.$router.push({
-                  name: 'myRepair',
-                  query: {
-                    ContactId: data['Contact Id']
-                  }
-                });
-              }
-            };
-            // 提交服务请求
-            me.submitService(form);
-          } else {
-            Toast('验证码错误，请重新输入');
-          }
+        // 控制验证码节点
+        me.$nextTick(data => {
+          tools.valid.call(me, () => {
+            // 校验短信验证码和手机号
+            if (!me.verify || me.$refs.$verify.verify(me.validate)) {
+              let form = {
+                'Address Id': me.form.type === 'add' ? me.form.Id : '', // 如果是用户自己新建了地址，传新建的地址Id,如果只是简单定位，不用传
+                'Appoint Time': me.AppointTime ? me.AppointTime : '', // 用户的预约上门时间
+                'Asset Id': me.AssetId,  // 如果是用户扫码了，并带出了资产，传资产Id，扫不出来，不用传
+                'Province': me.form.Province, // 省
+                'City': me.form.City, // 城市
+                'Town': me.form.County, // 区
+                'Detail Address': me.form['Street Address'], // 详细地址
+                'Contact Name': me.lastName, // 名字
+                'Contact Phone': me.callPhone, // 电话
+                'Area': me.Area, // 故障分类
+                'Sub-Area': me.SubArea, // 故障描述
+                'Complaint Description': me.ComplaintDescription, // 故障详情描述
+                'callback': function(data) {
+                  uploadAttach(data['SR Id']);
+                  me.$router.push({
+                    name: 'myRepair',
+                    query: {
+                      ContactId: data['Contact Id']
+                    }
+                  });
+                }
+              };
+              // 提交服务请求
+              me.submitService(form);
+            } else {
+              Toast('验证码错误，请重试');
+            }
+          });
         });
       },
       serchSn() {

@@ -124,6 +124,18 @@ export default new Vuex.Store({
               Toast('该码未录入系统');
             }
           });
+        },
+        /**
+         * 发送短信
+         */
+        sendMsg({state}, data) {
+          api.get({
+            key: 'sendMsg',
+            data: data,
+            success: data => {
+              Toast('发送成功');
+            }
+          });
         }
       }
     },
@@ -543,40 +555,6 @@ export default new Vuex.Store({
               if (callback) {
                 callback(Survey);
               }
-            },
-            error: data => {
-              console.log(data);
-            }
-          });
-        }
-      }
-    },
-    telValidate: {
-      namespaced: true,
-      state: {
-        obj: {}
-      },
-      mutations: {
-        clObj(state) {
-          state.obj = {};
-        }
-      },
-      actions: {
-        toTelValidate({state}, obj) {
-          state.obj = obj; // 存 发送验证码的手机号码与随机码
-          api.get({
-            key: 'getMsg',
-            data: {
-              account: obj.account,
-              ts: obj.timestamp,
-              pswd: obj.pswd,
-              mobile: obj.phoneNumber,
-              msg: obj.msg,
-              needstatus: true,
-              resptype: 'json'
-            },
-            success: data => {
-              console.log(data);
             },
             error: data => {
               console.log(data);

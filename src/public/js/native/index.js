@@ -269,7 +269,7 @@ import queue from '../base/queue';
   /**
    * 本地调试
    */
-  if (config.WeixinJSBridge === false) {
+  if (config.wxJSBridge === false) {
     // 选图
     native.chooseImage = option => {
       util.invoke(option.success, {

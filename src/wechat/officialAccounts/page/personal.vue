@@ -2,7 +2,10 @@
   <div style="background-color: #ebebeb;">
     <div class="mint-content">
       <div class="contact-info co-flex co-ac" style="padding: 0 1rem; min-height: 5rem; background: #ffffff">
-        <div class="co-f1"><img class="headimgurl" :src="contactInfo.headimgurl"/></div>
+        <div class="co-f1">
+          <img class="headimgurl" v-if="contactInfo.headimgurl" :src="contactInfo.headimgurl"/>
+          <img class="headimgurl" v-else src="../img/timg.jpeg"/>
+        </div>
         <div class="co-f2" v-text="contactInfo.nickname"></div>
       </div>
       <div class="my-personal">
