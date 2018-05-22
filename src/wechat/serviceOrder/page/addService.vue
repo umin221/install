@@ -349,6 +349,16 @@
             }
           }
         }
+        if (me.SR_TYPE !== '咨询') {
+          if (!me.KL_PROVINCE) {
+            Toast('请输入省市区');
+            return;
+          }
+          if (!me.Address) {
+            Toast('请输入详细地址');
+            return;
+          }
+        }
         let key = (me.isClick) ? 'upDateContact' : 'addContact';
         let submitForm = {
           Contact_Id: me.Contact_Id,

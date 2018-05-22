@@ -102,7 +102,7 @@
               Name: me.name[i]['Product Name'],
               num: 1,
               'KL Translated Name': me.name[i]['KL Product Name Join'],
-              'List Price': 200,
+              'List Price': me.name[i]['KL Price'],
               Id: me.name[i]['Id']
             });
           }

@@ -79,7 +79,8 @@
                         <!--{{ServiceRequest['KL Town']}}-->
                         <!--{{ServiceRequest['KL Address']}}-->
                       <!--</li>-->
-                      <li><span>产品类型</span>{{item['KL Product Model']}}</li>
+                      <li><span>面板型号</span>{{item['KL Lock Model']}}</li>
+                      <li><span>锁体型号</span>{{item['KL Lock Body Model']}}</li>
                       <li><span>故障描述</span>{{item['KL Responsbility']}}</li>
                       <li><span>故障现象</span>{{item['SR Rootcause']}}</li>
                       <attach ioName="KL Service Request Attachment IO" ref="attach"
@@ -134,7 +135,8 @@
                         {{ServiceRequest['KL Town']}}
                         {{ServiceRequest['KL Address']}}
                       </li>
-                      <li><span>产品类型</span>{{ServiceRequest['KL Product Model']}}</li>
+                      <li><span>面板型号</span>{{ServiceRequest['KL Lock Model']}}</li>
+                      <li><span>锁体型号</span>{{ServiceRequest['KL Lock Body Model']}}</li>
                       <li><span>故障描述</span>{{ServiceRequest['KL Responsbility']}}</li>
                       <li><span>故障现象</span>{{ServiceRequest['SR Rootcause']}}</li>
                       <attach ioName="KL Service Request Attachment IO" ref="attach"
@@ -812,7 +814,10 @@
     padding: 0!important;
   }
   .service-continer{
+    position: relative;
+    height:100%;
     .service-detail{
+      height: 84%;
       .detail-title{
         position: relative;
         padding: 0.5rem;

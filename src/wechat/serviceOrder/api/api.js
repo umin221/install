@@ -108,6 +108,44 @@ let ApiList = {
     // 通过序列号查询
   },
   addContact: option => {
+    var ListOfBase = {};
+    if (option.data.form.KL_PROVINCE && option.data.form.Address) { // 如果地址为空 不传参数 ListOfCutAddress
+      ListOfBase = {
+        'Contact': {
+          'Id': '1',
+          'M/F': '男',
+          'Type': option.data.form.CONTACT_TYPE,
+          'Last Name': option.data.form.Contact_Name,
+          'Work Phone #': option.data.form.workPhone,
+          'Cellular Phone #': option.data.form.callPhone,
+          'User Type': '售后',
+          'ListOfCutAddress': {
+            'CUT Address': [
+              {
+                'Id': '1',
+                'Country': '中国',
+                'Province': option.data.form.KL_PROVINCE,
+                'City': option.data.form.KL_CITY,
+                'County': option.data.form.KL_TOWN,
+                'Street Address': option.data.form.Address
+              }
+            ]
+          }
+        }
+      };
+    } else {
+      ListOfBase = {
+        'Contact': {
+          'Id': '1',
+          'M/F': '男',
+          'Type': option.data.form.CONTACT_TYPE,
+          'Last Name': option.data.form.Contact_Name,
+          'Work Phone #': option.data.form.workPhone,
+          'Cellular Phone #': option.data.form.callPhone,
+          'User Type': '售后'
+        }
+      };
+    }
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/Upsert',
@@ -118,29 +156,7 @@ let ApiList = {
             'MessageType': 'Integration Object',
             'IntObjectName': 'Base KL Contact Interface BO',
             'IntObjectFormat': 'Siebel Hierarchical',
-            'ListOfBase KL Contact Interface BO': {
-              'Contact': {
-                'Id': '1',
-                'M/F': '男',
-                'Type': option.data.form.CONTACT_TYPE,
-                'Last Name': option.data.form.Contact_Name,
-                'Work Phone #': option.data.form.workPhone,
-                'Cellular Phone #': option.data.form.callPhone,
-                'User Type': '售后',
-                'ListOfCutAddress': {
-                  'CUT Address': [
-                    {
-                      'Id': '1',
-                      'Country': '中国',
-                      'Province': option.data.form.KL_PROVINCE,
-                      'City': option.data.form.KL_CITY,
-                      'County': option.data.form.KL_TOWN,
-                      'Street Address': option.data.form.Address
-                    }
-                  ]
-                }
-              }
-            }
+            'ListOfBase KL Contact Interface BO': ListOfBase
           }
         }
       }
@@ -367,6 +383,44 @@ let ApiList = {
     };
   },
   upDateContact: option => {
+    var ListOfBase = {};
+    if (option.data.form.KL_PROVINCE && option.data.form.Address) { // 如果地址为空 不传参数 ListOfCutAddress
+      ListOfBase = {
+        'Contact': {
+          'Id': '1',
+          'M/F': '男',
+          'Type': option.data.form.CONTACT_TYPE,
+          'Last Name': option.data.form.Contact_Name,
+          'Work Phone #': option.data.form.workPhone,
+          'Cellular Phone #': option.data.form.callPhone,
+          'User Type': '售后',
+          'ListOfCutAddress': {
+            'CUT Address': [
+              {
+                'Id': '1',
+                'Country': '中国',
+                'Province': option.data.form.KL_PROVINCE,
+                'City': option.data.form.KL_CITY,
+                'County': option.data.form.KL_TOWN,
+                'Street Address': option.data.form.Address
+              }
+            ]
+          }
+        }
+      };
+    } else {
+      ListOfBase = {
+        'Contact': {
+          'Id': '1',
+          'M/F': '男',
+          'Type': option.data.form.CONTACT_TYPE,
+          'Last Name': option.data.form.Contact_Name,
+          'Work Phone #': option.data.form.workPhone,
+          'Cellular Phone #': option.data.form.callPhone,
+          'User Type': '售后'
+        }
+      };
+    }
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/Upsert',
@@ -377,28 +431,7 @@ let ApiList = {
             'MessageType': 'Integration Object',
             'IntObjectName': 'Base KL Contact Interface BO',
             'IntObjectFormat': 'Siebel Hierarchical',
-            'ListOfBase KL Contact Interface BO': {
-              'Contact': {
-                'Id': option.data.form.Contact_Id,
-                'M/F': '女',
-                'Type': option.data.form.CONTACT_TYPE,
-                'Last Name': option.data.form.Contact_Name,
-                'Work Phone #': option.data.form.Work_Phone,
-                'Cellular Phone #': option.data.form.callPhone,
-                'ListOfCUT Address': {
-                  'CUT Address': [
-                    {
-                      'Id': option.data.form.AddressId,
-                      'Country': '中国',
-                      'Province': option.data.form.KL_PROVINCE,
-                      'City': option.data.form.KL_CITY,
-                      'County': option.data.form.KL_TOWN,
-                      'Street Address': option.data.form.Address
-                    }
-                  ]
-                }
-              }
-            }
+            'ListOfBase KL Contact Interface BO': ListOfBase
           }
         }
       }

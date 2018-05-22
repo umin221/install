@@ -17,7 +17,7 @@
                            :right="getSwipeBtn(index, item)">
               <mt-switch
                 v-model="switchStatus[index]"
-                @change="changeSwitch(item.isBn)">
+                @change="changeSwitch(item)">
                 {{switchStatus[index]?'保内': '保外'}}
               </mt-switch>
               <div class="TranslatedLine">
@@ -152,6 +152,7 @@ export default {
         }
       });
     }
+    me.getPrice(); // 获取价格列表
     me.switchStatus = [];
     for (let i = 0;i < me.returnSelect.length;i++) {
       if (me.isBn === '保内') {
@@ -238,7 +239,7 @@ export default {
       serviceType: '',
       productData: [],
       switchStatus: [],
-      fee: '',
+      fee: '', // 上门费
       allFee: 0,
       one: 1,
       Service: {},
@@ -276,6 +277,7 @@ export default {
     ...mapActions(NAMESPACE, ['addServiceOrder', 'getServiceR', 'getOrderDetail', 'upDateOrderStatu', 'deleteOrderEntry', 'backDone']),
     ...mapMutations(NAMESPACE, ['setIsBn', 'ProductNum', 'deleteProduct', 'initSelect', 'selectProduct', 'setA', 'setSelectBn']),
     ...mapActions('app', ['getLov', 'upload']),
+    ...mapActions('searchTrans', ['getPrice']),
     ...mapMutations('searchTrans', ['initSelected', 'deleteSelected']),
     ...mapMutations('detail', ['setPartner']),
     toDate(time) {
@@ -292,7 +294,7 @@ export default {
     getSwipeBtn(index, item) {
       return [{
         content: '删除',
-        style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
+        style: {background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px'},
         handler: () => this.deleteFn(index, item)
       }];
     },
@@ -301,16 +303,19 @@ export default {
       me.deleteProduct(index);
     },
     submit() {
+      /**
+      * 1.上传附近
+       * 2. 请求接口更新保内保外
+       * 3. 维修配件为空，则调用完成子服务请求更改状态
+       * 4.维修配件不为空，则提交创建订单 ， 则调用完成子服务请求更改状态
+       */
       let me = this;
-//      if (!me.attach.list.length) {
-//        Toast('请上传相关的维修单据');
-//        return;
-//      }
+      if (!me.attach.list.length) {
+        Toast('请上传维修记录表');
+        return;
+      }
       MessageBox.confirm('确认提交，数据一经提交不可修改。', '提示').then(action => {
-        let lineItems = [];
-        let obj = {};
-        let isBn = me.isBn === '保内' ? 'Y' : 'N';
-        if (me.returnSelect.length > 0) {
+        if (me.returnSelect.length > 0) { // 检验维修配件输入正整数
           for (let i = 0;i < me.returnSelect.length; i++) {
             if (me.returnSelect[i].num < 1) {
               Toast('维修配件请填写正确的数量');
@@ -323,87 +328,89 @@ export default {
             me.$refs.attach.getServerIds(),
             id,
             function(data) {
-              let key = !me.EntryOrdersId ? 'addServiceOrder' : 'deleteOrderEntry';
-              for (let i = 0;i < me.returnSelect.length; i++) {
-                obj = {
-                  'Id': i + 1,
-                  'Product': me.returnSelect[i].Name, // 产品编码
-                  'Quantity Requested': me.returnSelect[i].num, // 数量
-                  'KL Warranty Flag': me.returnSelect[i].isBn ? 'Y' : 'N'
-                };
-                lineItems.push(obj);
-              }
-              if (me.isBn === '保外' && me.fee) {
-                obj = {
-                  'Id': lineItems.length + 1,
-                  'Product': 'AP003', // 产品编码
-                  'Unit Price': me.fee,
-                  'KL Warranty Flag': 'N'
-                };
-                lineItems.push(obj);
-              }
-              obj = {
-                // 订单行
-                lineItems: lineItems,
-                // 订单头
-                EntryOrdersId: me.EntryOrdersId,
-                ServiceRequestId: me['Service'].Id,   // 服务请求ID
-                priceId: me.priceId,      // 价格列表ID
-                warrantyFlag: me.isBn === '保内' ? 'Y' : 'N',    // 订单头是否保内
-                contactId: me['ServiceRequest']['Contact Id'], // 联系人Id
-                assetId: me['ServiceRequest']['Asset Id'], // 资产Id
-                srNum: me['Service']['SR Number'],
-                parentId: me.ServiceRequest.Id,
-                type: me.serviceType,
-                key: key,
-                callBack: function(data) {
-                  KND.Session.set('popupVisible', 'popupVisible');
-                  me.setPartner(data);
-                  me.$router.go(-1);
-                  _upload('', true);
-                },
-                error: function() {
-                  me.getServiceR({
-                    Id: me.Service.Id,
-                    callback: function(data) {
-                      me.Service = data['SiebelMessage']['Service Request'];
-                      let EntryOrders = KND.Util.toArray(me.Service['Order Entry - Orders']);
-                      if (EntryOrders.length) {
-                        for (let i = 0;i < EntryOrders.length;i++) {
-                          if (EntryOrders[i]['Status LIC'] === 'Draft') {
-                            me.EntryOrdersId = EntryOrders[i].Id;
-                            return;
-                          }
-                        }
-                      }
-                    }
-                  });
-                }
-              };
-              console.log(obj);
-              if (me.Service['Product Warranty Flag'] !== isBn || !lineItems.length) {
-                me.upDateOrderStatu({ // 更新状态
-                  Id: me.ServiceRequest.Id,
-                  type: isBn,
-                  callback: function(data) {
-//                    if (lineItems.length) {
-//                      me[key](obj);
-//                    } else {
-                    if (key === 'deleteOrderEntry') {
-                      me[key](obj);
-                    } else {
-                      me.backDone(obj);
-                    }
-//                    }
-                  }
-                });
-              } else {
-                me[key](obj);
-              }
+            // 提交订单
+              me.submitOrder();
             });
         };
-        uploadAttach(me['Service'].Id);
+        uploadAttach(me['Service'].Id); // 上传附件
       });
+    },
+    submitOrder() {
+      var me = this;
+      let lineItems = []; // 维修配件集合
+      let obj = {}; // 维修配件对象
+      let isBn = me.isBn === '保内' ? 'Y' : 'N';  // 是否报修范围
+      let key = !me.EntryOrdersId ? 'addServiceOrder' : 'deleteOrderEntry'; // EntryOrdersId有值则删除再重新提交
+      for (let i = 0;i < me.returnSelect.length; i++) {
+        obj = {
+          'Id': i + 1,
+          'Product': me.returnSelect[i].Name, // 产品编码
+          'Quantity Requested': me.returnSelect[i].num, // 数量
+          'KL Warranty Flag': me.returnSelect[i].isBn ? 'Y' : 'N'
+        };
+        lineItems.push(obj);
+      }
+      if (isBn === 'N' && me.fee) {
+        obj = {
+          'Id': lineItems.length + 1,
+          'Product': 'AP003', // 产品编码
+          'Unit Price': me.fee,
+          'KL Warranty Flag': 'N'
+        };
+        lineItems.push(obj); // 上门费用不为空 则当成一个维修配件
+      }
+      obj = {
+        // 订单行
+        lineItems: lineItems,
+        // 订单头
+        EntryOrdersId: me.EntryOrdersId,
+        ServiceRequestId: me['Service'].Id,   // 服务请求ID
+        priceId: me.priceId,      // 价格列表ID
+        warrantyFlag: isBn,    // 订单头是否保内
+        contactId: me['ServiceRequest']['Contact Id'], // 联系人Id
+        assetId: me['ServiceRequest']['Asset Id'], // 资产Id
+        srNum: me['Service']['SR Number'],
+        parentId: me.ServiceRequest.Id,
+        type: me.serviceType,
+        key: key,
+        callBack: function(data) {
+          KND.Session.set('popupVisible', 'popupVisible');
+          me.setPartner(data);
+          me.$router.go(-1);
+          _upload('', true);
+        },
+        error: function() {
+          me.getServiceR({
+            Id: me.Service.Id,
+            callback: function(data) {
+              me.Service = data['SiebelMessage']['Service Request'];
+              let EntryOrders = KND.Util.toArray(me.Service['Order Entry - Orders']);
+              if (EntryOrders.length) {
+                for (let i = 0;i < EntryOrders.length;i++) {
+                  if (EntryOrders[i]['Status LIC'] === 'Draft') {
+                    me.EntryOrdersId = EntryOrders[i].Id;
+                    return;
+                  }
+                }
+              }
+            }
+          });
+        }
+      };
+      console.log(obj);
+      if (me.Service['Product Warranty Flag'] !== isBn) { // 根据保外包内更改保修期
+        me.upDateOrderStatu({
+          Id: me.ServiceRequest.Id,
+          type: isBn,
+          callback: function(data) {
+          }
+        });
+      }
+      if (lineItems.length || (isBn === 'N' && me.fee)) { // 维修配件不为空 || 保外金额不为空，则提交创建订单 ， 则调用完成子服务请求更改状态
+        me[key](obj);
+      } else { // 维修配件为空，则调用完成子服务请求更改状态
+        me.backDone(obj);
+      }
     },
     toTranslated() {
       this.$router.push('searchTrans');
@@ -436,8 +443,12 @@ export default {
         me.slots[0].values = ['工作时间', '其他时间'];
       }
     },
-    changeSwitch(is) {
-      console.log(is);
+    changeSwitch(item) {
+      if (item.isBn) {
+        item.isBn = false;
+      } else {
+        item.isBn = true;
+      }
     }
   },
   watch: {

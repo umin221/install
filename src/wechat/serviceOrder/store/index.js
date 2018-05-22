@@ -124,8 +124,8 @@ export default new Vuex.Store({
           {name: '联系人电话', key: 'Contact_Phone'},
           {name: '报修联系人', key: 'Contact_Name'},
           {name: '联系人类型', key: 'CONTACT_TYPE'},
-          {name: '省市', key: 'KL_PROVINCE'},
-          {name: '详细地址', key: 'Address'},
+         /* {name: '省市', key: 'KL_PROVINCE'},
+          {name: '详细地址', key: 'Address'},*/
           {name: '服务类型', key: 'SR_TYPE'},
           {name: '故障现象', key: 'SR_AREA'}
         ],
@@ -863,6 +863,14 @@ export default new Vuex.Store({
               }
             }
           });
+        },
+        getPrice({state, commit}, val) {
+          api.get({
+            key: 'getPrice',
+            success: function(data) {
+              state.priceId = data.Id;
+            }
+          });
         }
         // getProduct({state, commit}, val) {
         //   api.get({
@@ -1144,32 +1152,13 @@ export default new Vuex.Store({
               form
             },
             success: function(data) {
-              api.get({ // 提交接口
+              api.get({ // 提交完工确认单到EBS
                 key: 'toSubmitOrder',
                 data: {
                   'Object Id': data.PrimaryRowId
                 },
                 success: function(data) {
                   dispatch('backDone', form);
-                  // if (form.type === 'child') {
-                  //   api.get({
-                  //     key: 'serviceDone',
-                  //     data: {
-                  //       'Object Id': form.ServiceRequestId
-                  //     },
-                  //     success: function(data) {
-                  //       form.callBack(data);
-                  //     }
-                  //     // error: function(data) {
-                  //     //   console.log(data);
-                  //     // }
-                  //   });
-                  // } else {
-                  //   dispatch('upDateOrderStatu', {
-                  //     Id: form.parentId,
-                  //     callback: form.callBack
-                  //   });
-                  // }
                 },
                 error: function(error) {
                   let message = error.response && error.response.data.ERROR;
