@@ -388,8 +388,8 @@ let ApiList = {
     if (option.data.form.KL_PROVINCE && option.data.form.Address) { // 如果地址为空 不传参数 ListOfCutAddress
       ListOfBase = {
         'Contact': {
-          'Id': '1',
-          'M/F': '男',
+          'Id': option.data.form.Contact_Id,
+          'M/F': '女',
           'Type': option.data.form.CONTACT_TYPE,
           'Last Name': option.data.form.Contact_Name,
           'Work Phone #': option.data.form.workPhone,
@@ -398,7 +398,7 @@ let ApiList = {
           'ListOfCutAddress': {
             'CUT Address': [
               {
-                'Id': '1',
+                'Id': option.data.form.AddressId,
                 'Country': '中国',
                 'Province': option.data.form.KL_PROVINCE,
                 'City': option.data.form.KL_CITY,
@@ -412,7 +412,7 @@ let ApiList = {
     } else {
       ListOfBase = {
         'Contact': {
-          'Id': '1',
+          'Id': option.data.form.Contact_Id,
           'M/F': '男',
           'Type': option.data.form.CONTACT_TYPE,
           'Last Name': option.data.form.Contact_Name,

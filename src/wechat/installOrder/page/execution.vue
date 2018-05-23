@@ -5,21 +5,30 @@
     </mt-header>
     <div class="mint-content execution">
       <div>
+        <div class="lock-line disable">
+          <lock-line title="面板"></lock-line>
+        </div>
         <cus-field label="数量" tag="数量"
                    placeholder="请输入"
-                   v-valid.require.number
+                   v-valid.number
                    type="number"
                    v-model="batchNum"></cus-field>
         <cus-field label="发运日期" tag="发运日期"
                    @click.native="open('picker','start_Date')"
                    :value="start_Date"
-                   v-valid.require
                    is-link></cus-field>
-        <mt-checklist
-          title="类型"
-          v-model="value"
-          :options="options">
-        </mt-checklist>
+        <div class="lock-line disable">
+          <lock-line title="锁体"></lock-line>
+        </div>
+        <cus-field label="数量" tag="数量"
+                   placeholder="请输入"
+                   v-valid.number
+                   type="number"
+                   v-model="batchNum1"></cus-field>
+        <cus-field label="发运日期" tag="发运日期"
+                   @click.native="open('picker','start_Date1')"
+                   :value="start_Date1"
+                   is-link></cus-field>
       </div>
       <button-group>
         <mt-button class="single"
@@ -64,11 +73,15 @@
         start_Date: '',        // 开始时间
         startDate: '',
         batchNum: '', // 数量
+        start_Date1: '',        // 开始时间
+        startDate1: '',
+        batchNum1: '', // 数量
         sDate: today,
         item: '',
         id: '', // 记录新增后的批次ID
         type: 'add', // add 新增 / edit 编辑 / read 只读
         titleVal: '订单执行',
+        timeKey: '',
         options: [
           {
             label: '面板',
@@ -101,22 +114,39 @@
       }
     },
     methods: {
-      open(picker) {
+      open(picker, key) {
+        this.timeKey = key;
         var self = this;
         self.$refs[picker].open();
       },
       handleChange(value) {
         let me = this;
-        me.start_Date = value.format('yyyy/MM/dd');
-        me.startDate = value.format('MM/dd/yyyy'); // 后台存值格式
+        var key = me.timeKey;
+        if (key === 'start_Date') {
+          me.start_Date = value.format('yyyy/MM/dd');
+          me.startDate = value.format('MM/dd/yyyy'); // 后台存值格式
+        } else {
+          me.start_Date1 = value.format('yyyy/MM/dd');
+          me.startDate1 = value.format('MM/dd/yyyy'); // 后台存值格式
+        }
       },
       submitFn() {
         var self = this;
-        tools.valid.call(this, () => {
-          if (self.value.length > 0) {
-            var comment = self.value.join('/');
-            comment = comment + '，需求数量：' + self.batchNum + '，需求日期：' + self.start_Date;
-            console.dir(comment);
+        if (self.batchNum || self.batchNum1 || self.start_Date || self.start_Date1) {
+          var comment = '';
+          if ((self.batchNum && !self.start_Date) || (!self.batchNum && self.start_Date)) {
+            Toast('请填写面板的数量与发运日期！');
+            return;
+          } else {
+            comment += '面板，需求数量：' + self.batchNum + '，需求日期：' + self.start_Date + ';';
+          }
+          if ((self.batchNum1 && !self.start_Date1) || (!self.batchNum1 && self.start_Date1)) {
+            Toast('请填写锁体的数量与发运日期！');
+            return;
+          } else {
+            comment += '锁体，需求数量：' + self.batchNum1 + '，需求日期：' + self.start_Date1 + ';';
+          }
+          if (comment) {
             api.get({ // 提交数据
               key: 'getTaskAdd',
               method: 'POST',
@@ -137,10 +167,10 @@
                 }
               }
             });
-          } else {
-            Toast('请选择类型！');
           }
-        });
+        } else {
+          Toast('请填写面板或者锁体信息！');
+        }
       }
     },
     components: {buttonGroup, lockLine, cusField}
