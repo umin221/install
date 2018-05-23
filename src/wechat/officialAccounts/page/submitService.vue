@@ -370,6 +370,9 @@
         color: #000000;
         font-size: 20px;
       }
+      .mint-field .mint-cell-title {
+        width: 80px;
+      }
     }
     .datetime>.picker>.picker-items>.picker-slot:nth-child(5){
       display: none;

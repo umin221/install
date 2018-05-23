@@ -1,9 +1,5 @@
 <template>
   <div>
-    <mt-header fixed title="公众号">
-      <fallback slot="left"></fallback>
-    </mt-header>
-
     <div class="mint-content">
       <div class="workbench">
         <div class="co-flex co-ver co-jsa"
@@ -57,6 +53,8 @@
     methods: {
       ...mapActions(NAMESPACE, ['getContact']),
       getUrl(id) {
+        // 用户信息，每次进入前先从会话中获取用户信息
+        contact = KND.Util.parse(KND.Session.get('Contact'));
         if (!contact && validPage.indexOf(id) !== -1) {
           Toast('请先绑定手机号码');
           KND.Session.set('nextPage', id);

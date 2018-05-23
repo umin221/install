@@ -69,7 +69,7 @@ export default new Vuex.Store({
         },
         /**
          * 通过微信openid 获取联系人信息
-         * @param {Function} cb 选填 回调函数
+         * @param {Function} 选填 cb 选填 回调函数
          */
         getContact({commit}, cb) {
           let openId = KND.Util.getParam('openid');

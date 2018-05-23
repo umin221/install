@@ -35,10 +35,10 @@
   import cusVerify from '../components/cus-verify-code';
   import api from '../api/api';
 
-  const NameSpace = 'telValidate';
+  const NAMESPACE = 'telValidate';
   Vue.use(validateVp);
   export default {
-    name: NameSpace,
+    name: NAMESPACE,
     created() {
       this.openId = KND.Util.getParam('openid');
     },
@@ -50,7 +50,8 @@
       };
     },
     methods: {
-      ...mapActions(NameSpace, ['toTelValidate']),
+      ...mapActions(NAMESPACE, ['toTelValidate']),
+      ...mapActions('index', ['getContact']),
       submit() {
         let me = this;
         tools.valid.call(this, () => {
@@ -69,9 +70,11 @@
               },
               success: function(data) {
                 if (!data.ERROR) {
-                  Toast('绑定成功');
-                  let path = KND.Session.get('nextPage');
-                  me.$router.replace(path);
+                  me.getContact(contact => {
+                    Toast('绑定成功');
+                    let path = KND.Session.get('nextPage');
+                    me.$router.replace(path);
+                  });
                 }
               }
             });
@@ -91,6 +94,9 @@
     border-radius: 10px;
     border: 1px solid  black;
     color: red;
+  }
+  .mint-field .mint-cell-title {
+    width: 80px;
   }
   .mar-right>.mint-field>.mint-cell-wrapper>.mint-cell-value>input{
     margin-right: 10px;
