@@ -149,6 +149,8 @@
   }, {
     userID: '16043215', position: '门厂技术组', area: '门厂技术主管（代）', name: '胡清秀'
   }, {
+    userID: '17053018', position: '门厂技术组', area: '门厂技术工程师', name: '韦吉辉'
+  }, {
     userID: '12090020', position: 'CRM应用组', area: '主管（代）', name: '周利尔'
   }, {
     userID: '14123015', position: 'CRM应用组', area: '应用工程师', name: '薛哲'
