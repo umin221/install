@@ -45,14 +45,15 @@ class Cordova {
    * 设备准备完成回调
    */
   onDeviceReady() {
-    this.getUpdateController();
+    this.fetchUpdate();
+    this.getDevice();
     this.getAppVersion();
   };
 
   /**
    * 获取更新
    */
-  getUpdateController() {
+  fetchUpdate() {
     let me = this;
 //    upgrade mode
     let upgrade = config.upgrade;
@@ -175,12 +176,20 @@ class Cordova {
     }
   };
 
+  getDevice() {
+    this.platform = KND.Util.getDevice();
+  };
+
   /**
    * 获取当前app版本
    */
   getAppVersion() {
+    let platform = this.platform.IOS ? 'ios' : 'android';
     if (cordova) {
-      cordova.getAppVersion.getVersionNumber().then(version => this.app.version = version);
+      cordova.getAppVersion.getVersionNumber().then(version => {
+        if (version !== config[platform].version) console.log('app需要更新，请前往公众号更新');
+        this.app.version = version
+      });
     }
   };
 

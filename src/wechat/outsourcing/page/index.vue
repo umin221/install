@@ -39,7 +39,7 @@
                       :title="'合作伙伴名称:'+ item.Name"
                       @click.native="toDetailFn(item.Id)"
                      is-link>
-              <div class="mint-cell-sub-title" slot="title">合作伙伴负责人: {{item['KL Partner Owner Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">负责人: {{item['KL Partner Owner Name']}}</div>
               <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Main Phone Number']}}</div>
             </cus-cell>
           </cus-loadmore>
@@ -117,7 +117,7 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['navs', 'pending', 'valid', 'invalid', 'isManager']),
+      ...mapState(NAMESPACE, ['navs', 'pending', 'valid', 'invalid', 'reject', 'isManager']),
       rows() {
         let type = this.selected;
         return this[type];

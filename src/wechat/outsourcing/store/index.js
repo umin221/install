@@ -6,7 +6,7 @@ import { app } from 'public/store';
 Vue.use(Vuex);
 
 // 缓存页面
-app.state.alive = ['index'];
+app.state.alive = ['index', 'detail'];
 
 // 每页加载条数
 const PAGESIZE = config.pageSize;
@@ -30,6 +30,8 @@ export default new Vuex.Store({
         valid: [],
         // 失效
         invalid: [],
+//        已驳回
+        reject: [],
         // 搜索结果
         result: []
       },
@@ -141,27 +143,33 @@ export default new Vuex.Store({
         addPartner({state}, success) {
           success = success || (data => console.log(data));
           let partner = state.form;
-          let select = this.state.engineer.select;
           // Alias 为必填，默认填入 Name
           partner.Alias = partner.Alias || partner.Name;
-          // 失效编辑状态修改
-          // if (partner.state === '失效') {
-          //  partner.state = '待审批';
-          // };
-          // 添加委外负责人
-          if (select) {
-            partner['ListOfChannel Partner_Position'] = {
-              'Channel Partner_Position': {
-                'Position Id': select['Primary Position Id'],
-                'IsPrimaryMVG': 'Y'
-              }
-            };
-          };
           api.get({
             key: 'submitPartner',
             data: partner,
+            primary: this.state.engineer.select,
             success: success
           });
+        },
+        /**
+         * 更新委外团队信息
+         * @param {Object} setting 必填 请求参数配置
+         */
+        updateSyn({state}, setting) {
+          let partner = state.form;
+          delete partner['Channel Partner_Position'];
+          delete partner['User'];
+          // 更新信息
+          api.get(Object.extend(true, {
+            key: 'updateSyn',
+            data: partner,
+            success: data => {
+              tools.success(data, {
+                successTips: '更新成功'
+              });
+            }
+          }, setting));
         },
         /**
          * 删除委外联系人
@@ -193,51 +201,6 @@ export default new Vuex.Store({
             }
           });
 
-        },
-        /**
-         * 更新委外团队信息
-         * @param {Object} setting 必填 请求参数配置
-         */
-        updateSyn({state}, setting) {
-          let partner = state.form;
-          let partnerPosition = KND.Util.toArray(partner['Channel Partner_Position']);
-          // 更新委外负责人
-          let select = this.state.engineer.select;
-          if (select) {
-            // 添加选择的负责人
-            let arr = [{
-              'Position Id': select['Primary Position Id'],
-              'IsPrimaryMVG': 'Y'
-            }];
-            // 添加创建人，不添加创建人会看不到这个团队信息
-            for (let i in partnerPosition) {
-              let pos = partnerPosition[i];
-              if (partner['KL Partner Owner Name'].indexOf(pos['Last Name']) !== -1) {
-                arr.push({
-                  'Position Id': pos['Position Id'],
-                  'IsPrimaryMVG': 'N'
-                });
-                break;
-              }
-            };
-            // 委外负责人&创建人
-            partner['ListOfChannel Partner_Position'] = {
-              'Channel Partner_Position': arr
-            };
-          } else {
-            delete partner['Channel Partner_Position'];
-          }
-          delete partner['User'];
-          // 更新信息
-          api.get(Object.extend(true, {
-            key: 'updateSyn',
-            data: partner,
-            success: data => {
-              tools.success(data, {
-                successTips: '更新成功'
-              });
-            }
-          }, setting));
         },
         /**
          * 批量上传附件

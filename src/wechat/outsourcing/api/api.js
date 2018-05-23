@@ -28,13 +28,19 @@ let apiList = {
    * @returns {{method: string, url: string}}
    */
   queryPartners: option => {
-    let name = option.data.Name;
-    let arr = [];
+    let condition = option.data;
+    let name = condition.Name;
+    let status = condition['KL Partner Status'];
+    // 只查询委外厂商
+    let arr = ['[Channel Partner.KL Partner Type] = "Outsourcing Manufacturer"'];
     if (name) {
+      // 搜索界面按名字搜索
       arr.push('[Channel Partner.Name] LIKE "*' + name + '*"');
-      delete option.data.Name;
+      delete condition.Name;
     };
-    let spec = KND.Util.condition(option.data, 'Channel Partner');
+    // 多状态处理
+    condition['KL Partner Status'] = status.split(',');
+    let spec = KND.Util.condition2D(condition, 'Channel Partner', ' OR ');
     if (spec) arr.push(spec);
 
     return {
@@ -109,11 +115,44 @@ let apiList = {
    */
   submitPartner: option => {
     let partner = option.data;
+//    负责人
+    let primary = option.primary;
+//    协作团队，编辑时包含，创建人，负责人，安装支持专员
+    let partnerPosition = KND.Util.toArray(partner['Channel Partner_Position']);
+//    协作团队
+    let arr = [];
+//    默认类型
     partner['KL Partner Type'] = '委外厂商';
+//    省市区地址
     partner['ListOfCUT Address'] = {
       'CUT Address': partner['CUT Address']
     };
+
+//    添加负责人
+    if (primary) {
+      arr.push({
+        'Position Id': primary['Primary Position Id'],
+        'IsPrimaryMVG': 'Y'
+      });
+//    编辑时包含，创建人，负责人，安装支持专员；添加除负责人以外的人员
+      for (let i in partnerPosition) {
+        let pos = partnerPosition[i];
+        if (pos.IsPrimaryMVG === 'N') {
+          arr.push({
+            'Position Id': pos['Position Id'],
+            'IsPrimaryMVG': 'N'
+          });
+        }
+      };
+//      更新协作团队
+      partner['ListOfChannel Partner_Position'] = {
+        'Channel Partner_Position': arr
+      };
+    };
+
     delete partner['CUT Address'];
+    delete partner['Channel Partner_Position'];
+
     return {
       method: 'post',
       url: 'service/Workflow Process Manager/RunProcess/',

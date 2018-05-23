@@ -4,12 +4,13 @@
 config.mapp = {
   'manager': {
     'pending': {status: 'Approval Pending', label: '待审批'},
-    'valid': {status: 'Active', label: '已生效'}
-    // 'invalid': {status: 'Inactive', label: '已失效'}
+    'valid': {status: 'Active', label: '已生效'},
+    'reject': {status: 'Rejected', label: '已驳回'}
   },
   'employee': {
     'pending': {status: 'Approval Pending', label: '待审批'},
-    'valid': {status: 'Active', label: '已生效'}
+    'valid': {status: 'Active', label: '已生效'},
+    'reject': {status: 'Rejected', label: '已驳回'}
   },
   'option': {  // 委外 lov 下拉值列表
     'KL Partner Credentials Type': [], // 证件类型

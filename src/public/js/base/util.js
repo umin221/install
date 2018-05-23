@@ -218,7 +218,7 @@
           }
         }
       }
-      return arr.join(join);
+      return `(${arr.join(join)})`;
     };
 
     /**

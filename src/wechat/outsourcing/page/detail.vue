@@ -4,10 +4,10 @@
     <!--header-->
     <mt-header fixed :title="title">
       <fallback slot="left"></fallback>
-      <!--<mt-button v-show="read && isValid" slot="right"-->
-                 <!--@click="type = 'edit'">编辑</mt-button>-->
-      <mt-button v-show="!read && isValid" slot="right"
-                 @click="updateFn">完成</mt-button>
+      <mt-button v-show="read && isReject" slot="right"
+                 @click="type = 'edit'">编辑</mt-button>
+      <!--<mt-button v-show="!read && isReject" slot="right"-->
+                 <!--@click="updateFn">完成</mt-button>-->
     </mt-header>
 
     <!--create detail edit-->
@@ -71,19 +71,21 @@
 
       <!--pending -->
       <div class="records"
-           v-show="state === 'pending'">
+           v-show="isPending || isReject">
         <title-group>审批记录</title-group>
         <empty v-show="!records"></empty>
         <mt-cell class="multiple"
                        v-for="item in records"
                        :key="item.state">
           <div class="mint-cell-title" slot="title">审批人：{{item['Task Owner Full Name']}}</div>
+          <div class="mint-cell-sub-title" slot="title">审批状态：{{item['Action']}}</div>
+          <div class="mint-cell-sub-title" slot="title">审批意见：{{item['KL Request Description']}}</div>
           <div class="mint-cell-sub-title" slot="title">{{new Date(item['Created']).format('yyyy-MM-dd hh:mm')}}</div>
         </mt-cell>
       </div>
 
       <!--valid invalid && read-->
-      <div v-show="read && state !== 'pending'">
+      <div v-show="read && isValid">
         <title-group>联系人列表</title-group>
         <empty v-show="!form.User || !form.User.length"></empty>
         <mt-cell class="multiple"
@@ -106,14 +108,12 @@
       </div>
 
       <!--buttons-->
-      <button-group>
-        <mt-button v-show="isSubmit"
+      <button-group v-if="!disableSubmit">
+        <mt-button v-show="isSubmit || (!read && isReject)"
                    @click.native="submitFn">提交</mt-button>
         <mt-button v-show="isValid"
                    v-text="read ? '新增联系人' : '失效'"
                    @click.native="multipleFn"></mt-button>
-        <mt-button v-show="read && state === 'invalid'"
-                   @click="type = 'edit'">重新启用</mt-button>
       </button-group>
     </div>
 
@@ -177,7 +177,7 @@
     name: NAMESPACE,
     components: {titleGroup, cusField, cusCity, menuBox},
     // 初始化
-    created() {
+    activated() {
       let me = this;
       let param = me.$route.query;
 
@@ -185,10 +185,11 @@
       me.type = param.type;
       // 选择&&参数只读时，处于页面编辑状态
       if (this.select && param.type === 'read') me.type = 'edit';
+      if (me.form.Name) return;
       // 获取详情
       if (param.id) {
         me.findPartnerById(param.id);
-        // 已生效不抓去审批流程
+        // 已生效不抓取审批流程
         if (!this.isValid) {
           me.queryApprovalList({
             data: {id: param.id},
@@ -242,7 +243,10 @@
         ],
         showBox: false,
         lovType: '',
-        records: '' // 审批记录
+//        审批记录
+        records: '',
+//        禁用提交
+        disableSubmit: false
       };
     },
     computed: {
@@ -256,6 +260,14 @@
       // 已生效
       isValid() {
         return this.state === 'valid';
+      },
+//      待审批
+      isPending() {
+        return this.state === 'pending';
+      },
+//      已驳回
+      isReject() {
+        return this.state === 'reject';
       },
       // 提交按钮
       isSubmit() {
@@ -288,7 +300,8 @@
       },
       // Check whether the name is repeated
       checkNameExistFn(val) {
-        this.findPartner({
+        let me = this;
+        me.findPartner({
           data: {
             Name: val
           },
@@ -298,10 +311,12 @@
             if (data.items) {
               console.log(data);
               Toast('伙伴名称已存在');
+              me.disableSubmit = true;
             }
           },
           error: error => {
             console.log(error);
+            me.disableSubmit = false;
           }
         });
       },
@@ -355,45 +370,6 @@
               uploadAttach(data['Object Id']);
             });
           }
-        });
-      },
-      // Partner update
-      updateFn() {
-        let me = this;
-        tools.valid.call(me, () => {
-          me.updateSyn({
-            success: data => {
-              let tasks = [
-                // 上传资质文件
-                new Promise((resolve, reject) => {
-                  _upload.call(me, {
-                    MediaId: me.$refs.qualified.getServerIds(), Comment: '资质文件', Id: data.PrimaryRowId
-                  }, resolve);
-                }),
-                // 上传合同文件
-                new Promise((resolve, reject) => {
-                  _upload.call(me, {
-                    MediaId: me.$refs.contract.getServerIds(), Comment: '合同文件', Id: data.PrimaryRowId
-                  }, resolve);
-                })
-              ];
-              // 启动上传任务
-              Promise.all(tasks).then(result => {
-                // 成功回调
-                tools.success(result, {
-                  back: true,
-                  successTips: '提交成功'
-                });
-                // 标记列表刷新
-                KND.Session.set('refresh', 'pending,valid');
-              }).catch(err => {
-                Toast('附件上传失败');
-                console.error(err);
-              });
-              // 标记列表刷新
-              KND.Session.set('refresh', 'valid');
-            }
-          });
         });
       },
       // To contact or fail out partner
