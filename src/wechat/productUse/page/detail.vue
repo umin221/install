@@ -120,7 +120,7 @@
                 'InboxItemId': me.InboxItemId,
                 'InboxTaskId': me.InboxTaskId,
                 'ActionLIC': type,
-                'RequestDesc': '',
+                'KL Request Description': '',
                 'ProcessName': 'KL Sparts Order Approval Action Main Workflow'
               }
             },
@@ -151,10 +151,10 @@
                 data: {
                   'body': {
                     'Object Id': me.id,
-                    'InboxItemId': '1-2BSRCRZL',
-                    'InboxTaskId': '1-2BSRCRZM',
+                    'InboxItemId': me.InboxItemId,
+                    'InboxTaskId': me.InboxTaskId,
                     'ActionLIC': type,
-                    'RequestDesc': value,
+                    'KL Request Description': value,
                     'ProcessName': 'KL Sparts Order Approval Action Main Workflow'
                   }
                 },

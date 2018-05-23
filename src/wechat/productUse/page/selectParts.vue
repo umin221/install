@@ -36,6 +36,7 @@
                       @click.native="select(item2.Id, index, item.Id)">
               <div class="mint-cell-sub-title" slot="title">配件代码: {{item4.Name}}</div>
               <div class="mint-cell-sub-title" slot="title">价格:{{item4["List Price"]}} </div>
+              <div class="mint-cell-sub-title" slot="title">配件描述:{{item4["KL Translated Description"]}} </div>
               <div v-show="item4.select" class="selectIcon" slot="title">
                 <i class="xs-icon icon-select"></i>
               </div>
@@ -59,6 +60,7 @@
                         @click.native="select(item3.Id, index, item.Id)">
                 <div class="mint-cell-sub-title" slot="title">配件代码: {{item4.Name}}</div>
                 <div class="mint-cell-sub-title" slot="title">价格:{{item4["List Price"]}} </div>
+                <div class="mint-cell-sub-title" slot="title">配件描述:{{item4["KL Translated Description"]}} </div>
                 <div v-show="item4.select" class="selectIcon" slot="title">
                   <i class="xs-icon icon-select"></i>
                 </div>

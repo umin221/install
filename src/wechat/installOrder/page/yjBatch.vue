@@ -299,86 +299,90 @@
             return;
           }
         }
-        var newDate = new Date().format('MM/dd/yyyy hh:mm:ss');
-        var assetsList = [];
-        var assetsObj = self.assetsObj;
-        console.dir(assetsObj);
-        for (let i in assetsObj) {
-          var obj = {};
-          obj.Id = assetsObj[i].Id;
-          obj['KL Transfer Activity Id'] = self.itemTask.Id;
-          obj['Install Date'] = newDate;
-          assetsList.push(obj);
-        }
-        console.dir('0==========');
-        console.dir(assetsList);
-        api.get({ // 更新工程真锁移交
-          key: 'setUpyj',
-          method: 'POST',
-          data: {
-            'body': {
-              'ContactId': self.Contact_Id,
-              'ContactName': self.Contact_Name,
-              'CellPhone': self.CellPhone,
-              'WorkPhone': self.WorkPhone,
-              'Amount': self.assetsLeng,
-              'ProcessName': 'KL Install Order Asset Lock Transfer Process',
-              'SiebelMessage': {
-                'MessageId': '',
-                'MessageType': 'Integration Object',
-                'IntObjectName': 'KL Install Order',
-                'IntObjectFormat': 'Siebel Hierarchical',
-                'ListOfKL Install Order': {
-                  'Order Entry - Orders': {
-                    'Id': self.itemTask['Order Id'], // 订单ID
-                    'ListOfKL Install Order Asset': {
-                      'KL Install Order Asset': assetsList
+        if (self.attach.list.length > 0) {
+          var newDate = new Date().format('MM/dd/yyyy hh:mm:ss');
+          var assetsList = [];
+          var assetsObj = self.assetsObj;
+          console.dir(assetsObj);
+          for (let i in assetsObj) {
+            var obj = {};
+            obj.Id = assetsObj[i].Id;
+            obj['KL Transfer Activity Id'] = self.itemTask.Id;
+            obj['Install Date'] = newDate;
+            assetsList.push(obj);
+          }
+          console.dir('0==========');
+          console.dir(assetsList);
+          api.get({ // 更新工程真锁移交
+            key: 'setUpyj',
+            method: 'POST',
+            data: {
+              'body': {
+                'ContactId': self.Contact_Id,
+                'ContactName': self.Contact_Name,
+                'CellPhone': self.CellPhone,
+                'WorkPhone': self.WorkPhone,
+                'Amount': self.assetsLeng,
+                'ProcessName': 'KL Install Order Asset Lock Transfer Process',
+                'SiebelMessage': {
+                  'MessageId': '',
+                  'MessageType': 'Integration Object',
+                  'IntObjectName': 'KL Install Order',
+                  'IntObjectFormat': 'Siebel Hierarchical',
+                  'ListOfKL Install Order': {
+                    'Order Entry - Orders': {
+                      'Id': self.itemTask['Order Id'], // 订单ID
+                      'ListOfKL Install Order Asset': {
+                        'KL Install Order Asset': assetsList
+                      }
                     }
                   }
                 }
               }
-            }
-          },
-          success: function(data) {
-            if (!data.ERROR) {
-              // 提交图片
-              let uploadAttach = id => {
-                _upload.call(self, self.$refs.attach.getServerIds(), id);
-              };
-              if (self.attach.list.length > 0) {
-                uploadAttach(self.itemTask.Id);
-              }
-              // 更新状态
-              var Status = '';
-              self.getLov({ // 取类型值
-                data: {
-                  'Type': 'EVENT_STATUS',
-                  'Name': 'In Progress'
-                },
-                success: data => {
-                  Status = KND.Util.toArray(data.items)[0].Value;
-                  var parma = {};
-                  parma.Status = Status;
-                  parma.Id = self.itemTask.Id;
-                  api.get({ // 提交数据
-                    key: 'getUPData',
-                    method: 'PUT',
-                    data: parma,
-                    success: function(data) {
-                      if (!data.ERROR) {
-                        Toast('提交成功');
-                        // 标记楼栋资产刷新
-                        KND.Session.set('refreshAssets', true);
-                        self.$router.go(-2);
-                      }
-                    }
-                  });
+            },
+            success: function(data) {
+              if (!data.ERROR) {
+                // 提交图片
+                let uploadAttach = id => {
+                  _upload.call(self, self.$refs.attach.getServerIds(), id);
+                };
+                if (self.attach.list.length > 0) {
+                  uploadAttach(self.itemTask.Id);
                 }
-              });
-            }
+                // 更新状态
+                var Status = '';
+                self.getLov({ // 取类型值
+                  data: {
+                    'Type': 'EVENT_STATUS',
+                    'Name': 'In Progress'
+                  },
+                  success: data => {
+                    Status = KND.Util.toArray(data.items)[0].Value;
+                    var parma = {};
+                    parma.Status = Status;
+                    parma.Id = self.itemTask.Id;
+                    api.get({ // 提交数据
+                      key: 'getUPData',
+                      method: 'PUT',
+                      data: parma,
+                      success: function(data) {
+                        if (!data.ERROR) {
+                          Toast('提交成功');
+                          // 标记楼栋资产刷新
+                          KND.Session.set('refreshAssets', true);
+                          self.$router.go(-2);
+                        }
+                      }
+                    });
+                  }
+                });
+              }
 
-          }
-        });
+            }
+          });
+        } else {
+          Toast('请上传附件，附件不能为空！');
+        }
       }
     },
     components: {buttonGroup}

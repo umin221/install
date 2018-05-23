@@ -126,7 +126,7 @@
                 'InboxItemId': me.InboxItemId,
                 'InboxTaskId': me.InboxTaskId,
                 'ActionLIC': type,
-                'RequestDesc': '',
+                'KL Request Description': '',
                 'ProcessName': 'KL Sparts Order Approval Action Main Workflow'
               }
             },
@@ -161,7 +161,7 @@
                     'InboxItemId': me.InboxItemId,
                     'InboxTaskId': me.InboxTaskId,
                     'ActionLIC': type,
-                    'RequestDesc': value,
+                    'KL Request Description': value,
                     'ProcessName': 'KL Sparts Order Approval Action Main Workflow'
                   }
                 },

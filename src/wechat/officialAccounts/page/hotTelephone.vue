@@ -2,10 +2,10 @@
   <div style="background-color: #ebebeb;">
     <div class="mint-content">
       <div class="hotTelephone" @click="call=true">400-931-9898</div>
-      <div class="callExplain">
+      <!--<div class="callExplain">
         <span>技术热线支持：</span>
         <span>7x24小时</span>
-      </div>
+      </div>-->
       <cus-call number="400-931-9898" v-model="call"></cus-call>
     </div>
   </div>

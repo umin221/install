@@ -11,13 +11,14 @@
                     :topStatus="topStatus">
         <cus-cell class="multiple"
                   :key="item.id"
-                  :title="'配件型号:'+ item['KL Prod Model No']"
-                  @click.native="toDetailFn(item)"
+                  :title="'配件代码:'+ item['Product Name']"
+                  @click.native="toDetailFn(item['Inventory Location ID'],item['Product ID'])"
                   v-for="item in result">
-          <div slot="after" style="color: #A2BBFC">{{item.Type}}</div>
+          <div slot="after" style="color: #0772c1">{{item.Type}}</div>
           <div class="mint-cell-sub-title" slot="title">配件名称：{{item['KL Product Name Join']}}</div>
+          <div class="mint-cell-sub-title" slot="title">配件型号: {{item['KL Prod Model No']}}</div>
           <div class="mint-cell-sub-title" slot="title">库存量：{{item['KL Inventory Qty']}}</div>
-          <div class="mint-cell-sub-title" slot="title">负责人：{{item['KL Primary Employee Full Name']}}</div>
+          <div class="mint-cell-sub-title" slot="title">配件描述：{{item['KL Product Description']}}</div>
         </cus-cell>
       </cus-loadmore>
 
@@ -37,6 +38,8 @@
     let name = me.value;
     let param = {
       data: {
+        'Product Name': '*' + name + '*',
+        'KL Prod Model No': '*' + name + '*',
         'KL Product Name Join': '*' + name + '*',
         'KL Primary Employee Full Name': '*' + name + '*'
       },
@@ -75,11 +78,20 @@
        * To detail
        * @param {Object} item 行内容
        */
-      toDetailFn(item) {
+      /* toDetailFn(item) {
         this.$router.push({
           name: 'detail',
           query: {
             id: item.Id
+          }
+        });
+      },*/
+      toDetailFn(InvId, ProductId) {
+        this.$router.push({
+          name: 'detail',
+          query: {
+            InvID: InvId,
+            ProductId: ProductId
           }
         });
       },
