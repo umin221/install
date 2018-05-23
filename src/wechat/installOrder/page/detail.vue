@@ -1013,6 +1013,7 @@
               success: function(data) {
                 if (!data.ERROR) {
                   Toast('关闭成功');
+                  self.detail();
                 }
               }
             });
