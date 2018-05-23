@@ -11,7 +11,8 @@
           <div class="mt-Detail-title"><span class="name">申请单：</span><span class="val">{{orderEntry['Order Number']}}</span></div>
           <div class="mt-Detail-title"><span class="name">申请领用人：</span><span class="val">{{orderEntry['KL Primary Owner']}}</span></div>
           <div class="mt-Detail-title"><span class="name">工程替代锁所属项目：</span><span class="val">{{orderEntry['KL Install Order Opty Name']}}</span></div>
-          <div class="mt-Detail-title"><span class="name">申请领用时间：</span><span class="val">{{orderEntry['Order Date']}}</span></div>
+          <div class="mt-Detail-title"><span class="name">WMS订单编号：</span><span class="val">{{orderEntry['KL WMS Order Number']}}</span></div>
+          <div class="mt-Detail-title"><span class="name">申请领用时间：</span><span class="val">{{toDate(orderEntry['Order Date'])}}</span></div>
           <div class="mt-Detail-title"><span class="name">领用说明：</span><span class="val">{{orderEntry['Description']}}</span></div>
           <div class="mt-Detail-title"><span class="name">状态：</span><span class="val" style="color: #0772c1;">{{orderEntry['Status']}}</span></div>
         </div>
@@ -94,6 +95,13 @@
     methods: {
       ...mapActions(NameSpace, ['getOrderEntry']),
       ...mapActions('add', ['toApproval']),
+      toDate(time) {
+        if (time) {
+          return KND.Util.format(time, 'yyyy-MM-dd hh:mm:ss');
+        } else {
+          return '';
+        }
+      },
       toApprovalsave() {
         let me = this;
         console.log(me.orderEntry.Id);

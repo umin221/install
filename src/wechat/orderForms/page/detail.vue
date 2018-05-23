@@ -7,16 +7,28 @@
 
       <div class="mint-content orderForms">
         <div class="detail-title">
-          <div class="mt-Detail-title">维修订单号：{{orderDatail['Order Number']}}</div>
-          <div class="mt-Detail-title">服务订单号：{{orderDatail['Service Request Number']}}</div>
-          <div class="mt-Detail-title">负责人：{{orderDatail['KL Primary Owner']}}</div>
-          <div class="mt-Detail-title">保修期：{{orderDatail['KL Warranty Flag']}}</div>
+          <div class="mt-Detail-title"><span class="name">维修订单号：</span><span class="val">{{orderDatail['Order Number']}}</span></div>
+          <div class="mt-Detail-title"><span class="name">服务订单号：</span><span class="val">{{orderDatail['Service Request Number']}}</span></div>
+          <div class="mt-Detail-title"><span class="name">EBS订单编号：</span><span class="val">{{orderDatail['Back Office Order Number']}}</span></div>
+          <div class="mt-Detail-title"><span class="name">WMS订单编号：</span><span class="val">{{orderDatail['KL WMS Order Number']}}</span></div>
+          <div class="mt-Detail-title"><span class="name">负责人：</span><span class="val">{{orderDatail['KL Primary Owner']}}</span></div>
+          <div class="mt-Detail-title"><span class="name">保修期：</span><span class="val">{{orderDatail['KL Warranty Flag']}}</span></div>
         </div>
-        <div class="detail-content" v-for="(item, index) in lineItems" :key="index">
+       <!-- <div class="detail-content" v-for="(item, index) in lineItems" :key="index">
           <div class="mt-Detail-title">产品名称：{{item['KL Product Name Join']}}</div>
           <div class="mt-Detail-title">型号：{{item['KL Product Model Join']}}</div>
           <div class="mt-Detail-title">单价：CNY {{item['Adjusted List Price - Display']}} x {{item['Quantity Requested']}}</div>
           <div class="mt-Detail-title">订单总额：CNY {{item['NRC CxTotal']}}</div>
+        </div>-->
+        <div class="detail-content">
+          <div class="item"
+               v-for="(item, index) in lineItems"
+               :key="index">
+            <div class="mt-Detail-title">产品名称：{{item['KL Product Name Join']}}</div>
+            <div class="mt-Detail-title">型号：{{item['KL Product Model Join']}}</div>
+            <div class="mt-Detail-title">单价：CNY {{item['Adjusted List Price - Display']}} x {{item['Quantity Requested']}}</div>
+            <div class="mt-Detail-title">订单总额：CNY {{item['NRC CxTotal']}}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -48,17 +60,30 @@
 <style lang="scss">
   .orderForms{
     .detail-title{
-      font-size: $font-size-large;
-      line-height: 2rem;
       background-color: #ffffff;
-      padding: 1rem;
+      padding: 10px;
+      font-size: .75rem;
+      line-height: 1.75rem;
+      .mt-Detail-title{
+        display: flex;
+        .name {
+          color: #888;
+          display: inline-block;
+        }
+        .val {
+          word-break: break-all;
+        }
+      }
     }
     .detail-content{
-      margin-top: 1rem;
+      margin-top: 10px;
       background-color: #ffffff;
-      padding: 1rem;
-      font-size: $font-size-large;
-      line-height: 2rem;
+      padding: 10px;
+      .item {
+        font-size: .75rem;
+        line-height: 1.75rem;
+        background-image: linear-gradient(0deg, #d9d9d9, #d9d9d9 1%, transparent 0%);
+      }
     }
   }
 

@@ -101,9 +101,18 @@ let apiList = {
     };
     // 产品价格
   },
+  deleteLine: option => {
+    return {
+      method: 'DELETE',
+      url: 'data/Order Entry/Order Entry - Orders/' + option.data.obj.headerId + '/Order Entry - Line Items/' + option.data.obj.lineId,
+      data: {
+        'body': {}
+      }
+    };
+  },
   addServiceOrder: option => {
     let data = {
-      'Id': '1',
+      'Id': option.data.form.Id,
       'Order Type': '备件领料',
       'Description': option.data.form.Description,
       'ListOfOrderEntry-LineItems': {

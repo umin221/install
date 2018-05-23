@@ -8,8 +8,8 @@
         </mt-button>
       </router-link>
     </cus-header>
-    <div class="mint-content indexService">
-      <loadmore ref="pending"
+    <div class="mint-content">
+      <!--<loadmore ref="pending"
                 @loadTop="pendingLoadTop"
                 @loadBottom="pendingLoadBottom"
                 :param="isTeam"
@@ -21,17 +21,39 @@
           class="multiple"
            @click.native="toDateil(item['Order Number'])" is-link>
           <div class="mint-cell-sub-title" slot="title">维修订单号： {{item['Order Number']}}</div>
+          <div class="mint-cell-sub-title" slot="title">EBS订单编号: {{item['Back Office Order Number']}}</div>
+          <div class="mint-cell-sub-title" slot="title">WMS订单编号: {{item['KL WMS Order Number']}}</div>
           <div class="mint-cell-sub-title" slot="title">订单总额： ￥{{item['Order Total']}}</div>
         </cus-cell>
-      </loadmore>
+      </loadmore>-->
+      <mt-tab-container-item>
+        <loadmore ref="pending"
+                  :allLoaded="true"
+                  @loadTop="loadTopFn"
+                  :topStatus="topStatus"
+                  @loadBottom="loadBottomFn"
+                  :param="{status:'待处理', list:'pending'}">
+          <cus-cell
+            class="multiple border-bottom"
+            :title="'维修订单号'+ item['Order Number']"
+            v-for="(item,index) in orderEntry"
+            @click.native="toDateil(item['Order Number'])"
+            :key="index"
+            is-link>
+            <div class="mint-cell-sub-title" slot="title">EBS订单编号: {{item['Back Office Order Number']}}</div>
+            <div class="mint-cell-sub-title" slot="title">WMS订单编号: {{item['KL WMS Order Number']}}</div>
+            <div class="mint-cell-sub-title" slot="title">订单总额： ￥{{item['Order Total']}}</div>
+          </cus-cell>
+        </loadmore>
+      </mt-tab-container-item>
     </div>
   </div>
 </template>
 <script type="application/javascript">
   import {mapState, mapActions, mapMutations} from 'vuex';
-  import loadmore from 'public/components/cus-loadmore';
   import cusHeader from 'public/components/cus-header';
-  import cusCell from '../components/order-cell';
+  import loadmore from 'public/components/cus-loadmore';
+  import cusCell from 'public/components/cus-cell';
   //
   let userName = '';
   let loader = function(...args) {
@@ -82,6 +104,21 @@
             type: name
           }
         });
+      },
+      loadTopFn(param) {
+        loader.call(this, {
+          data: {
+            'Status': param.status
+          }
+        }, param.list, 'onTopLoaded');
+      }, // 底部加载
+      loadBottomFn(param) {
+        loader.call(this, {
+          data: {
+            'Status': param.status
+          },
+          more: true
+        }, param.list, 'onBottomLoaded');
       },
       pendingLoadTop(param) {
         loader.call(this, {

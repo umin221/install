@@ -31,6 +31,7 @@
               :key="index"
               is-link>
               <div class="mint-cell-sub-title" slot="title">领用人: {{item['KL Primary Owner']}}</div>
+              <div class="mint-cell-sub-title" slot="title">WMS订单编号: {{item['KL WMS Order Number']}}</div>
               <div class="mint-cell-sub-title" slot="title">申请领用日期: {{item['Order Date']}}</div>
             </cus-cell>
           </loadmore>
@@ -50,6 +51,7 @@
               :key="index"
               is-link>
               <div class="mint-cell-sub-title" slot="title">领用人: {{item['KL Primary Owner']}}</div>
+              <div class="mint-cell-sub-title" slot="title">WMS订单编号: {{item['KL WMS Order Number']}}</div>
               <div class="mint-cell-sub-title" slot="title">申请领用日期: {{item['Order Date']}}</div>
             </cus-cell>
           </loadmore>
@@ -69,6 +71,7 @@
               :key="index"
               is-link>
             <div class="mint-cell-sub-title" slot="title">退入人: {{item['KL Primary Owner']}}</div>
+              <div class="mint-cell-sub-title" slot="title">WMS订单编号: {{item['KL WMS Order Number']}}</div>
               <div class="mint-cell-sub-title" slot="title">申请退入日期: {{item['Order Date']}}</div>
             </cus-cell>
           </loadmore>
