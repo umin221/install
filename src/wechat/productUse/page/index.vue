@@ -126,7 +126,8 @@
       ...mapActions(NameSpace, ['getList']),
       ...mapActions('app', ['getLov']),
       ...mapMutations(NameSpace, ['setManager']),
-      ...mapMutations('add', ['initSelect']),
+      ...mapMutations('add', ['initSelect', 'setId']),
+
       toDate(time) {
         if (time) {
           return KND.Util.format(time, 'yyyy-MM-dd hh:mm:ss');
@@ -143,6 +144,7 @@
         });
       },
       toAdd() {
+        this.setId('');
         this.initSelect();
         this.$router.push('add');
       },

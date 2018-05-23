@@ -89,17 +89,25 @@ export default {
   },
   created() {
     let me = this;
+    let query = me.$route.query;
+    if (query.id && !me.id) {
+      console.log(query);
+      me.setId(query.id);
+      me.Description = query.Description;
+    } else {
+      me.Description = KND.Session.get('DescriptionUse') || '';
+      KND.Session.remove('DescriptionUse');
+    }
     me.isProjected();
-    me.Description = KND.Session.get('DescriptionBack') || '';
-    KND.Session.remove('DescriptionBack');
+    console.dir(me.partList);
   },
   computed: {
-    ...mapState(NAMESPACE, ['partList', 'project', 'descript']),
+    ...mapState(NAMESPACE, ['partList', 'project', 'descript', 'id']),
     ...mapState('selectParts', ['selected'])
   },
   methods: {
     ...mapActions(NAMESPACE, ['setPartList', 'setProject', 'setTime', 'setDescript', 'setpartNum', 'deletePart', 'addServiceOrder']),
-    ...mapMutations(NAMESPACE, ['initSelect']),
+    ...mapMutations(NAMESPACE, ['initSelect', 'setId']),
     /*
     * 左滑 删除
     * */
@@ -169,8 +177,14 @@ export default {
             Toast('请填写正确的数量');
             return;
           }
+          var partListId = '';
+          if (me.id && me.partList[i].lineId) { // 编辑并且有行ID
+            partListId = me.partList[i].lineId;
+          } else {
+            partListId = i + 1;
+          }
           obj = {
-            'Id': i + 1,
+            'Id': partListId,
             'Product': me.partList[i]['Product Name'], // 产品编码
             'Quantity Requested': me.partList[i].num // 数量
           };

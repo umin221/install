@@ -34,15 +34,15 @@
         <mt-button class="single"
                    @click.native="submitFn('Approved')">确认</mt-button>
       </button-group>
-      <!--<button-group v-if="(orderEntry['Status LIC'] === 'Draft'||orderEntry['Status LIC'] === 'Rejected')&&option !== 'approval'">-->
-        <!--<mt-button class="single"-->
-                   <!--@click.native="submitApproval">提交</mt-button>-->
-      <!--</button-group>-->
+      <button-group v-if="(orderEntry['Status LIC'] === 'Draft' || orderEntry['Status LIC'] === 'Rejected') && option !== 'approval'">
+        <mt-button class="single"
+                   @click.native="submitApproval">编辑</mt-button>
+      </button-group>
     </div>
   </div>
 </template>
 <script>
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import { Toast } from 'mint-ui';
   import api from '../api/api';
   let userInfo = {};
@@ -95,6 +95,7 @@
     methods: {
       ...mapActions(NameSpace, ['getOrderEntry']),
       ...mapActions('add', ['toApproval']),
+      ...mapMutations('add', ['selectProduct', 'initSelect', 'setId']),
       toDate(time) {
         if (time) {
           return KND.Util.format(time, 'yyyy-MM-dd hh:mm:ss');
@@ -191,13 +192,34 @@
       },
       submitApproval() {
         let me = this;
+//        selectProduct initSelect
+        me.initSelect();
+        me.setId('');
+        for (let i = 0; i < me.lineItems.length; i++) {
+          me.selectProduct({
+            'KL Product Name Join': me.lineItems[i]['KL Product Name Join'],
+            'Product Name': me.lineItems[i].Product,
+            'num': me.lineItems[i]['Quantity Requested'],
+            'KL Product Series Code': me.lineItems[i]['KL Product Series Code'],
+            'Id': me.lineItems[i]['Product Id'],
+            'lineId': me.lineItems[i]['Id']
+          });
+        }
+        me.$router.push({
+          name: 'add',
+          query: {
+            id: me.id,
+            Description: me.orderEntry['Description']
+          }
+        });
+        /* let me = this;
         let form = {
           callBack: data => {
             Toast(data);
             me.$router.go(-1);
           }
         };
-        me.toApproval({id: me.orderEntry.Id, form});
+        me.toApproval({id: me.orderEntry.Id, form});*/
       }
     },
     components: {Toast}

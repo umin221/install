@@ -71,7 +71,8 @@ export default new Vuex.Store({
       namespaced: true,
       state: {
         partList: [],
-        project: {}
+        project: {},
+        id: ''
       },
       actions: {
         /* 设置配件列表
@@ -84,6 +85,10 @@ export default new Vuex.Store({
         *  @param {Object} index 必填 删除哪一个配件的索引
         */
         deletePart({state, commit, dispatch}, index) {
+          if (state.id && state.partList[index].lineId) { // 编辑时删除
+            dispatch('deleteLine', state.partList[index]);
+
+          }
           state.partList.splice(index, 1);
         },
         /* 设置项目
@@ -104,7 +109,23 @@ export default new Vuex.Store({
         setpartNum({state, commit, dispatch}, index, sumVal) {
           commit('partSum', index, sumVal);
         },
+        deleteLine({state}, obj) { // 编辑删除
+          obj.headerId = state.id;
+          api.get({
+            key: 'deleteLine',
+            data: {
+              obj
+            },
+            success: data => {
+              console.log('删除成功');
+            },
+            error: data => {
+              console.log('删除失败');
+            }
+          });
+        },
         addServiceOrder({state, commit, dispatch}, form) {
+          form.Id = state.id || '1';
           api.get({
             key: 'addServiceOrder',
             data: {
@@ -133,7 +154,17 @@ export default new Vuex.Store({
       },
       mutations: {
         selectProduct(state, select) {                    // 确认选择的配件
+          if (state.partList.length) {
+            for (let i = 0;i < state.partList.length;i++) {
+              if (select.Id === state.partList[i].Id) {
+                return;
+              }
+            }
+          }
           state.partList.push(select);
+        },
+        setId(state, id) {
+          state.id = id;
         },
         project(state, data) {
           state.project = data;

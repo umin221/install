@@ -95,7 +95,7 @@ let apiList = {
   },
   addServiceOrder: option => {
     let data = {
-      'Id': '1',
+      'Id': option.data.form.Id,
       'Order Type': '备件退入',
       'Description': option.data.form.Description,
       'ListOfOrderEntry-LineItems': {

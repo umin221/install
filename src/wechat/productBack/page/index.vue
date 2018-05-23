@@ -126,7 +126,7 @@
       ...mapActions(NameSpace, ['getList']),
       ...mapActions('app', ['getLov']),
       ...mapMutations(NameSpace, ['setManager']),
-      ...mapMutations('add', ['initSelect']),
+      ...mapMutations('add', ['initSelect', 'setId']),
       toDateil(id) {
         this.$router.push({
           name: 'detail',
@@ -136,6 +136,7 @@
         });
       },
       toAdd() {
+        this.setId('');
         this.initSelect();
         this.$router.push('add');
       },
