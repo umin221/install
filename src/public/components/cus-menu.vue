@@ -1,7 +1,7 @@
 <template>
   <div class="menu-box">
     <div class="button-group">
-      <div @click="cancel">取消</div>
+      <div @click="cancel" v-text="cancelTxt"></div>
       <div @click="enter">确定</div>
     </div>
     <mt-picker @change="onValuesChange"
@@ -9,10 +9,10 @@
                :value-key="vk"></mt-picker>
   </div>
 </template>
-<script>
+<script type="es6">
   export default {
     name: 'menu',
-    props: ['slots', 'type', 'vk'],
+    props: ['slots', 'type', 'vk', 'mode'],
     created() {
     },
     data() {
@@ -21,22 +21,34 @@
         value1: ''
       };
     },
+    computed: {
+//      清除模式
+      clearMode() {
+        return this.mode === 'clear';
+      },
+      cancelTxt() {
+        return this.clearMode ? '清除' : '取消';
+      }
+    },
     methods: {
       cancel() {                    // 取消事件
-        let self = this;
-        self.$emit('my-cancel', '');
+        let me = this;
+        let value = {};
+        me.$emit('my-cancel', '');
+        value[me.vk ? me.vk : 'Value'] = '';
+        if (me.clearMode) me.$emit('my-enter', [value], me.type);
       },
       enter() {                     // 确定
-        let self = this;
-        self.$emit('my-enter', self.value, self.type);
+        let me = this;
+        me.$emit('my-enter', me.value, me.type);
       },
       onValuesChange(picker, values) {
-        let self = this;
-        self.value = values;
-        if (self.value1 !== self.value[0]) {
-          self.$emit('my-change', self.value, self.type);
+        let me = this;
+        me.value = values;
+        if (me.value1 !== me.value[0]) {
+          me.$emit('my-change', me.value, me.type);
         }
-        self.value1 = values[0];
+        me.value1 = values[0];
       }
     }
   };

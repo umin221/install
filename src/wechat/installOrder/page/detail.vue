@@ -1457,8 +1457,9 @@
       // 订单行
       toLineFn(line = {}, type) {
         let me = this;
-        // 跳转配件 或 其他订单行(面板、锁体、假锁)
-        let path = line['KL Product Type LIC'] === 'Other' ? 'fitting' : 'orderLine';
+        // 跳转配件 或 其他订单行(面板、锁体、假锁、VP003)
+        let types = ['Lock Body', 'Panel', 'False Lock', 'VP003'];
+        let path = types.indexOf(line['KL Product Type LIC']) === -1 ? 'fitting' : 'orderLine';
         // 填充订单id，保存编辑行时需要
         line['Order Header Id'] = me.detailData.Id;
         me.$router.push({

@@ -41,9 +41,9 @@
                    v-model="line['KL Door Thickness']"></cus-field>
         <cus-field label="锁芯中心距门内距(cm)" type="number" tag="锁芯中心距门内距"
                    v-valid.nonNegative
-                   v-if="isVP || isLockBody"
+                   v-if="isVP || isLockBody || isPanel"
                    v-model="line['KL Lock Core Distance']"></cus-field>
-        <cus-field label="锁舌导向板规格" tag="锁舌导向板规格"
+        <cus-field label="锁芯导向板规格" tag="锁芯导向板规格"
                    @click.native="showLovFn('KL Guide Plate Specification')"
                    v-if="isVP || isLockBody"
                    v-model="line['KL Guide Plate Specification']"
@@ -79,7 +79,7 @@
 
       <!--popup-->
       <mt-popup v-model="showBox" position="bottom">
-        <menu-box vk="Value"
+        <menu-box vk="Value" mode="clear"
                   @my-enter="enter"
                   @my-cancel="showBox=false"
                   :type="lovType"
