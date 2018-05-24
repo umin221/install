@@ -519,9 +519,9 @@ export default {
     .toRed {
       color: red;
     }
-    .require>.mint-cell-wrapper>.mint-cell-title>span:before{
+    /*.require>.mint-cell-wrapper>.mint-cell-title>span:before{
       content: '*';
       color: red;
-    }
+    }*/
   }
 </style>

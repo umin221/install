@@ -79,6 +79,12 @@
                   v-model="repairDetails"
                   placeholder="详细描述或附加需求..."
                   type="textarea" rows="3"></mt-field>
+        <mt-field class="block"
+                  :class="{readonly: !isSubmit}"
+                  label="故障描述"
+                  v-model="rootcauseDetails"
+                  placeholder="故障描述填写"
+                  type="textarea" rows="3"></mt-field>
         <!--<mt-checklist
           class="require"
           title="故障现象"
@@ -180,6 +186,7 @@
             me.SR_ROOTCAUSE = datas['SR Rootcause'];
             me.KL_SR_RESP = datas['KL Responsbility'];
             me.repairDetails = datas['Repair Details'];
+            me.rootcauseDetails = datas['Description'];
             me.KL_LOCK_BODY_MODEL = datas['KL Lock Body Model'];
             me.KL_LOCK_MODEL = datas['KL Lock Model'];
             me.status = datas['Status'];
@@ -269,6 +276,7 @@
         KL_SR_RESP: '', // 责任划分
         SR_ROOTCAUSE: '',  // 故障分类
         repairDetails: '', // 方法明细
+        rootcauseDetails: '', // 故障描述
         ProductId: '',    // 产品Id
         KL_LOCK_BODY_MODEL: '',
         KL_LOCK_MODEL: '',
@@ -401,6 +409,7 @@
           'SR Rootcause': me.SR_ROOTCAUSE,                   // 故障反馈
           'KL Responsibility': me.KL_SR_RESP,     // 责任划分
           'Repair Details': me.repairDetails, // 解决方法明细
+          'Description': me.rootcauseDetails, // 故障描述
           'KL Product Model': me.ProductModel,
           'srNum': me.ServiceRequest['SR Number'],
           'KL Lock Body Model': me['KL_LOCK_BODY_MODEL'],

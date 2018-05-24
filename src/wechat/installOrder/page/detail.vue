@@ -20,6 +20,9 @@
           label="销售类型"
           :value="detailData['KL Delivery Sales Type']"></cus-field>
         <cus-field
+          label="锁体是否发门厂装配"
+          :value="detailData['KL Delivery Check Box 1'] === 'Y' ? '是':'否'"></cus-field>
+        <cus-field
           label="安装数量"
           :value="detailData['KL Install Amount'] || 0"></cus-field>
         <cus-field

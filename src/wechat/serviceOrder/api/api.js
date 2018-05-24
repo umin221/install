@@ -334,6 +334,7 @@ let ApiList = {
         'SR Rootcause': option.data.form['SR Rootcause'],               // 故障反馈
         'KL Responsbility': option.data.form['KL Responsibility'],     // 责任划分
         'Repair Details': option.data.form['Repair Details'], // 解决方法明细
+        'Description': option.data.form['Description'], // 故障描述
         'KL Lock Body Model': option.data.form['KL Lock Body Model'],
         'KL Lock Model': option.data.form['KL Lock Model'],
         'KL Country': '中国',

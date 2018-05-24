@@ -34,6 +34,7 @@
               <div class="mt-Detail-info">
                 <div><span>客户预约时间</span>{{toDate(ServiceRequest['KL Customer Appointment Time'])}}</div>
                 <!--<div><span>实际预约时间</span>{{toDate(Action['Planned'])}}</div>-->
+                <div><span>故障类型</span>{{ServiceRequest['Area']}}</div>
                 <div><span>用户故障说明</span>{{ServiceRequest['Sub-Area']}}</div>
                 <div><span>产品条形码</span><a href="javascript:void(0);" class="detail-call">{{ServiceRequest['KL SN']}}</a></div>
 <!--
@@ -49,7 +50,7 @@
                 </div>
                 <div><span>问题说明</span>
                   <p class="Description">
-                    {{ServiceRequest['Description']||ServiceRequest['Complaint Description']}}
+                    {{ServiceRequest['Complaint Description']}}
                   </p>
                   <!--Complaint Description-->
                 </div>
@@ -81,7 +82,8 @@
                       <!--</li>-->
                       <li><span>面板型号</span>{{item['KL Lock Model']}}</li>
                       <li><span>锁体型号</span>{{item['KL Lock Body Model']}}</li>
-                      <li><span>故障描述</span>{{item['KL Responsbility']}}</li>
+                      <li><span>故障类型</span>{{item['KL Responsbility']}}</li>
+                      <li><span>故障描述</span>{{item['Description']}}</li>
                       <li><span>故障现象</span>{{item['SR Rootcause']}}</li>
                       <attach ioName="KL Service Request Attachment IO" ref="attach"
                               :attach="ProblemRecord[index].list"
@@ -137,7 +139,8 @@
                       </li>
                       <li><span>面板型号</span>{{ServiceRequest['KL Lock Model']}}</li>
                       <li><span>锁体型号</span>{{ServiceRequest['KL Lock Body Model']}}</li>
-                      <li><span>故障描述</span>{{ServiceRequest['KL Responsbility']}}</li>
+                      <li><span>故障类型</span>{{ServiceRequest['KL Responsbility']}}</li>
+                      <li><span>故障描述</span>{{ServiceRequest['Description']}}</li>
                       <li><span>故障现象</span>{{ServiceRequest['SR Rootcause']}}</li>
                       <attach ioName="KL Service Request Attachment IO" ref="attach"
                               :attach="attach1.list"
