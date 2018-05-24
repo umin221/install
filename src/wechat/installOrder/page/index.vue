@@ -1,7 +1,7 @@
 <!--委外团队列表-->
 <template>
   <div>
-    <cus-header fixed :title="isTeam || isDoorManager ? '团队的安装订单' : '我的安装订单'" :menu="isManager ? [isTeam ? {title:'我的安装订单', key:'my'} : {title:'查看我的团队', key:'team'}] : undefined">
+    <cus-header fixed :title="isTeam ? '团队的安装订单' : '我的安装订单'" :menu="isManager ? [isTeam ? {title:'我的安装订单', key:'my'} : {title:'查看我的团队', key:'team'}] : undefined">
       <fallback slot="left"></fallback>
       <mt-button @click.native="toSearchFn" slot="right">
         <i class="xs-icon icon-search"></i>
@@ -13,7 +13,7 @@
       <mt-navbar v-model="selected">
         <mt-tab-item id="pending"
                      @click.native="!pending.length && loadBottomFn({status:'待处理', list:'pending'})"
-        v-if="userInfo['KL Primary Position Type LIC'] === 'Door Factory Engineer'">待处理</mt-tab-item>
+                     v-if="isDoorEmp">待处理</mt-tab-item>
         <mt-tab-item id="process"
                      @click.native="!process.length && loadBottomFn({status:'处理中', list:'process'})">处理中</mt-tab-item>
         <mt-tab-item id="completed"
@@ -88,7 +88,7 @@
   </div>
 </template>
 
-<script type="application/javascript">
+<script type="es6">
   import {mapState, mapActions, mapMutations} from 'vuex';
   import cusHeader from 'public/components/cus-header';
   import cusLoadmore from 'public/components/cus-loadmore';
@@ -120,12 +120,10 @@
     created() {
       var self = this;
       KND.Native.getUserInfo((info) => {
-        let userPos = info['KL Primary Position Type LIC'];
         self.userInfo = info;
         self.setInfoUser(info);
         console.log(self.userInfo);
-        self.setManager(userPos === 'Field Service Manager');
-        if (userPos === 'Door Factory Engineer' || userPos === 'Door Factory Manager') {
+        if (self.isDoorEmp) {
           self.tabVal = 'pending';
           self.tabStatus = '待处理';
           self.selected = 'pending';
@@ -145,7 +143,6 @@
       return {
         tabVal: '',
         tabStatus: '',
-//        isDoorManager: '', // 是否门厂技术主管 true===是
         // 活跃tab
         selected: 'pending',
         userInfo: '',
@@ -155,15 +152,17 @@
     },
     computed: {
       ...mapState(NAMESPACE, ['pending', 'process', 'completed', 'isManager', 'isTeam', 'taskIndex']),
-      isDoorManager() {
+//      是否门厂技术，包括门厂技术主管
+      isDoorEmp() {
         let code = this.userInfo['KL Primary Position Type LIC'];
-        return code === 'Door Factory Manager'; // code === 'Door Factory Engineer' || code === 'Door Factory Manager';
+        // 安装工程师、门厂技术主管
+        this.setManager(code === 'Field Service Manager' || code === 'Door Factory Manager');
+        return code === 'Door Factory Engineer' || code === 'Door Factory Manager';
       }
     },
     methods: {
       ...mapActions(NAMESPACE, ['getList']),
       ...mapMutations(NAMESPACE, ['setInfoUser', 'setManager', 'setTeam', 'setTaskIndex']),
-      // 标题栏菜单选择回调方法
       // 标题栏菜单选择回调方法
       menuFn(item) {
         var self = this;

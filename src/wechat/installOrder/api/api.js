@@ -18,21 +18,26 @@ let apiList = {
       'StartRowNum': option.paging.StartRowNum,
       'PageSize': option.paging.PageSize
     };
-    var searchSpec = [];
+    var searchSpec = ['[Order Entry - Orders.Status]<>"Draft"'];
     // 状态条件
     var status = option.data.Status || '';
     // 搜索条件
     var search = option.data.search || '';
+//    用户职位
+    var position = option.data.infoUser['KL Primary Position Type LIC'];
+//    是否查看团队
+    var isTeam = option.data.isTeam;
     // 所有人都不看草稿
-    if (option.data.infoUser['KL Primary Position Type LIC'] === 'Door Factory Engineer') { // 门厂技术安装员
+//    门厂技术安装员
+    if (position === 'Door Factory Engineer' || position === 'Door Factory Manager') {
       boby.ViewMode = 'Sales Rep';
-    } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Manager' && !option.data.isTeam) { // 安装主管(我的安装订单)
+//      安装主管(我的安装订单) 安装工程师(我的安装订单)
+    } else if ((position === 'Field Service Manager' || position === 'Field Service Engineer') && !isTeam) {
       searchSpec.push('[Order Entry - Orders.Primary Position Id]="' + option.data.infoUser['Primary Position Id'] + '"');
-    } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Engineer') { // 安装工程师(我的安装订单)
-      searchSpec.push('[Order Entry - Orders.Primary Position Id]="' + option.data.infoUser['Primary Position Id'] + '"');
-    } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Field Service Manager' && option.data.isTeam) { // option.data.isTeam 等于true 是我的团队 安装主管我的团队
-      boby.ViewMode = 'Manager';
-    } else if (option.data.infoUser['KL Primary Position Type LIC'] === 'Door Factory Manager') { // 门厂技术主管
+      searchSpec.push('[Order Entry - Orders.Status]<>"In Confirming"');
+    }
+//    isTeam 等于true 安装主管、门厂技术主管 我的团队
+    if (isTeam) {
       boby.ViewMode = 'Manager';
     }
     // 订单状态过滤

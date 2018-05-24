@@ -34,7 +34,7 @@
       </div>
       <toggle :show="isConfirming">
         <div style="height: 0.5rem;background: #eaeaea;"></div>
-        <div class="mint-content-info" :class="{disable: !isConfirming}" style="padding-bottom: 50px;background-color: #eaeaea;">
+        <div class="mint-content-info" :class="{disable: !editable}" style="padding-bottom: 50px;background-color: #eaeaea;">
 
           <div class="lock-line">
             <lock-line v-for="(g, key) in group"
@@ -158,7 +158,7 @@
           </div>
         </div>
       </div>
-      <button-group v-show="isConfirming">
+      <button-group v-show="editable">
         <mt-button @click.native="rollbackFn">退回</mt-button>
         <mt-button @click.native="submitFn">确认提交</mt-button>
       </button-group>
@@ -554,10 +554,14 @@
     },
     computed: {
       ...mapState(NameSpace, ['orderId', 'taskDataST']),
-      ...mapState('index', ['taskIndex']),
+      ...mapState('index', ['taskIndex', 'isTeam']),
       isConfirming() {
         let status = this.detailData['Calculated Order Status'];
         return !status || status === 'In Confirming';
+      },
+//      门厂确认中，非查看团队，订单可编辑
+      editable() {
+        return this.isConfirming && !this.isTeam;
       },
       // 订单行
       group() {
@@ -1448,7 +1452,7 @@
       },
       // 右滑删除
       getSwipeBtn(line, index) {
-        return this.isConfirming ? [{
+        return this.editable ? [{
           content: '删除',
           style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
           handler: () => this.deleteFn(line)
@@ -1467,7 +1471,7 @@
           query: {
             line: JSON.stringify(line),
             type: line['KL Product Type LIC'] || type,
-            editable: me.isConfirming // this.editable
+            editable: me.editable
           }
         });
       },
@@ -1477,17 +1481,19 @@
       },
       // Copy line
       copyFn(line) {
+        let me = this;
         MessageBox.confirm('复制此订单行记录？', '请确认').then(action => {
           // 复制只修改id，其他字段拷贝
           line.Id = KND.Util.now();
-          // 跳转配件 或 其他订单行(面板、锁体、假锁)
-          let path = line['KL Product Type LIC'] === 'Other' ? 'fitting' : 'orderLine';
+          // 跳转配件 或 其他订单行(面板、锁体、假锁、VP003)
+          let types = ['Lock Body', 'Panel', 'False Lock', 'VP003'];
+          let path = types.indexOf(line['KL Product Type LIC']) === -1 ? 'fitting' : 'orderLine';
           this.$router.push({
             path: path,
             query: {
               line: JSON.stringify(line),
               type: line['KL Product Type LIC'],
-              editable: true
+              editable: me.editable
             }
           });
         });

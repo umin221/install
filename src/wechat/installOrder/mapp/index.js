@@ -25,7 +25,7 @@ config.mapp = {
   'code2group': { // 订单行分类
     'Panel': {group: 'panels', label: '面板'},
     'Lock Body': {group: 'lockBody', label: '锁体'},
-    'VP003': {group: 'VP003', label: '智能锁虚拟产品'},
+//    'VP003': {group: 'VP003', label: '智能锁虚拟产品'},
     'False Lock': {group: 'falseLock', label: '假锁'},
     'Other': {group: 'others', label: '其他'}
   },

@@ -1,11 +1,16 @@
+/**
+ * @author umin
+ * @copyright Copyright (c) 2018, YZKJ
+ * @description project configuration file
+ */
 var project = {
-//  DEV SIT UAT PROD，服务器环境，默认 DEV
-  env: 'UAT',
-//  是否可以调用微信api，发布到服务器时修改为 true
+//  Environment => DEV SIT UAT PROD
+  env: 'SIT',
+//  Is it possible to call the WeChat API
   wxJSBridge: false,
-//  是否开启debug模式，app日志开关
+//  Debug switch to view app log
   debug: false,
-//  短信平台账号密码，目前仅在公众号使用
+//  SMS channel
   shortMsg: {
     account: 'gdjlwj',
     password: 'Net263gdjl'
