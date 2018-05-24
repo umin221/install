@@ -152,7 +152,7 @@
       toOrderFn(item) {
         let status = item['Calculated Order Status'];
         // 无状态 或者 状态 为 草稿，已驳回，门厂技术退回时
-        if (!status || status === 'In Confirming' || mapp.editOrderStatus.indexOf(status) !== -1) {
+        if (!status || mapp.editOrderStatus.indexOf(status) !== -1) {
           // 安装订单编辑
           let me = this;
           delete item['Link'];

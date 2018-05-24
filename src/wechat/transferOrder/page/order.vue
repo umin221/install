@@ -387,8 +387,9 @@
         MessageBox.confirm('复制此订单行记录？', '请确认').then(action => {
           // 复制只修改id，其他字段拷贝
           line.Id = KND.Util.now();
-          // 跳转配件 或 其他订单行(面板、锁体、假锁)
-          let path = line['KL Product Type LIC'] === 'Other' ? 'fitting' : 'orderLine';
+          // 跳转配件 或 其他订单行(面板、锁体、假锁、VP003)
+          let types = ['Lock Body', 'Panel', 'False Lock', 'VP003'];
+          let path = types.indexOf(line['KL Product Type LIC']) === -1 ? 'fitting' : 'orderLine';
           // 缓存订单
           KND.Session.set('order', JSON.stringify(me.order));
           me.$router.push({
