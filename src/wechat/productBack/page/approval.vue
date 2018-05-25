@@ -12,9 +12,11 @@
               <li class="bd-radius">
                 <span class="icon"></span>
               </li>
-              <li style="color: #888;line-height: 40px;font-size: 0.8rem;">审批人：{{itemTask['Task Owner Full Name']}}
-                <span class="journalName">{{new Date(itemTask['End Working Time']).format('yyyy-MM-dd')}}</span>
+              <li style="color: #888;line-height: 40px;font-size: 0.8rem;">{{new Date(itemTask['End Working Time']).format('yyyy-MM-dd')}}
               </li>
+              <div class="content-div">
+                <div>审批人：{{itemTask['Task Owner Full Name']}}</div>
+              </div>
               <div class="content-div">
                 <div>审批状态：{{itemTask['Action']}}</div>
               </div>

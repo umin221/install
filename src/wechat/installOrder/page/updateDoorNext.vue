@@ -10,7 +10,7 @@
       <div :class="{'readonly':read}">
         <cus-field :label="nextText" :tag="nextText"
                    type="number"
-                   v-valid.number
+                   v-valid.positiveInteger
                    :class="heartVisible"
                    v-model="line['Completed Install Amount']"></cus-field>
         <cus-field label="备注说明"

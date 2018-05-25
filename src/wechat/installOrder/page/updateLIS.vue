@@ -13,15 +13,15 @@
       <div :class="{'readonly':read}">
         <cus-field label="抽查数量" tag="抽查数量"
                    type="number"
-                   v-valid.number
+                   v-valid.positiveInteger
                    v-model="line['Spot Check Amount']"></cus-field>
         <cus-field label="合格数量" tag="合格数量"
                    type="number"
-                   v-valid.number
+                   v-valid.positiveInteger
                    v-model="line['Qualified Amount']"></cus-field>
         <cus-field label="异常处理数量" tag="异常处理数量"
                    type="number"
-                   v-valid.number
+                   v-valid.positiveInteger
                    v-model="line['Unqualified Solve Amount']"></cus-field>
         <cus-field label="异常描述"
                    type="textarea"

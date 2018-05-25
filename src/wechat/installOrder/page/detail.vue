@@ -196,7 +196,8 @@
       font-size: 1rem;
     }
     .mint-content-div {
-      height: 30px;
+      height: 40px;
+      line-height: 40px;
       padding-top: 10px;
       padding-right: 10px;
       text-align: right;

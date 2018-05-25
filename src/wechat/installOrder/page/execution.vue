@@ -10,7 +10,7 @@
         </div>
         <cus-field label="数量" tag="数量"
                    placeholder="请输入"
-                   v-valid.number
+                   v-valid.positiveInteger
                    type="number"
                    v-model="batchNum"></cus-field>
         <cus-field label="发运日期" tag="发运日期"
@@ -22,7 +22,7 @@
         </div>
         <cus-field label="数量" tag="数量"
                    placeholder="请输入"
-                   v-valid.number
+                   v-valid.positiveInteger
                    type="number"
                    v-model="batchNum1"></cus-field>
         <cus-field label="发运日期" tag="发运日期"
