@@ -20,6 +20,9 @@
         <mt-cell title="工作描述" class="borderBottom">
           <span>{{desc()}}</span>
         </mt-cell>
+        <mt-cell title="批次名称" class="borderBottom" v-if="descpc()">
+          <span>{{descpc()}}</span>
+        </mt-cell>
          <mt-cell title="计划开始时间" class="borderBottom"><span >{{initDateStart()}}</span></mt-cell>
          <mt-cell title="计划结束时间" class="borderBottom"><span >{{initDateEnd()}}</span></mt-cell>
          <mt-cell title="实际开始时间" is-link class="borderBottom" @click.native='openStartTime'><span>{{initDate()}} {{ACstartPickerValue}}</span></mt-cell>
@@ -134,6 +137,10 @@
       // 描述字段
       desc() {
         return this.currentDayData[this.$route.query.index]['KL Detail Type'];
+      },
+      // 描述字段
+      descpc() {
+        return this.currentDayData[this.$route.query.index]['KL Task Batch Name'];
       },
       // 点击选开始时间
       openStartTime() {
