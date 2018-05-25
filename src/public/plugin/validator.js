@@ -65,7 +65,8 @@ class ValidatorPlug {
         email: `${tag}格式不正确`,
         fax: `${tag}格式错误`,
         phone: `${tag}格式错误`,
-        nonNegative: `${tag}不能是负数`
+        nonNegative: `${tag}不能是负数`,
+        positiveInteger: `${tag}必须为正整数`
       };
       return errMsgs[type];
     };

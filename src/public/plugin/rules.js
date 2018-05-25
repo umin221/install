@@ -10,6 +10,8 @@ export default {
   number: /^[0-9]+$/,
   // 非负数
   nonNegative: /^\d+(\.{0,1}\d+){0,1}$/,
+  // 正整数
+  positiveInteger: /^[1-9]\d*$/,
   /**
    * @descrition:邮箱规则
    * 1.邮箱以a-z、A-Z、0-9开头，最小长度为1.
