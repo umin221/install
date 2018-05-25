@@ -132,45 +132,47 @@
       },
       submitFn() {
         var self = this;
-        if (self.batchNum || self.batchNum1 || self.start_Date || self.start_Date1) {
-          var comment = '';
-          if ((self.batchNum && !self.start_Date) || (!self.batchNum && self.start_Date)) {
-            Toast('请填写面板的数量与发运日期！');
-            return;
-          } else {
-            comment += '面板，需求数量：' + self.batchNum + '，需求日期：' + self.start_Date + ';';
-          }
-          if ((self.batchNum1 && !self.start_Date1) || (!self.batchNum1 && self.start_Date1)) {
-            Toast('请填写锁体的数量与发运日期！');
-            return;
-          } else {
-            comment += '锁体，需求数量：' + self.batchNum1 + '，需求日期：' + self.start_Date1 + ';';
-          }
-          if (comment) {
-            api.get({ // 提交数据
-              key: 'getTaskAdd',
-              method: 'POST',
-              data: {
-                'body': {
-                  'ProcessName': 'KL Install Order Execute Inbox Create Process',
-                  'Object Id': self.detailData.Id,
-                  'Inbox Comments': comment
+        tools.valid.call(this, () => {
+          if (self.batchNum || self.batchNum1 || self.start_Date || self.start_Date1) {
+            var comment = '';
+            if ((self.batchNum && !self.start_Date) || (!self.batchNum && self.start_Date)) {
+              Toast('请填写面板的数量与发运日期！');
+              return;
+            } else {
+              comment += '面板，需求数量：' + self.batchNum + '，需求日期：' + self.start_Date + ';';
+            }
+            if ((self.batchNum1 && !self.start_Date1) || (!self.batchNum1 && self.start_Date1)) {
+              Toast('请填写锁体的数量与发运日期！');
+              return;
+            } else {
+              comment += '锁体，需求数量：' + self.batchNum1 + '，需求日期：' + self.start_Date1 + ';';
+            }
+            if (comment) {
+              api.get({ // 提交数据
+                key: 'getTaskAdd',
+                method: 'POST',
+                data: {
+                  'body': {
+                    'ProcessName': 'KL Install Order Execute Inbox Create Process',
+                    'Object Id': self.detailData.Id,
+                    'Inbox Comments': comment
+                  }
+                },
+                success: function (data) {
+                  if (!data.ERROR) {
+                    Toast({
+                      message: '提交成功',
+                      duration: 5000
+                    });
+                    KND.Util.back();
+                  }
                 }
-              },
-              success: function(data) {
-                if (!data.ERROR) {
-                  Toast({
-                    message: '提交成功',
-                    duration: 5000
-                  });
-                  KND.Util.back();
-                }
-              }
-            });
+              });
+            }
+          } else {
+            Toast('请填写面板或者锁体信息！');
           }
-        } else {
-          Toast('请填写面板或者锁体信息！');
-        }
+        });
       }
     },
     components: {buttonGroup, lockLine, cusField}
