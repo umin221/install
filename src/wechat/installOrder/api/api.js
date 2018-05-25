@@ -18,7 +18,8 @@ let apiList = {
       'StartRowNum': option.paging.StartRowNum,
       'PageSize': option.paging.PageSize
     };
-    var searchSpec = ['[Order Entry - Orders.Status]<>"Draft"'];
+//    默认获取非草稿订单，类型为安装订单
+    var searchSpec = ['[Order Entry - Orders.Status]<>"Draft" AND [Order Entry - Orders.Order Type]="Install Order"'];
     // 状态条件
     var status = option.data.Status || '';
     // 搜索条件
