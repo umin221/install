@@ -34,11 +34,13 @@ export default new Vuex.Store({
           mapps = config.mapp['product'];
           state.isManager = isManager;
         },
+        setList(state) {
+          // 清空列表数据
+          state.DestinationList = [];
+          state.SourceList = [];
+        },
         setTeam(state, isTeam) {
           state.isTeam = isTeam;
-          // 清空列表数据
-          state.PartsList = [];
-          state.badPartsList = [];
         }
       },
       actions: {
@@ -91,11 +93,13 @@ export default new Vuex.Store({
         setManager(state, isManager) {
           mapps = config.mapp['detail'];
         },
-        setTeam(state, isTeam) {
-          state.isTeam = isTeam;
+        setList(state) {
           // 清空列表数据
           state.DestinationList = [];
           state.SourceList = [];
+        },
+        setTeam(state, isTeam) {
+          state.isTeam = isTeam;
         }
       },
       actions: {
