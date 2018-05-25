@@ -7,7 +7,9 @@
   <div id='calendar'>
     <mt-header fixed :title="headTitle">
       <fallback slot="left"></fallback>
-      <mt-button v-show="isShowBtn" class="xs-icon icon-add" slot="right" @click.native="createPlan"></mt-button>
+      <mt-button v-show="isShowBtn" slot="right" @click.native="createPlan">
+        <i class="xs-icon icon-add"></i>
+      </mt-button>
     </mt-header>
     <div class="date mint-content">
       <div class="calendar-content">
@@ -68,7 +70,7 @@
     </div>
   </div>
 </template>
-<script>
+<script type="es6">
   import {mapState, mapActions, mapMutations} from 'vuex';
   import { DatetimePicker, CellSwipe, MessageBox } from 'mint-ui';
 
@@ -108,7 +110,6 @@
     },
     created() {
       var self = this;
-      console.dir('00000');
       var date = '';
       if (this.newYear) {
         date = new Date(this.formatDate(self.newYear, self.newMonth, self.newDay));
@@ -127,7 +128,6 @@
       self.startGetData(self.formatDate(date.getFullYear(), date.getMonth() + 1, 1));
     },
     activated() {
-      console.dir('1111');
       var self = this;
       var date = '';
       if (this.newYear) {
@@ -151,7 +151,8 @@
       ...mapMutations(NAMESPACE, ['setNewYear', 'setNewMonth', 'setNewDay']),
       // 去掉年月日
       formatDateTime(time) {
-        return time.replace(/\d+\/\d+\/\d+\s/, '');
+        return new Date(time).format('hh:mm');
+//        return time.replace(/\d+\/\d+\/\d+\s/, '');
       },
       // 开始数据请求
       startGetData(cur) {
@@ -263,7 +264,7 @@
         if (m < 10) m = `0${m}`;
         let d = day;
         if (d < 10) d = `0${d}`;
-        return `${y}-${m}-${d}`;
+        return `${y}/${m}/${d}`;
       },
       // 判断是否有数据
       isData(cur, data) {
@@ -509,8 +510,8 @@
         * 修改内容：工作计划还会存在其他的工作任务 会同步到工作计划中，之前判断的的逻辑只是工作计划中的状态
         * */
         var val = 'none';
-        console.log('day:' + day);
-        console.log(noArray);
+//        console.log('day:' + day);
+//        console.log(noArray);
        /* console.log(noArray.indexOf('Done'));
         console.log(noArray.indexOf('Not Started'));*/
         if (day !== 'spaces' && noArray && noArray.length > 0) {

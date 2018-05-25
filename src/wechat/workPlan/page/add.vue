@@ -125,7 +125,7 @@
           var minutes = new Date().getMinutes();
           console.dir(self.newTimes + ' ' + today + ':' + minutes);
           if (self.newTimes === self.initDate()) { // 选择当前时间以后
-            this.setStartPicker(today + ':' + (minutes + 1));
+            this.setStartPicker(new Date(new Date().setMinutes(new Date().getMinutes() + 1)).format('hh:mm'));
           } else {
             this.setStartPicker('00:00');
           }
