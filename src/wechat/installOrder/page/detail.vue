@@ -168,340 +168,6 @@
     </div>
   </div>
 </template>
-<style lang="scss">
-  .icon-clock:before {
-    content: '\A130';
-  }
-  .mint-content-datail {
-    /*.mint-cell-wrapper {
-      font-size: 0.7rem!important;
-    }*/
-    /*.readonly {
-      pointer-events: initial!important;
-    }*/
-    .mint-cell-title {
-    }
-    .list-text-span {
-      color: #a9acb1;
-      margin-right: 0.5rem;
-    }
-    .mint-content-xl {
-      text-align: center;
-      color: #0772c1;
-      font-size: 0.15rem;
-    }
-    .xl::before {
-      font-family: "mintui";
-      content: '\E601';
-      font-size: 1rem;
-    }
-    .mint-content-div {
-      height: 40px;
-      line-height: 40px;
-      padding-top: 10px;
-      padding-right: 10px;
-      text-align: right;
-      background: white;
-    }
-    .mint-content-xt {
-      border: 1px solid #cccccc;
-      padding: 0.35rem 0.5rem;
-      width: 3rem;
-      display: initial;
-      text-align: center;
-      border-radius: 0.25rem;
-      color: #0772c1;
-      font-size: 0.65rem;
-    }
-    .mint-sx-div {
-      margin-left: 0.5rem;
-    }
-
-    /*流程*/
-    .crm-zyList {
-      overflow: hidden;
-    }
-    .crm-zyList ul {
-      padding-left: 0;
-    }
-    .crm-zyList ul li {
-      list-style: none;
-    }
-    .crm-zyList ul .butLi {
-      position: absolute;
-      right: 0px;
-      top: 0px;
-      line-height: 27px;
-      height: 27px;
-      text-align: right;
-    }
-    .crm-zyList ul .butLi span {
-      display: inline-block;
-      text-align: center;
-      width: 40px;
-      font-size: 14px !important;
-      color: #999 !important;
-    }
-    .batchClose::before {
-      font-family: "kinlong-icon" !important;
-      font-style: normal;
-      font-size: 1rem;
-      content: '\A152';
-      color: red;
-    }
-    .itemTask .batchClose {
-      position: absolute;
-      width: 45px;
-      right: -15px;
-      top: -14px;
-      text-align: center;
-    }
-    .butLi .batchAdd::before{
-      font-family: "kinlong-icon" !important;
-      font-style: normal;
-      font-size: 1rem;
-      content: '\A153';
-      color: #356DFC;
-    }
-    .butLi .batchSta {
-      width: 60px!important;
-      text-align: center!important;
-      padding: 0px 10px;
-      border-radius: 10px;
-      border: 1px solid #0772c1;
-    }
-    .crm-zyList .content {
-      position: relative;
-      border-left: 1px solid #dddddd;
-      padding-bottom: 10px;
-      margin: 0 30px;
-      padding-left: 20px;
-    }
-    .crm-zyList .content .bd-radius {
-      background: #fff;
-      position: absolute;
-      left: -20px;
-      top: 0px;
-    }
-    .crm-zyList .icon {
-      border-radius: 26px;
-      background: #8bc17c;
-      color: #fff;
-      padding: 1px 7px;
-      margin-left: 13px;
-      font-size: 12px;
-      top: 10px;
-    }
-    .crm-zyList .content :nth-of-type(2) {
-      font-size: 14px;
-      color: #999;
-      line-height: 27px;
-    }
-    .content li {
-      height: 27px;
-    }
-    .content li span {
-      font-size: 14px;
-      margin-top: 5px;
-      color: #999;
-      line-height: 27px;
-    }
-    .content li :nth-of-type(2), .mt-switch {
-      position: absolute;
-      top: 23px;
-      right: 0px;
-    }
-    .content-div {
-      border: 1px solid #81B92C;
-      border-radius: 5px;
-      padding: 10px;
-      font-size: 0.5rem;
-      margin-bottom: 10px;
-    }
-    /*横线滚动*/
-    .stage_li {
-      width: 100%;
-      position: relative;
-    }
-
-    .stage_li > p.title {
-      margin: 0;
-      padding: 16px 0 17px 15px;
-      color: #333;
-      font-size: 15px;
-      line-height: 15px;
-    }
-
-    .stage_li > span.bu_stage {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      color: #d61518;
-      font-size: 14px;
-      padding-right: 15px;
-    }
-
-    .stage_li > span.bu_stage > span {
-      font-size: 12px;
-      line-height: 20px;
-      position: absolute;
-      right: 0;
-    }
-
-    .stage_li > .mui-scroll-wrapper a {
-      display: inline-block !important;
-      margin: 0 !important;
-      height: 50px;
-      width: 74px;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div {
-      text-align: center;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.date {
-      font-size: 10px;
-      color: #777;
-      line-height: 10px;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon {
-      height: 24px;
-      padding: 7px 0;
-      position: relative;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.point {
-      width: 14px;
-      height: 14px;
-      background: #8bc17c;
-      border-radius: 7px;
-      -webkit-border-radius: 7px;
-      -moz-border-radius: 7px;
-      font-size: 8px;
-      position: absolute;
-      left: 30px;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.point > span {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      background: #8bc17c;
-      border-radius: 6px;
-      -webkit-border-radius: 6px;
-      -moz-border-radius: 6px;
-      top: 1px;
-      left: 1px;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.close {
-      background: #0772c1 !important;
-    }
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.approval {
-      background: #0772c1 !important;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.close > span {
-      background: #fff;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.close > span:before {
-      color: #0772c1;
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      font-size: 8px;
-    }
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.approval > span {
-      background: #0772c1;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.approval > span:before {
-      color: #0772c1;
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      font-size: 8px;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.finish > span:before {
-      content: "\A131";
-      color: #8bc17c;
-      position: absolute;
-      top: 2px;
-      left: 1px;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.present {
-      background: #8bc17c;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.present > span {
-      background: #fff;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.p_grey {
-      background: #efefef;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.p_grey > span {
-      background: #efefef;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.p_grey {
-      background: #efefef !important;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.line {
-      position: absolute;
-      width: 30px;
-      height: 2px;
-      display: inline-block;
-      background: #8bc17c;
-      top: 13px;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.left {
-      left: 0;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.icon > span.right {
-      right: 0;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.name {
-      font-size: 12px;
-      color: #333;
-      line-height: 36px;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.present {
-      color: #8bc17c;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.close {
-      color: #0772c1;
-    }
-    .stage_li > .mui-scroll-wrapper a > div.approval {
-      color: #0772c1;
-    }
-
-    .stage_li > .mui-scroll-wrapper a > div.p_grey {
-      color: #cccccc;
-    }
-    .itemTaskId .mint-cell-value input {
-      color: #0772c1;
-    }
-
-    .disable {
-      .cus-lock:before {
-        content: '';
-      }
-    }
-
-  }
-</style>
 <script type="application/javascript">
   import {mapState, mapActions, mapMutations} from 'vuex';
   import api from '../api/api';
@@ -1504,3 +1170,338 @@
     }
   };
 </script>
+<style lang="scss">
+  .icon-clock:before {
+    content: '\A130';
+  }
+  .mint-content-datail {
+    /*.mint-cell-wrapper {
+      font-size: 0.7rem!important;
+    }*/
+    /*.readonly {
+      pointer-events: initial!important;
+    }*/
+    .mint-cell-title {
+    }
+    .list-text-span {
+      color: #a9acb1;
+      margin-right: 0.5rem;
+    }
+    .mint-content-xl {
+      text-align: center;
+      color: #0772c1;
+      font-size: 0.15rem;
+    }
+    .xl::before {
+      font-family: "mintui";
+      content: '\E601';
+      font-size: 1rem;
+    }
+    .mint-content-div {
+      height: 40px;
+      line-height: 40px;
+      padding-top: 10px;
+      padding-right: 10px;
+      text-align: right;
+      background: white;
+    }
+    .mint-content-xt {
+      border: 1px solid #cccccc;
+      padding: 0.35rem 0.5rem;
+      width: 3rem;
+      display: initial;
+      text-align: center;
+      border-radius: 0.25rem;
+      color: #0772c1;
+      font-size: 0.65rem;
+    }
+    .mint-sx-div {
+      margin-left: 0.5rem;
+    }
+
+    /*流程*/
+    .crm-zyList {
+      overflow: hidden;
+    }
+    .crm-zyList ul {
+      padding-left: 0;
+    }
+    .crm-zyList ul li {
+      list-style: none;
+    }
+    .crm-zyList ul .butLi {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      line-height: 27px;
+      height: 27px;
+      text-align: right;
+    }
+    .crm-zyList ul .butLi span {
+      display: inline-block;
+      text-align: center;
+      width: 40px;
+      font-size: 14px !important;
+      color: #999 !important;
+    }
+    .batchClose::before {
+      font-family: "kinlong-icon" !important;
+      font-style: normal;
+      font-size: 1rem;
+      content: '\A152';
+      color: red;
+    }
+    .itemTask .batchClose {
+      position: absolute;
+      width: 45px;
+      right: -15px;
+      top: -14px;
+      text-align: center;
+    }
+    .butLi .batchAdd::before{
+      font-family: "kinlong-icon" !important;
+      font-style: normal;
+      font-size: 1rem;
+      content: '\A153';
+      color: #356DFC;
+    }
+    .butLi .batchSta {
+      width: 60px!important;
+      text-align: center!important;
+      padding: 0px 10px;
+      border-radius: 10px;
+      border: 1px solid #0772c1;
+    }
+    .crm-zyList .content {
+      position: relative;
+      border-left: 1px solid #dddddd;
+      padding-bottom: 10px;
+      margin: 0 30px;
+      padding-left: 20px;
+    }
+    .crm-zyList .content .bd-radius {
+      background: #fff;
+      position: absolute;
+      left: -20px;
+      top: 0px;
+    }
+    .crm-zyList .icon {
+      border-radius: 26px;
+      background: #8bc17c;
+      color: #fff;
+      padding: 1px 7px;
+      margin-left: 13px;
+      font-size: 12px;
+      top: 10px;
+    }
+    .crm-zyList .content :nth-of-type(2) {
+      font-size: 14px;
+      color: #999;
+      line-height: 27px;
+    }
+    .content li {
+      height: 27px;
+    }
+    .content li span {
+      font-size: 14px;
+      margin-top: 5px;
+      color: #999;
+      line-height: 27px;
+    }
+    .content li :nth-of-type(2), .mt-switch {
+      position: absolute;
+      top: 23px;
+      right: 0px;
+    }
+    .content-div {
+      border: 1px solid #81B92C;
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 0.5rem;
+      margin-bottom: 10px;
+    }
+    /*横线滚动*/
+    .stage_li {
+      width: 100%;
+      position: relative;
+    }
+
+    .stage_li > p.title {
+      margin: 0;
+      padding: 16px 0 17px 15px;
+      color: #333;
+      font-size: 15px;
+      line-height: 15px;
+    }
+
+    .stage_li > span.bu_stage {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #d61518;
+      font-size: 14px;
+      padding-right: 15px;
+    }
+
+    .stage_li > span.bu_stage > span {
+      font-size: 12px;
+      line-height: 20px;
+      position: absolute;
+      right: 0;
+    }
+
+    .stage_li > .mui-scroll-wrapper a {
+      display: inline-block !important;
+      margin: 0 !important;
+      height: 50px;
+      width: 74px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div {
+      text-align: center;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.date {
+      font-size: 10px;
+      color: #777;
+      line-height: 10px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon {
+      height: 24px;
+      padding: 7px 0;
+      position: relative;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.point {
+      width: 14px;
+      height: 14px;
+      background: #8bc17c;
+      border-radius: 7px;
+      -webkit-border-radius: 7px;
+      -moz-border-radius: 7px;
+      font-size: 8px;
+      position: absolute;
+      left: 30px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.point > span {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #8bc17c;
+      border-radius: 6px;
+      -webkit-border-radius: 6px;
+      -moz-border-radius: 6px;
+      top: 1px;
+      left: 1px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.close {
+      background: #0772c1 !important;
+    }
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.approval {
+      background: #0772c1 !important;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.close > span {
+      background: #fff;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.close > span:before {
+      color: #0772c1;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      font-size: 8px;
+    }
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.approval > span {
+      background: #0772c1;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.approval > span:before {
+      color: #0772c1;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      font-size: 8px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.finish > span:before {
+      content: "\A131";
+      color: #8bc17c;
+      position: absolute;
+      top: 2px;
+      left: 1px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.present {
+      background: #8bc17c;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.present > span {
+      background: #fff;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.p_grey {
+      background: #efefef;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.p_grey > span {
+      background: #efefef;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.p_grey {
+      background: #efefef !important;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.line {
+      position: absolute;
+      width: 30px;
+      height: 2px;
+      display: inline-block;
+      background: #8bc17c;
+      top: 13px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.left {
+      left: 0;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.icon > span.right {
+      right: 0;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.name {
+      font-size: 12px;
+      color: #333;
+      line-height: 36px;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.present {
+      color: #8bc17c;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.close {
+      color: #0772c1;
+    }
+    .stage_li > .mui-scroll-wrapper a > div.approval {
+      color: #0772c1;
+    }
+
+    .stage_li > .mui-scroll-wrapper a > div.p_grey {
+      color: #cccccc;
+    }
+    .itemTaskId .mint-cell-value input {
+      color: #0772c1;
+    }
+
+    .disable {
+      .cus-lock:before {
+        content: '';
+      }
+    }
+
+  }
+</style>
+

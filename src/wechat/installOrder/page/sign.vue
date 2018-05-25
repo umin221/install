@@ -16,8 +16,8 @@
                 <mt-switch v-model="box1"></mt-switch>
         </mt-cell>
         <div v-show="box1" :class="{disable: !editable}">
-          <mt-field v-if="item['KL Detail Type LIC'] !== 'Working Drawing Sign'" label="签收数量"
-                    placeholder="请输入签收数量"
+          <mt-field v-if="item['KL Detail Type LIC'] !== 'Working Drawing Sign'" :label="labelText"
+                    placeholder="请输入数量"
                     :class="heartVisible"
                     type="number"
                     v-model="form['KL Signed Amount']">
@@ -122,6 +122,7 @@
         id: '',
         item: '',
         is_edit: false,
+        labelText: '签收数量',
         editable: false,
         Description: '', // 附件备注
         box1: true,
@@ -164,6 +165,7 @@
        * 查看&编辑标题一致
        */
       title() {
+        var self = this;
         let item = this.item;
         var val = '';
         if (item['KL Detail Type LIC'] === 'Trompil Lock Sign') {
@@ -178,6 +180,7 @@
           val = '真锁到货';
         } else if (item['KL Detail Type LIC'] === 'Substitution Lock Trans Return') {
           val = '替代锁回收';
+          self.labelText = '回收数量';
         }
         return val;
       }

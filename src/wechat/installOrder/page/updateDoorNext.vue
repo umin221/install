@@ -145,7 +145,7 @@
           self.nextText = '完成数量';
           val = '真锁移交';
         } else {
-          self.nextText = '签收数量';
+          self.nextText = '回收数量';
           val = '替代锁回收';
         }
         return val;
