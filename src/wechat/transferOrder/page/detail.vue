@@ -32,7 +32,7 @@
                  :value="form['Sales Type']"></mt-cell>
         <mt-cell title="指派安装工程师"
                  v-show="!isTeam"
-                 :value="select['KL Employee Full Name']"
+                 :value="select && select['KL Employee Full Name']"
                  @click.native="toEngineer"
                  is-link></mt-cell>
       </div>
