@@ -1,8 +1,8 @@
 <template>
   <div class="cus-field">
-    <mt-field v-if="edit&&!isLink"
+    <mt-field v-if="editable && !isLink"
       :label="label"
-      :placeholder="placeholder"
+      :placeholder="editable ? placeholder : ''"
       :value="currentValue"
       :state="state"
       :type="type"
@@ -13,12 +13,14 @@
     </mt-field>
     <mt-cell v-else
       :title="label"
-      :placeholder="placeholder"
       :value="currentValue"
       :state="state"
       @change="changeFn"
-      :isLink="isLink">
-      <slot>{{linkPlaceholder}}</slot>
+      :isLink="isLink && editable">
+      <input v-if="!value && editable" class="mint-field-core" :placeholder="placeholder" />
+      <slot v-show="value">
+        <span v-text="value"></span>
+      </slot>
     </mt-cell>
   </div>
 </template>
@@ -31,7 +33,7 @@
         type: String,
         label: String,
         placeholder: String,
-        edit: {
+        editable: {
           type: Boolean,
           default: true
         },
@@ -44,12 +46,6 @@
         return {
           currentValue: this.value
         };
-      },
-      computed: {
-        linkPlaceholder() {
-          let val = this.value;
-          return this.isLink && !val ? '请选择' : val;
-        }
       },
       methods: {
         handleInput(val) {

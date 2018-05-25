@@ -158,6 +158,9 @@
           delete item['Link'];
           // 缓存订单
           KND.Session.remove('order');
+          // 不传递订单行
+          item['KL Delivery Partner Name'] = '';
+          delete item['Order Entry - Line Items'];
           me.$router.push({
             path: 'order',
             query: {

@@ -15,13 +15,15 @@
                    v-valid.require
                    @click.native="showLovFn('KL Hole Type')"
                    :value="order['KL Hole Type']"
+                   :editable="editable"
                    is-link></cus-field>
-          <cus-field label="门厂名称" tag="门厂名称"
+          <cus-field label="门厂名称" tag="门厂名称" placeholder="选择门厂"
                    v-if="isDoorFactoryOpen"
                    v-valid.require
                    @click.native="$router.push('doorFactory')"
                    :data-value="factory"
                    :value="order['KL Delivery Partner Name']"
+                   :editable="editable"
                    is-link></cus-field>
           <mt-cell title="是否门厂安装锁体" v-show="isProject && isDoorFactoryOpen">
             <mt-switch v-model="box1"></mt-switch>

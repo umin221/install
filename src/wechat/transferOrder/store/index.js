@@ -277,9 +277,7 @@ export default new Vuex.Store({
       namespaced: true,
       state: {
         result: [],
-        select: {
-          'KL Employee Full Name': '请选择'
-        }
+        select: {}
       },
       mutations: {
         setEngineer(state, engineer) {
@@ -288,7 +286,7 @@ export default new Vuex.Store({
         addEngineer(state, engineer) {
           state.result.push(...engineer);
         },
-        selEngineer(state, engineer = {'KL Employee Full Name': '请选择'}) {
+        selEngineer(state, engineer) {
           state.select = engineer;
         }
       },
@@ -457,9 +455,7 @@ export default new Vuex.Store({
       namespaced: true,
       state: {
         result: [],
-        select: {
-          'Name': '请选择'
-        }
+        select: {}
       },
       mutations: {
         setFactory(state, factory) {
@@ -468,7 +464,7 @@ export default new Vuex.Store({
         addFactory(state, factory) {
           state.result.push(...factory);
         },
-        selFactory(state, factory = {'Name': '请选择'}) {
+        selFactory(state, factory) {
           state.select = factory;
         }
       },
