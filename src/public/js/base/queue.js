@@ -59,7 +59,10 @@ class Queue {
       } else {
         let message = err.response && err.response.data.ERROR;
         // 屏蔽空数据报错
-        if (message === 'There is no data for the requested resource') return;
+        if (message === 'There is no data for the requested resource') {
+          success({});
+          return;
+        }
         console.error(err);
         Toast({
           message: message || '获取数据失败',
