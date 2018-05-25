@@ -47,6 +47,10 @@
                  <!--placeholder="请选择"-->
                  <!--@click.native="isSubmit&&toLov('KL_LOCK_MODEL')" is-link>{{KL_LOCK_MODEL}}</mt-cell>-->
         <cus-field class="require"
+                   label="型号配置"
+                   :value="KL_MODEL_CONFIG"
+                   @click.native="isSubmit&&toLov('KL_MODEL_CONFIG')" is-link></cus-field>
+        <cus-field class="require"
                    label="面板型号"
                    :value="KL_LOCK_MODEL"
                   @click.native="isSubmit&&toLov('KL_LOCK_MODEL')" is-link></cus-field>
@@ -189,6 +193,7 @@
             me.rootcauseDetails = datas['Description'];
             me.KL_LOCK_BODY_MODEL = datas['KL Lock Body Model'];
             me.KL_LOCK_MODEL = datas['KL Lock Model'];
+            me.KL_MODEL_CONFIG = datas['KL Model Configuration'];
             me.status = datas['Status'];
             if (datas['KL Parent SR Complete Flag'] || datas['KL Status LIC'] === 'Completed') {
               me.isSubmit = false;
@@ -215,6 +220,12 @@
         type: 'KL_LOCK_MODEL',
         success: data => {
           mapp.option['KL_LOCK_MODEL'] = data.items;
+        }
+      });
+      me.getLov({
+        type: 'KL_MODEL_CONFIG',
+        success: data => {
+          mapp.option['KL_MODEL_CONFIG'] = data.items;
         }
       });
       me.getLov({
@@ -280,6 +291,7 @@
         ProductId: '',    // 产品Id
         KL_LOCK_BODY_MODEL: '',
         KL_LOCK_MODEL: '',
+        KL_MODEL_CONFIG: '',
         valueList: [],
         optionList: [],
         srId: '',
@@ -332,6 +344,7 @@
                   me.room = data['KL Personal Address Room'];
                   me.KL_LOCK_BODY_MODEL = data['KL Lock Body Model'];
                   me.KL_LOCK_MODEL = data['KL Lock Model'];
+                  me.KL_MODEL_CONFIG = data['KL Model Configuration'];
                 } else {
                   Toast('查无此资产');
                   me.SerialNumber = '';
@@ -414,6 +427,7 @@
           'srNum': me.ServiceRequest['SR Number'],
           'KL Lock Body Model': me['KL_LOCK_BODY_MODEL'],
           'KL Lock Model': me['KL_LOCK_MODEL'],
+          'KL Model Configuration': me['KL_MODEL_CONFIG'],
           callback: function(data) {
             Toast('提交成功');
             KND.Session.set('popupVisible', 'popupVisible');

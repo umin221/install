@@ -12,6 +12,7 @@ config.mapp = {
     '已分配': {status: '', list: 'cusProcess'}
   },
   'option': {
+    'KL_MODEL_CONFIG': [], // 型号配置
     'KL_LOCK_MODEL': [], // 面板
     'KL_LOCK_BODY_MODEL': [], // 锁体
     'KL_SR_RESP': [],

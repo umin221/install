@@ -315,6 +315,7 @@ let ApiList = {
         'KL SN': option.data.form.KL_SN || '',
         'KL Lock Body Model': option.data.form.KL_LOCK_BODY_MODEL,
         'KL Lock Model': option.data.form.KL_LOCK_MODEL,
+        'KL Model Configuration': option.data.form.KL_MODEL_CONFIG,
         // 'KL Product Model': option.data.form.KL_Product_Model,
         'KL Cutoff Date': option.data.form.KL_Cutoff_Date,
         'Product Warranty Flag': option.data.form.Product_Warranty_Flag,
@@ -337,6 +338,7 @@ let ApiList = {
         'Description': option.data.form['Description'], // 故障描述
         'KL Lock Body Model': option.data.form['KL Lock Body Model'],
         'KL Lock Model': option.data.form['KL Lock Model'],
+        'KL Model Configuration': option.data.form['KL Model Configuration'],
         'KL Country': '中国',
         'KL Province': option.data.form.Province,
         'KL City': option.data.form.City,

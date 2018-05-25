@@ -40,6 +40,7 @@
 <!--
                 <div><span>产品型号</span>{{ServiceRequest['KL Lock Body Model']}} {{ServiceRequest['KL Lock Model']}}</div>
 -->
+                <div><span>型号配置</span>{{ServiceRequest['KL Model Configuration']}}</div>
                 <div><span>面板型号</span>{{ServiceRequest['KL Lock Model']}}</div>
                 <div><span>锁体型号</span>{{ServiceRequest['KL Lock Body Model']}}</div>
                 <div><span>申请时间</span>{{toDate(ServiceRequest['Created'])}}</div>
@@ -80,6 +81,7 @@
                         <!--{{ServiceRequest['KL Town']}}-->
                         <!--{{ServiceRequest['KL Address']}}-->
                       <!--</li>-->
+                      <li><span>型号配置</span>{{item['KL Model Configuration']}}</li>
                       <li><span>面板型号</span>{{item['KL Lock Model']}}</li>
                       <li><span>锁体型号</span>{{item['KL Lock Body Model']}}</li>
                       <li><span>故障类型</span>{{item['KL Responsbility']}}</li>
@@ -137,6 +139,7 @@
                         {{ServiceRequest['KL Town']}}
                         {{ServiceRequest['KL Address']}}
                       </li>
+                      <li><span>型号配置</span>{{ServiceRequest['KL Model Configuration']}}</li>
                       <li><span>面板型号</span>{{ServiceRequest['KL Lock Model']}}</li>
                       <li><span>锁体型号</span>{{ServiceRequest['KL Lock Body Model']}}</li>
                       <li><span>故障类型</span>{{ServiceRequest['KL Responsbility']}}</li>

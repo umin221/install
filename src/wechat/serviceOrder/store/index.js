@@ -146,6 +146,7 @@ export default new Vuex.Store({
         form: {
           AssetNumber: '',
           KL_Product_Model: '', // 产品类型
+          KL_MODEL_CONFIG: '', // 型号配置
           KL_LOCK_MODEL: '', // 面板型号
           KL_LOCK_BODY_MODEL: '', // 锁体型号
           KL_Cutoff_Date: '',  // 移交日期
@@ -649,6 +650,7 @@ export default new Vuex.Store({
         mustForm: [
           // {name: '产品条形码', key: 'SerialNumber'},
           // {name: '产品型号', key: 'ProductModel'},
+          {name: '型号配置', key: 'KL_MODEL_CONFIG'},
           {name: '面板型号', key: 'KL_LOCK_MODEL'},
           {name: '锁体型号', key: 'KL_LOCK_BODY_MODEL'},
           {name: '故障现象', key: 'SR_ROOTCAUSE'},

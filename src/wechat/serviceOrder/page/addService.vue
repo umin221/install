@@ -106,6 +106,9 @@
                     placeholder="客户如提供请输入"
                     v-model="form.KL_Product_Model"
                     class="textRight"></mt-field>-->
+          <cus-field label="型号配置"
+                     :value="form.KL_MODEL_CONFIG"
+                     @click.native="toLov('KL_MODEL_CONFIG')" is-link></cus-field>
           <cus-field label="面板型号"
                      :value="form.KL_LOCK_MODEL"
                      @click.native="toLov('KL_LOCK_MODEL')" is-link></cus-field>
@@ -240,6 +243,12 @@
       var me = this;
       me.setSn('');
       me.getLov({
+        type: 'KL_MODEL_CONFIG',
+        success: data => {
+          mapp.option['KL_MODEL_CONFIG'] = data.items;
+        }
+      });
+      me.getLov({
         type: 'KL_LOCK_MODEL',
         success: data => {
           mapp.option['KL_LOCK_MODEL'] = data.items;
@@ -269,6 +278,7 @@
         callPhone: '',
         workPhone: '',
         AssetNumber: '',
+        KL_MODEL_CONFIG: '',
         KL_LOCK_BODY_MODEL: '',
         KL_LOCK_MODEL: '',
         Contact_Name: '',   // 报修联系人
@@ -382,6 +392,7 @@
           AssetNumber: me.form.AssetNumber,
           KL_LOCK_BODY_MODEL: me.form.KL_LOCK_BODY_MODEL,
           KL_LOCK_MODEL: me.form.KL_LOCK_MODEL,
+          KL_MODEL_CONFIG: me.form.KL_MODEL_CONFIG,
           KL_Product_Model: me.form.KL_Product_Model,
           KL_Cutoff_Date: me.form.Cutoff_Date,
           Product_Warranty_Flag: me.form.Product_Warranty_Flag,

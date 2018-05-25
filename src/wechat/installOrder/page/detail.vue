@@ -63,8 +63,8 @@
         </div>
       </toggle>
       <div style="height: 0.5rem;background: #eaeaea;"></div>
-      <div v-show="!isConfirming">
-        <div class="content-lc" style="margin-top: 15px">
+      <div v-show="!isConfirming" style="background: white">
+        <div class="content-lc" style="padding-top: 15px">
           <div class="stage_li">
             <div  class="mui-scroll-wrapper mui-segmented-control" style="height: 80px;overflow: auto">
               <div class="mui-scroll" style="height: 80px;" :style="{width: (74 * taskData.length) + 'px'}">
@@ -179,7 +179,6 @@
     /*.readonly {
       pointer-events: initial!important;
     }*/
-    background: white;
     .mint-cell-title {
     }
     .list-text-span {
@@ -197,11 +196,11 @@
       font-size: 1rem;
     }
     .mint-content-div {
-      width: 98%;
       height: 30px;
-      margin-top: 5px;
-      margin-bottom: 10px;
+      padding-top: 10px;
+      padding-right: 10px;
       text-align: right;
+      background: white;
     }
     .mint-content-xt {
       border: 1px solid #cccccc;
