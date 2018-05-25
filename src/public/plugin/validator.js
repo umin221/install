@@ -105,8 +105,13 @@ class ValidatorPlug {
         el.addEventListener('blur', e => v.valid(e));
       },
       unbind: (el, binding) => {
+        for (let i in group) {
+          if (group[i].el === el) {
+            group.splice(i, 1);
+          }
+        }
         errors = [];
-        group = [];
+//        group = [];
       }
     });
   };
