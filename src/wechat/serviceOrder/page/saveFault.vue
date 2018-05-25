@@ -37,11 +37,12 @@
             <!--<mt-button type="primary" v-show="isBn === '保外'" @click.native="getLov1('wm')"><i class="xs-icon icon-add" ></i>添加上门费</mt-button>-->
           </div>
         </div>
+        <!-- v-show="isBn === '保外'"        :attr="{'min':'0'}"-->
         <cus-field label="上门费"
-                   v-show="isBn === '保外'"
+                   tag="上门费"
                    placeholder="请输入上门费"
-                   :attr="{'min':'0'}"
-                   type="number" v-model="fee"></cus-field>
+                   v-valid.positiveInteger
+                   v-model="fee"></cus-field>
         <mt-cell title="总费用">￥{{Product}}</mt-cell>
         <mt-cell class="require" title="附件"></mt-cell>
         <div style="background-color: #ffffff">
@@ -64,6 +65,10 @@ import { Toast } from 'mint-ui';
 import menuBox from '../../../public/components/cus-menu';
 import numBox from '../components/number-box';
 import cusField from 'public/components/cus-field';
+import Vue from 'vue';
+import vp from 'public/plugin/validator';
+Vue.use(vp);
+
 const NAMESPACE = 'saveFault';
 let _upload = function(serverIds, id, successBack) {
   let callback = data => {
@@ -310,29 +315,31 @@ export default {
        * 4.维修配件不为空，则提交创建订单 ， 则调用完成子服务请求更改状态
        */
       let me = this;
-      if (!me.attach.list.length) {
-        Toast('请上传维修记录表');
-        return;
-      }
-      MessageBox.confirm('确认提交，数据一经提交不可修改。', '提示').then(action => {
-        if (me.returnSelect.length > 0) { // 检验维修配件输入正整数
-          for (let i = 0;i < me.returnSelect.length; i++) {
-            if (me.returnSelect[i].num < 1) {
-              Toast('维修配件请填写正确的数量');
-              return;
+      tools.valid.call(this, () => {
+        if (!me.attach.list.length) {
+          Toast('请上传维修记录表');
+          return;
+        }
+        MessageBox.confirm('确认提交，数据一经提交不可修改。', '提示').then(action => {
+          if (me.returnSelect.length > 0) { // 检验维修配件输入正整数
+            for (let i = 0; i < me.returnSelect.length; i++) {
+              if (me.returnSelect[i].num < 1) {
+                Toast('维修配件请填写正确的数量');
+                return;
+              }
             }
           }
-        }
-        let uploadAttach = id => {
-          _upload.call(me,
-            me.$refs.attach.getServerIds(),
-            id,
-            function(data) {
-            // 提交订单
-              me.submitOrder();
-            });
-        };
-        uploadAttach(me['Service'].Id); // 上传附件
+          let uploadAttach = id => {
+            _upload.call(me,
+              me.$refs.attach.getServerIds(),
+              id,
+              function(data) {
+                // 提交订单
+                me.submitOrder();
+              });
+          };
+          uploadAttach(me['Service'].Id); // 上传附件
+        });
       });
     },
     submitOrder() {
@@ -350,7 +357,7 @@ export default {
         };
         lineItems.push(obj);
       }
-      if (isBn === 'N' && me.fee) {
+      if (me.fee) {
         obj = {
           'Id': lineItems.length + 1,
           'Product': 'AP003', // 产品编码
