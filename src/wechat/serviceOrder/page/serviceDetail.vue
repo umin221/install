@@ -700,8 +700,10 @@
         }
       },
       moreOrder() {
+        let me = this;
+        me.popupVisible1 = false;
         MessageBox.confirm('新建后无法删除，是否再记一单', '提示').then(action => {
-          let me = this;
+          me.popupVisible1 = true;
           let params = {
             parentId: me.ServiceRequest['Id'],
             contactId: me.ServiceRequest['Contact Id'],
@@ -710,6 +712,8 @@
             srNumber: me.ServiceRequest['SR Number']
           };
           me.addChildService(params);
+        }).catch(action => {
+          me.popupVisible1 = true;
         });
       },
       fillIn(id) {
