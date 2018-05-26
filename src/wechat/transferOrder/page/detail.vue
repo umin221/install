@@ -188,7 +188,11 @@
       },
       // 合同附件
       getAttach() {
-        return KND.Util.toArray(this.form['KL Agreement Attachment']);
+//        需要展示附件的类型
+        let fileType = ['doc', 'docx', 'xls', 'xlsx', 'pdf', 'jpg'];
+        return KND.Util.toArray(this.form['KL Agreement Attachment']).filter(item => {
+          return fileType.indexOf(item['AgreeFileExt'].toLowerCase()) !== -1;
+        });
       }
     }
   };
