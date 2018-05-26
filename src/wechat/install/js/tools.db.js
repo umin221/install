@@ -247,10 +247,11 @@ class DataHandle {
                   resolve(result);
                 });
               },
-              error: () => {
+              error: err => {
                 let failRecord = util.parse(item.data);
-                Toast(`记录<${failRecord['Id']} , ${failRecord['Serial Number']}> 提交失败`);
-                console.log(failRecord);
+                let mes = err.response.data.ERROR || `记录<${failRecord['Id']} , ${failRecord['Serial Number']}> 提交失败。`;
+                Toast(mes);
+                reject(result);
               }
             });
           }));
