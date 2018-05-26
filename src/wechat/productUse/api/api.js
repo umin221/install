@@ -52,6 +52,27 @@ let apiList = {
     };
     // 产品目录
   },
+  // 搜索
+  getSearchProduct: option => {
+    // let condition = Object.assign({}, option.data);
+    let model = '';
+    if (option.data) {
+      model += ' AND ([Product.Name] ~LIKE "*' + option.data.name + '*" OR [Product.KL Translated Description] ~LIKE "*' + option.data.name + '*")';
+      // model += KND.Util.condition2D(condition, 'Catalog Category', ' OR ', ' ~LIKE ');
+     // model = 'AND ([Product.Name] ~LIKE "*' + option.data.val + '*" OR [Product.KL Product Model No] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*")';
+    }
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base Catalog Category (Content Management)',
+          'SearchSpec': '[Catalog Category.Private Flag] = "Y" AND [Product.Price List Id]= "' + option.data.id + '"' + model,
+          'ViewMode': 'Group'
+        }
+      }
+    };
+  },
 /*  getProduct: option => {
     // let model = 'AND ([Product.Name] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Description] ~LIKE "*' + option.data.val + '*" OR [Product.KL Translated Name] ~LIKE "*' + option.data.val + '*")';
     let id = option.data.id;

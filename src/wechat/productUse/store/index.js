@@ -305,6 +305,94 @@ export default new Vuex.Store({
         }
       }
     },
+    searchPart: {
+      namespaced: true,
+      state: {
+        priceId: '',
+        result: [],
+        selected: [],
+        returnSelect: []
+      },
+      actions: {
+        getSearchProduct({state, commit}, {data, more, callback}) {
+          api.get({
+            key: 'getPrice',
+            success: function(dataObj) {
+              state.priceId = dataObj.Id;
+              if (dataObj.Id) {
+                /* api.get({
+                  key: 'getSearchProduct',
+                  data: {
+                    id: data.Id,
+                    obj: obj
+                  },
+                  success: function(data) {
+                    let product = KND.Util.toArray(data.SiebelMessage['Catalog Category']);
+                    if (product) {
+                      commit('setProduct', product);
+                    }
+                  }
+                });*/
+                data.id = dataObj.Id;
+                api.get({
+                  key: 'getSearchProduct',
+                  data: data,
+                  success: data => {
+                    console.dir('=000==');
+                    let product = KND.Util.toArray(data.SiebelMessage['Catalog Category']);
+                    if (product) {
+                      commit('setProduct', product);
+                    }
+                  },
+                  error: error => {
+                    if (callback) {
+                      callback();
+                    };
+                    console.log(error);
+                  }
+                });
+              }
+            }
+          });
+        }
+      },
+      mutations: {
+        count(state, val) {
+          if (val.isShow) {
+            state.selected.splice(val.index, 1, false);
+          } else {
+            state.selected.splice(val.index, 1, true);
+          }
+        },
+        setProduct(state, data) {
+          // state.result = data;
+          state.selected = [];
+          for (let i = 0; i < data.length; i++) {
+            if (data[i].Product) {
+              if (KND.Util.isArray(data[i].Product)) {
+                state.result = state.result.concat(data[i].Product);
+              } else {
+                state.result.push(data[i].Product);
+              }
+            }
+          }
+          console.dir('====000===');
+          console.dir(state.result);
+          for (let i = 0; i < state.result.length;i++) {
+            state.selected.push(false);
+          }
+        },
+        initSelected(state) {
+          state.selected = [];
+          for (let i = 0; i < state.result.length;i++) {
+            state.selected.push(false);
+          }
+        },
+        deleteSelected(state) {
+          state.selected = [];
+        }
+      }
+    },
     selectProject: {
       namespaced: true,
       state: {

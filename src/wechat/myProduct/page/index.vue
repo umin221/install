@@ -28,7 +28,7 @@
                       :key="item.Id"
                       @click.native="toDetail(item['Inventory Location ID'],item['Product ID'])"
                       :title="'配件代码:'+ item['Product Name']" is-link>
-            <div slot="after" style="color: #0772c1">{{item.Type}}</div>
+            <div slot="after" style="color: #0772c1">{{item['KL Inventory Product Status']}}</div>
               <div class="mint-cell-sub-title" slot="title">配件名称：{{item['KL Product Name Join']}}</div>
               <div class="mint-cell-sub-title" slot="title">配件型号: {{item['KL Prod Model No']}}</div>
               <div class="mint-cell-sub-title" slot="title">库存量：{{item['KL Inventory Qty']}}</div>
@@ -49,7 +49,7 @@
                       :key="item.Id"
                       @click.native="toDetail(item['Inventory Location ID'],item['Product ID'])"
                       :title="'配件代码:'+ item['Product Name']" is-link>
-              <div slot="after" style="color: #0772c1">{{item.Type}}</div>
+              <div slot="after" style="color: #0772c1">{{item['KL Inventory Product Status']}}</div>
               <div class="mint-cell-sub-title" slot="title">配件名称：{{item['KL Product Name Join']}}</div>
               <div class="mint-cell-sub-title" slot="title">配件型号: {{item['KL Prod Model No']}}</div>
               <div class="mint-cell-sub-title" slot="title">库存量：{{item['KL Inventory Qty']}}</div>

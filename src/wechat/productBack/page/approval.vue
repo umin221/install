@@ -12,10 +12,16 @@
               <li class="bd-radius">
                 <span class="icon"></span>
               </li>
-              <li style="color: #888;line-height: 40px;font-size: 0.8rem;">{{new Date(itemTask['End Working Time']).format('yyyy-MM-dd')}}
+              <li style="color: #888;line-height: 40px;font-size: 0.8rem;">{{new Date(itemTask['Start Time']).format('yyyy-MM-dd hh:mm:ss')}}
               </li>
               <div class="content-div">
                 <div>审批人：{{itemTask['Task Owner Full Name']}}</div>
+              </div>
+              <div class="content-div">
+                <div>审批时间：{{new Date(itemTask['End Working Time']).format('yyyy-MM-dd hh:mm:ss')}}</div>
+              </div>
+              <div class="content-div">
+                <div>申请人：{{itemTask['Created By Full Name']}}</div>
               </div>
               <div class="content-div">
                 <div>审批状态：{{itemTask['Action']}}</div>

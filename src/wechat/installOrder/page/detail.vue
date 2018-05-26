@@ -446,9 +446,9 @@
                 },
                 success: data => {
                   lov = KND.Util.toArray(data.items)[0].Value;
-                  console.dir('-------打开范围------------');
-                  console.dir(lov);
-                  console.dir(parseFloat(dis1.toFixed(2)));
+                  console.log('-------打开范围------------');
+                  console.log(lov);
+                  console.log(parseFloat(dis1.toFixed(2)));
                   if (parseFloat(dis1.toFixed(2)) > parseFloat(lov)) {
                     Toast('不在范围内不能打卡！');
                   } else {

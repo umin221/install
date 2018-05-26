@@ -14,6 +14,7 @@ let ApiList = {
     } else {
       SearchSpec = KND.Util.condition2D(condition, 'KL FS Invloc Product', ' OR ', operator);
     }
+    SearchSpec += ' AND [KL FS Invloc Product.KL Inventory Qty]>0';
     return {
       url: 'service/EAI Siebel Adapter/QueryPage',
       data: {

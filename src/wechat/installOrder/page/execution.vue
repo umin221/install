@@ -158,7 +158,7 @@
                     'Inbox Comments': comment
                   }
                 },
-                success: function (data) {
+                success: function(data) {
                   if (!data.ERROR) {
                     Toast({
                       message: '提交成功',

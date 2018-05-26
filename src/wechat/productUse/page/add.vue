@@ -6,8 +6,12 @@
     <div class="mint-content product-use">
       <div class="add-parts-list">
         <div class="add-btn" @click="selectPart">
+        <i class="xs-icon icon-add"></i>
+        <span>添加配件</span>
+        </div>
+        <div class="add-btn" @click="searchPart" style="margin-left: 20px">
           <i class="xs-icon icon-add"></i>
-          <span>添加配件</span>
+          <span>搜索配件</span>
         </div>
       </div>
       <div class="parts-list">
@@ -123,11 +127,18 @@ export default {
       ];
     },
     /*
-    * 跳转 配件选择
+    * 跳转 配件选择 ------分类
     * */
     selectPart() {
       KND.Session.set('DescriptionUse', this.Description);
       this.$router.push('./selectParts');
+    },
+    /*
+   * 跳转 配件选择-----搜索
+   * */
+    searchPart() {
+      KND.Session.set('DescriptionUse', this.Description);
+      this.$router.push('./searchPart');
     },
     /*
     * 跳转 项目选择

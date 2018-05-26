@@ -35,6 +35,12 @@ export default new Router({
       require(['../page/selectParts'], resolve);
     }
   }, {
+    path: '/searchPart', // 选择配件 -- 搜索
+    name: 'searchPart',
+    component(resolve) {
+      require(['../page/searchPart'], resolve);
+    }
+  }, {
     path: '/selectProject', // 选择项目
     name: 'selectProject',
     component(resolve) {
