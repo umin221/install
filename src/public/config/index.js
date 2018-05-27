@@ -2,16 +2,17 @@
 import prod from './prod.env';
 import dev from './dev.env';
 
-let project = global['project'] || {};
+const project = global['project'] || {};
 // 环境
-let env = project['env'];
+const env = project['env'];
+// 是否生产标记
+const production = process.env.NODE_ENV === 'production';
+
 // 环境配置
 let envConfig = {};
 // 项目配置
 let config;
 let name;
-// 是否生产标记
-let production = process.env.NODE_ENV === 'production';
 
 /**
  * 环境配置

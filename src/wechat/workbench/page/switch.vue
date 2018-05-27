@@ -20,7 +20,8 @@
 <script type="es6">
   import list from '../store/users';
   // 环境
-  let env = global['project']['env'] || {env: 'SIT'};
+  let project = global['project'];
+  let env = (project && project['env']) || {env: 'SIT'};
   let NameSpace = 'default';
   export default {
     name: NameSpace,

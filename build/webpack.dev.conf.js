@@ -45,6 +45,13 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
     new webpack.NoEmitOnErrorsPlugin(),
+
+    ...Object.keys(config.library).map(name => {
+      return new webpack.DllReferencePlugin({
+        context: '.',
+        manifest: require(`${config.build.assetsPublicOutputRoot}/${name}.manifest.json`),
+      })
+    })
     // https://github.com/ampedandwired/html-webpack-plugin
     /* 单模块
     new HtmlWebpackPlugin({

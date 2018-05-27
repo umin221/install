@@ -43,12 +43,13 @@ const getCompileModules = () => {
   return modules;
 };
 
+const exclude = {'sign': false, 'public': false, 'App.vue': false};
 const createEntry = () => {
   let entry = {};
   let modules = getCompileModules();
   for (var i = modules.length - 1; i >= 0; i--) {
     let child = modules[i];
-    if (child.indexOf('.') !== -1 || child === 'sign') continue;
+    if (exclude[child] === false) continue;
     entry[child] = './src/wechat/'+ child +'/main.js';
   }
   return entry;
@@ -70,7 +71,8 @@ module.exports = {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
       'public': path.resolve(__dirname, '../src/public'),
-    }
+    },
+    modules :["node_modules", path.resolve(__dirname, '../dll')]
   },
   module: {
     rules: [

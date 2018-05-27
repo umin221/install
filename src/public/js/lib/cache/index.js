@@ -1,5 +1,6 @@
-let ws = require('./web-storage-cache.min');
-let cache = new ws.WebStorageCache();
+import WebStorageCache from './web-storage-cache.min';
+
+let cache = new WebStorageCache();
 cache.isSupport = cache.isSupported();
 
 export default cache;

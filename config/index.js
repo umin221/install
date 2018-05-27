@@ -3,6 +3,7 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
+const library = require('./library')
 
 module.exports = {
   dev: {
@@ -57,6 +58,8 @@ module.exports = {
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
+    assetsPublicSourcePath: path.resolve(__dirname, '../src/public'),
+    assetsPublicOutputRoot: path.resolve(__dirname, '../dll'),
 
     /**
      * Source Maps
@@ -89,5 +92,8 @@ module.exports = {
       pass: 'abcd1234',
       remotePath: '/kinlong/html/deploy/'
     }
-  }
+  },
+
+  // Dll library
+  library: library
 }

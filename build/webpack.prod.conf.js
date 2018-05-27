@@ -132,7 +132,14 @@ const webpackConfig = merge(baseWebpackConfig, {
         to: config.build.assetsSubDirectory,
         ignore: ['.*']
       }
-    ])
+    ]),
+    // Dll library
+    ...Object.keys(config.library).map(name => {
+      return new webpack.DllReferencePlugin({
+        context: '.',
+        manifest: require(`${config.build.assetsPublicOutputRoot}/${name}.manifest.json`),
+      })
+    })
   ]
 })
 
