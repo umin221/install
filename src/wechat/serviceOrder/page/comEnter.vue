@@ -30,7 +30,7 @@
         <mt-field class="block border-none"
                   v-show="AssetNumber && SerialNumber"
                   :class="{readonly: !isSubmit}"
-                  label="详细地址"
+                  label="小区名称"
                   v-model="Address"
                   placeholder="如设备过旧未贴条码,允许为空"
                   type="textarea" rows="2"></mt-field>
@@ -344,7 +344,7 @@
                   me.room = data['KL Personal Address Room'];
                   me.KL_LOCK_BODY_MODEL = data['KL Lock Body Model'];
                   me.KL_LOCK_MODEL = data['KL Lock Model'];
-                  me.KL_MODEL_CONFIG = data['KL Model Configuration'];
+                  // me.KL_MODEL_CONFIG = data['KL Model Configuration'];
                 } else {
                   Toast('查无此资产');
                   me.SerialNumber = '';

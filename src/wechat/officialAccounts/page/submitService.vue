@@ -192,7 +192,7 @@
       address() {
         let me = this;
         if (me.form.Id) {
-          return me.form.Province + me.form.City + me.form.County + me.form['Street Address'];
+          return me.form.Province + me.form.City + me.form.County + me.form['Street Address'] + me.form['Street Address 2'] + me.form['Street Address 3'] + me.form['Street Address 4'];
         } else {
           return '';
         }
@@ -220,6 +220,9 @@
                 'City': me.form.City, // 城市
                 'Town': me.form.County, // 区
                 'Detail Address': me.form['Street Address'], // 详细地址
+                'Building': me.form['Street Address 2'], // 详细地址
+                'Floor': me.form['Street Address 3'], // 详细地址
+                'Room': me.form['Street Address 4'], // 详细地址
                 'Contact Name': me.lastName, // 名字
                 'Contact Phone': me.callPhone, // 电话
                 'Area': me.Area, // 故障分类

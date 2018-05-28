@@ -48,6 +48,9 @@
                   {{ServiceRequest['KL City']}}
                   {{ServiceRequest['KL Town']}}
                   {{ServiceRequest['KL Address']}}
+                  {{ServiceRequest['KL Building']}}
+                  {{ServiceRequest['KL Floor']}}
+                  {{ServiceRequest['KL Room']}}
                 </div>
                 <div><span>问题说明</span>
                   <p class="Description">
@@ -138,6 +141,9 @@
                         {{ServiceRequest['KL City']}}
                         {{ServiceRequest['KL Town']}}
                         {{ServiceRequest['KL Address']}}
+                        {{ServiceRequest['KL Building']}}
+                        {{ServiceRequest['KL Floor']}}
+                        {{ServiceRequest['KL Room']}}
                       </li>
                       <li><span>型号配置</span>{{ServiceRequest['KL Model Configuration']}}</li>
                       <li><span>面板型号</span>{{ServiceRequest['KL Lock Model']}}</li>

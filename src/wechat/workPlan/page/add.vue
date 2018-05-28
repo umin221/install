@@ -163,9 +163,24 @@
         var minutes = new Date().getMinutes();
         console.dir(self.newTimes + ' ' + today + ':' + minutes);
         if (self.newTimes === self.initDate()) { // 选择当前时间以后
-          if (date < (today + ':' + (minutes + 1))) {
+          /* if (date < (today + ':' + minutes)) {
             Toast('开始时间必须大于当前时间');
             return;
+          }*/
+          var selectToday = parseInt(date.split(':')[0], 10);
+          var selectMinutes = parseInt(date.split(':')[1], 10);
+          console.dir(selectToday + selectMinutes);
+          if (selectToday < today) {
+            Toast('开始时间必须大于当前时间');
+            return;
+          } else if (selectToday === today) {
+            if ((minutes + 1) < 10) {
+              minutes = '0' + (minutes + 1);
+            }
+            if (selectMinutes < minutes) {
+              Toast('开始时间必须大于当前时间');
+              return;
+            }
           }
         }
         this.setStartPicker(date);
@@ -248,9 +263,24 @@
           var minutes = new Date().getMinutes();
           console.dir(self.newTimes + ' ' + today + ':' + minutes);
           if (self.newTimes === self.initDate()) { // 选择当前时间以后
-            if (self.startPickerValue < (today + ':' + (minutes + 1))) {
+            /* if (self.startPickerValue < (today + ':' + (minutes + 1))) {
               Toast('开始时间必须大于当前时间');
               return;
+            }*/
+            var selectToday = parseInt(self.startPickerValue.split(':')[0], 10);
+            var selectMinutes = parseInt(self.startPickerValue.split(':')[1], 10);
+            console.dir(selectToday + selectMinutes);
+            if (selectToday < today) {
+              Toast('开始时间必须大于当前时间');
+              return;
+            } else if (selectToday === today) {
+              if ((minutes + 1) < 10) {
+                minutes = '0' + (minutes + 1);
+              }
+              if (selectMinutes < minutes) {
+                Toast('开始时间必须大于当前时间');
+                return;
+              }
             }
           }
         }

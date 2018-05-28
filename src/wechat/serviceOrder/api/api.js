@@ -127,7 +127,11 @@ let ApiList = {
                 'Province': option.data.form.KL_PROVINCE,
                 'City': option.data.form.KL_CITY,
                 'County': option.data.form.KL_TOWN,
-                'Street Address': option.data.form.Address
+                'Street Address': option.data.form.Address,
+                'Street Address 2': option.data.form.building,
+                'Street Address 3': option.data.form.floor,
+                'Street Address 4': option.data.form.room
+
               }
             ]
           }
@@ -298,6 +302,9 @@ let ApiList = {
         'KL City': option.data.form.KL_CITY,
         'KL Town': option.data.form.KL_TOWN,
         'KL Address': option.data.form.Address,
+        'KL Building': option.data.form.building,
+        'KL Floor': option.data.form.floor,
+        'KL Room': option.data.form.room,
         'Asset Number': option.data.form.AssetNumber, // 产品ID
         // 'KL Personal Province': option.data.form.KL_PROVINCE,
         // 'Personal City': option.data.form.KL_CITY,
@@ -406,7 +413,10 @@ let ApiList = {
                 'Province': option.data.form.KL_PROVINCE,
                 'City': option.data.form.KL_CITY,
                 'County': option.data.form.KL_TOWN,
-                'Street Address': option.data.form.Address
+                'Street Address': option.data.form.Address,
+                'Street Address 2': option.data.form.building,
+                'Street Address 3': option.data.form.floor,
+                'Street Address 4': option.data.form.room
               }
             ]
           }

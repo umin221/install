@@ -43,12 +43,19 @@
         <mt-field class="block require"
                   id="addressText"
                   :attr="isEdit"
-                  label="详细地址"
-                  placeholder="请输入详细地址"
+                  label="小区名称"
+                  placeholder="请输入小区名称"
                   v-model="Address"
                   type="textarea" rows="2">
           <i class="xs-icon icon-edit" @click="editAddress" style="position: absolute;bottom: 1.8rem;right: 0.8rem;"></i>
         </mt-field>
+        <div class="floor-box">
+          <div>
+            <input type="text"  placeholder="楼栋名" v-model="building">
+            <input type="text"  placeholder="楼层" v-model="floor">
+            <input type="text"  placeholder="房号" v-model="room">
+          </div>
+        </div>
         <!--<mt-cell class="mint-field require"-->
                  <!--title="服务类型"-->
                  <!--:value="SR_TYPE"-->
@@ -284,6 +291,9 @@
         Contact_Name: '',   // 报修联系人
         Contact_Id: '',     // 客户Id
         Address: '',       // 详细地址
+        building: '',
+        floor: '',
+        room: '',
         KL_PROVINCE: '',      // 省
         KL_CITY: '',           // 市
         KL_TOWN: '',            // 区
@@ -382,6 +392,9 @@
           KL_CITY: me.KL_CITY,           // 市
           KL_TOWN: me.KL_TOWN,            // 区
           Address: me.Address,
+          building: me.building,
+          floor: me.floor,
+          room: me.room,
           Area: me.Area,
           SR_AREA: me.SR_AREA,
           SR_TYPE: me.SR_TYPE,
@@ -473,6 +486,9 @@
         me.KL_CITY = val['Primary Personal City'];           // 市
         me.KL_TOWN = val['KL Primary Personal Town'];            // 区
         me.Address = val['Primary Personal Street Address'];
+        me.building = val['KL Personal Address Building'];
+        me.floor = val['KL Personal Address Floor'];
+        me.room = val['KL Personal Address Room'];
         me.isCall = {disabled: true};
         me.isEdit = {disabled: true};
         me.isClick = true;
@@ -602,6 +618,23 @@
     align-items: center;
   }
   .addService{
+    .floor-box {
+      padding: 0 0.5rem;
+      background: #ebebeb;
+      div{
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        height: 48px;
+        input{
+          width: 30%;
+          line-height: 1.2rem;
+        }
+        input:focus{
+          outline:0 !important
+        }
+      }
+    }
     .addform{
       background: white;
       .block{

@@ -21,6 +21,9 @@ let ApiList = {
           'City': option.data.form['City'], // 城市
           'Town': option.data.form['Town'], // 区
           'Detail Address': option.data.form['Detail Address'], // 详细地址
+          'Building': option.data.form['Building'], // 详细地址
+          'Floor': option.data.form['Floor'], // 详细地址
+          'Room': option.data.form['Room'], // 详细地址
           'Contact Name': option.data.form['Contact Name'], // 名字
           'Contact Phone': option.data.form['Contact Phone'], // 电话
           'Area': option.data.form['Area'], // 故障分类
@@ -80,7 +83,10 @@ let ApiList = {
         'Province': option.data.form.Province,
         'City': option.data.form.City,
         'County': option.data.form.County,
-        'Street Address': option.data.form['Street Address']
+        'Street Address': option.data.form['Street Address'],
+        'Street Address 2': option.data.form['Street Address 2'],
+        'Street Address 3': option.data.form['Street Address 3'],
+        'Street Address 4': option.data.form['Street Address 4']
       }
     };
   },
@@ -103,7 +109,10 @@ let ApiList = {
         'Province': option.data.form.Province,
         'City': option.data.form.City,
         'County': option.data.form.County,
-        'Street Address': option.data.form['Street Address']
+        'Street Address': option.data.form['Street Address'],
+        'Street Address 2': option.data.form['Street Address 2'],
+        'Street Address 3': option.data.form['Street Address 3'],
+        'Street Address 4': option.data.form['Street Address 4']
       }
     };
   },

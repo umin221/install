@@ -26,7 +26,7 @@ let ApiList = {
       data: {
         'body': {
           'OutputIntObjectName': 'Base KL Daily Action Interface BO',
-          'SearchSpec': '[KL Daily Action.Planned Completion]>= ' + "'" + option.data + ' 00:00:00' + "'" + ' AND [KL Daily Action.Planned] <= ' + "'" + option.data + ' 00:00:00' + "'",
+          'SearchSpec': '[KL Daily Action.Planned Completion]>= ' + "'" + option.data + ' 00:00:00' + "'" + ' AND [KL Daily Action.Planned] <= ' + "'" + option.data + ' 23:59:59' + "'",
           'SortSpec': 'Created (DESCENDING)',
           'ViewMode': 'Personal'
         }

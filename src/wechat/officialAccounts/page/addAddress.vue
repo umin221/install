@@ -8,10 +8,17 @@
                  is-link
                  v-model="provinces"></mt-cell>
         <cus-field class="block"
-                   label="详细地址"
+                   label="小区名称"
                    v-model= 'street_Address'
                    type="textarea"
-                   placeholder="请输入详细地址"></cus-field>
+                   placeholder="请输入小区名称"></cus-field>
+        <div class="floor-box">
+          <div>
+            <input type="text"  placeholder="楼栋名" v-model="building">
+            <input type="text"  placeholder="楼层" v-model="floor">
+            <input type="text"  placeholder="房号" v-model="room">
+          </div>
+        </div>
         <!--<cus-field label="联系人" type="text" placeholder="请输入联系人姓名"></cus-field>-->
         <!--<cus-field label="联系电话" type="number" placeholder="请输入联系人电话"></cus-field>-->
       </div>
@@ -67,6 +74,9 @@
               me.KL_CITY = data['City'];
               me.KL_TOWN = data['County'];
               me.street_Address = data['Street Address'];
+              me.building = data['Street Address 2'];
+              me.floor = data['Street Address 3'];
+              me.room = data['Street Address 4'];
               me.provinces = data['Province'] + data['City'] + data['County'];
             }
           }
@@ -84,6 +94,9 @@
         KL_CITY: '',
         KL_TOWN: '',
         street_Address: '',
+        building: '',
+        floor: '',
+        room: '',
         addrId: '',
         ContactId: ''
       };
@@ -176,6 +189,9 @@
             'City': me.KL_CITY,
             'County': me.KL_TOWN,
             'Street Address': me.street_Address,
+            'Street Address 2': me.building,
+            'Street Address 3': me.floor,
+            'Street Address 4': me.room,
             'contactId': me.ContactId,
             success: function(data) {
               if (!me.ContactId && data) {
@@ -192,6 +208,9 @@
             'City': me.KL_CITY,
             'County': me.KL_TOWN,
             'Street Address': me.street_Address,
+            'Street Address 2': me.building,
+            'Street Address 3': me.floor,
+            'Street Address 4': me.room,
             'contactId': me.ContactId,
             'addrId': me.addrId,
             callback: function(data) {
@@ -216,6 +235,24 @@
 
     .mint-cell>.mint-cell-wrapper{
       display: block;
+    }
+
+  }
+  .floor-box {
+    padding: 0 0.5rem;
+    background: #ebebeb;
+    div{
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 48px;
+      input{
+        width: 30%;
+        line-height: 1.2rem;
+      }
+      input:focus{
+        outline:0 !important
+      }
     }
   }
 </style>
