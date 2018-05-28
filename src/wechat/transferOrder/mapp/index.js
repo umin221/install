@@ -40,5 +40,5 @@ config.mapp = {
     'Other': {group: 'others', label: '其他'}
   },
   // 可编辑订单状态
-  'editOrderStatus': ['Draft', 'Rejected', 'In Confirming', 'Door Factory Return']
+  'editOrderStatus': ['Draft', 'Rejected', 'Door Factory Return']
 };
