@@ -1,3 +1,3 @@
-import VConsole from 'public/js/lib/vconsole.min';
+let vc = require('public/js/lib/vconsole.min');
 /* eslint-disable no-new */
-if (config.debug) new VConsole();
+if (config.debug) new vc.VConsole();
