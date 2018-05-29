@@ -8,7 +8,7 @@
       <cus-loadmore ref="result"
                     :loadBottom="loadBottomFn"
                     :emptyTips="false"
-                    :topStatus="topStatus">
+                    :refresh="false">
         <cus-cell class="multiple"
                   :key="item.Id"
                   :title="'订单编码:'+ item['Order Number']"
@@ -42,23 +42,23 @@
           'KL Delivery Setter Full Name': exp
         }
       },
+      more: args.pop(),
       callback: (data) => {
-        me.$refs['result'][event](data.length);
+        // me.$refs['result'][event](data.length);
+        me.$refs.result[event](data.length);
       }
     }, args.pop() || {});
     // 获取安装订单
     console.dir('00000');
     me.getList(param, me.userInfo);
   };
-
   const NAMESPACE = 'index';
   export default {
     name: 'search',
     components: {cusLoadmore, cusSearch, cusCell},
     data: () => {
       return {
-        value: '',
-        topStatus: ''
+        value: ''
       };
     },
     computed: {

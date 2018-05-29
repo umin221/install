@@ -17,11 +17,11 @@
                    v-model="line['Spot Check Amount']"></cus-field>
         <cus-field label="合格数量" tag="合格数量"
                    type="number"
-                   v-valid.positiveInteger
+                   v-valid.number
                    v-model="line['Qualified Amount']"></cus-field>
         <cus-field label="异常处理数量" tag="异常处理数量"
                    type="number"
-                   v-valid.positiveInteger
+                   v-valid.number
                    v-model="line['Unqualified Solve Amount']"></cus-field>
         <cus-field label="异常描述"
                    type="textarea"

@@ -206,6 +206,7 @@
             data: {
               'body': {
                 'ProcessName': 'KL Install Order Asset Room Upsert Process', // 详情ID
+                'Serial Number': self.SerialNumber,
                 'SiebelMessage': {
                   'MessageId': '',
                   'MessageType': 'Integration Object',
@@ -243,7 +244,9 @@
             },
             success: function(data) {
               if (!data.ERROR) {
-                if (self.type) { // 新增成功 更新条形码
+                Toast('保存成功');
+                KND.Util.back();
+                /* if (self.type) { // 新增成功 更新条形码
                   api.get({
                     key: 'getUPNumber',
                     method: 'PUT',
@@ -261,7 +264,7 @@
                 } else {
                   Toast('保存成功');
                   KND.Util.back();
-                }
+                }*/
               }
             }
           });

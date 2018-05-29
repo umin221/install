@@ -7,7 +7,8 @@
 
       <cus-loadmore ref="result"
                   :loadBottom="loadBottomFn"
-                  :topStatus="topStatus">
+                    :emptyTips="false"
+                    :refresh="false">
         <mt-cell class="multiple"
                  v-for="(item, index) in result"
                  @click.native="selectFn(item)"
@@ -37,6 +38,9 @@
     position: absolute;
     right: 20px;
     top: 23px;
+  }
+  .mint-search-list {
+    padding-bottom: 40px!important;
   }
 </style>
 

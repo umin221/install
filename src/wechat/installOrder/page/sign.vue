@@ -18,8 +18,10 @@
         <div v-show="box1" :class="{disable: !editable}">
           <mt-field v-if="item['KL Detail Type LIC'] !== 'Working Drawing Sign'" :label="labelText"
                     placeholder="请输入数量"
+                    :tag=labelText
                     :class="heartVisible"
                     type="number"
+                    v-valid.require.positiveInteger
                     v-model="form['KL Signed Amount']">
 
           </mt-field>
@@ -46,6 +48,9 @@
   import {mapState, mapActions, mapMutations} from 'vuex';
   import titleGroup from 'public/components/cus-title-group';
   import buttonGroup from 'public/components/cus-button-group';
+  import Vue from 'vue';
+  import vp from 'public/plugin/validator';
+  Vue.use(vp);
 
   // Right button
   let right = [{
@@ -223,25 +228,27 @@
       },
       submitFn() {
         var self = this;
-        var item = this.item;
-        if (item['KL Detail Type LIC'] === 'Trompil Lock Sign' ||
-          item['KL Detail Type LIC'] === 'Working Drawing Sign') { // 提交后可编辑
-          if (self.type === 'edit' && !self.Description) {
-            Toast('重新编辑，备注不能为空！');
-            return;
-          }
-          this.submit();
-        } else { // 提交后不可编辑
-          MessageBox({
-            title: '提示',
-            message: ' 确认提交？一经提交不可修改',
-            showCancelButton: true
-          }).then(action => {
-            if (action === 'confirm') {
-              this.submit();
+        tools.valid.call(this, () => {
+          var item = this.item;
+          if (item['KL Detail Type LIC'] === 'Trompil Lock Sign' ||
+            item['KL Detail Type LIC'] === 'Working Drawing Sign') { // 提交后可编辑
+            if (self.type === 'edit' && !self.Description) {
+              Toast('重新编辑，备注不能为空！');
+              return;
             }
-          });
-        }
+            this.submit();
+          } else { // 提交后不可编辑
+            MessageBox({
+              title: '提示',
+              message: ' 确认提交？一经提交不可修改',
+              showCancelButton: true
+            }).then(action => {
+              if (action === 'confirm') {
+                this.submit();
+              }
+            });
+          }
+        });
       }
     },
     components: {titleGroup, buttonGroup}

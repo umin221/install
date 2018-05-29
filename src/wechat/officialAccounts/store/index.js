@@ -465,7 +465,7 @@ export default new Vuex.Store({
         }
       },
       actions: {
-        getAssetSn({commit}, {klsn, callback}) {
+        getAssetSn({state, commit}, {klsn, callback}) {
           api.get({
             key: 'getAssetdetail',
             data: {
@@ -485,6 +485,7 @@ export default new Vuex.Store({
               }
             },
             error: data => {
+              state.assetDetail = {};
               Toast('该码未录入系统');
             }
           });

@@ -10,9 +10,9 @@
             <span class="icon"></span>
           </li>
           <li style="color: #888;line-height: 40px;font-size: 0.9rem;">{{new Date(item['Install Date']).format('yyyy-MM-dd')}}
-            <span class="journalName">{{item['Contact Login Name']}}</span>
           </li>
           <div class="content-div">
+            <div>操作人：<span style="color: #0772c1">{{item['Conatct Name']}}</span></div>
             <div>完成数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
             <div>合格数量/异常数量：{{item['Qualified Amount']}}/{{item['Unqualified Amount']}}</div>
             <div>异常处理数量：{{item['Unqualified Solve Amount']}}</div>
@@ -27,9 +27,9 @@
             <span class="icon"></span>
           </li>
           <li style="color: #888;line-height: 40px;font-size: 0.9rem;">{{new Date(item['Install Date']).format('yyyy-MM-dd')}}
-            <span class="journalName">{{item['Contact Login Name']}}</span>
           </li>
           <div class="content-div">
+            <div>操作人：<span style="color: #0772c1">{{item['Conatct Name']}}</span></div>
             <div>完成数量：<span style="color: #0772c1">{{item['Completed Install Amount']}}</span></div>
             <div>备注说明：{{showDescription(item, item['KL Installation Log Attachment'], index)}}</div>
           </div>

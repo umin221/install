@@ -118,13 +118,13 @@
       ...mapActions('app', ['getLov']),
       // 处理计划开始时间
       initDateStart() {
-        var time = this.currentDayData[this.$route.query.index]['Planned'].replace(/\d+\/\d+\/\d+\s/, '');
-        return this.newYear + '-' + this.newMonth + '-' + this.newDay + ' ' + time;
+        var time = new Date(this.currentDayData[this.$route.query.index]['Planned']).format('yyyy-MM-dd hh:mm:ss');
+        return time;
       },
       // 处理计划结束时间
       initDateEnd() {
-        var time = this.currentDayData[this.$route.query.index]['Planned Completion'].replace(/\d+\/\d+\/\d+\s/, '');
-        return this.newYear + '-' + this.newMonth + '-' + this.newDay + ' ' + time;
+        var time = new Date(this.currentDayData[this.$route.query.index]['Planned Completion']).format('yyyy-MM-dd hh:mm:ss');
+        return time;
       },
       // 格式化年月日
       initDate() {
