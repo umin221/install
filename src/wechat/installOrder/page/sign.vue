@@ -4,7 +4,7 @@
     <mt-header fixed :title="title">
       <fallback slot="left"></fallback>
       <mt-button v-if="is_edit" slot="right"
-                 @click="type = 'edit'">编辑</mt-button>
+                 @click="editFn">编辑</mt-button>
     </mt-header>
 
     <div class="mint-content wide-form">
@@ -194,6 +194,11 @@
       ...mapActions('app', ['upload', 'queryMedias']),
       ...mapMutations(NameSpace, ['clear']),
       ...mapActions(NameSpace, ['getSign', 'getUPData', 'getTpye', 'setItemObj']),
+      editFn() {
+        var self = this;
+        self.type = 'edit';
+        self.is_edit = false;
+      },
       submit() {
         var self = this;
         var item = self.item;
