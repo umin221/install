@@ -39,7 +39,7 @@ let apiList = {
       delete condition.Name;
     };
     // 多状态处理
-    condition['KL Partner Status'] = status.split(',');
+    if (status) condition['KL Partner Status'] = status.split(',');
     let spec = KND.Util.condition2D(condition, 'Channel Partner', ' OR ');
     if (spec) arr.push(spec);
 
@@ -116,11 +116,11 @@ let apiList = {
   submitPartner: option => {
     let partner = option.data;
 //    负责人
-    let primary = option.primary;
+//    let primary = option.primary;
 //    协作团队，编辑时包含，创建人，负责人，安装支持专员
-    let partnerPosition = KND.Util.toArray(partner['Channel Partner_Position']);
+//    let partnerPosition = KND.Util.toArray(partner['Channel Partner_Position']);
 //    协作团队
-    let arr = [];
+//    let arr = [];
 //    默认类型
     partner['KL Partner Type'] = '委外厂商';
 //    省市区地址
@@ -129,28 +129,28 @@ let apiList = {
     };
 
 //    添加负责人
-    if (primary) {
-      arr.push({
-        'Position Id': primary['Primary Position Id'],
-        'IsPrimaryMVG': 'Y'
-      });
+//    if (primary) {
+//      arr.push({
+//        'Position Id': primary['Primary Position Id'],
+//        'IsPrimaryMVG': 'Y'
+//      });
 //    编辑时包含，创建人，负责人，安装支持专员；添加除负责人以外的人员
-      for (let i in partnerPosition) {
-        let pos = partnerPosition[i];
-        if (pos.IsPrimaryMVG === 'N') {
-          arr.push({
-            'Position Id': pos['Position Id'],
-            'IsPrimaryMVG': 'N'
-          });
-        }
-      };
+//      for (let i in partnerPosition) {
+//        let pos = partnerPosition[i];
+//        if (pos.IsPrimaryMVG === 'N') {
+//          arr.push({
+//            'Position Id': pos['Position Id'],
+//            'IsPrimaryMVG': 'N'
+//          });
+//        }
+//      };
 //      更新协作团队
-      partner['ListOfChannel Partner_Position'] = {
-        'Channel Partner_Position': arr
-      };
-    };
+//      partner['ListOfChannel Partner_Position'] = {
+//        'Channel Partner_Position': arr
+//      };
+//    };
 
-    delete partner['CUT Address'];
+//    delete partner['CUT Address'];
     delete partner['Channel Partner_Position'];
 
     return {

@@ -4,12 +4,12 @@
 config.mapp = {
   'manager': {
     '待处理': 'In Confirming',
-    '处理中': 'In Installing,Sales Confirmed',
+    '处理中': 'In Installing,Sales Confirmed,Submitted',
     '已完成': 'Closed,Cancelled'
   },
   'list': {
     'In Confirming': 'pending',
-    'In Installing,Sales Confirmed': 'process',
+    'In Installing,Sales Confirmed,Submitted': 'process',
     'Closed,Cancelled': 'completed'
   },
   'option': {  // 订单行 lov 下拉值列表

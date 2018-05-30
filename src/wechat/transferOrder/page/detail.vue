@@ -13,8 +13,8 @@
     <div class="mint-content">
       <div class="readonly narrow-form">
         <cus-field label="合同编号" :value="form['Agree Number']"></cus-field>
-        <cus-field label="工程名称" :value="form['Opportunity Name']" :isLink="!!form['Opportunity Name']"></cus-field>
-        <cus-field label="项目地址" :value="form['Address']" :isLink="!!form['Address']"></cus-field>
+        <cus-field label="工程名称" :value="form['Opportunity Name']" isLink></cus-field>
+        <cus-field label="项目地址" :value="address" isLink></cus-field>
 
         <toggle>
           <cus-field label="门厂名称" :value="form['Partner Name']"></cus-field>
@@ -118,6 +118,11 @@
       readonly() {
         // 查看团队交接单&非安装人员不可操作
         return this.isTeam || !this.isEngineer;
+      },
+      // 项目地址
+      address() {
+        let me = this;
+        return `${me.form.Province} ${me.form.City} ${me.form.Town} ${me.form.Address}`;
       }
     },
     methods: {

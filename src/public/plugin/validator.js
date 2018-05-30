@@ -40,35 +40,19 @@ class ValidatorPlug {
         for (var m in modifiers) {
           let ms = m.split('|');
           for (var i in ms) {
-            let flag = rules[ms[i]].test(value) || (!modifiers.require && !value);
+            let rule = rules[ms[i]];
+            let flag = rule.reg.test(value) || (!modifiers.require && !value);
             if (flag) {
               KND.Util.removeClass(el, 'error');
               break;
             } else {
               KND.Util.addClass(el, 'error');
-              // this.Vue.$emit('error', {
-              //  msg: getErrMsg(tag, m),
-              //  tag: tag
-              // });
             };
-            msg = getErrMsg(tag, ms[i]);
+            msg = rule.msg(tag);
           };
         };
         return msg;
       };
-    };
-
-    let getErrMsg = (tag, type) => {
-      var errMsgs = {
-        require: `${tag}不能为空`,
-        number: `${tag}必须是数字`,
-        email: `${tag}格式不正确`,
-        fax: `${tag}格式错误`,
-        phone: `${tag}格式错误`,
-        nonNegative: `${tag}不能是负数`,
-        positiveInteger: `${tag}必须为正整数`
-      };
-      return errMsgs[type];
     };
   };
 

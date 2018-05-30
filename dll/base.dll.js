@@ -1831,7 +1831,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }
           }
         }
-        return '(' + arr.join(join) + ')';
+        return arr.length ? '(' + arr.join(join) + ')' : '';
       }
     }, {
       key: 'getParam',
@@ -2370,18 +2370,15 @@ var ValidatorPlug = function () {
             for (var m in modifiers) {
               var ms = m.split('|');
               for (var i in ms) {
-                var flag = __WEBPACK_IMPORTED_MODULE_2__rules__["default"][ms[i]].test(value) || !modifiers.require && !value;
+                var rule = __WEBPACK_IMPORTED_MODULE_2__rules__["default"][ms[i]];
+                var flag = rule.reg.test(value) || !modifiers.require && !value;
                 if (flag) {
                   KND.Util.removeClass(el, 'error');
                   break;
                 } else {
                   KND.Util.addClass(el, 'error');
-                  // this.Vue.$emit('error', {
-                  //  msg: getErrMsg(tag, m),
-                  //  tag: tag
-                  // });
                 };
-                msg = getErrMsg(tag, ms[i]);
+                msg = rule.msg(tag);
               };
             };
             return msg;
@@ -2390,19 +2387,6 @@ var ValidatorPlug = function () {
 
         return Validator;
       }();
-
-      var getErrMsg = function getErrMsg(tag, type) {
-        var errMsgs = {
-          require: tag + '\u4E0D\u80FD\u4E3A\u7A7A',
-          number: tag + '\u5FC5\u987B\u662F\u6570\u5B57',
-          email: tag + '\u683C\u5F0F\u4E0D\u6B63\u786E',
-          fax: tag + '\u683C\u5F0F\u9519\u8BEF',
-          phone: tag + '\u683C\u5F0F\u9519\u8BEF',
-          nonNegative: tag + '\u4E0D\u80FD\u662F\u8D1F\u6570',
-          positiveInteger: tag + '\u5FC5\u987B\u4E3A\u6B63\u6574\u6570'
-        };
-        return errMsgs[type];
-      };
     }
   }, {
     key: 'install',
@@ -2473,15 +2457,44 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  * @type {{rule: RegExp, numericRegex: RegExp, email: RegExp, fax: RegExp, phone: RegExp, url: RegExp, money: RegExp, english: RegExp, chinese: RegExp, percent: RegExp}}
  */
 /* harmony default export */ __webpack_exports__["default"] = ({
-  require: /[^\s]/,
+  require: {
+    reg: /[^\s]/,
+    msg: function msg(tag) {
+      return tag + "\u4E0D\u80FD\u4E3A\u7A7A";
+    }
+  },
   // 匹配 max_length(12) => ['max_length',12]
-  rule: /^(.+?)\((.+)\)$/,
+  rule: {
+    reg: /^(.+?)\((.+)\)$/
+  },
   // 数字
-  number: /^[0-9]+$/,
+  number: {
+    reg: /^[0-9]+$/,
+    msg: function msg(tag) {
+      return tag + "\u5FC5\u987B\u662F\u6570\u5B57";
+    }
+  },
   // 非负数
-  nonNegative: /^\d+(\.{0,1}\d+){0,1}$/,
+  nonNegative: {
+    reg: /^\d+(\.{0,1}\d+){0,1}$/,
+    msg: function msg(tag) {
+      return tag + "\u4E0D\u80FD\u662F\u8D1F\u6570";
+    }
+  },
   // 正整数
-  positiveInteger: /^[1-9]\d*$/,
+  positiveInteger: {
+    reg: /^[1-9]\d*$/,
+    msg: function msg(tag) {
+      return tag + "\u5FC5\u987B\u4E3A\u6B63\u6574\u6570";
+    }
+  },
+  // 身份证
+  IDCard: {
+    reg: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/,
+    msg: function msg(tag) {
+      return tag + "\u8F93\u5165\u4E0D\u5408\u6CD5";
+    }
+  },
   /**
    * @descrition:邮箱规则
    * 1.邮箱以a-z、A-Z、0-9开头，最小长度为1.
@@ -2490,13 +2503,23 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
    * 4.右则部分可分为两部分，第一部分为邮件提供商域名地址，第二部分为域名后缀，现已知的最短为2位。最长的为6为。
    * 5.邮件提供商域可以包含特殊字符-、_、.
    */
-  email: /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/,
+  email: {
+    reg: /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/,
+    msg: function msg(tag) {
+      return tag + "\u683C\u5F0F\u4E0D\u6B63\u786E";
+    }
+  },
   /**
    * @descrition:判断输入的参数是否是个合格的固定电话号码。
    * 待验证的固定电话号码。
    * 国家代码(2到3位)-区号(2到3位)-电话号码(7到8位)-分机号(3位)
    **/
-  fax: /^(([0+]\d{2,3}-)?(0\d{2,3})-)(\d{7,8})(-(\d{3,}))?$/,
+  fax: {
+    reg: /^(([0+]\d{2,3}-)?(0\d{2,3})-)(\d{7,8})(-(\d{3,}))?$/,
+    msg: function msg(tag) {
+      return tag + "\u683C\u5F0F\u9519\u8BEF";
+    }
+  },
   /**
    *@descrition:手机号码段规则
    * 13段：130、131、132、133、134、135、136、137、138、139
@@ -2506,15 +2529,45 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
    * 18段：180、181、182、183、184、185、186、187、188、189
    * 国际码 如：中国(+86)
    */
-  phone: /^((\+?[0-9]{1,4})|(\(\+86\)))?(13[0-9]|14[57]|15[012356789]|17[03678]|18[0-9])\d{8}$/,
+  phone: {
+    reg: /^((\+?[0-9]{1,4})|(\(\+86\)))?(13[0-9]|14[57]|15[012356789]|17[03678]|18[0-9])\d{8}$/,
+    msg: function msg(tag) {
+      return tag + "\u683C\u5F0F\u9519\u8BEF";
+    }
+  },
   /**
    * @descrition 匹配 URL
    */
-  url: /[a-zA-z]+:\/\/[^\s]/,
-  money: /^(0|[1-9]\d*)(\.\d+)?$/,
-  english: /^[A-Za-z]+$/,
-  chinese: /^[\u0391-\uFFE5]+$/,
-  percent: /^(?:[1-9][0-9]?|100)(?:\.[0-9]{1,2})?$/
+  url: {
+    reg: /[a-zA-z]+:\/\/[^\s]/,
+    msg: function msg(tag) {
+      return tag + "\u8BF7\u8F93\u5165\u5408\u6CD5\u94FE\u63A5";
+    }
+  },
+  money: {
+    reg: /^(0|[1-9]\d*)(\.\d+)?$/,
+    msg: function msg(tag) {
+      return tag + "\u8BF7\u8F93\u5165\u91D1\u989D";
+    }
+  },
+  english: {
+    reg: /^[A-Za-z]+$/,
+    msg: function msg(tag) {
+      return tag + "\u5FC5\u987B\u662F\u5B57\u6BCD";
+    }
+  },
+  chinese: {
+    reg: /^[\u0391-\uFFE5]+$/,
+    msg: function msg(tag) {
+      return tag + "\u5FC5\u987B\u662F\u4E2D\u6587";
+    }
+  },
+  percent: {
+    reg: /^(?:[1-9][0-9]?|100)(?:\.[0-9]{1,2})?$/,
+    msg: function msg(tag) {
+      return tag + "\u5FC5\u987B\u662F\u767E\u5206\u6570";
+    }
+  }
 });
 
 /***/ })

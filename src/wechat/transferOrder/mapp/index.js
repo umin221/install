@@ -30,7 +30,8 @@ config.mapp = {
   },
   'k2v': { // checkbox 标记
     'Y': '是',
-    'N': '否'
+    'N': '否',
+    '': '否'
   },
   'code2group': { // 订单行分类
     'Panel': {group: 'panels', label: '面板'}, // , add: true
