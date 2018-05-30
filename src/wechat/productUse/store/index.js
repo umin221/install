@@ -16,6 +16,7 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
+        isTeam: false,
         isManager: false,
         // 待处理
         pending: [],
@@ -25,7 +26,7 @@ export default new Vuex.Store({
         invalid: []
       },
       actions: {
-        getList({state, commit, dispatch}, {data, more, callback, error}) {
+        getList({state, commit}, {data, more, callback, error}) {
           let status = data['Status'];
           let mapp = mapps[status] || {};
           // 搜索时，没有状态
@@ -33,6 +34,7 @@ export default new Vuex.Store({
 
           data['Status'] = mapp['status'];
           // ViewMode 随当前状态切换
+          data['ViewMode'] = state.isManager ? (state.isTeam ? 'Manager' : 'Sales Rep') : 'Sales Rep';
           api.get({
             key: 'getList',
             data: data,
@@ -58,6 +60,9 @@ export default new Vuex.Store({
         setManager(state, isManager) {
           mapps = config.mapp['manager'];
           state.isManager = isManager;
+        },
+        setTeam(state, isTeam) {
+          state.isTeam = isTeam;
         },
         setProductUse(state, {TransferOrders, list}) {
           state[list] = TransferOrders;
@@ -185,6 +190,8 @@ export default new Vuex.Store({
             }
           }
           state.partList.push(select);
+          console.dir('======');
+          console.dir(state.partList);
         },
         setId(state, id) {
           state.id = id;
@@ -320,19 +327,6 @@ export default new Vuex.Store({
             success: function(dataObj) {
               state.priceId = dataObj.Id;
               if (dataObj.Id) {
-                /* api.get({
-                  key: 'getSearchProduct',
-                  data: {
-                    id: data.Id,
-                    obj: obj
-                  },
-                  success: function(data) {
-                    let product = KND.Util.toArray(data.SiebelMessage['Catalog Category']);
-                    if (product) {
-                      commit('setProduct', product);
-                    }
-                  }
-                });*/
                 data.id = dataObj.Id;
                 api.get({
                   key: 'getSearchProduct',
@@ -366,6 +360,7 @@ export default new Vuex.Store({
         },
         setProduct(state, data) {
           // state.result = data;
+          state.result = [];
           state.selected = [];
           for (let i = 0; i < data.length; i++) {
             if (data[i].Product) {
@@ -376,8 +371,6 @@ export default new Vuex.Store({
               }
             }
           }
-          console.dir('====000===');
-          console.dir(state.result);
           for (let i = 0; i < state.result.length;i++) {
             state.selected.push(false);
           }

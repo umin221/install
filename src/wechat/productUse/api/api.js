@@ -8,22 +8,23 @@ let apiList = {
    */
   getList: option => {
     let condition = Object.assign({}, option.data);
-    let status = condition.Status;
+    // 状态条件
+    var status = condition.Status || '';
+    var viewMode = condition.ViewMode;
+    var searchSpec = '';
     delete option.data.Status;
     // 状态多匹配 逗号分隔
     if (status) {
-      condition['Status'] = status.split(',');
+      searchSpec = '(' + KND.Util.condition2D({Status: status.split(',')}, 'Order Entry - Orders', ' OR ', '=') + ')';
     };
-    console.log(KND.Util.condition2D(condition, 'Order Entry - Orders', ' OR ', operator));
     // 运算符
-    let operator = ' = ';
     return {
       url: 'service/EAI Siebel Adapter/QueryPage',
       data: {
         'body': {
           'OutputIntObjectName': 'Base Order Entry',
-          'ViewMode': 'Sales Rep',
-          'SearchSpec': '(' + KND.Util.condition2D(condition, 'Order Entry - Orders', ' OR ', operator) + ') AND [Order Entry - Orders.Order Type] = LookupValue("FS_ORDER_TYPE", "Sparts Picking")',
+          'ViewMode': viewMode,
+          'SearchSpec': searchSpec + ' AND [Order Entry - Orders.Order Type] = LookupValue("FS_ORDER_TYPE", "Sparts Picking")',
           'StartRowNum': option.paging.StartRowNum,
           'PageSize': option.paging.PageSize
         }
@@ -141,7 +142,7 @@ let apiList = {
       }
     };
     if (option.data.form.installId) {
-      data['KL Install Order Agreement Id'] = option.data.form.installId;
+      data['KL Install Order Id'] = option.data.form.installId;
       data['KL Install Order Opty Name'] = option.data.form.installName;
     }
     delete option.data.form;

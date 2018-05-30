@@ -1,11 +1,18 @@
 <template>
   <div style="background-color: #ebebeb;">
-    <mt-header fixed title="配件领用">
+    <!--<mt-header fixed title="配件领用">
       <fallback slot="left"></fallback>
       <mt-button @click.native="toAdd" slot="right">
         <i class="xs-icon icon-add"></i>
       </mt-button>
-    </mt-header>
+    </mt-header>-->
+
+    <cus-header fixed :title="isTeam ? '团队的配件' : '配件领用'" :menu="isManager ? [isTeam ? {title:'配件领用', key:'my'} : {title:'查看我的团队', key:'team'}] : undefined">
+      <fallback slot="left"></fallback>
+      <mt-button @click.native="toAdd" slot="right">
+        <i class="xs-icon icon-add"></i>
+      </mt-button>
+    </cus-header>
     <div class="mint-content">
       <mt-navbar v-model="selected">
         <mt-tab-item id="pending"
@@ -82,6 +89,7 @@
 </template>
 <script type="application/javascript">
   import {mapState, mapActions, mapMutations} from 'vuex';
+  import cusHeader from 'public/components/cus-header';
   import loadmore from 'public/components/cus-loadmore';
   import cusCell from 'public/components/cus-cell';
   //
@@ -120,12 +128,12 @@
       };
     },
     computed: {
-      ...mapState(NameSpace, ['pending', 'valid', 'invalid'])
+      ...mapState(NameSpace, ['pending', 'valid', 'invalid', 'isManager', 'isTeam'])
     },
     methods: {
       ...mapActions(NameSpace, ['getList']),
       ...mapActions('app', ['getLov']),
-      ...mapMutations(NameSpace, ['setManager']),
+      ...mapMutations(NameSpace, ['setManager', 'setTeam']),
       ...mapMutations('add', ['initSelect', 'setId']),
 
       toDate(time) {
@@ -148,6 +156,17 @@
         this.initSelect();
         this.$router.push('add');
       },
+      // 切换头部菜单
+      menuFn(item) {
+        this.setTeam(item.key === 'team');
+        // 刷新数据
+        this.loadBottomFn({
+          status: '待处理',
+          list: 'pending'
+        });
+        // 切换回待处理
+        this.selected = 'pending';
+      },
       loadTopFn(param) {
         loader.call(this, {
           data: {
@@ -164,7 +183,7 @@
         }, param.list, 'onBottomLoaded');
       }
     },
-    components: {loadmore, cusCell}
+    components: {loadmore, cusCell, cusHeader}
   };
 </script>
 <style lang="scss">

@@ -16,6 +16,7 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
+        isTeam: false,
         isManager: false,
         // 待处理
         pending: [],
@@ -33,6 +34,7 @@ export default new Vuex.Store({
 
           data['Status'] = mapp['status'];
           // ViewMode 随当前状态切换
+          data['ViewMode'] = state.isManager ? (state.isTeam ? 'Manager' : 'Sales Rep') : 'Sales Rep';
           api.get({
             key: 'getList',
             data: data,
@@ -58,6 +60,9 @@ export default new Vuex.Store({
         setManager(state, isManager) {
           mapps = config.mapp['manager'];
           state.isManager = isManager;
+        },
+        setTeam(state, isTeam) {
+          state.isTeam = isTeam;
         },
         setProductUse(state, {TransferOrders, list}) {
           state[list] = TransferOrders;
