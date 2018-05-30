@@ -351,18 +351,26 @@ class Cache {
     return new Promise((resolve, reject) => {
       resolve(data);
     }).then(data => {
+      let batchs = data.SiebelMessage;
+      batchs = (batchs && batchs.Contact) || {};
+      let installTask = util.toArray(batchs['KL Installation Task']);
+      let tasks = [];
+      // 过滤无效数据
+      for (let i in installTask) {
+        let batch = installTask[i];
+        tasks.push(util.mappDTO(batch, ['Id', 'KL Agreement Opportunity Name', 'KL Task Batch Name', 'Created']));
+      };
       // 1. 缓存批次数据
       return new Promise((resolve, reject) => {
-        console.log(data);
+        console.log(installTask);
         console.log('开始缓存批次...');
         Indicator.process('正在缓存批次数据...');
         invokeSQL('insert', 'batch', {
-          data: JSON.stringify(data),
+          data: JSON.stringify({
+            SiebelMessage: { 'Contact': {'KL Installation Task': tasks} }
+          }),
           create_date: now()
         }).then(result => {
-          let batchs = data.SiebelMessage;
-          batchs = (batchs && batchs.Contact) || {};
-          let installTask = util.toArray(batchs['KL Installation Task']);
           console.log('批次缓存完成...');
           resolve(installTask);
         });

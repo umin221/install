@@ -29,7 +29,7 @@
                    is-link></cus-field>
 
         <div v-if="error.batch" class="error-tips">
-          <div>错误：条码已绑定</div>
+          <div>错误：条码已绑定 <{{error.serial}}></div>
           <div>批次编号：{{error.batch}}</div>
           <div>安装地址：{{error.address}}</div>
         </div>
@@ -124,6 +124,7 @@
               if (data.length) {
                 let room = KND.Util.parse(data.shift().super);
                 me.assets['serial'] = me.assets['serial'] = '';
+                me.error.serial = serial;
                 me.error.address = room['Province'] + room['City'] + room['Personal County'] + room['Street Address'] + room['Street Address 2'] + room['Street Address 3'] + room['Street Address 4'];
                 me.error.batch = room['KL Activity Id'];
               } else {

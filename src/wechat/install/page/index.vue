@@ -21,10 +21,10 @@
                       @loadBottom="loadBottomFn"
                       :loadmore="false">
           <cus-cell class="multiple"
+                    v-for="item in pending"
                     @click.native="toDetailFn(item.Id)"
                     :key="item.Id"
                     :title="'订单批次:'+ item.Id"
-                    v-for="item in pending"
                     is-link>
             <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
             <div class="mint-cell-sub-title" slot="title">批次名称: {{item['KL Task Batch Name']}}</div>

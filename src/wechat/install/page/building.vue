@@ -101,6 +101,7 @@
           'City': room['City'],
           'DetailAddress': room['Street Address'],
           'Country': room['Country'],
+          'County': room['County'],
           'TaskId': room['KL Activity Id'],
           'Province': room['Province']
         });
