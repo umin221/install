@@ -28,6 +28,12 @@
                    @click.native="showLovFn('panel')"
                    is-link></cus-field>
 
+        <div v-if="error.batch" class="error-tips">
+          <div>错误：条码已绑定</div>
+          <div>批次编号：{{error.batch}}</div>
+          <div>安装地址：{{error.address}}</div>
+        </div>
+
         <button-group>
           <mt-button class="single"
                      @click.native="saveFn">保存</mt-button>
@@ -81,8 +87,8 @@
             me.assets['KL Product Model No Panel'] = panel['KL Product Model No Cal'];
             me.assets['KL Product Model No Lock Body'] = body['KL Product Model No Cal'];
             // product id，优先取 KL Final Product Id
-            body['KL Final Product Id'] = body['KL Final Product Id'] || body['Product Id'];
-            me.assets['Product Id'] = body['KL Final Product Id'];
+            panel['KL Final Product Id'] = panel['KL Final Product Id'] || panel['Product Id'];
+            me.assets['Product Id'] = panel['KL Final Product Id'];
           }
         }
       });
@@ -96,19 +102,41 @@
           {flex: 1, values: [], className: 'slot1', textAlign: 'center'}
         ],
         showBox: false,
-        lovType: ''
+        lovType: '',
+        error: {
+          address: '', // 已绑定条码详细位置
+          batch: '' // 安装批次
+        }
       };
     },
     computed: {
       serial() {
-        let assets = this.assets;
+        let me = this;
+        let assets = me.assets;
         let serial = assets['serial'];
-        if (serial) assets['serial'] = serial.replace(/[\u4e00-\u9fa5]/g, '');
+        if (serial) {
+          if (serial) assets['serial'] = serial.replace(/[\u4e00-\u9fa5]/g, '');
+          // 查询条码绑定记录
+          me.serialHasBind({
+            serial: serial,
+            success: data => {
+              // 已存在绑定记录则不允许绑定，清空条码
+              if (data.length) {
+                let room = KND.Util.parse(data.shift().super);
+                me.assets['serial'] = me.assets['serial'] = '';
+                me.error.address = room['Province'] + room['City'] + room['Personal County'] + room['Street Address'] + room['Street Address 2'] + room['Street Address 3'] + room['Street Address 4'];
+                me.error.batch = room['KL Activity Id'];
+              } else {
+                me.error = {};
+              }
+            }
+          });
+        }
         return serial;
       }
     },
     methods: {
-      ...mapActions(NAMESPACE, ['queryOrderLines', 'installOrderAssets']),
+      ...mapActions(NAMESPACE, ['queryOrderLines', 'installOrderAssets', 'serialHasBind']),
       // 保存资产信息
       saveFn() {
         let me = this;
@@ -122,7 +150,8 @@
                 'Product Id': assets['Product Id'],
                 'KL Product Model No Lock Body': assets['KL Product Model No Lock Body'],
                 'KL Product Model No Panel': assets['KL Product Model No Panel']
-              }
+              },
+              super: assets
             });
           } else {
             Toast('条码必须包含字母或数字');
@@ -165,6 +194,13 @@
   .install-container {
     .icon-scan {
       margin-left: 2px;
+    }
+
+    .error-tips {
+      font-size: 0.75rem;
+      color: red;
+      font-weight: bold;
+      padding: 10px;
     }
   }
 </style>

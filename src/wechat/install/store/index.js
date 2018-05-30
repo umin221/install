@@ -309,6 +309,15 @@ export default {
             KND.Session.set('refreshAssets', true);
           };
           cache.invoke(setting);
+        },
+        /**
+         * 检查条码是否绑定
+         * @param {String} setting.serial 条码
+         * @param {Function} setting.success 成功回调
+         */
+        serialHasBind({state}, setting) {
+          setting.key = 'serialHasBind';
+          cache.invoke(setting);
         }
       }
     }

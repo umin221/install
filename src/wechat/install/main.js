@@ -39,7 +39,9 @@ Vue.use(Vuex);
 
 let store = new Vuex.Store(sto);
 
-FastClick.attach(document.body);
+FastClick.attach(document.body, {
+  tapDelay: 10
+});
 
 /**
  * 导航守卫
