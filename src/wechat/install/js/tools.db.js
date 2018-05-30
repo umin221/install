@@ -165,8 +165,11 @@ class Helper {
         me.invokeSQL('ct', 'order_line', buildCreateField({order_id: null, data: 'VARCHAR(2000)', state: null, create_date: null})).then(result => {
           console.log('创建数据库表 order_line...');
         }),
-        me.invokeSQL('ct', 'install_record', buildCreateField({id: null, data: null, state: null, create_date: null})).then(result => {
-          console.log('创建数据库表 install_record...');
+        me.invokeSQL('ct', 'install_record_remote', buildCreateField({task_id: null, serial_num: null, building_num: null, super: null, state: null, create_date: null})).then(result => {
+          console.log('创建数据库表 install_record_remote...');
+        }),
+        me.invokeSQL('ct', 'install_record_local', buildCreateField({id: null, serial_num: null, data: null, super: null, state: null, create_date: null})).then(result => {
+          console.log('创建数据库表 install_record_local...');
         })
       ];
       // 非全量初始化
@@ -220,7 +223,7 @@ class DataHandle {
    * @param {Function} callback 必填 回调函数
    */
   getPendingInstallRecord(callback) {
-    helper.queryStrict('install_record', {state: 'pending'}, callback);
+    helper.queryStrict('install_record_local', {state: 'pending'}, callback);
   };
 
   /**
@@ -243,7 +246,7 @@ class DataHandle {
               success: data => {
                 result.push(item);
                 // 提交成功后修改数据状态
-                db.update('install_record', {state: 'finish'}, `'${item.id}'`, result => {
+                db.update('install_record_local', {state: 'finish'}, `'${item.id}'`, result => {
                   resolve(result);
                 });
               },
@@ -342,7 +345,7 @@ class Cache {
     /**
      * 1. 缓存批次数据
      * 2. 缓存楼栋数据
-     * 3. 缓存房号资产数据
+     * 3. 缓存房间资产数据
      */
     let invokeSQL = helper.invokeSQL;
     return new Promise((resolve, reject) => {
@@ -435,7 +438,7 @@ class Cache {
         });
       });
     }).then(result => {
-      // 4. 缓存房号资产数据
+      // 4. 缓存房间资产数据
       return new Promise((resolve, reject) => {
         console.log(result);
         console.log('开始缓存资产...');
@@ -458,6 +461,13 @@ class Cache {
                 },
                 success: data => {
                   console.log(data);
+                  // 房间清单
+                  let assets = data['SiebelMessage'];
+                  assets = KND.Util.toArray(assets && assets['Asset Room']);
+                  /**
+                   * 缓存楼栋下所有资产
+                   * @returns {Promise}
+                   */
                   invokeSQL('insert', 'assets', {
                     order_id: batch['Order Id'],
                     task_id: batch.Id,
@@ -465,6 +475,22 @@ class Cache {
                     data: JSON.stringify(data),
                     create_date: now()
                   }).then(resolve);
+                  /**
+                   * 缓存每个房间资产信息
+                   * @returns {Promise}
+                   */
+                  tasks.push(new Promise((resolve, reject) => {
+                    for (let j = 0, len = assets.length; j < len; j++) {
+                      let room = assets[j];
+                      invokeSQL('insert', 'install_record_remote', {
+                        task_id: batch.Id,
+                        serial_num: room['Serial Number'],
+                        building_num: building[i].BuildingNum,
+                        super: JSON.stringify(room),
+                        create_date: now()
+                      }).then(resolve);
+                    }
+                  }));
                 },
                 error: err => {
                   console.error(`资产失败：${err}`);
@@ -534,7 +560,8 @@ class Cache {
 
   /**
    * 查询楼栋信息 <查询本地>
-   * @param setting
+   * @param {String} setting.TaskId 批次编号
+   * @param {Function} setting.success 成功回调
    */
   queryBuilding(setting) {
     helper.query('building', {
@@ -545,8 +572,11 @@ class Cache {
   };
 
   /**
-   * 查询房号资产 <查询本地>
+   * 查询房间资产 <查询本地>
    * @param setting
+   * @param {String} setting.data['KL Activity Id'] 批次编号
+   * @param {String} setting.data['KL Building Number'] 楼栋编号
+   * @param {Function} setting.success 成功回调
    */
   getLayer(setting) {
     let param = setting.data;
@@ -572,15 +602,44 @@ class Cache {
   };
 
   /**
+   * 查询条码是否已绑定
+   * @param {String} setting.serial 条码
+   * @param {Function} setting.success 成功回调
+   */
+  serialHasBind(setting) {
+    let serial = setting.serial;
+    let success = setting.success;
+    // 查找本地记录是否存在相同条码数据
+    helper.query('install_record_local', {
+      serial_num: serial
+    }, result => {
+      // 找到相同条码数据
+      if (result.length) {
+        success(result);
+      } else {
+        // 查找远程记录是否存在相同条码数据
+        helper.query('install_record_remote', {
+          serial_num: serial
+        }, result => {
+          // 找到相同条码数据
+          success(result);
+        });
+      }
+    });
+  };
+
+  /**
    * 绑定资产条码信息 <保存本地>
    * @param setting
    */
   installOrderAssets(setting) {
     let data = setting.data;
     let id = data.Id;
-    helper.upsert('install_record', {
+    helper.upsert('install_record_local', {
       id: id,
+      serial_num: data['Serial Number'],
       data: JSON.stringify(data),
+      super: JSON.stringify(setting.super),
       state: 'pending',
       create_date: now()
     }, {id: id}, result => {
@@ -594,7 +653,7 @@ class Cache {
    * @param setting
    */
   queryLocalInstallRecord(setting) {
-    helper.query('install_record', {}, result => {
+    helper.query('install_record_local', {}, result => {
       let data = {};
       for (let i = 0, len = result.length; i < len; i++) data[result[i].id] = result[i];
       setting.success(data);
