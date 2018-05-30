@@ -82,7 +82,8 @@
           me.queryUserInfo({
             data: {
               'Login Name': me.username.trim(),
-              'KL Outsource Password': me.password.trim()
+              'KL Outsource Password': me.password.trim(),
+              'KL Status': 'Active'
             },
             success: user => {
               // 缓存用户进入APP首页

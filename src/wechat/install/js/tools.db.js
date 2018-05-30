@@ -291,6 +291,10 @@ class Cache {
    */
   constructor() {
     util.log('Cache init...');
+//    let me = this;
+//    setTimeout(function() {
+//      me.init();
+//    }, 200);
   };
 
   /**
