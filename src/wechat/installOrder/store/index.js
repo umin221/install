@@ -579,7 +579,7 @@ export default new Vuex.Store(Object.extend(true, sto, {
       },
       actions: {
         getSporadic({state}, id) {
-          api.get({ // 获取零星列表数据
+          /* api.get({ // 获取零星列表数据
             key: 'getSporadic',
             data: {
               id: id
@@ -588,6 +588,24 @@ export default new Vuex.Store(Object.extend(true, sto, {
               if (data.items) {
                 state.objList = KND.Util.toArray(data.items);
               }
+            }
+          });*/
+          api.get({ // 获取日志
+            key: 'getSporadic',
+            method: 'POST',
+            data: {
+              'body': {
+                'OutputIntObjectName': 'Base KL Install Order Asset',
+                'SortSpec': 'Created (DESCENDING)',
+                'PageSize': '100',
+                'SearchSpec': '[Asset Room.KL Activity Id]=' + '\'' + id + '\''
+                // 'SearchSpec': '[Asset Room.KL Activity Id]="1-2BSGEG4H"'
+              }
+            },
+            success: function(data) {
+              self.processDate = KND.Util.toArray(data.SiebelMessage['Asset Room']);
+              console.dir(self.processDate);
+              state.objList = self.processDate;
             }
           });
         },

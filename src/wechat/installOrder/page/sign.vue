@@ -210,19 +210,21 @@
         };
         if (self.type === 'add') { // 新增
           if (self.box1) { // 涉及签收 才提交数据  不涉及只更新状态
-            if (self.form['KL Signed Amount'] || item['KL Detail Type LIC'] === 'Working Drawing Sign') {
-              // self.getUPData(item);
-              // 新增签收
-              self.getUPData(data => {
-                console.dir(data.items.Id);
-                if (self.attach.list.length > 0) {
-                  uploadAttach(data.items.Id);
-                }
-                self.getTpye();
-              });
-            } else {
-              Toast('签收数量不能为空！');
-            }
+            tools.valid.call(this, () => {
+              if (self.form['KL Signed Amount'] || item['KL Detail Type LIC'] === 'Working Drawing Sign') {
+                // self.getUPData(item);
+                // 新增签收
+                self.getUPData(data => {
+                  console.dir(data.items.Id);
+                  if (self.attach.list.length > 0) {
+                    uploadAttach(data.items.Id);
+                  }
+                  self.getTpye();
+                });
+              } else {
+                Toast('签收数量不能为空！');
+              }
+            });
           } else {
             self.getTpye();
           }
@@ -233,27 +235,25 @@
       },
       submitFn() {
         var self = this;
-        tools.valid.call(this, () => {
-          var item = this.item;
-          if (item['KL Detail Type LIC'] === 'Trompil Lock Sign' ||
-            item['KL Detail Type LIC'] === 'Working Drawing Sign') { // 提交后可编辑
-            if (self.type === 'edit' && !self.Description) {
-              Toast('重新编辑，备注不能为空！');
-              return;
-            }
-            this.submit();
-          } else { // 提交后不可编辑
-            MessageBox({
-              title: '提示',
-              message: ' 确认提交？一经提交不可修改',
-              showCancelButton: true
-            }).then(action => {
-              if (action === 'confirm') {
-                this.submit();
-              }
-            });
+        var item = this.item;
+        if (item['KL Detail Type LIC'] === 'Trompil Lock Sign' ||
+          item['KL Detail Type LIC'] === 'Working Drawing Sign') { // 提交后可编辑
+          if (self.type === 'edit' && !self.Description) {
+            Toast('重新编辑，上传附件，备注不能为空！');
+            return;
           }
-        });
+          this.submit();
+        } else { // 提交后不可编辑
+          MessageBox({
+            title: '提示',
+            message: ' 确认提交？一经提交不可修改',
+            showCancelButton: true
+          }).then(action => {
+            if (action === 'confirm') {
+              this.submit();
+            }
+          });
+        }
       }
     },
     components: {titleGroup, buttonGroup}

@@ -47,6 +47,8 @@
                 <div><span>地址</span>{{ServiceRequest['KL Province']}}
                   {{ServiceRequest['KL City']}}
                   {{ServiceRequest['KL Town']}}
+                </div>
+                <div><span>小区名称</span>
                   {{ServiceRequest['KL Address']}}
                   {{ServiceRequest['KL Building']}}
                   {{ServiceRequest['KL Floor']}}
@@ -140,6 +142,8 @@
                         {{ServiceRequest['KL Province']}}
                         {{ServiceRequest['KL City']}}
                         {{ServiceRequest['KL Town']}}
+                      </li>
+                      <li><span>小区名称</span>
                         {{ServiceRequest['KL Address']}}
                         {{ServiceRequest['KL Building']}}
                         {{ServiceRequest['KL Floor']}}

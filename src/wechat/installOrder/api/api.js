@@ -324,10 +324,13 @@ let apiList = {
   * 获取零星房屋信息
   * */
   getSporadic: option => {
-    return {
+    /* return {
       method: 'get',
       url: 'data/KL Install Order Asset/KL Install Order Asset/?searchspec=[KL Activity Id]=' + "'" + option.data.id + "'" + '&PageSize=100&StartRowNum=0',
       data: {}
+    };*/
+    return {
+      url: 'service/EAI Siebel Adapter/QueryPage'
     };
   },
   /*

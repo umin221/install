@@ -13,7 +13,7 @@
                    v-valid.positiveInteger
                    type="number"
                    v-model="batchNum"></cus-field>
-        <cus-field label="发运日期" tag="发运日期"
+        <cus-field label="到货日期" tag="到货日期"
                    @click.native="open('picker','start_Date')"
                    :value="start_Date"
                    is-link></cus-field>
@@ -25,10 +25,17 @@
                    v-valid.positiveInteger
                    type="number"
                    v-model="batchNum1"></cus-field>
-        <cus-field label="发运日期" tag="发运日期"
+        <cus-field label="到货日期" tag="到货日期"
                    @click.native="open('picker','start_Date1')"
                    :value="start_Date1"
                    is-link></cus-field>
+      </div>
+      <div class="lock-line disable">
+        <lock-line title="面板">
+          <mt-cell-swipe v-for="(installer, index) in installerList" class="lock-line-cell enable" ref="body" :key=index>
+            <div class="co-flex co-jc" slot="title">{{installer.Comments}}</div>
+          </mt-cell-swipe>
+        </lock-line>
       </div>
       <button-group>
         <mt-button class="single"
@@ -64,7 +71,9 @@
     created() {
       var self = this;
       let param = this.$route.query;
+      self.id = param.id;
       self.state = param.state;
+      self.getInstallerList();
     },
     data: () => {
       return {
@@ -76,6 +85,7 @@
         start_Date1: '',        // 开始时间
         startDate1: '',
         batchNum1: '', // 数量
+        installerList: [],
         sDate: today,
         item: '',
         id: '', // 记录新增后的批次ID
@@ -130,22 +140,41 @@
           me.startDate1 = value.format('MM/dd/yyyy'); // 后台存值格式
         }
       },
+      getInstallerList() { // 订单执行记录
+        var self = this;
+        self.installerList = [];
+        api.get({ // 提交数据
+          key: 'getApproval',
+          method: 'POST',
+          data: {
+            'body': {
+              'OutputIntObjectName': 'Base UInbox Item History',
+              'SearchSpec': '[UInbox Item.Item Object Id]=' + '"' + self.id + '"' + ' AND [UInbox Item.Item Type Name]="KL Install Order Execute"'
+            }
+          },
+          success: function(data) {
+            if (data.SiebelMessage['UInbox Item']) {
+              self.installerList = KND.Util.toArray(data.SiebelMessage['UInbox Item']['UInbox Item Task']);
+            }
+          }
+        });
+      },
       submitFn() {
         var self = this;
         tools.valid.call(this, () => {
           if (self.batchNum || self.batchNum1 || self.start_Date || self.start_Date1) {
             var comment = '';
             if ((self.batchNum && !self.start_Date) || (!self.batchNum && self.start_Date)) {
-              Toast('请填写面板的数量与发运日期！');
+              Toast('请填写面板的数量与到货日期！');
               return;
             } else {
-              comment += '面板，需求数量：' + self.batchNum + '，需求日期：' + self.start_Date + ';';
+              comment += '面板，需求数量：' + self.batchNum + '，到货日期：' + self.start_Date + ';';
             }
             if ((self.batchNum1 && !self.start_Date1) || (!self.batchNum1 && self.start_Date1)) {
-              Toast('请填写锁体的数量与发运日期！');
+              Toast('请填写锁体的数量与到货日期！');
               return;
             } else {
-              comment += '锁体，需求数量：' + self.batchNum1 + '，需求日期：' + self.start_Date1 + ';';
+              comment += '锁体，需求数量：' + self.batchNum1 + '，到货日期：' + self.start_Date1 + ';';
             }
             if (comment) {
               api.get({ // 提交数据

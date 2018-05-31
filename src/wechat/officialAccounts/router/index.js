@@ -47,6 +47,12 @@ export default new Router({
       require(['../page/addAddress'], resolve);
     }
   }, {
+    path: '/address', // 地址列表
+    name: 'address',
+    component(resolve) {
+      require(['../page/address'], resolve);
+    }
+  }, {
     path: '/commentOn', // 点评
     name: 'commentOn',
     component(resolve) {

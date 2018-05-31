@@ -156,6 +156,7 @@ let ApiList = {
       data: {
         'body': {
           'OutputIntObjectName': 'Base KL Contact Interface BO',
+          // 'SearchSpec': '[Contact.KL Open Id]="o9AqWtwHRjLhycFLsZUxdOKuAq1o"'
           'SearchSpec': '[Contact.KL Open Id]="' + option.data.openId + '"'
         }
       }

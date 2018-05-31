@@ -30,13 +30,13 @@
                    v-model="validate"
                    v-valid.require
                    placeholder="请输入验证码"></cus-field>
-        <mt-cell title="详细地址" tag="详细地址"
+        <cus-field label="详细地址" tag="详细地址"
                  placeholder="请选择"
                  :value="address"
-                 to="address"
+                   @click.native="addressFn()"
                  class="requisite hideText"
                  v-valid.require
-                 is-link></mt-cell>
+                 is-link></cus-field>
         <cus-field label="故障现象" tag="故障现象"
                  placeholder="请选择"
                  :value="SubArea"
@@ -192,7 +192,7 @@
       address() {
         let me = this;
         if (me.form.Id) {
-          return me.form.Province + me.form.City + me.form.County + me.form['Street Address'] + me.form['Street Address 2'] + me.form['Street Address 3'] + me.form['Street Address 4'];
+          return me.form.Province + me.form.City + me.form.County + me.form['Street Address'];
         } else {
           return '';
         }
@@ -202,6 +202,12 @@
       ...mapActions('app', ['upload']),
       ...mapActions(INDEX, ['getLov', 'submitService', 'getAsset']),
       ...mapMutations(INDEX, ['addressBack']),
+      addressFn() {
+        let me = this;
+        me.$router.push({
+          name: 'address'
+        });
+      },
       submit() {
         let me = this;
         let uploadAttach = id => {
@@ -256,15 +262,20 @@
         me.getAsset({
           num: me.KLSN,
           callback: function(data) {
-            let form = {
-              Province: data['KL Personal Province'],
-              City: data['Personal City'],
-              County: data['KL Personal Town'],
-              'Street Address': data['Personal Address'],
-              Id: 'Asset'
-            };
-            me.AssetId = data.Id;
-            me.addressBack(form);
+            console.dir('0000' + data);
+            if (data) {
+              let form = {
+                Province: data['KL Personal Province'],
+                City: data['Personal City'],
+                County: data['KL Personal Town'],
+                'Street Address': data['Personal Address'] + data['KL Personal Address Building'] + data['KL Personal Address Floor'] + data['KL Personal Address Room'],
+                Id: 'Asset'
+              };
+              me.AssetId = data.Id;
+              me.addressBack(form);
+            } else {
+              me.KLSN = '';
+            }
           }
         });
       },

@@ -312,8 +312,8 @@
       executionShow() {
         var self = this;
         var isVal = false;
-        // 职位 === 安装员  处理中状态=In Installing,Sales Confirmed
-        if ((self.detailData['Calculated Order Status'] === 'In Installing' || self.detailData['Calculated Order Status'] === 'Sales Confirmed') && (userInfo['KL Primary Position Type LIC'] === 'Field Service Manager')) {
+        // 职位 === 安装工程师、安装主管  处理中状态=In Installing,Sales Confirmed
+        if ((self.detailData['Calculated Order Status'] === 'In Installing' || self.detailData['Calculated Order Status'] === 'Sales Confirmed') && (userInfo['KL Primary Position Type LIC'] === 'Field Service Engineer' || userInfo['KL Primary Position Type LIC'] === 'Field Service Manager')) {
           return true;
         }
         return isVal;
