@@ -14,7 +14,7 @@
     <div class="mint-content wide-form">
       <div class="normal-form" :class="{'readonly': read}">
         <cus-field label="合作伙伴名称" placeholder="请输入名称" tag="名称"
-                   @change="checkNameExistFn"
+                   @change="findPartnerFn"
                    :edit=!read
                    v-valid.require
                    v-model="form['Name']"></cus-field>
@@ -23,11 +23,14 @@
                    v-model="form['KL Partner Type 2']"
                    @click.native="showLovFn('KL Partner Type 2')"
                    :is-link="!read"></cus-field>
-        <cus-field label="负责人" placeholder="请输入负责人" tag="负责人"
-                   @click.native="selectEngineerFn"
+        <cus-field label="电话" placeholder="主要联系人电话" type="tel" tag="电话"
+                   :edit=!read
+                   v-valid.require.phone
+                   @change="findContactFn"
+                   v-model="contact['Cellular Phone #']"></cus-field>
+        <cus-field label="联系人" placeholder="主要联系人" tag="联系人"
                    v-valid.require
-                   v-model="select['KL Employee Full Name'] || form['KL Partner Owner Name']"
-                   :is-link="!read"></cus-field>
+                   v-model="contact['Last Name']"></cus-field>
         <cus-field label="证件类型" tag="证件类型"
                    :edit=!read
                    v-valid.require
@@ -38,10 +41,6 @@
                    :edit=!read
                    v-valid.require
                    v-model="form['KL Partner Credentials Number']"></cus-field>
-        <cus-field label="联系电话" placeholder="请输入电话" type="tel" tag="电话"
-                   :edit=!read
-                   v-valid.require.phone
-                   v-model="form['Main Phone Number']"></cus-field>
         <cus-field label="省市区" tag="省市区"
                    @click.native="showCity++"
                    placeholder="请选择"
@@ -142,6 +141,8 @@
   // use plugin
   Vue.use(vp);
   let mapp = config.mapp;
+  // 当前时间戳
+  let now = KND.Util.now();
 
   let getLov = function() {
     let me = this;
@@ -177,15 +178,12 @@
     name: NAMESPACE,
     components: {titleGroup, cusField, cusCity, menuBox},
     // 初始化
-    activated() {
+    created() {
       let me = this;
       let param = me.$route.query;
 
       me.state = param.state;
       me.type = param.type;
-      // 选择&&参数只读时，处于页面编辑状态
-      if (this.select && param.type === 'read') me.type = 'edit';
-      if (me.form.Name) return;
       // 获取详情
       if (param.id) {
         me.findPartnerById(param.id);
@@ -246,8 +244,24 @@
 //        审批记录
         records: '',
 //        禁用提交
-        disableSubmit: false
+        disableSubmit: false,
+        contact: {
+          'Id': now,
+          'Cellular Phone #': '', // app登陆账号
+          'First Name': '.', // 固定
+          'KL Type': '委外人员', // 固定 联系人类型
+          'User Type': '委外人员', // 固定 用户类型
+          'SSA Primary Field': 'Y', // 主要联系人
+          'KL Outsource Password': '' // 密码
+        }
       };
+    },
+    watch: {
+      form(n, o) {
+        let me = this;
+        me.contact['Cellular Phone #'] = n['KL Primary Contact Cellular Phone'];
+        me.contact['Last Name'] = n['KL Primary Contact Last Name'];
+      }
     },
     computed: {
       ...mapState('index', ['isManager']),
@@ -291,6 +305,7 @@
     },
     methods: {
       ...mapActions('app', ['upload', 'queryMedias', 'getLov']),
+      ...mapActions('contact', ['findContact']),
       ...mapActions(NAMESPACE, ['findPartnerById', 'findPartner', 'addPartner', 'updateSyn', 'pushMedia', 'queryApprovalList', 'deleteUser']),
       toContact(contact) {
         this.$router.push({
@@ -299,7 +314,7 @@
         });
       },
       // Check whether the name is repeated
-      checkNameExistFn(val) {
+      findPartnerFn(val) {
         let me = this;
         me.findPartner({
           data: {
@@ -317,6 +332,22 @@
           error: error => {
             console.log(error);
             me.disableSubmit = false;
+          }
+        });
+      },
+      // 通过电话号码查询联系人 查询到则直接关联用户
+      findContactFn() {
+        this.findContact({
+          data: {'Login Name': this.contact['Cellular Phone #']},
+          success: result => {
+            let me = this;
+            me.contact = result.items;
+            me.contact['SSA Primary Field'] = 'Y';
+            delete me.contact.Link;
+          },
+          error: err => {
+            console.error(err);
+            this.contact.Id = now;
           }
         });
       },
@@ -348,7 +379,7 @@
                 successTips: '提交成功'
               });
               // 标记列表刷新
-              KND.Session.set('refresh', 'pending,valid');
+              KND.Session.set('refresh', 'pending,valid,reject');
             }).catch(err => {
               Toast('附件上传失败');
               console.error(err);
@@ -365,6 +396,10 @@
             //  }
             // });
           } else {
+            me.contact['Login Name'] = me.contact['Cellular Phone #'];
+            me.form.ListOfUser = {
+              User: me.contact
+            };
             // 创建委外团队
             me.addPartner(data => {
               uploadAttach(data['Object Id']);

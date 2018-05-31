@@ -29,7 +29,7 @@ export default {
   // 身份证
   IDCard: {
     reg: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/,
-    msg: tag => `${tag}输入不合法`,
+    msg: tag => `${tag}输入不合法`
   },
   /**
    * @descrition:邮箱规则

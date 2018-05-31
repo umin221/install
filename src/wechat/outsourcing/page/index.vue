@@ -39,8 +39,8 @@
                       :title="'合作伙伴名称:'+ item.Name"
                       @click.native="toDetailFn(item.Id)"
                      is-link>
-              <div class="mint-cell-sub-title" slot="title">负责人: {{item['KL Partner Owner Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">联系电话: {{item['Main Phone Number']}}</div>
+              <div class="mint-cell-sub-title" slot="title">主要联系人: {{item['KL Primary Contact Last Name']}}</div>
+              <div class="mint-cell-sub-title" slot="title">联系电话: {{item['KL Primary Contact Cellular Phone']}}</div>
             </cus-cell>
           </cus-loadmore>
         </mt-tab-container-item>

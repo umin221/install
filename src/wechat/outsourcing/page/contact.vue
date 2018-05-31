@@ -67,7 +67,9 @@
       // 联系人启用/失效
       enable: {
         get() {
-          return this.contact['KL Status'] === '活动';
+          let a = this.contact['KL Status'];
+          if (!a) this.contact['KL Status'] = a = '活动';
+          return a === '活动';
         },
         set(flag) {
           this.contact['KL Status'] = flag ? '活动' : '失效';
@@ -93,7 +95,7 @@
       saveFn() {
         tools.valid.call(this, () => {
           let c = this.contact;
-          c['Phone #'] = c['Login Name'];
+          c['Cellular Phone #'] = c['Login Name'];
           // 保存联系人
           this.upsertContact(this.contact);
         });

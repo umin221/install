@@ -6,7 +6,7 @@ import { app } from 'public/store';
 Vue.use(Vuex);
 
 // 缓存页面
-app.state.alive = ['index', 'detail'];
+app.state.alive = ['index'];
 
 // 每页加载条数
 const PAGESIZE = config.pageSize;
@@ -99,8 +99,8 @@ export default new Vuex.Store({
             'Id': KND.Util.now(),
             'Name': '',
             'Alias': '',
-            'Main Phone Number': '',
-            'CUT Address': {Province: ''}
+            'CUT Address': {Province: ''},
+            'ListOfUser': {}
           };
         },
         // 设置联系人

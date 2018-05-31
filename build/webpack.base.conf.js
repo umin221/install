@@ -43,13 +43,13 @@ const getCompileModules = () => {
   return modules;
 };
 
-const exclude = {'sign': false, 'public': false, 'App.vue': false};
+const exclude = {'sign': false, 'public': false};
 const createEntry = () => {
   let entry = {};
   let modules = getCompileModules();
   for (var i = modules.length - 1; i >= 0; i--) {
     let child = modules[i];
-    if (exclude[child] === false) continue;
+    if (exclude[child] === false || child.indexOf('.') !== -1) continue;
     entry[child] = './src/wechat/'+ child +'/main.js';
   }
   return entry;
