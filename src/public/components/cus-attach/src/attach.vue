@@ -38,7 +38,7 @@
    *  －本地，返回企业微信的mediaIds列表
    *  －在线，返回siebel图片列表
    */
-  import titleGroup from '../../cus-title-group';
+  import titleGroup from '../../cus-title-group.vue';
   let downloadFromSiebel = (`${config.proxy}/webchat/api/external/downloadattachment?url=${config.attachServer}/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess`);
   // 企业微信 与 公众号 非同一个下载接口
   let downloadFromWechat = config.appNo === 'wechat' ? `${config.host}/weixin-service/authorized/download_media?media_id=` : `${config.proxy}/webchat/api/local/downloadmedia?appNO=${config.appNo}&media_id=`;

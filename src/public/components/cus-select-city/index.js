@@ -1,1 +1,1 @@
-export { default } from './src/city';
+export { default } from './src/city.vue';

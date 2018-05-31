@@ -25,7 +25,7 @@
   }
 </style>
 
-<script type="text/babel">
+<script type="es6">
   export default {
     name: 'LazyRender',
     data() {

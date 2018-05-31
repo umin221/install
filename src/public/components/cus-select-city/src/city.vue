@@ -15,7 +15,7 @@
 
 <script type="es6">
   import {mapActions} from 'vuex';
-  import menuBox from './menu';
+  import menuBox from './menu.vue';
 
   export default {
     name: 'city',
