@@ -192,7 +192,7 @@
       address() {
         let me = this;
         if (me.form.Id) {
-          return me.form.Province + me.form.City + me.form.County + me.form['Street Address'];
+          return me.form.Province + me.form.City + me.form.County + me.form['Street Address'] + me.form['Street Address 2'] + me.form['Street Address 3'] + me.form['Street Address 4'];
         } else {
           return '';
         }
@@ -231,6 +231,7 @@
                 'Room': me.form['Street Address 4'], // 详细地址
                 'Contact Name': me.lastName, // 名字
                 'Contact Phone': me.callPhone, // 电话
+                'WeChat Id': contact['Id'], // 微信报修人id
                 'Area': me.Area, // 故障分类
                 'Sub-Area': me.SubArea, // 故障描述
                 'Complaint Description': me.ComplaintDescription, // 故障详情描述
@@ -332,17 +333,21 @@
             me.getAsset({
               num: resultStr,
               callback: function(data) {
-                let datas = util.toArray(data);
-                let form = {
-                  Province: datas[0]['KL Personal Province'],
-                  City: datas[0]['Personal City'],
-                  County: datas[0]['KL Personal Town'],
-                  'Street Address': datas[0]['Personal Address'],
-                  Id: 'Asset'
-                };
-                me.KLSN = resultStr;
-                me.addressBack(form);
-                me.AssetId = datas[0]['Id'];  // 产品ID
+                if (data) {
+                  let datas = util.toArray(data);
+                  let form = {
+                    Province: datas[0]['KL Personal Province'],
+                    City: datas[0]['Personal City'],
+                    County: datas[0]['KL Personal Town'],
+                    'Street Address': data['Personal Address'] + data['KL Personal Address Building'] + data['KL Personal Address Floor'] + data['KL Personal Address Room'],
+                    Id: 'Asset'
+                  };
+                  me.KLSN = resultStr;
+                  me.addressBack(form);
+                  me.AssetId = datas[0]['Id'];  // 产品ID
+                } else {
+                  me.KLSN = '';
+                }
               }
             });
           }

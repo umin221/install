@@ -21,6 +21,7 @@
                 {{ServiceRequest['KL Contact Mobile Phone']||ServiceRequest['Contact Business Phone']}}
               </i>
             </a></div>
+          <div v-if="ServiceRequest['KL WeChat Contact Phone']" class="mt-Detail-title" ><span class="label-title">代报人电话</span>{{ServiceRequest['KL WeChat Contact Phone']}}</div>
           <div v-if="role === 'install'" class="mt-Detail-title" ><span class="label-title">优先级</span>{{ServiceRequest['Priority']}}</div>
           <div class="mt-Detail-title"><span class="label-title">联系人</span>{{ServiceRequest['Contact Last Name']}}</div>
           <div v-if="role === 'custom'"   class="mt-Detail-title"><span class="label-title"> 服务类型</span>{{ServiceRequest['SR Type']}}</div>
@@ -551,12 +552,27 @@
         let myDate = new Date().format('MM/dd/yyyy hh:mm:ss');
           // 判断开始结束时间
         if (val.Time1.time && val.Time2.time) {
+          /* 修改 时间比对大小
           if (val.Time1.key <= val.Time2.key) {
             me.starTime = val.Time1.time;
             me.endTime = val.Time2.time;
           } else {
             me.starTime = val.Time2.time;
             me.endTime = val.Time1.time;
+          }*/
+          // 转化时间比对大小
+          if (val.Time1.time === '00:00') {
+            val.Time1.time = '24:00';
+          }
+          if (val.Time2.time === '00:00') {
+            val.Time2.time = '24:00';
+          }
+          if (val.Time1.time > val.Time2.time) {
+            me.starTime = val.Time2.time;
+            me.endTime = val.Time1.time;
+          } else {
+            me.starTime = val.Time1.time;
+            me.endTime = val.Time2.time;
           }
           // 转换时间格式
           me.starTime = new Date(val.selectDay + ' ' + me.starTime + ':00').format('MM/dd/yyyy hh:mm:ss');
@@ -572,6 +588,9 @@
             return;
           }
           if (me.BtnStatu === 'status2') {
+            if (me.endTime === '24:00') {
+              me.endTime = '00:00';
+            }
             let parms = {
               'Object Id': me.ServiceRequest.Id,
               'ActivityId': me.Action.Id,
@@ -841,7 +860,6 @@
       .detail-title{
         position: relative;
         padding: 0.5rem;
-        height: 6rem;
         font-size: $font-size-default;
         background: white;
         .mt-Detail-title{

@@ -26,6 +26,7 @@ let ApiList = {
           'Room': option.data.form['Room'], // 详细地址
           'Contact Name': option.data.form['Contact Name'], // 名字
           'Contact Phone': option.data.form['Contact Phone'], // 电话
+          'WeChat Id': option.data.form['WeChat Id'], //
           'Area': option.data.form['Area'], // 故障分类
           'Sub-Area': option.data.form['Sub-Area'], // 故障描述
           'Complaint Description': option.data.form['Complaint Description'], // 故障详情描述

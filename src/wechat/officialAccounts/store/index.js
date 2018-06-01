@@ -121,8 +121,8 @@ export default new Vuex.Store({
               }
             },
             error: function(data) {
-              callback(data[0]);
               Toast('该码未录入系统');
+              callback(data[0]);
             }
           });
         },

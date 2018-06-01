@@ -37,7 +37,8 @@
                 <div>地址：</div>
                 <p style="color: grey;font-size: 14px;line-height: 0">
                   {{serviceDetail['KL Province']}},{{serviceDetail['KL City']}},
-                  {{serviceDetail['KL Town']}},{{serviceDetail['KL Address']}}
+                  {{serviceDetail['KL Town']}},{{serviceDetail['KL Address']}},
+                  {{serviceDetail['KL Building']}} {{serviceDetail['KL Floor']}} {{serviceDetail['KL Room']}}
                 </p>
               </div>
               <div>问题说明：

@@ -36,7 +36,7 @@
     name: NAMESPACE,
     created() {
       let me = this;
-      me.getServiceList({search: 'Contact Id', value: contact.Id});
+      me.getServiceList({search: 'KL WeChat Contact Id', value: contact.Id});
     },
     data: () => {
       return {
