@@ -14,7 +14,7 @@
 
 <script type="es6">
   import {mapActions} from 'vuex';
-  import rules from 'public/plugin/rules';
+  import rulesV from 'public/plugin/rules';
   import md5 from 'js-md5';
 
   const NAMESPACE = 'verify';
@@ -37,6 +37,7 @@
     },
     methods: {
       ...mapActions('index', ['sendMsg']),
+      components: {rulesV},
 //      更新当前按钮状态
       updateState() {
         let me = this;
@@ -69,7 +70,7 @@
       sendVerCode() {
         let me = this;
         console.log(me.mobile);
-        if (rules['phone'].test(me.mobile)) {
+        if (rulesV['phone'].reg.test(me.mobile)) {
 //          更新当前按钮状态
           me.updateState();
 //          生成验证码
