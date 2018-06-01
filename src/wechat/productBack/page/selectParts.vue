@@ -1,11 +1,24 @@
 <template>
   <div class="searchTrans">
     <cus-search v-model="value" :show="true">
-      <mt-checklist
+      <!--<mt-checklist
         v-if="result.length"
         :options="arr"
         v-model="name">
-      </mt-checklist>
+        <div>{{arr['KL Product Description']}}</div>
+      </mt-checklist>-->
+      <cus-cell class="multiple"
+                v-for="item in result"
+                :key="item.id"
+                :title="'配件名称:'+ item['KL Product Name Join']"
+                @click.native="selectFn(item)">
+        <div class="mint-cell-sub-title" slot="title">配件代码: {{item['Product Name']}}</div>
+        <div class="mint-cell-sub-title" slot="title">数量: {{item['KL Inventory Qty']}}</div>
+        <div class="mint-cell-sub-title" slot="title">配件描述:{{item["KL Product Description"]}} </div>
+        <div v-show="showSelect(item)" class="selectIcon" slot="title">
+          <i class="xs-icon icon-select"></i>
+        </div>
+      </cus-cell>
     </cus-search>
     <button-group>
       <mt-button class="single" @click.native="selectEnter">确认</mt-button>
@@ -13,10 +26,10 @@
   </div>
 </template>
 <style lang="scss">
-  .selectIcon {
+  .selectIcon{
     position: absolute;
-    top: 0;
-    right: 0;
+    right: 10px;
+    top: 2px;
   }
 </style>
 <script type="es6">
@@ -32,13 +45,14 @@
       let me = this;
       me.getProduct({
         callback: function() {
-          for (let i = 0; i < me.result.length;i++) {
+          console.dir(me.result);
+          /* for (let i = 0; i < me.result.length;i++) {
             let name = me.result[i]['KL Product Name Join'] + me.result[i]['Product Name'];
             me.arr.push({
               label: name,
               value: me.result[i]
             });
-          }
+          }*/
         }
       });
     },
@@ -48,6 +62,7 @@
         value: '',
         name: [],
         number: [],
+        selectName: {},
         topStatus: '',
         arr: []
       };
@@ -60,6 +75,33 @@
       ...mapMutations(NAMESPACE, ['count', 'saveModelData', 'initSelected']),
       ...mapMutations('add', ['selectProduct']),
 //      ...mapMutations('comEnter', ['successCall']),
+      showSelect(item) {
+        return this.selectName[item['Product Name']];
+      },
+      /**
+       *修改是否选中
+       */
+      selectFn(item) {
+        let flag = !this.selectName[item['Product Name']];
+        if (flag) {
+          this.$set(this.selectName, item['Product Name'], item);
+        } else {
+          this.$set(this.selectName, item['Product Name'], null);
+          delete this.selectName[item['Product Name']];
+        }
+      },
+      selectEnter() {
+        let me = this;
+        let select = this.selectName;
+        // var objList = [];
+        for (let i in select) {
+          var obj = {};
+          obj = select[i];
+          obj['num'] = 1;
+          me.selectProduct(obj);
+        }
+        me.$router.go(-1);
+      },
       searchFn(val) {
         let me = this;
         me.getProduct({
@@ -76,7 +118,17 @@
             }
           }
         });
-      },
+      }/* ,
+      selectEnter() {
+        let me = this;
+        for (let i = 0; i < me.result.length; i++) {
+          if (me.name[i]) {
+            me.name[i].num = 1;
+            me.selectProduct(me.name[i]);
+          }
+        }
+        me.$router.go(-1);
+      }*/
 //      options() {
 //        let me = this;
 //        for (let i = 0; i < me.result.length;i++) {
@@ -93,16 +145,7 @@
 //      select(index, isShow) {
 //        this.count({index, isShow});
 //      },
-      selectEnter() {
-        let me = this;
-        for (let i = 0; i < me.result.length; i++) {
-          if (me.name[i]) {
-            me.name[i].num = 1;
-            me.selectProduct(me.name[i]);
-          }
-        }
-        me.$router.go(-1);
-      }
+
     }
   };
 </script>

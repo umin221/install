@@ -489,7 +489,7 @@ let ApiList = {
       data: {
         'body': {
           'OutputIntObjectName': 'Base KL FS InvLoc Product',
-          'SearchSpec': '[KL FS Invloc Product.KL Inventory Product Status]=LookupValue("KL_PROD_STATUS", "Parts")' + model,
+          'SearchSpec': '[KL FS Invloc Product.KL Inventory Product Status]=LookupValue("KL_PROD_STATUS", "Parts")  AND [KL FS Invloc Product.KL Inventory Qty]>0 ' + model,
           'ViewMode': 'Personal'
         }
       }

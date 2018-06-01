@@ -8,8 +8,8 @@ let ApiList = {
       url: 'service/EAI Siebel Adapter/Query',
       data: {
         'body': {
-          'OutputIntObjectName': 'Base KL Daily Action Interface BO',
-          'SearchSpec': `[KL Daily Action.Planned Completion]>= ${option.data.start} AND [KL Daily Action.Planned] <= ${option.data.end}`,
+          'OutputIntObjectName': 'Base KL Daily Action Simple',
+          'SearchSpec': `[KL Daily Action Simple.Planned Completion]>= ${option.data.start} AND [KL Daily Action Simple.Planned] <= ${option.data.end}`,
           'ViewMode': 'Personal'
         }
       }
@@ -25,8 +25,8 @@ let ApiList = {
       url: 'service/EAI Siebel Adapter/Query',
       data: {
         'body': {
-          'OutputIntObjectName': 'Base KL Daily Action Interface BO',
-          'SearchSpec': '[KL Daily Action.Planned Completion]>= ' + "'" + option.data + ' 00:00:00' + "'" + ' AND [KL Daily Action.Planned] <= ' + "'" + option.data + ' 23:59:59' + "'",
+          'OutputIntObjectName': 'Base KL Daily Action Simple',
+          'SearchSpec': '[KL Daily Action Simple.Planned Completion]>= ' + "'" + option.data + ' 00:00:00' + "'" + ' AND [KL Daily Action Simple.Planned] <= ' + "'" + option.data + ' 23:59:59' + "'",
           'SortSpec': 'Created (DESCENDING)',
           'ViewMode': 'Personal'
         }
@@ -40,7 +40,8 @@ let ApiList = {
   add: option => {
     return {
       method: 'put',
-      url: 'data/KL Daily Action Interface BO/KL Daily Action/'
+      // url: 'data/KL Daily Action Interface BO/KL Daily Action/'
+      url: 'data/KL Daily Action Simple/KL Daily Action Simple/'
     };
   },
   /**
@@ -49,7 +50,7 @@ let ApiList = {
   delete: option => {
     return {
       method: 'DELETE',
-      url: `data/KL Daily Action Interface BO/KL Daily Action/${option.data.Id}`
+      url: `data/KL Daily Action Simple/KL Daily Action Simple/${option.data.Id}`
     };
   }
 };

@@ -144,7 +144,7 @@ export default {
                       Name: LineItems[j].Product,
                       num: parseInt(LineItems[j]['Quantity Requested'], 0),
                       'KL Translated Name': LineItems[j]['KL Product Name Join'],
-                      'List Price': LineItems[j]['Adjusted List Price - Display'],
+                      'List Price': LineItems[j]['Item Price - Display'],
                       Id: LineItems[j]['Product Id'],
                       saveId: LineItems[j]['Id']
                     });
@@ -260,20 +260,27 @@ export default {
       let me = this;
       let len = me.returnSelect.length;
       me.allFee = 0;
-      if (me.isBn === '保外') {
-        if (me.fee) {
-          me.allFee = me.allFee + parseFloat(me.fee, 0);
-        }
-      } else {
+      // if (me.isBn === '保外') {
+      /* } else {
         me.allFee = me.allFee + 0;
-      }
+      }*/
       if (len) {
         for (let i = 0;i < len;i++) {
           console.log(me.returnSelect.length);
-          if (!me.switchStatus[i]) {
-            me.allFee += me.returnSelect[i].num * parseFloat(me.returnSelect[i]['List Price'], 0);
+          if (!me.switchStatus[i] && me.returnSelect[i].Name !== 'AP003') {
+            var Price = 0;
+            if (me.returnSelect[i]['List Price']) {
+              Price = me.returnSelect[i]['List Price'];
+            }
+            me.allFee += me.returnSelect[i].num * parseFloat(Price, 0);
+          }
+          if (me.returnSelect[i].Name === 'AP003') {
+            me.fee = me.returnSelect[i]['List Price'];
           }
         }
+      }
+      if (me.fee) {
+        me.allFee = me.allFee + parseFloat(me.fee, 0);
       }
       return me.allFee.toFixed(2) || 0;
     }

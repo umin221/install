@@ -598,6 +598,7 @@ export default new Vuex.Store(Object.extend(true, sto, {
                 'OutputIntObjectName': 'Base KL Install Order Asset',
                 'SortSpec': 'Created (DESCENDING)',
                 'PageSize': '100',
+                'NewQuery': 'true',
                 'SearchSpec': '[Asset Room.KL Activity Id]=' + '\'' + id + '\''
                 // 'SearchSpec': '[Asset Room.KL Activity Id]="1-2BSGEG4H"'
               }

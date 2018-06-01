@@ -47,6 +47,11 @@
           </mt-cell-swipe>
         </lock-line>
       </div>
+      <attach ioName="KL Action Attachment" ref="attach"
+              :attach="attach.list"
+              :edit="!read"
+              :title="attach.title">
+      </attach>
       <button-group>
         <mt-button class="single"
                    @click.native="submitFn">提交</mt-button>
@@ -117,6 +122,28 @@
   const NameSpace = 'batch';
   Vue.use(vp);
   let today = new Date();
+  /**
+   * 附件上传
+   * @param {Array} serverIds 企业微信临时素材id => mediaId
+   * @param {String} id 业务id
+   */
+  let _upload = function(serverIds, id) {
+    // 成功回调
+    let callback = data => {
+      tools.success(data, {
+        back: false
+      });
+    };
+    // 上传附件
+    serverIds ? this.upload({
+      data: {
+        MediaId: serverIds,
+        Id: id,
+        IOName: 'KL Action Attachment'
+      },
+      success: callback
+    }) : callback(id);
+  };
   export default {
     name: 'batch',
     created() {
@@ -175,6 +202,11 @@
         type: 'edit', // add 新增 / edit 编辑 / read 只读
         editable: true,
         titleVal: '新建批次',
+        attach: { // 附件
+          list: [],
+          edit: false,
+          title: '附件'
+        },
         active: 'tab-container'
       };
     },
@@ -198,7 +230,7 @@
       }
     },
     methods: {
-      ...mapActions('app', ['getLov']),
+      ...mapActions('app', ['getLov', 'upload']),
       ...mapActions(NameSpace, ['getPcObj']),
       getSwipeBtn(line, index) {
         return this.editable ? [{
@@ -313,6 +345,12 @@
             Toast('计划开始日期不能大于计划完成日期');
             return;
           }
+          let uploadAttach = id => {
+            _upload.call(self, self.$refs.attach.getServerIds(), id);
+          };
+          if (self.attach.list.length > 0) {
+            uploadAttach(self.id);
+          }
           var parma = {
             /* 'Planned': self.startDate,
             'Planned Completion': self.endDate,*/
@@ -384,9 +422,16 @@
       submitFn() {
         var self = this;
         tools.valid.call(this, () => {
+          console.dir(self.pcObj);
           if (self.planList.length === 0) {
             Toast('详细计划不能为空！');
             return;
+          }
+          if (self.itemTask['KL Detail Type LIC'] === 'Substitution Lock Trans Batch') { // 替代锁移交 附件不能为空
+            if (self.attach.list.length === 0) {
+              Toast('附件不能为空，请上传！');
+              return;
+            }
           }
           MessageBox({
             title: '提示',
