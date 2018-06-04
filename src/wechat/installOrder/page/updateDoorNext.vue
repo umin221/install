@@ -167,6 +167,10 @@
       submitFn() {
         var self = this;
         tools.valid.call(this, () => {
+          if ((self.item['KL Detail Type LIC'] === 'Substitution Lock Trans Batch' || self.item['KL Detail Type LIC'] === 'Transfer Batch') && self.attach.list.length === 0) {
+            Toast('附件不能为空！');
+            return;
+          }
           var lineObj = self.line;
           MessageBox({
             title: '提示',

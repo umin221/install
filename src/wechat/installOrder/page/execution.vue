@@ -31,9 +31,10 @@
                    is-link></cus-field>
       </div>
       <div class="lock-line disable">
-        <lock-line title="面板">
+        <lock-line title="执行详情">
           <mt-cell-swipe v-for="(installer, index) in installerList" class="lock-line-cell enable" ref="body" :key=index>
-            <div class="co-flex co-jc" slot="title">{{installer.Comments}}</div>
+            <div class="co-flex" slot="title" style="text-align: left">提报时间：{{new Date(installer.Created).format('yyyy-MM-dd hh:mm:ss')}}</div>
+            <div class="co-flex co-jc" slot="title">提报明细：{{installer.Comments}}</div>
           </mt-cell-swipe>
         </lock-line>
       </div>

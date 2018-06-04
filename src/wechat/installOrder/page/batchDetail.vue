@@ -256,22 +256,22 @@
               self.titleVal = '汇总详情';
             } else {
               self.getPlanList(id);
-              self.queryMedias({ // 附件查询
-                data: {
-                  'IOName': 'KL Action Attachment',
-                  'SearchSpec': {
-                    'Action Attachment.Activity Id': id
-                  }
-                },
-                success: data => {
-                  self.attach.list = KND.Util.toArray(data['SiebelMessage']['Action Attachment']);
-                }
-              });
               if (data['KL Delivery Sales Type'] === '工程') { // 区分工程还是零星  工程
                 if (data['KL Detail Type LIC'] === 'Substitution Lock Inst Batch' ||
                   data['KL Detail Type LIC'] === 'Lock Installation Batch') { // 替代锁批次=Substitution Lock Inst Batch、真锁=Lock Installation Batch获取为外人员 显示合作伙伴
                   self.is_installer = true;
                   self.getInstallerList(id);
+                  self.queryMedias({ // 附件查询
+                    data: {
+                      'IOName': 'KL Action Attachment',
+                      'SearchSpec': {
+                        'Action Attachment.Activity Id': id
+                      }
+                    },
+                    success: data => {
+                      self.attach.list = KND.Util.toArray(data['SiebelMessage']['Action Attachment']);
+                    }
+                  });
                   self.companyName = data['KL Partner Name'];
                   if (data['KL Detail Type LIC'] === 'Lock Installation Batch') { // 真锁
                     self.is_zs = true;

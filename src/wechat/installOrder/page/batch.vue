@@ -47,11 +47,11 @@
           </mt-cell-swipe>
         </lock-line>
       </div>
-      <attach ioName="KL Action Attachment" ref="attach"
+     <!-- <attach ioName="KL Action Attachment" ref="attach"
               :attach="attach.list"
               :edit="!read"
               :title="attach.title">
-      </attach>
+      </attach>-->
       <button-group>
         <mt-button class="single"
                    @click.native="submitFn">提交</mt-button>
@@ -127,7 +127,7 @@
    * @param {Array} serverIds 企业微信临时素材id => mediaId
    * @param {String} id 业务id
    */
-  let _upload = function(serverIds, id) {
+  /* let _upload = function(serverIds, id) {
     // 成功回调
     let callback = data => {
       tools.success(data, {
@@ -143,7 +143,7 @@
       },
       success: callback
     }) : callback(id);
-  };
+  };*/
   export default {
     name: 'batch',
     created() {
@@ -345,12 +345,12 @@
             Toast('计划开始日期不能大于计划完成日期');
             return;
           }
-          let uploadAttach = id => {
+          /* let uploadAttach = id => {
             _upload.call(self, self.$refs.attach.getServerIds(), id);
           };
           if (self.attach.list.length > 0) {
             uploadAttach(self.id);
-          }
+          }*/
           var parma = {
             /* 'Planned': self.startDate,
             'Planned Completion': self.endDate,*/
@@ -427,12 +427,12 @@
             Toast('详细计划不能为空！');
             return;
           }
-          if (self.itemTask['KL Detail Type LIC'] === 'Substitution Lock Trans Batch') { // 替代锁移交 附件不能为空
+          /* if (self.itemTask['KL Detail Type LIC'] === 'Substitution Lock Trans Batch') { // 替代锁移交 附件不能为空
             if (self.attach.list.length === 0) {
               Toast('附件不能为空，请上传！');
               return;
             }
-          }
+          }*/
           MessageBox({
             title: '提示',
             message: ' 确认提交？一经提交不可修改',
