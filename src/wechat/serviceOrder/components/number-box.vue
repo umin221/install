@@ -19,11 +19,15 @@
 <script type="es6">
   export default {
     name: 'cus-number',
-    props: ['index'],
+    props: ['index', 'number'],
     data() {
       return {
-        value: 1
+        value: ''
       };
+    },
+    created() {
+      var self = this;
+      self.value = this.number || 1;
     },
     methods: {
       changeFn(type) {

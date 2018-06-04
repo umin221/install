@@ -3,8 +3,8 @@
     <div class="linear"></div>
     <div class="text">{{srNum1}}</div>
     <div class="linear"></div>
-    <div :class="{text: name1, linear: !name1}">{{name1}}</div>
-    <div class="linear"></div>
+    <div :class="{text: name1, linear: !name1}">{{name1}}/{{phone1}}</div>
+   <!-- <div class="linear"></div>-->
   </div>
 </template>
 <style lang="scss">
@@ -14,7 +14,7 @@
     display: flex;
     .linear{
       height:10px;
-      width: 100%;
+      width: 15%;
       background-image: linear-gradient(0deg, #d9d9d9, #d9d9d9 15%, transparent 15%);
     }
     .text{
@@ -39,7 +39,7 @@
   const NameSpace = 'title';
   export default {
     name: NameSpace,
-    props: ['srNum', 'name', 'iscomple'],
+    props: ['srNum', 'name', 'phone', 'iscomple'],
     created() {
     },
     data() {
@@ -49,6 +49,9 @@
     computed: {
       srNum1() {
         return this.srNum;
+      },
+      phone1() {
+        return this.phone;
       },
       name1() {
         return this.name;

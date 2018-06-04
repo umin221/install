@@ -41,6 +41,12 @@ export default new Router({
       require(['../page/comEnter'], resolve);
     }
   }, {
+    path: '/contact',    // 修改联系人
+    name: 'contact',
+    component(resolve) {
+      require(['../page/contact'], resolve);
+    }
+  }, {
     path: '/saveFault',    // 故障记录
     name: 'saveFault',
     component(resolve) {

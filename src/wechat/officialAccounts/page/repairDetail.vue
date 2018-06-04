@@ -143,7 +143,7 @@
         });
       }
     },
-    components: {toggle, cusCall}
+    components: {toggle, cusCall, buttonGroup}
   };
 </script>
 <style lang="scss">

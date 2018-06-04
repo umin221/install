@@ -24,7 +24,7 @@
                 <div>配件代码： {{item['Name']}}</div>
                 <div style="width: 65%;">配件名称： {{item['KL Translated Name']}}</div>
                 <div class="toRed">￥{{item['List Price']}}</div>
-                <num-box :index="index" :type="switchStatus[index]" @input="productNumber"></num-box>
+                <num-box :index="index" :type="switchStatus[index]" :number="item.num" @input="productNumber"></num-box>
               </div>
             </mt-cell-swipe>
           </div>
@@ -100,6 +100,13 @@ export default {
     me.Service = service.Service;
     me.serviceType = service.type;
     console.log(me.returnSelect);
+    if (me.returnSelect.length) {
+      for (let i = 0;i < me.returnSelect.length;i++) {
+        if (me.returnSelect[i].Name === 'AP003') {
+          me.fee = me.returnSelect[i]['List Price'] || 0;
+        }
+      }
+    }
 //    let isBn = me.Service['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
 //    me.setIsBn(isBn);
 //    let EntryOrders = KND.Util.toArray(service.Service['Order Entry - Orders']);
@@ -273,9 +280,6 @@ export default {
               Price = me.returnSelect[i]['List Price'];
             }
             me.allFee += me.returnSelect[i].num * parseFloat(Price, 0);
-          }
-          if (me.returnSelect[i].Name === 'AP003') {
-            me.fee = me.returnSelect[i]['List Price'];
           }
         }
       }

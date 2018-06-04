@@ -25,8 +25,8 @@
         </mt-cell>
          <mt-cell title="计划开始时间" class="borderBottom"><span >{{initDateStart()}}</span></mt-cell>
          <mt-cell title="计划结束时间" class="borderBottom"><span >{{initDateEnd()}}</span></mt-cell>
-         <mt-cell title="实际开始时间" is-link class="borderBottom" @click.native='openStartTime'><span>{{initDate()}} {{ACstartPickerValue}}</span></mt-cell>
-         <mt-cell title="实际结束时间" is-link @click.native='openEndTime'><span>{{initDate()}} {{ACendPickerValue}}</span></mt-cell>
+         <mt-cell title="实际开始时间" is-link class="borderBottom" @click.native='openStartTime'><span>{{initDate('Start')}} {{ACstartPickerValue}}</span></mt-cell>
+         <mt-cell title="实际结束时间" is-link @click.native='openEndTime'><span>{{initDate('End')}} {{ACendPickerValue}}</span></mt-cell>
               <button-group>
         <mt-button class="submitBtn" v-if='saveBtn'
                    @click.native="handleSave">更新</mt-button>
@@ -65,11 +65,13 @@
       return {
         headTitle: '更新计划',
         startPickerHour: '00',
+        index: '',
         saveBtn: true // 是否显示保存按钮
       };
     },
     created() {
       // 判断是否显示更新按钮
+      this.index = this.$route.query.index;
       var yaer = this.newYear;
       var month = this.newMonth;
       var day = this.newDay;
@@ -85,13 +87,13 @@
       var today = new Date().getHours();
       this.startPickerHour = today;
       console.log(nowTime <= time);
-      if (this.currentDayData[this.$route.query.index]['Status INT'] === 'Not Started' && nowTime <= time) {
+      if (this.currentDayData[this.index]['Status INT'] === 'Not Started' && nowTime <= time) {
         this.saveBtn = true;
         this.setACStartPicker('');
         this.setACEndPicker('');
       } else {
-        this.setACStartPicker(this.currentDayData[this.$route.query.index]['Started'].replace(/\d+\/\d+\/\d+\s/, ''));
-        this.setACEndPicker(this.currentDayData[this.$route.query.index]['Done'].replace(/\d+\/\d+\/\d+\s/, ''));
+        this.setACStartPicker(this.currentDayData[this.index]['Started'].replace(/\d+\/\d+\/\d+\s/, ''));
+        this.setACEndPicker(this.currentDayData[this.index]['Done'].replace(/\d+\/\d+\/\d+\s/, ''));
         this.saveBtn = false;
         this.headTitle = '查看计划';
       }
@@ -118,29 +120,47 @@
       ...mapActions('app', ['getLov']),
       // 处理计划开始时间
       initDateStart() {
-        var time = new Date(this.currentDayData[this.$route.query.index]['Planned']).format('yyyy-MM-dd hh:mm:ss');
+        var time = new Date(this.currentDayData[this.index]['Planned']).format('yyyy-MM-dd hh:mm:ss');
         return time;
       },
       // 处理计划结束时间
       initDateEnd() {
-        var time = new Date(this.currentDayData[this.$route.query.index]['Planned Completion']).format('yyyy-MM-dd hh:mm:ss');
+        var time = new Date(this.currentDayData[this.index]['Planned Completion']).format('yyyy-MM-dd hh:mm:ss');
         return time;
       },
       // 格式化年月日
-      initDate() {
-        return this.newYear + '-' + this.newMonth + '-' + this.newDay;
+      initDate(type) {
+        var self = this;
+        console.dir(self.currentDayData[self.index]);
+        if (type === 'Start') { // 实际开始时间
+          if (self.currentDayData[self.index]['Started']) {
+            return new Date(self.currentDayData[self.index]['Started']).format('yyyy-MM-dd');
+          } else {
+            if (self.saveBtn) {
+              return self.newYear + '-' + self.newMonth + '-' + self.newDay;
+            } else {
+              return '';
+            }
+          }
+        } else {
+          if (self.currentDayData[self.index]['Done']) {
+            return new Date(self.currentDayData[self.index]['Done']).format('yyyy-MM-dd');
+          } else {
+            return self.newYear + '-' + self.newMonth + '-' + self.newDay;
+          }
+        }
       },
       // 描述字段
       descType() {
-        return this.currentDayData[this.$route.query.index]['Type'];
+        return this.currentDayData[this.index]['Type'];
       },
       // 描述字段
       desc() {
-        return this.currentDayData[this.$route.query.index]['KL Detail Type'];
+        return this.currentDayData[this.index]['KL Detail Type'];
       },
       // 描述字段
       descpc() {
-        return this.currentDayData[this.$route.query.index]['KL Task Batch Name'];
+        return this.currentDayData[this.index]['KL Task Batch Name'];
       },
       // 点击选开始时间
       openStartTime() {

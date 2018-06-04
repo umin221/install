@@ -92,14 +92,22 @@
           search: 'SR Number',
           value: parmer.srNum,
           callback: data => {
-            if (data) {
-              me.box1 = data.Accessible;
-              me.box2 = data.Resolved;
-              me.comments = data.Comments;
-              me.changeStar(data['KL Knowledgable Stars'], 'technologyIs', data['Knowledgable']);
-              me.changeStar(data['KL Overall Stars'], 'attitudeIs', data['Overall']);
-              setAttrButt('comments', 'textarea');
+            var obj = {};
+            if (data.length > 1) {
+              for (var i = 0; i < data.length; i++) {
+                if (data[i]['KL Status'] === '用户已点评') {
+                  obj = data[i];
+                }
+              }
+            } else {
+              obj = data;
             }
+            me.box1 = obj.Accessible;
+            me.box2 = obj.Resolved;
+            me.comments = obj.Comments;
+            me.changeStar(obj['KL Knowledgable Stars'], 'technologyIs', obj['Knowledgable']);
+            me.changeStar(obj['KL Overall Stars'], 'attitudeIs', obj['Overall']);
+            setAttrButt('comments', 'textarea');
           }
         });
         me.changeStar();

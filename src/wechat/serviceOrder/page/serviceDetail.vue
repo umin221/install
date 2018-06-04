@@ -317,7 +317,10 @@
             <!--子服务请求标题-->
             <sr-title :srNum="item['SR Number']"
                       :name="item['Contact Last Name']"
-                      :iscomple="item['KL Status LIC'] === 'Completed'"></sr-title>
+                      :phone="item['KL Contact Mobile Phone']"
+                      :iscomple="item['KL Status LIC'] === 'Completed'"
+                      @click.native="changContact(item)"
+            ></sr-title>
             <!--子服务请求 记录故障-->
             <div v-if="item['KL Status LIC'] !== 'Completed'">
               <mt-cell class="xs-icon icon-saver" title="记录故障">
@@ -339,7 +342,10 @@
           <!--父服务请求标题-->
           <sr-title :srNum="ServiceRequest['SR Number']"
                     :name="ServiceRequest['Contact Last Name']"
-                    :iscomple="ServiceRequest['KL Parent SR Complete Flag'] === 'Y'"></sr-title>
+                    :phone="ServiceRequest['KL Contact Mobile Phone']"
+                    :iscomple="ServiceRequest['KL Parent SR Complete Flag'] === 'Y'"
+                    @click.native="changContact(ServiceRequest)"
+          ></sr-title>
           <!--父服务请求-->
           <div class="parent-work-order" v-if="!ServiceRequest['KL Parent SR Complete Flag']">
             <!--父服务请求 记录故障-->
@@ -727,6 +733,14 @@
             }
           });
         }
+      },
+      changContact(item) {
+        this.$router.push({
+          name: 'contact',
+          query: {
+            item: item
+          }
+        });
       },
       moreOrder() {
         let me = this;

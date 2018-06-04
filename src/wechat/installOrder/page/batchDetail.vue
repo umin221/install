@@ -59,7 +59,8 @@
       <attach ioName="KL Action Attachment" ref="attach"
               :attach="attach.list"
               :edit="!read"
-              :title="attach.title">
+              :title="attach.title"
+              v-show="is_installer || is_attach">
       </attach>
       <button-group v-show="is_option && is_but">
         <mt-button class="single"
