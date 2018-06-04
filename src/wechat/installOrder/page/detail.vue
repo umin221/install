@@ -17,8 +17,20 @@
           label="项目名称"
           :value="detailData['KL Agreement Opportunity Name']" is-link></cus-field>
         <cus-field
+          label="门厂联系人"
+          :value="detailData['KL Delivery Partner Contact Name']"></cus-field>
+        <cus-field
+          label="门厂电话"
+          :value="detailData['KL Delivery Partner Contact Phone']"></cus-field>
+        <cus-field
+          label="门厂地址"
+          :value="detailData['KL Partner Full Address']" is-link></cus-field>
+        <cus-field
           label="销售类型"
           :value="detailData['KL Delivery Sales Type']"></cus-field>
+        <cus-field
+          label="是否销售审批"
+          :value="detailData['KL Delivery Need Approval Flag'] === 'Y' ? '是':'否'"></cus-field>
         <cus-field
           label="锁体是否发门厂装配"
           :value="detailData['KL Delivery Check Box 1'] === 'Y' ? '是':'否'"></cus-field>
@@ -26,7 +38,7 @@
           label="安装数量"
           :value="detailData['KL Install Amount'] || 0"></cus-field>
         <cus-field
-          label="地址"
+          label="项目地址"
           :value="detailData['KL Delivery Country'] + detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery County'] + detailData['KL Delivery Address']"
           is-link></cus-field>
         <div slot="title" class="mint-content-div enable">

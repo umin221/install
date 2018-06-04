@@ -269,7 +269,10 @@
                 Province: data['KL Personal Province'],
                 City: data['Personal City'],
                 County: data['KL Personal Town'],
-                'Street Address': data['Personal Address'] + data['KL Personal Address Building'] + data['KL Personal Address Floor'] + data['KL Personal Address Room'],
+                'Street Address': data['Personal Address'],
+                'Street Address 2': data['KL Personal Address Building'],
+                'Street Address 3': data['KL Personal Address Floor'],
+                'Street Address 4': data['KL Personal Address Room'],
                 Id: 'Asset'
               };
               me.AssetId = data.Id;

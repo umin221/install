@@ -108,7 +108,7 @@
         self.BuilingName = self.item['Street Address 2'];
         self.FloorName = self.item['Street Address 3'];
         self.RoomName = self.item['Street Address 4'];
-        self.productId = self.item['Product Id'];
+        self.ProductId = self.item['KL Final Product Id'] || self.item['Product Id'];
         self.productCode = self.item['Product Model No'];
         self.lockBody = self.item['KL Product Model No Lock Body'];
         self.panel = self.item['KL Product Model No Panel'];
@@ -141,7 +141,7 @@
         KL_CITY: '',
         KL_TOWN: '',
         detailAddress: '',
-        productId: '',
+        ProductId: '',
         productCode: '',
         panel: '',
         lockBody: '',
@@ -194,6 +194,7 @@
           me.lockBody = values[0]['KL Product Model No'];
         } else {
           me.panel = values[0]['KL Product Model No'];
+          me.ProductId = values[0]['KL Final Product Id'] || values[0]['Product Id'];
         }
       },
       scavenging() {
@@ -231,7 +232,7 @@
                           'Original Order Id': self.orderID,
                           'KL Activity Id': self.id,
                           // 'Serial Number': self.SerialNumber,
-                          'Product Id': self.productId,
+                          'Product Id': self.ProductId,
                           'KL Product Model No Panel': self.panel,
                           'KL Product Model No Lock Body': self.lockBody,
                           'Id': self.item.Id || '00001'
