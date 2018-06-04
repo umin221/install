@@ -151,6 +151,7 @@ let apiList = {
 //    };
 
 //    delete partner['CUT Address'];
+    delete partner['User'];
     delete partner['Channel Partner_Position'];
 
     return {

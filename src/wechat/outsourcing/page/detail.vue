@@ -246,7 +246,6 @@
 //        禁用提交
         disableSubmit: false,
         contact: {
-          'Id': now,
           'Cellular Phone #': '', // app登陆账号
           'First Name': '.', // 固定
           'KL Type': '委外人员', // 固定 联系人类型
@@ -259,8 +258,10 @@
     watch: {
       form(n, o) {
         let me = this;
-        me.contact['Cellular Phone #'] = n['KL Primary Contact Cellular Phone'];
-        me.contact['Last Name'] = n['KL Primary Contact Last Name'];
+        let phone = n['KL Primary Contact Cellular Phone'];
+        let name = n['KL Primary Contact Last Name'];
+        if (phone) me.contact['Cellular Phone #'] = phone;
+        if (name) me.contact['Last Name'] = name;
       }
     },
     computed: {
@@ -342,7 +343,6 @@
           success: result => {
             let me = this;
             me.contact = result.items;
-            me.contact['SSA Primary Field'] = 'Y';
             delete me.contact.Link;
           },
           error: err => {
@@ -396,6 +396,9 @@
             //  }
             // });
           } else {
+            // 设置主要联系人
+            me.contact['SSA Primary Field'] = 'Y';
+            // 设置登录名，必填参数
             me.contact['Login Name'] = me.contact['Cellular Phone #'];
             me.form.ListOfUser = {
               User: me.contact
