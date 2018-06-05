@@ -123,6 +123,12 @@
               // 已存在绑定记录则不允许绑定，清空条码
               if (data.length) {
                 let room = KND.Util.parse(data.shift().super);
+                /**
+                 * 当前房号资产查到记录，不属于重复情况
+                 * 场景1，多个房号重复同一个条码；理论上不存在，后台也有做限制，不会存在多条一样的记录
+                 * 场景2，不同安装人员，扫描同一个条码；只有第一个提交的安装人员能成功；在同一个批次中，可以直接查询出来，在不同批次中，需要总部专员查看
+                 */
+                if (room.Id === assets.Id) return serial;
                 me.assets['serial'] = me.assets['serial'] = '';
                 me.error.serial = serial;
                 me.error.address = room['Province'] + room['City'] + room['Personal County'] + room['Street Address'] + room['Street Address 2'] + room['Street Address 3'] + room['Street Address 4'];

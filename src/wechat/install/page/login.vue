@@ -78,10 +78,14 @@
       },
       loginFn() {
         let me = this;
+        // 当前登陆用户
+        let loginName = me.username.trim();
         tools.valid.call(me, () => {
+          // 设置当前用户id
+          KND.Session.set('userID', loginName);
           me.queryUserInfo({
             data: {
-              'Login Name': me.username.trim(),
+              'Login Name': loginName,
               'KL Outsource Password': me.password.trim(),
               'KL Status': 'Active'
             },
