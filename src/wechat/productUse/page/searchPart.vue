@@ -30,6 +30,9 @@
   </div>
 </template>
 <style>
+  .mint-search-list {
+    padding-bottom: 44px!important;
+  }
   .selectIcon{
     position: absolute;
     right: 10px;

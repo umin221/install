@@ -199,6 +199,9 @@
   };
 </script>
 <style lang="scss">
+  .mint-search-list {
+    padding-bottom: 44px!important;
+  }
     .selectIcon {
       position: absolute;
       top: 0;

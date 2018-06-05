@@ -25,6 +25,9 @@
   </div>
 </template>
 <style lang="scss">
+  .mint-search-list {
+    padding-bottom: 44px!important;
+  }
   .selectIcon{
     position: absolute;
     right: 10px;
