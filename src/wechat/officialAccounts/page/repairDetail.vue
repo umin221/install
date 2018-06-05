@@ -85,6 +85,8 @@
   import {mapState, mapActions} from 'vuex';
   import cusCall from 'public/components/cus-call';
   import toggle from '../components/detail-toggle';
+  import buttonGroup from 'public/components/cus-button-group';
+
   //
   const NameSpace = 'detail';
   //
