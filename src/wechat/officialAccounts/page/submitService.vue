@@ -342,7 +342,10 @@
                     Province: datas[0]['KL Personal Province'],
                     City: datas[0]['Personal City'],
                     County: datas[0]['KL Personal Town'],
-                    'Street Address': data['Personal Address'] + data['KL Personal Address Building'] + data['KL Personal Address Floor'] + data['KL Personal Address Room'],
+                    'Street Address': datas[0]['Personal Address'],
+                    'Street Address 2': datas[0]['KL Personal Address Building'],
+                    'Street Address 3': datas[0]['KL Personal Address Floor'],
+                    'Street Address 4': datas[0]['KL Personal Address Room'],
                     Id: 'Asset'
                   };
                   me.KLSN = resultStr;

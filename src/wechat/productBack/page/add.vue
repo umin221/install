@@ -16,7 +16,7 @@
           :title="'配件编码：' + item['Product Name']"
           :label="'配件名称：' + item['KL Product Name Join']">
               <div class="operation">
-                <num-box :index="index" :type="true" @input="productNumber"></num-box>
+                <num-box :index="index" :number="item.num" :type="true" @input="productNumber"></num-box>
               </div>
           </mt-cell-swipe>
       </div>

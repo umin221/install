@@ -146,7 +146,11 @@
           if (self.currentDayData[self.index]['Done']) {
             return new Date(self.currentDayData[self.index]['Done']).format('yyyy-MM-dd');
           } else {
-            return self.newYear + '-' + self.newMonth + '-' + self.newDay;
+            if (self.saveBtn) {
+              return self.newYear + '-' + self.newMonth + '-' + self.newDay;
+            } else {
+              return '';
+            }
           }
         }
       },
