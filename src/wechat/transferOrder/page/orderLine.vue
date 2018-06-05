@@ -26,7 +26,7 @@
         <mt-cell title="是否带天地" v-if="isVP || isLockBody">
           <mt-switch v-model="flag"></mt-switch>
         </mt-cell>
-        <cus-field :label="`数量(${line['KL Agreement Item Quantity'] || ''})`" tag="数量" placeholder="输入数量"
+        <cus-field :label="`数量(${line['KL Delivery Item Quantity'] || ''})`" tag="数量" placeholder="输入数量"
                    type="number"
                    :class="{disable: !holeType}"
                    v-valid.require.number
@@ -37,12 +37,12 @@
                    v-if="isVP || isLockBody"
                    :editable="editable"
                    is-link></cus-field>
-        <cus-field label="门厚(cm)" tag="门厚" placeholder="输入门厚"
+        <cus-field label="门厚(mm)" tag="门厚" placeholder="输入门厚"
                    v-if="isVP || isPanel"
                    v-valid.nonNegative
                    :editable="editable"
                    v-model="line['KL Door Thickness']"></cus-field>
-        <cus-field label="锁芯中心距门内距(cm)" type="number" tag="锁芯中心距门内距" placeholder="输入距离"
+        <cus-field label="锁芯中心距门内距(mm)" type="number" tag="锁芯中心距门内距" placeholder="输入距离"
                    v-valid.nonNegative
                    v-if="isVP || isLockBody || isPanel"
                    :editable="editable"

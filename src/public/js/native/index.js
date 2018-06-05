@@ -73,7 +73,10 @@ import queue from '../base/queue';
      * IM02 IE01
      */
     getUserID() {
-      return session.get('userID') || util['getParam']('userID') || 'GUESTERM';
+      let userID = util['getParam']('userID');
+      // 企业微信，虚拟组织下的用户无法正常获取用户信息，无法做审批才做
+      userID = userID.length > 10 ? 'GUESTERM' : userID;
+      return session.get('userID') || userID || 'GUESTERM';
     };
 
     /**
