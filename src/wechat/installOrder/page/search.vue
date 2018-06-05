@@ -6,7 +6,7 @@
                 placeholder="请输入项目名称或负责人">
 
       <cus-loadmore ref="result"
-                    :loadBottom="loadBottomFn"
+                    @loadBottom="loadBottomFn"
                     :emptyTips="false"
                     :refresh="false">
         <cus-cell class="multiple"
@@ -15,6 +15,7 @@
                   @click.native="toDetailFn(item.Id)"
                   v-for="item in result"
                   is-link>
+          <div class="mint-cell-sub-title" slot="title">订单状态: {{item['Status']}}</div>
           <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
           <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
         </cus-cell>
@@ -49,7 +50,6 @@
       }
     }, args.pop() || {});
     // 获取安装订单
-    console.dir('00000');
     me.getList(param, me.userInfo);
   };
   const NAMESPACE = 'index';

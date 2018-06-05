@@ -12,6 +12,7 @@ let apiList = {
   },*/
   getList: option => {
 
+    var data = option.data;
     var boby = {
       'OutputIntObjectName': 'KL Install Order Header',
       // 'OutputIntObjectName': 'KL Install Order',
@@ -21,21 +22,24 @@ let apiList = {
 //    默认获取非草稿订单，类型为安装订单
     var searchSpec = ['[Order Entry - Orders.Status]<>"Draft" AND [Order Entry - Orders.Order Type]="Install Order"'];
     // 状态条件
-    var status = option.data.Status || '';
+    var status = data.Status || '';
     // 搜索条件
-    var search = option.data.search || '';
+    var search = data.search || '';
 //    用户职位
-    var position = option.data.infoUser['KL Primary Position Type LIC'];
+    var position = data.infoUser['KL Primary Position Type LIC'];
 //    是否查看团队
-    var isTeam = option.data.isTeam;
+    var isTeam = data.isTeam;
     // 所有人都不看草稿
 //    门厂技术安装员
     if (position === 'Door Factory Engineer' || position === 'Door Factory Manager') {
       boby.ViewMode = 'Sales Rep';
 //      安装主管(我的安装订单) 安装工程师(我的安装订单)
     } else if ((position === 'Field Service Manager' || position === 'Field Service Engineer') && !isTeam) {
-      searchSpec.push('[Order Entry - Orders.Primary Position Id]="' + option.data.infoUser['Primary Position Id'] + '"');
-      searchSpec.push('[Order Entry - Orders.Status]<>"In Confirming"');
+      var id = data.infoUser['Id'];
+      var pid = data.infoUser['Primary Position Id'];
+      // 查询负责人是自己的订单 或者 门厂负责人是自己的订单
+      searchSpec.push(`([Order Entry - Orders.Primary Position Id]='${pid}' OR [Order Entry - Orders.KL Delivery Partner Owner Id]='${id}')`);
+//      searchSpec.push('[Order Entry - Orders.Status]<>"In Confirming"');
     }
 //    isTeam 等于true 安装主管、门厂技术主管 我的团队
     if (isTeam) {
@@ -43,7 +47,7 @@ let apiList = {
     }
     // 订单状态过滤
     if (status) {
-      searchSpec.push('(' + KND.Util.condition2D({Status: option.data.Status.split(',')}, 'Order Entry - Orders', ' OR ', '=') + ')');
+      searchSpec.push('(' + KND.Util.condition2D({Status: data.Status.split(',')}, 'Order Entry - Orders', ' OR ', '=') + ')');
     }
     // 订单搜索条件过滤
     if (search) {

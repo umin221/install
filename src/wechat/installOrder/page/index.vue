@@ -35,6 +35,7 @@
                       @click.native="toDetailFn(item.Id)"
                       v-for="item in pending"
                       is-link>
+              <div class="mint-cell-sub-title" slot="title">订单状态: {{item['Status']}}</div>
               <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
               <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
             </cus-cell>
@@ -55,6 +56,7 @@
                       @click.native="toDetailFn(item.Id)"
                       v-for="item in process"
                       is-link>
+              <div class="mint-cell-sub-title" slot="title">订单状态: {{item['Status']}}</div>
               <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
               <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
             </cus-cell>
@@ -75,6 +77,7 @@
                       @click.native="toDetailFn(item.Id)"
                       v-for="item in completed"
                       is-link>
+              <div class="mint-cell-sub-title" slot="title">订单状态: {{item['Status']}}</div>
               <div class="mint-cell-sub-title" slot="title">销售类型: {{item['KL Delivery Sales Type']}}</div>
               <div class="mint-cell-sub-title" slot="title">项目名称: {{item['KL Agreement Opportunity Name']}}</div>
             </cus-cell>
@@ -131,6 +134,10 @@
           self.tabVal = 'process';
           self.tabStatus = '处理中';
           self.selected = 'process';
+
+          // 安装工程师或者安装主管，在处理中需要查询需要确认的订单
+          mapp.manager['处理中'] = 'In Installing,Sales Confirmed,Submitted,In Confirming';
+          mapp.list['In Installing,Sales Confirmed,Submitted,In Confirming'] = 'process';
         }
         // 获取安装订单数据
         this.loadBottomFn({
