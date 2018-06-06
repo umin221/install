@@ -11,78 +11,35 @@
     <div class="mint-content">
 
       <mt-navbar v-model="selected">
-        <mt-tab-item id="pending"
-          @click.native="!pending.length && loadBottomFn({status:'待处理', list:'pending'})">待处理</mt-tab-item>
-        <mt-tab-item id="process"
-                     v-show="isManager"
-          @click.native="!process.length && loadBottomFn({status:'处理中', list:'process'})">处理中</mt-tab-item>
-        <mt-tab-item id="completed"
-          @click.native="!completed.length && loadBottomFn({status:'已完成', list:'completed'})">已完成</mt-tab-item>
+        <mt-tab-item v-for="(value, key) in navs"
+                     v-text="value.label"
+                     :id="key"
+                     :key="key"
+                     @click.native="!rows.length && loadBottomFn(key)"></mt-tab-item>
       </mt-navbar>
 
       <!-- tab-container -->
       <mt-tab-container v-model="selected">
-        <mt-tab-container-item id="pending">
-          <cus-loadmore ref="pending"
+        <mt-tab-container-item v-for="(value, key) in navs"
+                               :key="key"
+                               :id="key">
+          <cus-loadmore :ref="key"
+                        :param="key"
+                        :topStatus="topStatus"
                         @loadTop="loadTopFn"
-                        @loadBottom="loadBottomFn"
-                        :param="{status:'待处理', list:'pending'}"
-                        :topStatus="topStatus">
-            <empty v-show="!pending.length"></empty>
+                        :data-rows="rows"
+                        @loadBottom="loadBottomFn">
             <cus-cell class="multiple"
-                     :key="item.id"
-                     :title="'合同编号:'+ item['Agree Number']"
-                     @click.native="toDetailFn(item)"
-                     v-for="item in pending"
-                     is-link>
-              <div slot="after">{{item['Status']}}</div>
-              <div class="mint-cell-sub-title" slot="title">工程名称: {{item['Opportunity Name']}}</div>
-              <div v-if="isTeam" class="mint-cell-sub-title" slot="title">负责人: {{item['Project Owner Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
-            </cus-cell>
-          </cus-loadmore>
-        </mt-tab-container-item>
-
-        <mt-tab-container-item id="process">
-          <cus-loadmore ref="process"
-                        @loadTop="loadTopFn"
-                        @loadBottom="loadBottomFn"
-                        :param="{status:'处理中', list:'process'}"
-                        :topStatus="topStatus">
-            <empty v-show="!process.length"></empty>
-            <cus-cell class="multiple"
-                     :key="item.id"
-                     :title="'合同编号:'+ item['Agree Number']"
-                     @click.native="toDetailFn(item)"
-                     v-for="item in process"
-                     is-link>
-              <div class="mint-cell-sub-title" slot="title">工程名称: {{item['Opportunity Name']}}</div>
-              <div v-if="isTeam" class="mint-cell-sub-title" slot="title">负责人: {{item['Project Owner Name']}}</div>
-              <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
-            </cus-cell>
-          </cus-loadmore>
-        </mt-tab-container-item>
-
-        <mt-tab-container-item id="completed">
-          <cus-loadmore ref="completed"
-                        @loadTop="loadTopFn"
-                        @loadBottom="loadBottomFn"
-                        :param="{status:'已完成', list:'completed'}"
-                        :topStatus="topStatus">
-            <empty v-show="!completed.length"></empty>
-            <cus-cell class="multiple"
+                      v-for="item in rows"
                       :key="item.id"
                       :title="'合同编号:'+ item['Agree Number']"
                       @click.native="toDetailFn(item)"
-                      v-for="item in completed"
                       is-link>
-              <div slot="after">{{item['Status']}}</div>
               <div class="mint-cell-sub-title" slot="title">工程名称: {{item['Opportunity Name']}}</div>
               <div v-if="isTeam" class="mint-cell-sub-title" slot="title">负责人: {{item['Project Owner Name']}}</div>
               <div class="mint-cell-sub-title" slot="title">更新日期: {{new Date(item['Updated']).format('yyyy-MM-dd hh:mm:ss')}}</div>
             </cus-cell>
           </cus-loadmore>
-
         </mt-tab-container-item>
       </mt-tab-container>
 
@@ -99,15 +56,16 @@
   //
   let loader = function(...args) {
     let me = this;
-    let event = args.pop();
-    let list = args.pop();
-    let param = Object.extend(true, {
-      callback: (data) => {
-        me.$refs[list][event](data.length);
-      }
-    }, args.pop() || {});
+    let type = args.shift();
+    let more = args.shift();
     // 获取团队列表
-    me.getTransferOrder(param);
+    me.getTransferOrder({
+      type,
+      more,
+      callback: data => {
+        me.$refs[type][0][more ? 'onBottomLoaded' : 'onTopLoaded'](data.length);
+      }
+    });
   };
 
   const NAMESPACE = 'index';
@@ -125,10 +83,7 @@
         // 主管可查看团队视图
         me.viewTeam = position === 'Field Service Manager';
         // 获取列表数据
-        me.loadBottomFn({
-          status: '待处理',
-          list: 'pending'
-        });
+        me.loadTopFn('pending');
       });
     },
     data: () => {
@@ -142,7 +97,11 @@
       };
     },
     computed: {
-      ...mapState(NAMESPACE, ['pending', 'process', 'completed', 'isManager', 'isTeam'])
+      ...mapState(NAMESPACE, ['navs', 'pending', 'process', 'completed', 'isManager', 'isTeam']),
+      rows() {
+        let type = this.selected;
+        return this[type];
+      }
     },
     methods: {
       ...mapActions(NAMESPACE, ['getTransferOrder']),
@@ -152,29 +111,17 @@
       menuFn(item) {
         this.setTeam(item.key === 'team');
         // 刷新数据
-        this.loadBottomFn({
-          status: '待处理',
-          list: 'pending'
-        });
+        this.loadBottomFn('pending');
         // 切换回待处理
         this.selected = 'pending';
       },
       // 已完成顶部加载
-      loadTopFn(param) {
-        loader.call(this, {
-          data: {
-            'Status': param.status
-          }
-        }, param.list, 'onTopLoaded');
+      loadTopFn(type) {
+        loader.call(this, type, false);
       },
       // 待审批底部加载
-      loadBottomFn(param) {
-        loader.call(this, {
-          data: {
-            'Status': param.status
-          },
-          more: true
-        }, param.list, 'onBottomLoaded');
+      loadBottomFn(type) {
+        loader.call(this, type, true);
       },
       // 跳转搜索
       toSearchFn() {

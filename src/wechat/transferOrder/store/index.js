@@ -10,8 +10,6 @@ app.state.alive = ['index'];
 
 // 每页加载条数
 const PAGESIZE = config.pageSize;
-// mapps
-let mapps;
 
 export default new Vuex.Store({
   modules: {
@@ -22,6 +20,8 @@ export default new Vuex.Store({
     index: {
       namespaced: true,
       state: {
+        // 列表&导航，安装支持专员不在移动端使用，只查看安装工程师列表视图
+        navs: config.mapp['employee'],
         // 是否主管权限，可分配交接单给工程师
         isManager: false,
         // 查看团队，此状态下所有信息只可查看，不可编辑
@@ -56,7 +56,7 @@ export default new Vuex.Store({
         setAuthority(state, position) {
           // 总部支持主管 & 总部支持专员，具备管理权限，可查看&分配未完成的交接单。
           let isManager = position === 'HQ Support Assistant' || position === 'HQ Support Manager';
-          mapps = config.mapp[isManager ? 'manager' : 'employee'];
+          // 交接单管理权限，控制是否可查看未交接交接单，分配交接单
           state.isManager = isManager;
           // 只有安装人员可操作安装订单
           state.isEngineer = position === 'Field Service Manager' || position === 'Field Service Engineer';
@@ -65,33 +65,33 @@ export default new Vuex.Store({
       actions: {
         /**
          * 获取交接
-         * @param {Object} data 必填 接口请求参数
+         * @param {String} type 必填 列表标识
+         * @param {Object} data 必填 过滤条件
          * @param {Boolean} more 选填 是否加载更多
          * @param {Function} callback 选填 处理回调
          * @param {Function} error 选填 错误回调
          */
-        getTransferOrder({state, commit, dispatch}, {data, more, callback, error}) {
-          let status = data['Status'];
-          let mapp = mapps[status] || {};
-          // 搜索时，没有状态
-          let list = mapp['list'] || 'result';
-
-          data['Status'] = mapp['status'];
-          // 查看个人交接单&团队交接单
+        getTransferOrder({state, commit, dispatch}, {type, data, more, callback, error}) {
+          // 数据状态
+          let mapp = state.navs[type] || {};
+          // 请求参数
+          data = data || {};
+          // 订单状态 搜索时，不过滤状态
+          data['Status'] = mapp.status;
+          // 查看个人交接单||团队交接单
           data['ViewMode'] = state.isTeam ? 'Manager' : 'Personal';
-
           api.get({
             key: 'getTransferOrder',
             data: data,
             paging: {
-              StartRowNum: more ? state[list].length : 0,
+              StartRowNum: more ? state[type].length : 0,
               PageSize: PAGESIZE
             },
             success: data => {
               let TransferOrders = KND.Util.toArray(data.SiebelMessage.Project);
               commit(more ? 'addTransferOrders' : 'setTransferOrders', {
                 TransferOrders: TransferOrders,
-                list: list
+                list: type
               });
               if (callback) {
                 callback(TransferOrders);

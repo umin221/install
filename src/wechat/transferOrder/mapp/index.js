@@ -3,13 +3,13 @@
  */
 config.mapp = {
   'manager': {
-    '待处理': {status: 'Pending Approval', list: 'pending'},
-    '处理中': {status: 'Accepted', list: 'process'},
-    '已完成': {status: 'Closed,Rejected', list: 'completed'}
+    'pending': {status: 'Pending Approval', label: '待处理'},
+    'process': {status: 'Accepted', label: '处理中'},
+    'completed': {status: 'Closed,Rejected', label: '已完成'}
   },
   'employee': {
-    '待处理': {status: 'Accepted', list: 'pending'},
-    '已完成': {status: 'Closed,Rejected', list: 'completed'}
+    'pending': {status: 'Accepted', label: '待处理'},
+    'completed': {status: 'Closed,Rejected', label: '已完成'}
   },
   'option': {  // 订单行 lov 下拉值列表
     'KL Hole Type': [], // 开孔方式

@@ -3,6 +3,8 @@
  * @since
  * @copyright Copyright (c) 2018, YZKJ
  * @description main
+ * 1. SIT 阶段需求变更，新增安装支持专员和安装支持主管的操作视图，分配交接单操作由安装主管变更为安装支持专员处理
+ * 2. SIT 阶段 5月8日 需求变更，安装支持专员需要维护和同行信息，确认专员和主管的操作不在移动端实现
  */
 import Vue from 'vue';
 import router from './router';

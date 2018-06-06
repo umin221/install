@@ -31,18 +31,18 @@
   import cusSearch from 'public/components/cus-search';
   import cusCell from 'public/components/cus-cell';
   //
-  let loader = function(...args) {
+  let loader = function(more) {
     let me = this;
-    let event = args.pop();
     let exp = `*${me.value}*`;
     let param = {
+      type: 'result',
       data: {
         'Agree Number': exp, // 项目编号
         'Opportunity Name': exp // 项目名称
       },
-      more: args.pop(),
+      more,
       callback: (data) => {
-        me.$refs.result[event](data.length);
+        me.$refs.result['onBottomLoaded'](data.length);
       }
     };
     // 负责人
@@ -70,7 +70,7 @@
        * @param {String} val 搜索值
        */
       searchFn(val) {
-        loader.call(this, 'onBottomLoaded');
+        loader.call(this);
       },
       /**
        * To detail
@@ -88,9 +88,7 @@
        * Load more
        */
       loadBottomFn() {
-        loader.call(this, {
-          more: true
-        }, 'onBottomLoaded');
+        loader.call(this, true);
       }
     }
   };

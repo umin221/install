@@ -50,7 +50,7 @@ export default new Vuex.Store({
       actions: {
         /**
          * 获取委外团队列表
-         * @param {Object} data 必填 接口请求参数
+         * @param {String} type 必填 列表标识
          * @param {Boolean} more 选填 是否加载更多
          * @param {Function} callback 选填 处理回调
          * @param {Function} error 选填 错误回调
