@@ -291,6 +291,20 @@ let ApiList = {
     };
     // 搜索电话联系人
   },
+  selectContact: option => {
+    var Phone = option.data['KL Contact Mobile Phone'];
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Query',
+      data: {
+        'body': {
+          'OutputIntObjectName': 'Base KL Contact Interface BO',
+          'SearchSpec': '([Contact.Cellular Phone #] = \'' + Phone + '\' OR [Contact.Work Phone #] = \'' + Phone + '\' ) AND [Contact.User Type] <>LookupValue(\'CONTACT_USER_TYPE\',\'Sales\')'
+        }
+      }
+    };
+    // 通过ID查询服务请求
+  },
   submitService: option => {
     return {
       method: 'PUT',
@@ -451,6 +465,45 @@ let ApiList = {
       }
     };
     // 更新地址
+  },
+  saverContact: option => {
+    var ListOfBase = {
+      'Contact': {
+        'Id': option.data['Contact Id'],
+        'M/F': option.data['KL Contact M/F'],
+        'Type': '业主',
+        'Last Name': option.data['Contact Last Name'],
+        'Work Phone #': option.data['KL Contact Mobile Phone'],
+        'Cellular Phone #': option.data['KL Contact Mobile Phone'],
+        'User Type': '售后'
+      }
+    };
+    return {
+      method: 'post',
+      url: 'service/EAI Siebel Adapter/Upsert',
+      data: {
+        'body': {
+          'SiebelMessage': {
+            'MessageId': '',
+            'MessageType': 'Integration Object',
+            'IntObjectName': 'Base KL Contact Interface BO',
+            'IntObjectFormat': 'Siebel Hierarchical',
+            'ListOfBase KL Contact Interface BO': ListOfBase
+          }
+        }
+      }
+    };
+  },
+  contact: option => {
+    return {
+      method: 'PUT',
+      url: 'data/KL Service Request Interface BO/Service Request/1-2BSB0DZ1',
+      data: {
+        'Contact Id': option.data.contactId,
+        'Contact Last Name': option.data.contactName,
+        'Id': option.data.itemId
+      }
+    };
   },
   getAsset: option => {
     return {

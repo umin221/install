@@ -321,93 +321,67 @@
       },
       nextPageFn() {
         var self = this;
-        if (!self.id) {
-          Toast('请先保存批次信息！');
-          return;
-        }
-        // 提交图片
-        if (self.isStatus) { // 提交主管的时候选择委外 附件 委外安装员必选
-          if (self.installerList.length === 0) {
-            Toast('委外联系人不能为空，请选择！');
+        tools.valid.call(this, () => {
+          if (!self.id) {
+            Toast('请先保存批次信息！');
             return;
           }
-          if (self.planList.length === 0) {
-            Toast('详细计划不能为空！');
-            return;
-          }
-          if (self.attach.list.length === 0) {
-            Toast('附件不能为空，请上传！');
-            return;
-          }
-          let uploadAttach = id => {
-            _upload.call(self, self.$refs.attach.getServerIds(), id);
-          };
-          if (self.attach.list.length > 0) {
-            uploadAttach(self.id);
-          }
-        }
-        if (!self.box1) { // 不选择委外，直接提交主管，详细计划不能为空
-          if (self.planList.length === 0) {
-            Toast('详细计划不能为空！');
-            return;
-          }
-          if (self.attach.list.length === 0) {
-            Toast('附件不能为空，请上传！');
-            return;
-          }
-          let uploadAttach = id => {
-            _upload.call(self, self.$refs.attach.getServerIds(), id);
-          };
-          if (self.attach.list.length > 0) {
-            uploadAttach(self.id);
-          }
-        }
-        if (self.pcObj['Calculated Activity Status'] === 'Declined') { // 审批驳回记录状态
-          api.get({ // 更改按钮状态
-            key: 'getUPStatus',
-            method: 'POST',
-            data: {
-              'body': {
-                'ProcessName': 'KL Install Task Submit For Approval Workflow',
-                'RowId': self.id
-              }
-            },
-            success: function(dataObj) {
-              if (!dataObj.ERROR) {
-                Toast('提交成功');
-                KND.Util.back();
-              }
+          // 提交图片
+          if (self.isStatus) { // 提交主管的时候选择委外 附件 委外安装员必选
+            if (self.installerList.length === 0) {
+              Toast('委外联系人不能为空，请选择！');
+              return;
             }
-          });
-        } else {
-          if (self.isStatus) { // 提交安装主管
-            this.$router.push({
-              name: 'buildingInfo',
-              query: {
-                type: 'add',
-                id: self.id,
-                orderID: self.orderID
+            if (self.planList.length === 0) {
+              Toast('详细计划不能为空！');
+              return;
+            }
+            if (self.attach.list.length === 0) {
+              Toast('附件不能为空，请上传！');
+              return;
+            }
+            let uploadAttach = id => {
+              _upload.call(self, self.$refs.attach.getServerIds(), id);
+            };
+            if (self.attach.list.length > 0) {
+              uploadAttach(self.id);
+            }
+          }
+          if (!self.box1) { // 不选择委外，直接提交主管，详细计划不能为空
+            if (self.planList.length === 0) {
+              Toast('详细计划不能为空！');
+              return;
+            }
+            if (self.attach.list.length === 0) {
+              Toast('附件不能为空，请上传！');
+              return;
+            }
+            let uploadAttach = id => {
+              _upload.call(self, self.$refs.attach.getServerIds(), id);
+            };
+            if (self.attach.list.length > 0) {
+              uploadAttach(self.id);
+            }
+          }
+          if (self.pcObj['Calculated Activity Status'] === 'Declined') { // 审批驳回记录状态
+            api.get({ // 更改按钮状态
+              key: 'getUPStatus',
+              method: 'POST',
+              data: {
+                'body': {
+                  'ProcessName': 'KL Install Task Submit For Approval Workflow',
+                  'RowId': self.id
+                }
+              },
+              success: function(dataObj) {
+                if (!dataObj.ERROR) {
+                  Toast('提交成功');
+                  KND.Util.back();
+                }
               }
             });
           } else {
-            if (self.box1) { // 选择委外，提交至专员在后台选择
-              api.get({ // 更改按钮状态
-                key: 'getUPStatus',
-                method: 'POST',
-                data: {
-                  'body': {
-                    'ProcessName': 'KL Install Task Submit To HQ Workflow',
-                    'RowId': self.id
-                  }
-                },
-                success: function(dataObj) {
-                  if (!dataObj.ERROR) {
-                    Toast('提交成功');
-                    KND.Util.back();
-                  }
-                }
-              });
-            } else {
+            if (self.isStatus) { // 提交安装主管
               this.$router.push({
                 name: 'buildingInfo',
                 query: {
@@ -416,9 +390,37 @@
                   orderID: self.orderID
                 }
               });
+            } else {
+              if (self.box1) { // 选择委外，提交至专员在后台选择
+                api.get({ // 更改按钮状态
+                  key: 'getUPStatus',
+                  method: 'POST',
+                  data: {
+                    'body': {
+                      'ProcessName': 'KL Install Task Submit To HQ Workflow',
+                      'RowId': self.id
+                    }
+                  },
+                  success: function(dataObj) {
+                    if (!dataObj.ERROR) {
+                      Toast('提交成功');
+                      KND.Util.back();
+                    }
+                  }
+                });
+              } else {
+                this.$router.push({
+                  name: 'buildingInfo',
+                  query: {
+                    type: 'add',
+                    id: self.id,
+                    orderID: self.orderID
+                  }
+                });
+              }
             }
           }
-        }
+        });
       },
       getPlanList(id) {
         var self = this;
@@ -700,95 +702,97 @@
       },
       submitFn() {
         var self = this;
-        if (!self.id) {
-          Toast('请先保存批次信息！');
-          return;
-        }
-        // 提交图片
-        if (self.isStatus) { // 提交主管的时候选择委外 附件 委外安装员必选
-          if (self.installerList.length === 0) {
-            Toast('委外联系人不能为空，请选择！');
+        tools.valid.call(this, () => {
+          if (!self.id) {
+            Toast('请先保存批次信息！');
             return;
           }
-          if (self.planList.length === 0) {
-            Toast('详细计划不能为空！');
-            return;
-          }
-          if (self.attach.list.length === 0) {
-            Toast('附件不能为空，请上传！');
-            return;
-          }
-          let uploadAttach = id => {
-            _upload.call(self, self.$refs.attach.getServerIds(), id);
-          };
-          if (self.attach.list.length > 0) {
-            uploadAttach(self.id);
-          }
-        }
-        if (!self.box1) { // 不选择委外，直接提交主管，附件、详细计划不能为空
-          if (self.planList.length === 0) {
-            Toast('详细计划不能为空！');
-            return;
-          }
-          if (self.attach.list.length === 0) {
-            Toast('附件不能为空，请上传！');
-            return;
-          }
-          let uploadAttach = id => {
-            _upload.call(self, self.$refs.attach.getServerIds(), id);
-          };
-          if (self.attach.list.length > 0) {
-            uploadAttach(self.id);
-          }
-        }
-        MessageBox({
-          title: '提示',
-          message: ' 确认提交？一经提交不可修改',
-          showCancelButton: true
-        }).then(action => {
-          if (action === 'confirm') {
-            if (self.isStatus) { // 提交安装主管
-              api.get({ // 更改按钮状态
-                key: 'getUPStatus',
-                method: 'POST',
-                data: {
-                  'body': {
-                    'ProcessName': 'KL Install Task Submit For Approval Workflow',
-                    'RowId': self.id
-                  }
-                },
-                success: function(data) {
-                  if (!data.ERROR) {
-                    Toast('提交成功');
-                    KND.Util.back();
-                  }
-                }
-              });
-            } else {
-              var ProcessName = '';
-              if (self.box1) { // 选择委外，提交至专员在后台选择
-                ProcessName = 'KL Install Task Submit To HQ Workflow';
-              } else {
-                ProcessName = 'KL Install Task Submit For Approval Workflow';
-              }
-              api.get({ // 更改按钮状态
-                key: 'getUPStatus',
-                method: 'POST',
-                data: {
-                  'body': {
-                    'ProcessName': ProcessName,
-                    'RowId': self.id
-                  }
-                },
-                success: function(data) {
-                  if (!data.ERROR) {
-                    Toast('提交成功');
-                    KND.Util.back();
-                  }
-                }
-              });
+          // 提交图片
+          if (self.isStatus) { // 提交主管的时候选择委外 附件 委外安装员必选
+            if (self.installerList.length === 0) {
+              Toast('委外联系人不能为空，请选择！');
+              return;
+            }
+            if (self.planList.length === 0) {
+              Toast('详细计划不能为空！');
+              return;
+            }
+            if (self.attach.list.length === 0) {
+              Toast('附件不能为空，请上传！');
+              return;
+            }
+            let uploadAttach = id => {
+              _upload.call(self, self.$refs.attach.getServerIds(), id);
+            };
+            if (self.attach.list.length > 0) {
+              uploadAttach(self.id);
             }
           }
+          if (!self.box1) { // 不选择委外，直接提交主管，附件、详细计划不能为空
+            if (self.planList.length === 0) {
+              Toast('详细计划不能为空！');
+              return;
+            }
+            if (self.attach.list.length === 0) {
+              Toast('附件不能为空，请上传！');
+              return;
+            }
+            let uploadAttach = id => {
+              _upload.call(self, self.$refs.attach.getServerIds(), id);
+            };
+            if (self.attach.list.length > 0) {
+              uploadAttach(self.id);
+            }
+          }
+          MessageBox({
+            title: '提示',
+            message: ' 确认提交？一经提交不可修改',
+            showCancelButton: true
+          }).then(action => {
+            if (action === 'confirm') {
+              if (self.isStatus) { // 提交安装主管
+                api.get({ // 更改按钮状态
+                  key: 'getUPStatus',
+                  method: 'POST',
+                  data: {
+                    'body': {
+                      'ProcessName': 'KL Install Task Submit For Approval Workflow',
+                      'RowId': self.id
+                    }
+                  },
+                  success: function(data) {
+                    if (!data.ERROR) {
+                      Toast('提交成功');
+                      KND.Util.back();
+                    }
+                  }
+                });
+              } else {
+                var ProcessName = '';
+                if (self.box1) { // 选择委外，提交至专员在后台选择
+                  ProcessName = 'KL Install Task Submit To HQ Workflow';
+                } else {
+                  ProcessName = 'KL Install Task Submit For Approval Workflow';
+                }
+                api.get({ // 更改按钮状态
+                  key: 'getUPStatus',
+                  method: 'POST',
+                  data: {
+                    'body': {
+                      'ProcessName': ProcessName,
+                      'RowId': self.id
+                    }
+                  },
+                  success: function(data) {
+                    if (!data.ERROR) {
+                      Toast('提交成功');
+                      KND.Util.back();
+                    }
+                  }
+                });
+              }
+            }
+          });
         });
       }
     },
