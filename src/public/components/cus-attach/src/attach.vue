@@ -29,15 +29,19 @@
   /**
    * 附件组件
    * 1.展示图片
-   *  －本地，手机拍照或图库图片
-   *  －在线，siebel 返回来的图片
-   * 2.编辑图片
-   *  －本地，调用拍照，上传企业微信，删除图片
-   *  －在线，删除在线图片
+   *  －未保存至siebel，手机拍照或图库图片上传到腾讯服务器，通用预览插件服务（企业微信ios无法预览本地图片）
+   *  －已保存至siebel，siebel 返回来的图片
+   * 2.新增图片
+   *  －未保存至siebel，调用拍照，上传企业微信
+   *  －保存至siebel，业务关联业务id，调用通用上传接口
+   * 3.删除图片
+   *  -未保存至siebel，直接删除与siebel无对接
+   *  -已保存至siebel，组件提示确认操作并调用siebel执行删除操作
    * 3.获取图片
-   *  －本地，返回企业微信的mediaIds列表
-   *  －在线，返回siebel图片列表
+   *  －未保存至siebel，返回企业微信的mediaIds列表
+   *  －已保存至siebel，返回siebel图片列表
    */
+  import {mapActions} from 'vuex';
   import titleGroup from '../../cus-title-group.vue';
   let downloadFromSiebel = (`${config.proxy}/webchat/api/external/downloadattachment?url=${config.attachServer}/siebel-rest/v1.0/service/Workflow Process Manager/RunProcess`);
   // 企业微信 与 公众号 非同一个下载接口
@@ -62,6 +66,7 @@
       }
     },
     methods: {
+      ...mapActions('app', ['removeAttach']),
       /**
        * 添加图片/拍照
        * response res.localIds 选择图片的id集合
@@ -99,21 +104,35 @@
           }
         });
       },
+      /**
+       * 获取组件中上传至腾讯服务器（临时）所有的文件 serverId
+       * @param {String} exp 必填 文件扩展名
+       */
       getServerIds() {
         let attach = this.attach;
         return Array.prototype.filter.call(attach, (i) => {
           return i.serverId;
         });
       },
-      // 附件类型
+      /**
+       * 附件类型转换
+       * @param {String} exp 必填 文件扩展名
+       */
       convertType(exp) {
         return EXT2TYPE[exp];
       },
-      // 附件预览地址
+      /**
+       * 图片预览地址转换
+       * @param {Object} item 必填 文件属性
+       */
       convertImgSrc(item) {
         item.src = encodeURI(item.serverId ? (downloadFromWechat + item.serverId) : (`${downloadFromSiebel}&IOName=${this.ioName}&Object Id=${item.Id}&ProcessName=KL Attachment Query Process`));
         return item.src;
       },
+      /**
+       * 预览文件 PDF、DOC、EXL
+       * @param {Object} item 必填 文件属性
+       */
       previewFileFn(item) {
         KND.Native.previewFile({
           url: item.src,
@@ -123,6 +142,7 @@
       },
       /**
        * 预览图片
+       * @param {String} index 必填 图片角标
        */
       previewImageFn(index) {
         let arr = [];
@@ -137,9 +157,27 @@
       },
       /**
        * 删除图片
+       * @param {String} index 必填 图片角标
        */
       deleteFn(index) {
-        this.attach.splice(index, 1);
+        let me = this;
+        let file = me.attach[index];
+        let remove = i => me.attach.splice(i, 1);
+        MessageBox.confirm('删除后无法还原?', '请确认').then(action => {
+          if (file.Id) {
+            me.removeAttach({
+              data: {
+                PrimaryRowId: file.Id,
+                IOName: me.ioName
+              },
+              success: result => {
+                remove(index);
+              }
+            });
+          } else {
+            remove(index);
+          }
+        });
       }
     },
     components: {titleGroup}

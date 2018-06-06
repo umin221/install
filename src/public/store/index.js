@@ -92,9 +92,9 @@ export const app = {
 
     /**
      * 上传附件
-     * @param {String} option['IOName'] 必填 上传io 安装任务：KL Action Attachment 委外管理：KL Channel Partner Attachments
-     * @param {String} option['Id'] 必填 业务id
-     * @param {Array} option['MediaId'] 必填 腾讯mediaId
+     * @param {String} option.data['IOName'] 必填 上传io 安装任务：KL Action Attachment 委外管理：KL Channel Partner Attachments
+     * @param {String} option.data['Id'] 必填 业务id
+     * @param {Array} option.data['MediaId'] 必填 腾讯mediaId
      * @param {Function} option['success'] 必填 成功回调
      * @param {Function} option['error'] 选填 失败回调
      */
@@ -127,6 +127,27 @@ export const app = {
         };
       };
       run(MediaId.pop());
+    },
+
+    /**
+     * 删除附件
+     * @param {String} option.data['ioName'] 必填 更新io 安装任务：KL Action Attachment 委外管理：KL Channel Partner Attachments
+     * @param {String} option.data['PrimaryRowId'] 必填 附件id
+     * @param {Function} option['success'] 必填 成功回调
+     */
+    removeAttach({state}, option) {
+      console.log(option);
+      let data = option.data;
+      ajax({
+        url: 'service/EAI Siebel Adapter/Delete',
+        data: {
+          'body': {
+            'IntObjectName': data['IOName'],
+            'PrimaryRowId': data['PrimaryRowId']
+          }
+        },
+        success: option.success
+      });
     }
   }
 };
