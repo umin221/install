@@ -165,7 +165,7 @@ let apiList = {
     let specName = '';
     // 名字过滤
     if (name) {
-      specName += '[Channel Partner.Name] ~LIKE ' + "'" + name + '*' + "'" + ' AND ';
+      specName += '[User.Last Name] ~LIKE ' + "'" + name + '*' + "'" + ' AND ';
     };
     return {
       method: 'POST',
