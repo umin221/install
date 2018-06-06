@@ -12,14 +12,14 @@
         <mt-cell title="工作类型" class="borderBottom">
           <span>日常活动</span>
         </mt-cell>
-        <mt-cell title="工作描述" is-link  @click.native="tapWorkDescript">
+        <mt-cell title="工作描述" is-link :class="heartVisible"  @click.native="tapWorkDescript">
           <span>{{workDescDate.Value}}</span>
         </mt-cell>
       <mt-cell title="全天活动" class="margin10 borderBottom">
           <mt-switch :value="allDay" @change.native="changeSwitch" :disabled="switchDisabled"></mt-switch>
         </mt-cell>
-         <mt-cell title="开始时间" class="borderBottom" is-link  @click.native='openStartTime'><span>{{initDate()}} {{startPickerValue}}</span></mt-cell>
-         <mt-cell title="结束时间" is-link @click.native='openEndTime'><span>{{initDate()}} {{endPickerValue}}</span></mt-cell>
+         <mt-cell title="开始时间" class="borderBottom" :class="heartVisible" is-link  @click.native='openStartTime'><span>{{initDate()}} {{startPickerValue}}</span></mt-cell>
+         <mt-cell title="结束时间" :class="heartVisible" is-link @click.native='openEndTime'><span>{{initDate()}} {{endPickerValue}}</span></mt-cell>
         <button-group v-if='saveBtn'>
         <mt-button class="single"
                    @click.native="handleSave">保存</mt-button>
@@ -51,7 +51,7 @@
 
 <script type="es6">
   import api from '../api/api';
-  import {mapState, mapActions} from 'vuex';
+  import {mapState, mapActions, mapMutations} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
   import menuBox from 'public/components/cus-menu.vue';
   import { Cell, DatetimePicker, Toast } from 'mint-ui';
@@ -106,9 +106,14 @@
         'endPickerValue',
         'startHour'
       ]),
-      ...mapState('index', ['newYear', 'newMonth', 'newDay', 'currentDayData'])
+      ...mapState('index', ['newYear', 'newMonth', 'newDay', 'currentDayData']),
+      // * 是否显示
+      heartVisible() {
+        return 'require';
+      }
     },
     methods: {
+      ...mapMutations(NAMESPACE, ['workDesc']),
       ...mapActions(NAMESPACE, [
         'setWorkDesc',
         'setDayAll',
@@ -298,7 +303,10 @@
             if (data.items.Id) {
               MessageBox('提示', '新建计划成功').then(action => {
                 this.setStartPicker('');
-                this.setEndPicker('00');
+                this.setEndPicker('');
+                this.workDesc({ // 工作描述
+                  Value: '请选择描述'
+                });
                 KND.Util.back();
               });
             }

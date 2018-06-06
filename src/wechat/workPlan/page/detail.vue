@@ -25,8 +25,8 @@
         </mt-cell>
          <mt-cell title="计划开始时间" class="borderBottom"><span >{{initDateStart()}}</span></mt-cell>
          <mt-cell title="计划结束时间" class="borderBottom"><span >{{initDateEnd()}}</span></mt-cell>
-         <mt-cell title="实际开始时间" is-link class="borderBottom" @click.native='openStartTime'><span>{{initDate('Start')}} {{ACstartPickerValue}}</span></mt-cell>
-         <mt-cell title="实际结束时间" is-link @click.native='openEndTime'><span>{{initDate('End')}} {{ACendPickerValue}}</span></mt-cell>
+         <mt-cell title="实际开始时间" :class="heartVisible" is-link class="borderBottom" @click.native='openStartTime'><span>{{initDate('Start')}} {{ACstartPickerValue}}</span></mt-cell>
+         <mt-cell title="实际结束时间" :class="heartVisible" is-link @click.native='openEndTime'><span>{{initDate('End')}} {{ACendPickerValue}}</span></mt-cell>
               <button-group>
         <mt-button class="submitBtn" v-if='saveBtn'
                    @click.native="handleSave">更新</mt-button>
@@ -106,7 +106,11 @@
         'ACendPickerValue',
         'startHour'
       ]),
-      ...mapState('index', ['newYear', 'newMonth', 'newDay', 'currentDayData'])
+      ...mapState('index', ['newYear', 'newMonth', 'newDay', 'currentDayData']),
+      // * 是否显示
+      heartVisible() {
+        return this.saveBtn === true ? 'require' : '';
+      }
     },
     methods: {
       ...mapActions(NAMESPACE, [
