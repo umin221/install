@@ -330,7 +330,7 @@ let ApiList = {
         'Area': option.data.form.Area,
         'Sub-Area': option.data.form.SR_AREA,
         'Priority': option.data.form.Priority,
-        'Description': option.data.form.ProductFlag,
+        'Complaint Description': option.data.form.ProductFlag,
         'SR Type': option.data.form.SR_TYPE,
         'KL Customer Appointment Time': option.data.form.Start_Date || '',
         'KL SN': option.data.form.KL_SN || '',

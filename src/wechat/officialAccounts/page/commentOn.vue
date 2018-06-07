@@ -57,7 +57,7 @@
                  type="textarea"
                  :attr="{ maxlength: 250 }"
                  v-model="comments"
-                 placeholder="请输入意见与反馈,最多输入250字..."></mt-field>
+                 :placeholder=placeholder></mt-field>
       <button-group v-if="!type">
         <mt-button class="single" @click.native="submit">提交</mt-button>
       </button-group>
@@ -111,6 +111,7 @@
           }
         });
         me.changeStar();
+        me.placeholder = '';
       }
       for (let i = 0; i < 5; i++) {
         me.attitudeIs.push(false);
@@ -138,6 +139,7 @@
         technologyData: [],
         attitudeIsValue: '',
         technologyIsValue: '',
+        placeholder: '请输入意见与反馈,最多输入250字...',
         xs: 'xs-icon',
         starN: 'icon-starN',
         starY: 'icon-starY',

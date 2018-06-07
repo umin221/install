@@ -12,7 +12,9 @@
                     v-for="item in result"
                     @click.native="toDetail(item['Order Number'])"
                     is-link>
-            <div class="mint-cell-sub-title" slot="title">订单总额:{{item['Order Total']}}</div>
+            <div class="mint-cell-sub-title" slot="title">EBS订单编号: {{item['Back Office Order Number']}}</div>
+            <div class="mint-cell-sub-title" slot="title">WMS订单编号: {{item['KL WMS Order Number']}}</div>
+            <div class="mint-cell-sub-title" slot="title">订单总额： ￥{{item['Order Total']}}</div>
           </cus-cell>
         </cus-loadmore>
 

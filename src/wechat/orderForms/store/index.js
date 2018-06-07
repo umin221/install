@@ -23,7 +23,8 @@ export default new Vuex.Store({
       },
       actions: {
         getList({state, commit}, {data, more, callback, error}) {
-          data.team = data.team || '';
+          // data.team = data.team || '';
+          data.team = state.isTeam;
           api.get({
             key: 'getList',
             data: data,

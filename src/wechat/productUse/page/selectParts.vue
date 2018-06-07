@@ -208,6 +208,7 @@
       right: 0;
     }
     .searchTrans {
+      height: 100%;
       margin-bottom: 45px;
       background-color: white !important;
       .mint-navbar {
@@ -239,6 +240,7 @@
         width: 80%;
         top: 0;
         left: 20%;
+        padding-bottom: 44px;
         .mint-tab-container-wrap {
           display: block;
           .productTitle {
