@@ -486,9 +486,9 @@
         me.KL_CITY = val['Primary Personal City'];           // 市
         me.KL_TOWN = val['KL Primary Personal Town'];            // 区
         me.Address = val['Primary Personal Street Address'];
-        me.building = val['KL Personal Address Building'];
-        me.floor = val['KL Personal Address Floor'];
-        me.room = val['KL Personal Address Room'];
+        me.building = val['KL Primary Personal Building'];
+        me.floor = val['KL Primary Personal Floor'];
+        me.room = val['KL Primary Personal Room'];
         me.isCall = {disabled: true};
         me.isEdit = {disabled: true};
         me.isClick = true;

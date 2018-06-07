@@ -398,7 +398,7 @@ let ApiList = {
     };
     // 名字过滤
     if (name) {
-      specName += '[Last Name] ~LIKE "*' + name + '*" OR ([KL Parent Service Region Name] ~LIKE "*' + name + '*" OR [Service Region] ~LIKE "*' + name + '*") AND';
+      specName += '([Last Name] ~LIKE "*' + name + '*" OR [KL Parent Service Region Name] ~LIKE "*' + name + '*" OR [Service Region] ~LIKE "*' + name + '*") AND';
     };
     // 过滤离职人员
     specName += ' [KL CRM User Flag] = "Y" AND ';
