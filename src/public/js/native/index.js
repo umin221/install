@@ -74,7 +74,7 @@ import queue from '../base/queue';
      */
     getUserID() {
       let userID = util['getParam']('userID');
-      // 企业微信，虚拟组织下的用户无法正常获取用户信息，无法做审批才做
+      // 企业微信，虚拟组织下的用户无法正常获取用户信息，无法做审批操作
       userID = userID && userID.length < 10 ? userID : 'GUESTERM';
       return session.get('userID') || userID;
     };
