@@ -25,6 +25,14 @@
                    :value="order['KL Delivery Partner Name']"
                    :editable="editable"
                    is-link></cus-field>
+          <cus-field label="联系人" tag="联系人" placeholder="请输入联系人"
+                   v-if="isDoorFactoryOpen"
+                   v-valid.require
+                   v-model="order['KL Delivery Partner Contact Name']"></cus-field>
+          <cus-field label="联系电话" tag="联系电话" placeholder="请输入手机号码"
+                   v-if="isDoorFactoryOpen"
+                   v-valid.require.phone
+                   v-model="order['KL Delivery Partner Contact Phone']"></cus-field>
           <mt-cell title="是否门厂安装锁体" v-show="isProject && isDoorFactoryOpen">
             <mt-switch v-model="box1"></mt-switch>
           </mt-cell>
@@ -308,6 +316,7 @@
         };
         let me = this;
         let order = me.order;
+        console.log(order);
         // 表单验证
         tools.valid.call(this, () => {
           if (order.Id) {

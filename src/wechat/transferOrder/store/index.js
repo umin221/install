@@ -373,7 +373,8 @@ export default new Vuex.Store({
         update({state}, setting) {
           let param = KND.Util.mappDTO(setting.data, ['Id', 'KL Hole Type', 'KL Delivery Partner Id', 'KL Delivery Partner Name',
             'KL Delivery Check Box 1', 'KL Delivery Check Box 2', 'KL Delivery Province', 'KL Delivery City', 'KL Delivery County',
-            'KL Delivery Address', 'KL Lead Address Latitude', 'KL Lead Address Longitude']);
+            'KL Delivery Address', 'KL Lead Address Latitude', 'KL Lead Address Longitude', 'KL Delivery Partner Contact Name', 'KL Delivery Partner Contact Phone'
+          ]);
           // 现场改孔， 清除门厂信息
           if (setting.data['KL Hole Type'] === '现场改孔') {
             delete param['KL Delivery Partner Id'];
