@@ -6,6 +6,16 @@
  */
 import api from '../api/api';
 
+/**
+ * 本地安装记录状态枚举
+ * @type {{PENDING: string, FINISH: string, ERROR: string}}
+ */
+const STATE = {
+  PENDING: 'pending',
+  FINISH: 'finish',
+  ERROR: 'error'
+};
+
 let db = require('public/js/lib/db.sqlit');
 //
 let util = KND.Util;
@@ -62,11 +72,13 @@ class Helper {
    * @param {String} table 表名
    * @param {Object} condition 查询条件
    * @param callback
+   * @param {String} join 多个条件的连接符
+   * @param {String} operator 操作符
    */
-  query(table, condition, callback) {
+  query(table, condition, callback, join = ' and ', operator = '=') {
     let conditionArr = ['1=1'];
-    for (var i in condition) conditionArr.push(`${i}='${condition[i]}'`);
-    db.query((`select * from ${table} where ${conditionArr.join(' and ')}`), data => {
+    for (var i in condition) conditionArr.push(`${i}${operator}'${condition[i]}'`);
+    db.query((`select * from ${table} where ${conditionArr.join(join)}`), data => {
       var arr = [];
       for (var i = 0; i < data.rows.length; i++) {
         arr.push(data.rows.item(i));
@@ -77,12 +89,17 @@ class Helper {
 
   /**
    * 严格模式查询
+   * @param {String} table 表名
+   * @param {Object} condition 查询条件
+   * @param callback
+   * @param {String} join 多个条件的连接符
+   * @param {String} operator 操作符
    */
-  queryStrict(table, condition, callback) {
+  queryStrict(table, condition, callback, join, operator) {
     let me = this;
     let arr = [];
     me.invokeSQL('gts', table).then(result => {
-      result ? me.query(table, condition, callback) : callback(arr);
+      result ? me.query(table, condition, callback, join, operator) : callback(arr);
     });
   };
 
@@ -219,18 +236,26 @@ class DataHandle {
   };
 
   /**
-   * 查找本地未提交安装记录
+   * 查找本地未提交安装记录，不包含失败
    * @param {Function} callback 必填 回调函数
    */
   getPendingInstallRecord(callback) {
-    helper.queryStrict('install_record_local', {state: 'pending'}, callback);
+    helper.queryStrict('install_record_local', {state: STATE.PENDING}, callback);
+  };
+
+  /**
+   * 查询本地未完成的安装记录，包含失败
+   * @param {Function} callback 必填 回调函数
+   */
+  getUndoneInstallRecord(callback) {
+    helper.queryStrict('install_record_local', {state: STATE.FINISH}, callback, undefined, ' <> ');
   };
 
   /**
    * 提交本地安装信息
    */
   submit() {
-    this.getPendingInstallRecord(data => {
+    this.getUndoneInstallRecord(data => {
       // 未提交数据
       if (data.length) {
         Indicator.process('正在提交本地数据...');
@@ -246,7 +271,7 @@ class DataHandle {
               success: data => {
                 result.push(item);
                 // 提交成功后修改数据状态
-                db.update('install_record_local', {state: 'finish'}, `'${item.id}'`, result => {
+                db.update('install_record_local', {state: STATE.FINISH}, `'${item.id}'`, result => {
                   resolve(result);
                 });
               },
@@ -254,14 +279,19 @@ class DataHandle {
                 let failRecord = util.parse(item.data);
                 let mes = err.response.data.ERROR || `记录<${failRecord['Id']} , ${failRecord['Serial Number']}> 提交失败。`;
                 Toast(mes);
-                reject(result);
+                // 提交失败后修改数据状态
+                db.update('install_record_local', {state: STATE.ERROR}, `'${item.id}'`, result => {
+                  console.log(result);
+                  resolve();
+                });
               }
             });
           }));
         };
         Promise.all(tasks).then(result => {
-          console.log(result);
-          MessageBox.alert(`成功提交${result.length}条安装记录！`, '恭喜');
+          // 有效提交记录
+          let record = Array.prototype.filter.call(result, item => item);
+          if (record.length) MessageBox.alert(`成功提交${record.length}条安装记录！`, '恭喜');
           KND.Event.emit('submitHook');
           Indicator.process(false);
         }).catch(err => {
@@ -652,7 +682,7 @@ class Cache {
       serial_num: data['Serial Number'],
       data: JSON.stringify(data),
       super: JSON.stringify(setting.super),
-      state: 'pending',
+      state: STATE.PENDING,
       create_date: now()
     }, {id: id}, result => {
       setting.success(result);
@@ -662,7 +692,8 @@ class Cache {
 
   /**
    * 查询本地扫码安装记录 <查询本地>
-   * @param setting
+   * 查找所有本地安装记录，资产详情需要查看绑定的条码信息
+   * @param {Object} setting 必填
    */
   queryLocalInstallRecord(setting) {
     helper.query('install_record_local', {}, result => {

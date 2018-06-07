@@ -167,7 +167,7 @@
         let rc = this.installRecords;
         let flag = false;
         for (let r in rc) {
-          if (rc[r].state === 'pending') {
+          if (rc[r].state !== 'finish') {
             flag = true;
             break;
           }
@@ -197,7 +197,7 @@
             if (record) {
               let sn = KND.Util.parse(record.data)['Serial Number'];
               room['Serial Number'] = sn;
-              room['local'] = record.state === 'pending';
+              room['local'] = record.state !== 'finish';
             }
             // 选择模式 不显示已移交房号，不显示未绑定条码房号
             if (me.isSelect) {

@@ -1,6 +1,6 @@
 let apiList = {
   /**
-   * 获取安装批次列表 <废弃>
+   * 获取安装批次列表 <委外人员>
    * @param {String} option.data.body['PrimaryRowId'] 必填 当前委外人员id
    * @returns {{method: string, url: string}}
    */
@@ -12,7 +12,7 @@ let apiList = {
           'OutputIntObjectName': 'Base KL Contact - Installation Task', // 固定 io 名
           'PrimaryRowId': option.data.id, // 1-2BSH6IWP 1-2BSBXX0D  contact001 1-2BSBXX0D
           'SearchSpec': `(${KND.Util.condition2D({
-            'Calculated Activity Status': ['In Progress', 'Approved'] // 状态是 进行中 & 审批通过 的批次
+            'Calculated Activity Status': ['In Progress', 'Approved', 'Close Reject'] // 状态是 进行中 & 审批通过 & 关闭驳回 的批次
           }, 'KL Installation Task', ' OR ')}) AND ${KND.Util.condition({
             'KL Detail Type LIC': 'Lock Installation Batch' // 真锁批次
           }, 'KL Installation Task')}`,
@@ -25,7 +25,7 @@ let apiList = {
   },
 
   /**
-   * 查询安装员的安装批次
+   * 查询安装员的安装批次 <坚朗员工>
    * @param option
    */
   queryEmpInstallTask: option => {
