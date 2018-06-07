@@ -92,37 +92,35 @@
 </template>
 <script type="es6">
   import {mapState, mapActions, mapMutations} from 'vuex';
-  import { DatetimePicker, CellSwipe, MessageBox } from 'mint-ui';
 
   const NAMESPACE = 'index';
 
   export default {
-    components: {DatetimePicker, CellSwipe},
     name: NAMESPACE,
     data() {
       return {
         headTitle: '工作计划',
-        days: [],
-        daysUL: [],
-        params: {
+        days: [], // 用于临时存储数据
+        daysUL: [], // 当月所有数据
+        params: { // 跳转参数
           selectDay: '',
           type: ''
         },
-        isSelected: [],
-        isBan: [],
-        isXiu: [],
-        restDays: {
+        isSelected: [], // 全部数据, true代表选中
+        isBan: [], // 没有用到
+        isXiu: [], // 没有用到
+        restDays: { // 没有用到
           year: '',
           month: '',
           day: '',
           resttype: '',
           restdate: ''
         },
-        restDaysList: [],
-        banList: [],
-        xiuList: [],
+        restDaysList: [], // 没有用到
+        banList: [], // 没有用到
+        xiuList: [], // 没有用到
         alldayData: [], // 对应每天的数据标识，是否显示黑点还是红点
-        selectIndex: '',
+        selectIndex: '', // 当前选中的索引
         pickerValue: '', // DatetimePicker组件默认值
         beforeSpaces: [], // 前面需要空几天
         isShowBtn: true // 是否显示新建按钮
@@ -216,6 +214,7 @@
             console.log(data);
           }
         });
+        // 如果状态是未开始才有操作按钮
         if (item['Status INT'] === 'Not Started') {
           var currentYear = this.currentYear;
           var currentMonth = this.currentMonth;
@@ -419,6 +418,7 @@
         }
         this.startGetData(this.formatDate(d.getFullYear(), curmnth, 1));
       },
+      // 这个方法没有地方用到
       dealResult(currentYear, currentMonth) {
         this.banList = [];
         this.xiuList = [];
@@ -466,13 +466,14 @@
           }
         }
       },
-      // 返回今天
+      // 返回今天(没有调用)
       returnNow() {
         this.daysUL = [];
         this.initData(null);
       },
       // 当前选择日期
       pick(date, index) {
+        // 如果当前日期为 ‘spaces’ 直接返回
         if (date === 'spaces') {
           return;
         }
@@ -508,6 +509,7 @@
         // 点击的年月日数据
         var tapDateTime = new Date(this.formatDate(date.getFullYear(), date.getMonth() + 1, date.getDate())).getTime();
         var currDate = new Date(this.formatDate(year, month, day)).getTime();
+        // 如果当前日期大于点击的日期，则不能新建
         if (currDate > tapDateTime && this.selectIndex) {
           this.isShowBtn = false;
         } else {
@@ -534,9 +536,23 @@
 //        console.log(noArray);
        /* console.log(noArray.indexOf('Done'));
         console.log(noArray.indexOf('Not Started'));*/
+        /*
+          day 代表当前日期 如果 day === 'spaces' 说明是空格，没有日期
+          noArray 当天的所有数据状态集合 noArray.length > 0 说明有数据 没有数据为undefined
+          noArray.indexOf('Done') 当天数据是否有完成状态的数据
+          noArray.indexOf('Not Started') 当天数据是否有未开始状态的数据
+        */
         if (day !== 'spaces' && noArray && noArray.length > 0) {
           val = 'flag';
         }
+        /*
+          必须满足一下条件才显示红点
+          1、 day 不能等于 'spaces'
+          2、 noArray 必须为true
+          3、noArray.length> 0 当天必须有数据
+          4、noArray.indexOf('Done') > -1 必须存在完成状态的数据
+          5、noArray.indexOf('Not Started') === -1 当天不能有未开始状态的数据
+        */
         if (day !== 'spaces' && noArray && noArray.length > 0 && noArray.indexOf('Done') > -1 && noArray.indexOf('Not Started') === -1) {
           val = 'red';
         }
