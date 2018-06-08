@@ -744,13 +744,10 @@ class Cache {
     let callback = setting.success;
     setting.success = data => {
       let user = data.items;
-      // 初始化
-      me.init(result => {
-        // 缓存用户信息
-        me.cacheUser(user);
-        // 回调
-        callback(user);
-      });
+      // 缓存用户信息
+      me.cacheUser(user);
+      // 回调
+      callback(user);
     };
     api.get(setting);
   };

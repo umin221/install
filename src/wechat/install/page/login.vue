@@ -4,7 +4,6 @@
       <img src="../assets/bg_login.png" />
     </div>
 
-    <indicator></indicator>
     <div class="copyright">坚朗五金制品股份有限公司</div>
     <div class="login-form xs-icon"
       v-show="showLogin">
@@ -57,8 +56,8 @@
       });
 
       if (!config.isProduction) {
-        me.username = 'IE01'; // 15899999999 13899997777
-        me.password = 'Asdf2017';
+        me.username = '13388889999'; // 15899999999 13899997777 13388889999
+        me.password = '123456';
       }
     },
     data() {
@@ -92,7 +91,13 @@
             success: user => {
               // 缓存用户进入APP首页
               setUser(JSON.stringify(user));
-              me.$router.push('index');
+              me.$router.push({
+                path: 'index',
+                query: {
+                  // 如果走接口登陆，获取最新批次任务
+                  mode: 'refresh'
+                }
+              });
             },
             error: err => {
               console.log(err);

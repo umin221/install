@@ -8,10 +8,13 @@
       <mt-button @click.native="toSearchFn" slot="right">
         <i class="xs-icon icon-search"></i>
       </mt-button>
+      <mt-button @click.native="toSearchFn" slot="right">
+        <i class="xs-icon icon-question"></i>
+      </mt-button>
     </mt-header>
 
     <indicator></indicator>
-    <div class="tips">下拉更新数据</div>
+    <div class="tips">下拉获取最新任务</div>
     <div class="wrapper install">
 
       <div class="mint-content">
@@ -64,13 +67,12 @@
     name: NAMESPACE,
     // 数据初始化
     activated() {
-      let info = KND.Util.parse(KND.Session.get('userInfo'));
-      if (info) {
-        if (info.Id !== user.Id) {
-          user = info;
-          // 获取数据
-          this.loadBottomFn();
-        }
+      user = KND.Util.parse(KND.Session.get('userInfo'));
+      // 如果走接口登陆，获取最新批次任务
+      let mode = KND.Util.parse(this.$route.query).mode;
+      if (user) {
+        // 获取数据
+        this[mode === 'refresh' ? 'loadTopFn' : 'loadBottomFn']();
       } else {
         this.$router.replace({
           name: 'login',
@@ -121,6 +123,10 @@
   .icon-person:before {
     content: '\A128';
   }
+  .icon-question:before {
+    content: '\A133';
+    font-size: 1.1rem;
+  }
 
   .tips {
     position: fixed;
@@ -131,6 +137,7 @@
     text-align: center;
     padding: 6px 0;
     color: $theme-color;
+    font-weight: bold;
     z-index: 1;
   }
 
