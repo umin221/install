@@ -1,13 +1,22 @@
 let ApiList = {
   getList: option => {
     option.data.team = option.data.team ? 'Manager' : 'Sales Rep';
+    var searchSpec = [];
+
+    var data = option.data;
+    // 状态条件
+    var status = data.Status || '';
+    // 订单状态过滤
+    if (status) {
+      searchSpec.push('(' + KND.Util.condition2D({Status: data.Status.split(',')}, 'Order Entry - Orders', ' OR ', '=') + ')');
+    }
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/QueryPage',
       data: {
         'body': {
           'OutputIntObjectName': 'Base Order Entry',
-          'SearchSpec': '[Order Entry - Orders.Order Type]= "服务订单"',
+          'SearchSpec': '[Order Entry - Orders.Order Type LIC]= "Service Order" AND ' + searchSpec,
           'ViewMode': option.data.team,
           'StartRowNum': option.paging.StartRowNum,
           'PageSize': option.paging.PageSize
@@ -36,7 +45,7 @@ let ApiList = {
       data: {
         'body': {
           'OutputIntObjectName': 'Base Order Entry',
-          'SearchSpec': '[Order Entry - Orders.Order Number] ~LIKE "*' + option.data.orNumber + '*" OR [Order Entry - Orders.KL Primary Owner] ~LIKE "*' + option.data.orNumber + '*"',
+          'SearchSpec': '[Order Entry - Orders.Order Type LIC]= "Service Order" AND [Order Entry - Orders.Order Number] ~LIKE "*' + option.data.orNumber + '*" OR [Order Entry - Orders.KL Primary Owner] ~LIKE "*' + option.data.orNumber + '*"',
           'StartRowNum': option.paging.StartRowNum,
           'PageSize': option.paging.PageSize
         }

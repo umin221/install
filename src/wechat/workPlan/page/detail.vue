@@ -25,9 +25,17 @@
         </mt-cell>
          <mt-cell title="计划开始时间" class="borderBottom"><span >{{initDateStart()}}</span></mt-cell>
          <mt-cell title="计划结束时间" class="borderBottom"><span >{{initDateEnd()}}</span></mt-cell>
-         <mt-cell title="实际开始时间" :class="heartVisible" is-link class="borderBottom" @click.native='openStartTime'><span>{{initDate('Start')}} {{ACstartPickerValue}}</span></mt-cell>
+         <!--<mt-cell title="实际开始时间" :class="heartVisible" is-link class="borderBottom" @click.native='openStartTime'><span>{{initDate('Start')}} {{ACstartPickerValue}}</span></mt-cell>
          <mt-cell title="实际结束时间" :class="heartVisible" is-link @click.native='openEndTime'><span>{{initDate('End')}} {{ACendPickerValue}}</span></mt-cell>
-              <button-group>
+       --> <cus-field label="实际开始时间"
+                   @click.native="openCompletion('pickerEnd', 'Started')"
+                      :class="heartVisible"
+                   :value="Started" is-link></cus-field>
+        <cus-field label="实际结束时间"
+                   @click.native="openCompletion('pickerEnd', 'Done')"
+                   :class="heartVisible"
+                   :value="Done" is-link></cus-field>
+        <button-group>
         <mt-button class="submitBtn" v-if='saveBtn'
                    @click.native="handleSave">更新</mt-button>
         </button-group>
@@ -45,6 +53,18 @@
         :startHour="startHour"
         :endHour="startPickerHour">
       </mt-datetime-picker>
+    <mt-datetime-picker
+      ref="pickerEnd"
+      v-model="pickerVisibleEnd"
+      :endDate="eDate"
+      type="datetime"
+      year-format="{value} 年"
+      month-format="{value} 月"
+      date-format="{value} 日"
+      hour-format="{value} 时"
+      class="datetime"
+      @confirm="handleChangePlan">
+    </mt-datetime-picker>
 
   </div>
 </template>
@@ -54,18 +74,27 @@
   import {mapState, mapActions} from 'vuex';
   import buttonGroup from 'public/components/cus-button-group';
   import menuBox from 'public/components/cus-menu.vue';
+  import cusField from 'public/components/cus-field';
   import { Cell, Button, DatetimePicker, Toast } from 'mint-ui';
+  import Vue from 'vue';
+  import vp from 'public/plugin/validator';
+  Vue.use(vp);
 
   const NAMESPACE = 'detail';
-
+  let today = new Date();
   export default {
-    components: {Cell, buttonGroup, DatetimePicker, menuBox, Button},
+    components: {Cell, buttonGroup, DatetimePicker, menuBox, Button, cusField},
     name: 'add',
     data() {
       return {
         headTitle: '更新计划',
         startPickerHour: '00',
         index: '',
+        pickerVisibleEnd: today,
+        eDate: today,
+        planObj: {},
+        Started: '',
+        Done: '',
         saveBtn: true // 是否显示保存按钮
       };
     },
@@ -87,13 +116,11 @@
       var today = new Date().getHours();
       this.startPickerHour = today;
       console.log(nowTime <= time);
-      if (this.currentDayData[this.index]['Status INT'] === 'Not Started' && nowTime <= time) {
+      if (this.currentDayData[this.index]['Status INT'] === 'Not Started') {
         this.saveBtn = true;
-        this.setACStartPicker('');
-        this.setACEndPicker('');
       } else {
-        this.setACStartPicker(this.currentDayData[this.index]['Started'].replace(/\d+\/\d+\/\d+\s/, ''));
-        this.setACEndPicker(this.currentDayData[this.index]['Done'].replace(/\d+\/\d+\/\d+\s/, ''));
+        this.Started = new Date(this.currentDayData[this.index]['Started']).format('yyyy-MM-dd hh:mm:ss');
+        this.Done = new Date(this.currentDayData[this.index]['Done']).format('yyyy-MM-dd hh:mm:ss');
         this.saveBtn = false;
         this.headTitle = '查看计划';
       }
@@ -102,8 +129,6 @@
       ...mapState(NAMESPACE, [
         'workDescDate',
         'allDay',
-        'ACstartPickerValue',
-        'ACendPickerValue',
         'startHour'
       ]),
       ...mapState('index', ['newYear', 'newMonth', 'newDay', 'currentDayData']),
@@ -131,6 +156,26 @@
       initDateEnd() {
         var time = new Date(this.currentDayData[this.index]['Planned Completion']).format('yyyy-MM-dd hh:mm:ss');
         return time;
+      },
+      openCompletion(picker, key) {
+        if (this.saveBtn) {
+          this.timeKey = key;
+          var self = this;
+          console.dir('=====' + today);
+          self.pickerVisibleEnd = today;
+          self.$refs[picker].open();
+        }
+      },
+      handleChangePlan(value) {
+        let self = this;
+        var key = self.timeKey;
+        if (key === 'Started') {
+          self.Started = value.format('yyyy-MM-dd hh:mm:ss');
+          self.planObj['Started'] = value.format('MM/dd/yyyy hh:mm:ss');
+        } else if (key === 'Done') {
+          self.Done = value.format('yyyy-MM-dd hh:mm:ss');
+          self.planObj['Done'] = value.format('MM/dd/yyyy hh:mm:ss');
+        }
       },
       // 格式化年月日
       initDate(type) {
@@ -189,7 +234,7 @@
         }
       },
       // 确定结束时间
-      endPickerConfirm(date) {
+      /* endPickerConfirm(date) {
         if (this.ACstartPickerValue < date) {
           this.setACEndPicker(date);
         } else {
@@ -201,18 +246,17 @@
         if (this.saveBtn) {
           this.$refs.endPicker.open();
         }
-      },
+      },*/
       // 更新状态
       handleSave() {
         var self = this;
-        var year = this.newYear;
         var month = this.newMonth;
         if (month < 10) month = `0${month}`;
         var day = this.newDay;
         if (day < 10) day = `0${day}`;
         var id = '';
         id = this.currentDayData[this.$route.query.index]['Id'];
-        this.ACstartPickerValue = this.ACstartPickerValue.replace(/\d+:\d+:\d+/, (a, b) => {
+       /* this.ACstartPickerValue = this.ACstartPickerValue.replace(/\d+:\d+:\d+/, (a, b) => {
           this.setACStartPicker(this.ACstartPickerValue.substr(0, this.ACstartPickerValue.length - 3));
         });
         this.ACendPickerValue = this.ACendPickerValue.replace(/\d+:\d+:\d+/, (a, b) => {
@@ -225,10 +269,10 @@
         if (this.ACendPickerValue === '') {
           Toast('请选择实际结束时间');
           return;
-        }
-        var StartedTime = month + '/' + day + '/' + year + ' ' + this.ACstartPickerValue + ':00';
-        var DoneTime = month + '/' + day + '/' + year + ' ' + this.ACendPickerValue + ':00';
-        if (new Date(StartedTime).getTime() > new Date().getTime() || new Date(DoneTime) > new Date().getTime()) {
+        }*/
+        var StartedTime = self.planObj['Started'];
+        var DoneTime = self.planObj['Done'];
+        if (new Date(StartedTime).getTime() > new Date(DoneTime).getTime()) {
           Toast('实际开始时间和实际结束时间都不能大于当前时间');
           return;
         }

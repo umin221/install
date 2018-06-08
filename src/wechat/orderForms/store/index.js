@@ -6,6 +6,7 @@ import { app } from 'public/store';
 Vue.use(Vuex);
 //
 const PAGESIZE = config.pageSize;
+let mapps;
 
 // 缓存页面
 app.state.alive = ['index'];
@@ -19,23 +20,37 @@ export default new Vuex.Store({
         orderEntry: [],
         isManager: false,
         // 查看团队
-        isTeam: false
+        isTeam: false,
+        // 待处理
+        pending: [],
+        // 处理中
+        valid: [],
+        // 已完成
+        invalid: []
       },
       actions: {
         getList({state, commit}, {data, more, callback, error}) {
           // data.team = data.team || '';
+          let status = data['Status'];
+          let mapp = mapps[status] || {};
+          // 搜索时，没有状态
+          let list = mapp['list'] || 'result';
+          data['Status'] = mapp['status'];
           data.team = state.isTeam;
           api.get({
             key: 'getList',
             data: data,
             paging: {
-              StartRowNum: more ? state['orderEntry'].length : 0,
+              StartRowNum: more ? state[list].length : 0,
               PageSize: PAGESIZE
             },
             success: function(data) {
-              let orderEntry = KND.Util.toArray(data.SiebelMessage['Order Entry - Orders']);
-              if (orderEntry) {
-                commit(more ? 'addList' : 'setList', orderEntry);
+              let TransferOrders = KND.Util.toArray(data.SiebelMessage['Order Entry - Orders']);
+              if (TransferOrders) {
+                commit(more ? 'addList' : 'setList', {
+                  TransferOrders: TransferOrders,
+                  list: list
+                });
               }
               if (callback) {
                 callback(data);
@@ -46,18 +61,22 @@ export default new Vuex.Store({
         }
       },
       mutations: {
-        setList(state, data) {
-          state.orderEntry = data;
+        setList(state, {TransferOrders, list}) {
+          state[list] = TransferOrders;
         },
-        addList(state, data) {
-          state.orderEntry.push(...data);
+        addList(state, {TransferOrders, list}) {
+          state[list].push(...TransferOrders);
         },
         setManager(state, isManager) {
+          mapps = config.mapp['manager'];
           state.isManager = isManager;
         },
         setTeam(state, isTeam) {
           state.isTeam = isTeam;
-          state.orderEntry = [];
+          // 清空列表数据
+          state.pending = [];
+          state.valid = [];
+          state.invalid = [];
         }
       }
     },

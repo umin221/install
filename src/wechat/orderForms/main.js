@@ -10,6 +10,7 @@ import 'public/js/base/main';
 import 'public/js/base/mint';
 import fallback from 'public/components/cus-fallback';
 import empty from 'public/components/cus-empty';
+import './mapp'; // Status Mapp
 import App from '../../App';
 import store from './store';
 import './filters'; // Vue Filter

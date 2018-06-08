@@ -17,30 +17,32 @@
           label="项目名称"
           :value="detailData['KL Agreement Opportunity Name']" is-link></cus-field>
         <cus-field
-          label="门厂联系人"
-          :value="detailData['KL Delivery Partner Contact Name']"></cus-field>
-        <cus-field
-          label="门厂电话"
-          :value="detailData['KL Delivery Partner Contact Phone']"></cus-field>
-        <cus-field
-          label="门厂地址"
-          :value="detailData['KL Partner Full Address']" is-link></cus-field>
-        <cus-field
-          label="销售类型"
-          :value="detailData['KL Delivery Sales Type']"></cus-field>
-        <cus-field
-          label="是否销售审批"
-          :value="detailData['KL Delivery Need Approval Flag'] === 'Y' ? '是':'否'"></cus-field>
-        <cus-field
-          label="锁体是否发门厂装配"
-          :value="detailData['KL Delivery Check Box 1'] === 'Y' ? '是':'否'"></cus-field>
-        <cus-field
           label="安装数量"
           :value="detailData['KL Install Amount'] || 0"></cus-field>
-        <cus-field
-          label="项目地址"
-          :value="detailData['KL Delivery Country'] + detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery County'] + detailData['KL Delivery Address']"
-          is-link></cus-field>
+        <toggle>
+          <cus-field
+            label="门厂联系人"
+            :value="detailData['KL Delivery Partner Contact Name']"></cus-field>
+          <cus-field
+            label="门厂电话"
+            :value="detailData['KL Delivery Partner Contact Phone']"></cus-field>
+          <cus-field
+            label="门厂地址"
+            :value="detailData['KL Partner Full Address']" is-link></cus-field>
+          <cus-field
+            label="销售类型"
+            :value="detailData['KL Delivery Sales Type']"></cus-field>
+          <cus-field
+            label="是否销售审批"
+            :value="detailData['KL Delivery Need Approval Flag'] === 'Y' ? '是':'否'"></cus-field>
+          <cus-field
+            label="锁体是否发门厂装配"
+            :value="detailData['KL Delivery Check Box 1'] === 'Y' ? '是':'否'"></cus-field>
+          <cus-field
+            label="项目地址"
+            :value="detailData['KL Delivery Country'] + detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery County'] + detailData['KL Delivery Address']"
+            is-link></cus-field>
+        </toggle>
         <div slot="title" class="mint-content-div enable">
           <div class="mint-content-xt" @click="executionFn" v-show="executionShow()">订单执行</div>
           <div class="mint-content-xt" @click="punchClock">打卡</div>

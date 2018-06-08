@@ -63,6 +63,10 @@ export default new Vuex.Store({
         },
         setTeam(state, isTeam) {
           state.isTeam = isTeam;
+          // 清空列表数据
+          state.pending = [];
+          state.valid = [];
+          state.invalid = [];
         },
         setProductUse(state, {TransferOrders, list}) {
           state[list] = TransferOrders;

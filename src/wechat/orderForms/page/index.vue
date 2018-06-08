@@ -9,43 +9,76 @@
       </router-link>
     </cus-header>
     <div class="mint-content">
-      <!--<loadmore ref="pending"
-                @loadTop="pendingLoadTop"
-                @loadBottom="pendingLoadBottom"
-                :param="isTeam"
-                :topStatus="topStatus"
-                :allLoaded="true">
-        <cus-cell
-          v-for="(item,index) in orderEntry"
-          :key="index"
-          class="multiple"
-           @click.native="toDateil(item['Order Number'])" is-link>
-          <div class="mint-cell-sub-title" slot="title">维修订单号： {{item['Order Number']}}</div>
-          <div class="mint-cell-sub-title" slot="title">EBS订单编号: {{item['Back Office Order Number']}}</div>
-          <div class="mint-cell-sub-title" slot="title">WMS订单编号: {{item['KL WMS Order Number']}}</div>
-          <div class="mint-cell-sub-title" slot="title">订单总额： ￥{{item['Order Total']}}</div>
-        </cus-cell>
-      </loadmore>-->
-      <mt-tab-container-item>
-        <loadmore ref="pending"
-                  :allLoaded="true"
-                  @loadTop="loadTopFn"
-                  :topStatus="topStatus"
-                  @loadBottom="loadBottomFn"
-                  :param="{status:'待处理', list:'pending'}">
-          <cus-cell
-            class="multiple border-bottom"
-            :title="'维修订单号'+ item['Order Number']"
-            v-for="(item,index) in orderEntry"
-            @click.native="toDateil(item['Order Number'])"
-            :key="index"
-            is-link>
-            <div class="mint-cell-sub-title" slot="title">EBS订单编号: {{item['Back Office Order Number']}}</div>
-            <div class="mint-cell-sub-title" slot="title">WMS订单编号: {{item['KL WMS Order Number']}}</div>
-            <div class="mint-cell-sub-title" slot="title">订单总额： ￥{{item['Order Total']}}</div>
-          </cus-cell>
-        </loadmore>
-      </mt-tab-container-item>
+      <mt-navbar v-model="selected">
+        <mt-tab-item id="pending"
+                     @click.native="!pending.length && loadBottomFn({status:'已提交', list:'pending'})">已提交</mt-tab-item>
+        <mt-tab-item id="valid"
+                     @click.native="!valid.length && loadBottomFn({status:'库存异动', list:'valid'})">库存异动</mt-tab-item>
+        <mt-tab-item id="invalid"
+                     @click.native="!invalid.length && loadBottomFn({status:'已完成', list:'invalid'})">已完成</mt-tab-item>
+      </mt-navbar>
+      <mt-tab-container v-model="selected">
+        <mt-tab-container-item id="pending">
+          <loadmore ref="pending"
+                    :allLoaded="true"
+                    @loadTop="loadTopFn"
+                    :topStatus="topStatus"
+                    @loadBottom="loadBottomFn"
+                    :param="{status:'已提交', list:'pending'}">
+            <cus-cell
+              class="multiple border-bottom"
+              :title="'维修订单号'+ item['Order Number']"
+              v-for="(item,index) in pending"
+              @click.native="toDateil(item['Order Number'])"
+              :key="index"
+              is-link>
+              <div class="mint-cell-sub-title" slot="title">EBS订单编号: {{item['Back Office Order Number']}}</div>
+              <div class="mint-cell-sub-title" slot="title">WMS订单编号: {{item['KL WMS Order Number']}}</div>
+              <div class="mint-cell-sub-title" slot="title">订单总额： ￥{{item['Order Total']}}</div>
+            </cus-cell>
+          </loadmore>
+        </mt-tab-container-item>
+        <mt-tab-container-item id="valid">
+          <loadmore ref="valid"
+                    :allLoaded="true"
+                    @loadTop="loadTopFn"
+                    :topStatus="topStatus"
+                    @loadBottom="loadBottomFn"
+                    :param="{status:'库存异动', list:'valid'}">
+            <cus-cell
+              class="multiple border-bottom"
+              :title="'维修订单号'+ item['Order Number']"
+              v-for="(item,index) in valid"
+              @click.native="toDateil(item['Order Number'])"
+              :key="index"
+              is-link>
+              <div class="mint-cell-sub-title" slot="title">EBS订单编号: {{item['Back Office Order Number']}}</div>
+              <div class="mint-cell-sub-title" slot="title">WMS订单编号: {{item['KL WMS Order Number']}}</div>
+              <div class="mint-cell-sub-title" slot="title">订单总额： ￥{{item['Order Total']}}</div>
+            </cus-cell>
+          </loadmore>
+        </mt-tab-container-item>
+        <mt-tab-container-item id="invalid">
+          <loadmore ref="invalid"
+                    :allLoaded="true"
+                    @loadTop="loadTopFn"
+                    :topStatus="topStatus"
+                    @loadBottom="loadBottomFn"
+                    :param="{status:'已完成', list:'invalid'}">
+            <cus-cell
+              class="multiple border-bottom"
+              :title="'维修订单号'+ item['Order Number']"
+              v-for="(item,index) in invalid"
+              @click.native="toDateil(item['Order Number'])"
+              :key="index"
+              is-link>
+              <div class="mint-cell-sub-title" slot="title">EBS订单编号: {{item['Back Office Order Number']}}</div>
+              <div class="mint-cell-sub-title" slot="title">WMS订单编号: {{item['KL WMS Order Number']}}</div>
+              <div class="mint-cell-sub-title" slot="title">订单总额： ￥{{item['Order Total']}}</div>
+            </cus-cell>
+          </loadmore>
+        </mt-tab-container-item>
+      </mt-tab-container>
     </div>
   </div>
 </template>
@@ -76,7 +109,11 @@
         userName = info;
         me.setManager(info['KL Primary Position Type LIC'] === 'Field Service Manager');
       });
-      me.pendingLoadTop(me.isTeam);
+      // me.pendingLoadTop(me.isTeam);
+      me.loadBottomFn({
+        status: '已提交',
+        list: 'pending'
+      });
     },
     data: () => {
       return {
@@ -86,15 +123,22 @@
       };
     },
     computed: {
-      ...mapState(NameSpace, ['loginMeg', 'orderEntry', 'isTeam', 'isManager'])
+      ...mapState(NameSpace, ['pending', 'valid', 'invalid', 'loginMeg', 'isTeam', 'isManager'])
     },
     methods: {
       ...mapActions(NameSpace, ['getList']),
       ...mapMutations(NameSpace, ['setManager', 'setTeam']),
       menuFn(item) {
         this.setTeam(item.key === 'team');
-        this.pendingLoadTop(item.key === 'team');
+        // this.pendingLoadTop(item.key === 'team');
         // 刷新数据
+        // 刷新数据
+        this.loadBottomFn({
+          status: '已提交',
+          list: 'pending'
+        });
+        // 切换已提交
+        this.selected = 'pending';
       },
       toDateil(name) {
         console.log(name);
