@@ -17,6 +17,10 @@
         </mt-field>
        <!-- <mt-field label="计划开始日期"  :value="start_Date" v-show="is_plan"></mt-field>
         <mt-field label="计划完成日期" :value="end_Date" v-show="is_plan"></mt-field>-->
+        <mt-field label="批次名称"
+                  v-show="is_plan">
+          <span>{{batchName}}</span>
+        </mt-field>
         <mt-field label="计划数量" :class="showNum()">
           <span class="enable" @click="editBuildingFn">{{batchNum}}</span>
         </mt-field>
@@ -141,6 +145,7 @@
       return {
         value: '',
         batchCode: '', // 批次
+        batchName: '', // 批次名称
         orderId: '', // 订单详情ID
         InboxItemId: '', // 审批id
         InboxTaskId: '', // 审批id
@@ -300,6 +305,7 @@
               }
             }
             self.batchCode = data.Id; // 批次
+            self.batchName = data['KL Task Batch Name'];
             if (data.Planned) {
               self.start_Date = new Date(data.Planned).format('yyyy-MM-dd'); // 开始时间
             }

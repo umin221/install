@@ -352,10 +352,6 @@
               Toast('详细计划不能为空！');
               return;
             }
-            if (self.attach.list.length === 0) {
-              Toast('附件不能为空，请上传！');
-              return;
-            }
             let uploadAttach = id => {
               _upload.call(self, self.$refs.attach.getServerIds(), id);
             };
@@ -728,13 +724,9 @@
               uploadAttach(self.id);
             }
           }
-          if (!self.box1) { // 不选择委外，直接提交主管，附件、详细计划不能为空
+          if (!self.box1) { // 不选择委外，直接提交主管，详细计划不能为空
             if (self.planList.length === 0) {
               Toast('详细计划不能为空！');
-              return;
-            }
-            if (self.attach.list.length === 0) {
-              Toast('附件不能为空，请上传！');
               return;
             }
             let uploadAttach = id => {

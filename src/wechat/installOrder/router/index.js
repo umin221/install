@@ -77,6 +77,18 @@ export default new Router({
       require(['../page/batch'], resolve);
     }
   }, {
+    path: '/batchLX', // 批次新增页面-零星
+    name: 'batchLX',
+    component(resolve) {
+      require(['../page/batchLX'], resolve);
+    }
+  }, {
+    path: '/batchDetailLX', // 批次详情页面-零星
+    name: 'batchDetailLX',
+    component(resolve) {
+      require(['../page/batchDetailLX'], resolve);
+    }
+  }, {
     path: '/batchDetail', // 批次详情页面
     name: 'batchDetail',
     component(resolve) {
