@@ -8,7 +8,7 @@
       <mt-button @click.native="toSearchFn" slot="right">
         <i class="xs-icon icon-search"></i>
       </mt-button>
-      <mt-button @click.native="toSearchFn" slot="right">
+      <mt-button @click.native="$router.push('faq')" slot="right">
         <i class="xs-icon icon-question"></i>
       </mt-button>
     </mt-header>

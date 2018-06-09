@@ -64,5 +64,14 @@ export default new Router({
     component(resolve) {
       require(['../page/setting'], resolve);
     }
+  }, { // 常见问题
+    path: '/faq',
+    name: 'faq',
+    component(resolve) {
+      require(['../page/faq'], resolve);
+    },
+    meta: {
+      transition: 'push'
+    }
   }]
 });

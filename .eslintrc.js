@@ -30,7 +30,8 @@ module.exports = {
     'MessageBox': true,
     'tools': true,
     'wx': true,
-    'qq': true
+    'qq': true,
+    'FAQ': true
   },
   rules: {
     'accessor-pairs': 2,
