@@ -11,7 +11,7 @@
                    :value="assets['Street Address 4']"></cus-field>
         <cus-field label="产品条形码" tag="产品条形码"
                    :data-value="serial"
-                   :attr="{ maxlength: 20 }"
+                   :attr="{ maxlength: 15 }"
                    v-model="assets['serial']"
                    v-valid.require>
           <div class="xs-icon icon-scan" @click="toScanFn"></div>
@@ -149,6 +149,12 @@
         let me = this;
         tools.valid.call(me, () => {
           let assets = me.assets;
+          // 最少字符限制
+          if (assets.length < 10) {
+            Toast('条码至少是10个字符');
+            return;
+          }
+          // 条码字符规格限制
           if (/[A-Za-z0-9]+$/.test(assets['serial'])) {
             this.installOrderAssets({
               data: {

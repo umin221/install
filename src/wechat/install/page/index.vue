@@ -68,9 +68,11 @@
     // 数据初始化
     activated() {
       user = KND.Util.parse(KND.Session.get('userInfo'));
-      // 如果走接口登陆，获取最新批次任务
-      let mode = KND.Util.parse(this.$route.query).mode;
+      // 页面刷新缓存标记 如果走接口登陆，获取最新批次任务
+      let mode = KND.Session.get('mode');
       if (user) {
+        // 移除刷新标记
+        KND.Session.remove('mode');
         // 获取数据
         this[mode === 'refresh' ? 'loadTopFn' : 'loadBottomFn']();
       } else {

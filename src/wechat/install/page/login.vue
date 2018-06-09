@@ -91,13 +91,9 @@
             success: user => {
               // 缓存用户进入APP首页
               setUser(JSON.stringify(user));
-              me.$router.push({
-                path: 'index',
-                query: {
-                  // 如果走接口登陆，获取最新批次任务
-                  mode: 'refresh'
-                }
-              });
+              // 页面刷新缓存标记 如果走接口登陆，获取最新批次任务
+              KND.Session.set('mode', 'refresh');
+              me.$router.push('index');
             },
             error: err => {
               console.log(err);
