@@ -30,8 +30,8 @@
     name: 'LazyRender',
     data() {
       return {
-        show: true, // 是否渲染组件
-      }
+        show: true // 是否渲染组件
+      };
     },
     props: {
       data: Array,  // 需要在组件内渲染的数据
@@ -55,7 +55,7 @@
         }
       },
       trackByData: Boolean, // 是否跟踪data的变化来渲染列表
-      immediately: Boolean, // 是否立即重新渲染
+      immediately: Boolean // 是否立即重新渲染
     },
     created() {
       this.showLazy();
@@ -77,7 +77,7 @@
         if (this.immediately) {
           this.showLazy();
         }
-      },
+      }
     },
     methods: {
       /**
@@ -99,7 +99,7 @@
         setTimeout(() => {
           this.show = true;
           this.$emit('loaded');
-        },this.time);
+        }, this.time);
       }
     }
   };

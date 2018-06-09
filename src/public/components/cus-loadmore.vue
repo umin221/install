@@ -18,7 +18,7 @@
       <empty v-show="emptyTips"></empty>
     </slot>
 
-    <div slot="bottom" class="mint-loadmore-bottom">
+    <div v-show="bottomShow" slot="bottom" class="mint-loadmore-bottom">
       <span v-show="bottomStatus !== 'loading'" :class="{ 'is-rotate': bottomStatus === 'drop' }">↑</span>
           <span v-show="bottomStatus === 'loading'">
             <mt-spinner type="snake"></mt-spinner>
@@ -41,6 +41,7 @@
       return {
         topStatus: '',
         bottomStatus: '',
+        bottomShow: false,
         allLoaded: false
       };
     },
@@ -66,19 +67,27 @@
       handleBottomChange(status) {
         this.bottomStatus = status;
       },
-      onTopLoaded(len = 10) {
+      onTopLoaded(len = 0) {
+        let flag = len < pageSize;
         this.$refs.loadmore.onTopLoaded();
-        this.allLoaded = len < pageSize;
+        this.allLoaded = flag;
+        this.bottomShow = !flag;
       },
-      onBottomLoaded(len = 10) {
+      onBottomLoaded(len = 0) {
+        let flag = len < pageSize;
         this.$refs.loadmore.onBottomLoaded();
-        this.allLoaded = len < pageSize;
+        this.allLoaded = flag;
+        this.bottomShow = !flag;
       }
     }
   };
 </script>
 
 <style lang="scss">
+  .mint-loadmore {
+    min-height: 380px;
+  }
+
   .mint-loadmore-top {
     span {
       display: inline-block;
