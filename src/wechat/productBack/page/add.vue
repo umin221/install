@@ -155,7 +155,10 @@ export default {
       me.isProject = false;
       if (me.partList.length) {
         for (let i = 0; i < me.partList.length; i++) {
-          if (me.partList[i]['KL Product Series Code'] === '工程替代锁') {
+          var codeName = me.partList[i]['KL Product Specification'].substring(0, 5);
+          console.dir('==========' + codeName);
+          if (codeName === '工程替代锁') {
+          // if (me.partList[i]['KL Product Series Code'] === '工程替代锁') {
             me.isProject = true;
           }
         }

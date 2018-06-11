@@ -201,6 +201,7 @@
             'Product Name': me.lineItems[i].Product,
             'num': me.lineItems[i]['Quantity Requested'],
             'KL Product Series Code': me.lineItems[i]['KL Product Series Code'],
+            'KL Product Specification': me.lineItems[i]['KL Product Specification'],
             'Id': me.lineItems[i]['Product Id'],
             'lineId': me.lineItems[i]['Id']
           });
