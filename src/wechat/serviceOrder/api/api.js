@@ -183,6 +183,7 @@ let ApiList = {
           'ActivityId': option.data.obj.actionId, // 派工单Id
           'inStatus': 'Close', // 关闭
           'NoSalesReason': option.data.obj.closeMsg, // 关闭原因
+          'Description': option.data.obj.Description, // 关闭备注
           'ProcessName': 'KL SR Action Status Change Process' // 派工单状态改变逻辑WF
         }
       }

@@ -20,6 +20,7 @@
           label="安装数量"
           :value="detailData['KL Install Amount'] || 0"></cus-field>
         <toggle>
+          <div class="disable">
           <cus-field
             label="门厂联系人"
             :value="detailData['KL Delivery Partner Contact Name']"></cus-field>
@@ -42,6 +43,7 @@
             label="项目地址"
             :value="detailData['KL Delivery Country'] + detailData['KL Delivery Province'] + detailData['KL Delivery City'] + detailData['KL Delivery County'] + detailData['KL Delivery Address']"
             is-link></cus-field>
+          </div>
         </toggle>
         <div slot="title" class="mint-content-div enable">
           <div class="mint-content-xt" @click="executionFn" v-show="executionShow()">订单执行</div>

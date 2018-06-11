@@ -513,14 +513,16 @@
       boxClose(msg) {               // 关闭取消事件
         this.showBox = false;
       },
-      boxEnter(msg) {               // 关闭确认
+      boxEnter(msg, val) {               // 关闭确认
         let me = this;
         me.showBox = false;
+        console.dir(msg + val);
         if (msg) {
           let obj = {
             srId: me.ServiceRequest['Id'],
             actionId: me.Action['Id'],
-            closeMsg: msg
+            closeMsg: msg,
+            Description: val
           };
           me.getCloseReason(obj);
           me.$router.go(-1);

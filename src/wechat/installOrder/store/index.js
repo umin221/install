@@ -58,6 +58,12 @@ export default new Vuex.Store(Object.extend(true, sto, {
           state.pending = [];
           state.process = [];
           state.completed = [];
+        },
+        setList(state) {
+          // 清空列表数据
+          state.pending = [];
+          state.process = [];
+          state.completed = [];
         }
       },
       actions: {
@@ -160,6 +166,8 @@ export default new Vuex.Store(Object.extend(true, sto, {
               id: id
             },
             success(data) {
+              // 标记列表刷新
+              KND.Session.set('refresh', 'pending');
               tools.success(data, {
                 back: true,
                 successTips: '提交成功'

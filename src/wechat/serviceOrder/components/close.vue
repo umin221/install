@@ -16,6 +16,8 @@
             </mt-radio>
 
           </div>
+          <mt-field label="" placeholder="备注" type="textarea" rows="3" v-model="value"></mt-field>
+
           <div class="mint-msgbox-input" style="display: none;">
             <input placeholder="" type="text">
             <div class="mint-msgbox-errormsg" style="visibility: hidden;"></div>
@@ -30,6 +32,10 @@
   </div>
 </template>
 <style lang="scss">
+  .mint-msgbox-message {
+    height: 240px;
+    overflow: scroll;
+  }
   .page-part{
     a{
       text-align: left;
@@ -48,6 +54,7 @@
     },
     data() {
       return {
+        value: '',
         value1: ''
       };
     },
@@ -57,10 +64,10 @@
     methods: {
       ...mapActions(NameSpace, ['getClose']),
       enter() {
-        this.$emit('my-enter', this.value1);
+        this.$emit('my-enter', this.value1, this.value);
       },
       close() {
-        this.$emit('my-close', this.value1);
+        this.$emit('my-close', this.value1, this.value1);
       }
     }
   };

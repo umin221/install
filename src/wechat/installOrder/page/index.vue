@@ -140,6 +140,39 @@
           mapp.list['In Installing,Sales Confirmed,Submitted,In Confirming'] = 'process';
         }
         // 获取安装订单数据
+        this.loadBottomFn(
+          {
+            status: '待处理',
+            list: 'pending'
+          });
+        KND.Session.remove('refresh');
+      });
+    },
+    // 列表刷新
+    activated() {
+      var self = this;
+      let list = KND.Session.get('refresh');
+      if (!list) return;
+      KND.Native.getUserInfo((info) => {
+        self.userInfo = info;
+        self.setInfoUser(info);
+        console.log(self.userInfo);
+        if (self.isDoorEmp) {
+          self.tabVal = 'pending';
+          self.tabStatus = '待处理';
+          self.selected = 'pending';
+        } else {
+          self.tabVal = 'process';
+          self.tabStatus = '处理中';
+          self.selected = 'process';
+
+          // 安装工程师或者安装主管，在处理中需要查询需要确认的订单
+          mapp.manager['处理中'] = 'In Installing,Sales Confirmed,Submitted,In Confirming';
+          mapp.list['In Installing,Sales Confirmed,Submitted,In Confirming'] = 'process';
+        }
+        // 清空待处理数据
+        self.setList();
+        // 获取安装订单数据
         this.loadBottomFn({
           status: self.tabStatus,
           list: self.tabVal
@@ -169,7 +202,7 @@
     },
     methods: {
       ...mapActions(NAMESPACE, ['getList']),
-      ...mapMutations(NAMESPACE, ['setInfoUser', 'setManager', 'setTeam', 'setTaskIndex']),
+      ...mapMutations(NAMESPACE, ['setInfoUser', 'setManager', 'setTeam', 'setList', 'setTaskIndex']),
       // 标题栏菜单选择回调方法
       menuFn(item) {
         var self = this;
