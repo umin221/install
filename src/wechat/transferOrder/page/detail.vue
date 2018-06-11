@@ -122,7 +122,8 @@
       // 项目地址
       address() {
         let me = this;
-        return `${me.form.Province} ${me.form.City} ${me.form.Town} ${me.form.Address}`;
+        // 当接口响应直接，省市区读取为 undefined
+        return `${me.form.Province} ${me.form.City} ${me.form.Town} ${me.form.Address}`.replace(/undefined/g, '');
       }
     },
     methods: {

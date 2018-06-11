@@ -131,7 +131,7 @@
                 if (room.Id === assets.Id) return serial;
                 me.assets['serial'] = me.assets['serial'] = '';
                 me.error.serial = serial;
-                me.error.address = room['Province'] + room['City'] + room['Personal County'] + room['Street Address'] + room['Street Address 2'] + room['Street Address 3'] + room['Street Address 4'];
+                me.error.address = room['Province'] + room['City'] + room['County'] + room['Street Address'] + room['Street Address 2'] + room['Street Address 3'] + room['Street Address 4'];
                 me.error.batch = room['KL Activity Id'];
               } else {
                 me.error = {};

@@ -69,9 +69,6 @@ export default new Router({
     name: 'faq',
     component(resolve) {
       require(['../page/faq'], resolve);
-    },
-    meta: {
-      transition: 'push'
     }
   }]
 });
