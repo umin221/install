@@ -244,7 +244,9 @@
       },
 //      门厂确认中，非查看团队，订单可编辑
       editable() {
-        return this.isConfirming && !this.isTeam;
+        let me = this;
+        // 门厂确认中订单 && 非查看团队订单 && 门厂技术员是当前登陆人
+        return me.isConfirming && !me.isTeam && userInfo['Id'] === me.detailData['KL Delivery Partner Owner Id'];
       },
       // 订单行
       group() {
