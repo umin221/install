@@ -181,12 +181,12 @@ export default {
       let me = this;
       let obj = {};
       let lineItems = [];
-      if (me.isProject) {
+      /* if (me.isProject) {
         if (!me.project.Id) {
           Toast('请选择所属项目');
           return;
         }
-      }
+      }*/
       if (me.partList.length) {
         for (let i = 0;i < me.partList.length; i++) {
           if (me.partList[i].num < 1) {

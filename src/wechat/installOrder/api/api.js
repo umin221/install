@@ -271,7 +271,7 @@ let apiList = {
   findContact: option => {
     return {
       method: 'get',
-      url: 'data/KL User/User/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=2&StartRowNum=0'
+      url: 'data/KL User/User/?searchspec=' + KND.Util.condition(option.data) + '&PageSize=100&StartRowNum=0'
     };
   },
   /**

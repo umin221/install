@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showBox1">
+  <div v-if="showBox1" class="close">
     <div class="v-modal" style="z-index: 2000;" ></div>
     <div class="mint-msgbox-wrapper" style="position: absolute; z-index: 2009;">
       <div class="mint-msgbox" style="">
@@ -32,7 +32,7 @@
   </div>
 </template>
 <style lang="scss">
-  .mint-msgbox-message {
+  .close .mint-msgbox-message {
     height: 240px;
     overflow: scroll;
   }
@@ -64,7 +64,11 @@
     methods: {
       ...mapActions(NameSpace, ['getClose']),
       enter() {
-        this.$emit('my-enter', this.value1, this.value);
+        if (this.value1) {
+          this.$emit('my-enter', this.value1, this.value);
+        } else {
+          Toast('请选择原因！');
+        }
       },
       close() {
         this.$emit('my-close', this.value1, this.value1);

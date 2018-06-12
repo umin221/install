@@ -1234,7 +1234,7 @@ export default new Vuex.Store({
                     'Name': EntryOrders[i].Product,
                     'num': parseInt(EntryOrders[i]['Quantity Requested'], 0),
                     'KL Translated Name': EntryOrders[i]['KL Product Name Join'],
-                    'List Price': EntryOrders[i]['Adjusted List Price - Display'],
+                    'Unit Price': EntryOrders[i]['Adjusted List Price - Display'],
                     'Id': EntryOrders[i]['Product Id'],
                     'isBn': (EntryOrders[i]['KL Warranty Flag'] === 'Y')
                   });

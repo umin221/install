@@ -124,10 +124,15 @@ export default new Vuex.Store({
       },
       actions: {
         getSearchList({state, commit}, {orNumber, more, callback, error}) {
+          var isTeam = this.state.index.isTeam;
+          var obj = {
+            team: isTeam,
+            orNumber: orNumber
+          };
           api.get({
             key: 'getSearchList',
             data: {
-              orNumber
+              obj
             },
             paging: {
               StartRowNum: more ? state['result'].length : 0,

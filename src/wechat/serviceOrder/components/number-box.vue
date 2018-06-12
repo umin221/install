@@ -59,7 +59,7 @@
       display: inline-block;
       height: 1rem;
       border: none;
-      text-align: center;
+      text-align: center!important;
     }
   }
 </style>

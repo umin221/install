@@ -23,7 +23,7 @@
               <div class="TranslatedLine">
                 <div>配件代码： {{item['Name']}}</div>
                 <div style="width: 65%;">配件名称： {{item['KL Translated Name']}}</div>
-                <div class="toRed">￥{{item['List Price']}}</div>
+                <div class="toRed">￥<input v-show="!switchStatus[index]" type="number" v-model="item['Unit Price']"  class="numberCalss" @change="Product"/></div>
                 <num-box :index="index" :type="switchStatus[index]" :number="item.num" @input="productNumber"></num-box>
               </div>
             </mt-cell-swipe>
@@ -41,7 +41,7 @@
         <cus-field label="上门费"
                    tag="上门费"
                    placeholder="请输入上门费"
-                   v-valid.positiveInteger
+                   v-valid.number
                    v-model="fee"></cus-field>
         <mt-cell title="总费用">￥{{Product}}</mt-cell>
         <mt-cell class="require" title="附件"></mt-cell>
@@ -68,7 +68,7 @@ import cusField from 'public/components/cus-field';
 import Vue from 'vue';
 import vp from 'public/plugin/validator';
 Vue.use(vp);
-
+let testVal = /^\d+(\.{0,1}\d+){0,1}$/; // /^[+]{0,1}(\d+)$|^[+]{0,1}(\d+\.\d+)$/;
 const NAMESPACE = 'saveFault';
 let _upload = function(serverIds, id, successBack) {
   let callback = data => {
@@ -99,14 +99,6 @@ export default {
     me.serviceId = service.id;
     me.Service = service.Service;
     me.serviceType = service.type;
-    console.log(me.returnSelect);
-    if (me.returnSelect.length) {
-      for (let i = 0;i < me.returnSelect.length;i++) {
-        if (me.returnSelect[i].Name === 'AP003') {
-          me.fee = me.returnSelect[i]['List Price'] || 0;
-        }
-      }
-    }
 //    let isBn = me.Service['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
 //    me.setIsBn(isBn);
 //    let EntryOrders = KND.Util.toArray(service.Service['Order Entry - Orders']);
@@ -146,12 +138,15 @@ export default {
                 let LineItems = KND.Util.toArray(EntryOrders[i]['Order Entry - Line Items']);
                 if (LineItems.length) {
                   for (let j = 0; j < LineItems.length; j++) {
+                    if (LineItems[j].Product === 'AP003') {
+                      me.fee = LineItems[j]['Unit Price - Display'] || 0;
+                    }
                     me.switchStatus.push(LineItems[j]['KL Warranty Flag'] === 'Y');
                     me.selectProduct({
                       Name: LineItems[j].Product,
                       num: parseInt(LineItems[j]['Quantity Requested'], 0),
                       'KL Translated Name': LineItems[j]['KL Product Name Join'],
-                      'List Price': LineItems[j]['Item Price - Display'],
+                      'Unit Price': LineItems[j]['Unit Price - Display'],
                       Id: LineItems[j]['Product Id'],
                       saveId: LineItems[j]['Id']
                     });
@@ -163,6 +158,14 @@ export default {
           }
         }
       });
+    }
+    console.log(me.returnSelect);
+    if (me.returnSelect.length) {
+      for (let i = 0;i < me.returnSelect.length;i++) {
+        if (me.returnSelect[i].Name === 'AP003') {
+          me.fee = me.returnSelect[i]['Unit Price'] || 0;
+        }
+      }
     }
     me.getPrice(); // 获取价格列表
     me.switchStatus = [];
@@ -276,8 +279,12 @@ export default {
           console.log(me.returnSelect.length);
           if (!me.switchStatus[i] && me.returnSelect[i].Name !== 'AP003') {
             var Price = 0;
-            if (me.returnSelect[i]['List Price']) {
-              Price = me.returnSelect[i]['List Price'];
+            var listPrice = me.returnSelect[i]['Unit Price'];
+            if (!testVal.test(listPrice)) {
+              Toast('必须为正数');
+            }
+            if (me.returnSelect[i]['Unit Price']) {
+              Price = me.returnSelect[i]['Unit Price'];
             }
             me.allFee += me.returnSelect[i].num * parseFloat(Price, 0);
           }
@@ -327,10 +334,10 @@ export default {
        */
       let me = this;
       tools.valid.call(this, () => {
-        if (!me.attach.list.length) {
+        /* if (!me.attach.list.length) {
           Toast('请上传维修记录表');
           return;
-        }
+        }*/
         MessageBox.confirm('确认提交，数据一经提交不可修改。', '提示').then(action => {
           if (me.returnSelect.length > 0) { // 检验维修配件输入正整数
             for (let i = 0; i < me.returnSelect.length; i++) {
@@ -338,9 +345,14 @@ export default {
                 Toast('维修配件请填写正确的数量');
                 return;
               }
+              var listPrice = me.returnSelect[i]['Unit Price'];
+              if (!testVal.test(listPrice)) {
+                Toast('必须为正数');
+                return;
+              }
             }
           }
-          let uploadAttach = id => {
+          /* let uploadAttach = id => {
             _upload.call(me,
               me.$refs.attach.getServerIds(),
               id,
@@ -349,7 +361,8 @@ export default {
                 me.submitOrder();
               });
           };
-          uploadAttach(me['Service'].Id); // 上传附件
+          uploadAttach(me['Service'].Id); // 上传附件*/
+          me.submitOrder();
         });
       });
     },
@@ -360,17 +373,23 @@ export default {
       let isBn = me.isBn === '保内' ? 'Y' : 'N';  // 是否报修范围
       let key = !me.EntryOrdersId ? 'addServiceOrder' : 'deleteOrderEntry'; // EntryOrdersId有值则删除再重新提交
       for (let i = 0;i < me.returnSelect.length; i++) {
-        obj = {
-          'Id': i + 1,
-          'Product': me.returnSelect[i].Name, // 产品编码
-          'Quantity Requested': me.returnSelect[i].num, // 数量
-          'KL Warranty Flag': me.returnSelect[i].isBn ? 'Y' : 'N'
-        };
-        lineItems.push(obj);
+        if (me.returnSelect[i].Name !== 'AP003') {
+          if (me.returnSelect[i].isBn) { // 保内 价格等于0
+            me.returnSelect[i]['Unit Price'] = 0;
+          }
+          obj = {
+            'Id': i + 1,
+            'Product': me.returnSelect[i].Name, // 产品编码
+            'Quantity Requested': me.returnSelect[i].num, // 数量
+            'Unit Price': me.returnSelect[i]['Unit Price'],
+            'KL Warranty Flag': me.returnSelect[i].isBn ? 'Y' : 'N'
+          };
+          lineItems.push(obj);
+        }
       }
       if (me.fee) {
         obj = {
-          'Id': lineItems.length + 1,
+          'Id': '001',
           'Product': 'AP003', // 产品编码
           'Unit Price': me.fee,
           'KL Warranty Flag': 'N'
@@ -480,6 +499,13 @@ export default {
 </script>
 <style lang="scss">
   .saveFault{
+    .numberCalss{
+      width: 80px;
+      line-height: 26px;
+      margin-bottom: 5px;
+      border: 1px solid #d9d9d9;
+      text-align: left !important;
+    }
     .servesParts{
       .Parts{
         font-size: 0.75rem;
