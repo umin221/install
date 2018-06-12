@@ -5,7 +5,7 @@
  */
 var project = {
 //  Environment => DEV SIT UAT PROD
-  env: 'SIT',
+  env: 'UAT',
 //  Is it possible to call the WeChat API
   wxJSBridge: false,
 //  Debug switch to view app log
@@ -14,5 +14,14 @@ var project = {
   shortMsg: {
     account: 'gdjlwj',
     password: 'Net263gdjl'
-  }
+  },
+//  SYS manager
+  manager: [
+//    培训业务人员
+    '18010225', '16043202', '13030172', '16043218', '15063016', '15120017', '16033164', '11040118', '17023089',
+//    业务部长
+    '14083015', '10080387', '13070453', '1651',
+//    坚朗 技术团队
+    '12090020', '14123015', '17063108', '17063032', '18031439', '13030901', '16123001', '16023067'
+  ]
 };

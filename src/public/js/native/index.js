@@ -70,13 +70,19 @@ import queue from '../base/queue';
     /**
      * 获取用户ID
      * @returns {string} 用户userID
+     * 1. 优先从会话中获取用户id
+     * 2. 如果没有择从url中获取用户id，获取不到或长度大于10(工号长度不会大于10)默认为 GUESTERM
      * IM02 IE01
      */
     getUserID() {
-      let userID = util['getParam']('userID');
+      // 优先获取会话中的用户id
+      let userID = session.get('userID');
+      if (userID) return userID;
+      // url 获取用户id
+      userID = util['getParam']('userID');
       // 企业微信，虚拟组织下的用户无法正常获取用户信息，无法做审批操作
       userID = userID && userID.length < 10 ? userID : 'GUESTERM';
-      return session.get('userID') || userID;
+      return userID;
     };
 
     /**
