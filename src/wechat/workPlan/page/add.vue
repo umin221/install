@@ -78,6 +78,7 @@
     },
     created() {
       var self = this;
+      self.setDayAll(false);
       self.newTimes = self.newTimes.getFullYear() + '-' + (self.newTimes.getMonth() + 1) + '-' + self.newTimes.getDate() ; // 当前年月日
       if (this.$route.path === '/edit') {
         this.headTitle = '编辑计划详情';
@@ -301,7 +302,7 @@
           success: data => {
             console.log(data);
             if (data.items.Id) {
-              MessageBox('提示', '新建计划成功').then(action => {
+              MessageBox('提示', '保存成功').then(action => {
                 this.setStartPicker('');
                 this.setEndPicker('');
                 this.workDesc({ // 工作描述

@@ -140,12 +140,10 @@
           mapp.list['In Installing,Sales Confirmed,Submitted,In Confirming'] = 'process';
         }
         // 获取安装订单数据
-        this.loadBottomFn(
-          {
-            status: '待处理',
-            list: 'pending'
-          });
-        KND.Session.remove('refresh');
+        this.loadBottomFn({
+          status: self.tabStatus,
+          list: self.tabVal
+        });
       });
     },
     // 列表刷新
@@ -177,6 +175,7 @@
           status: self.tabStatus,
           list: self.tabVal
         });
+        KND.Session.remove('refresh');
       });
     },
     data: () => {

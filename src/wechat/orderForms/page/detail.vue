@@ -24,9 +24,10 @@
           <div class="item"
                v-for="(item, index) in lineItems"
                :key="index">
-            <div class="mt-Detail-title">产品名称：{{item['KL Product Name Join']}}</div>
+            <div class="mt-Detail-title">产品描述：{{item['KL Product Description']}}</div>
+            <div class="mt-Detail-title">配件代码：{{item['Product']}}</div>
             <div class="mt-Detail-title">型号：{{item['KL Product Model Join']}}</div>
-            <div class="mt-Detail-title">单价：CNY {{item['Adjusted List Price - Display']}} x {{item['Quantity Requested']}}</div>
+            <div class="mt-Detail-title">单价：CNY {{item['Unit Price']}} x {{item['Quantity Requested']}}</div>
             <div class="mt-Detail-title">订单总额：CNY {{item['NRC CxTotal']}}</div>
           </div>
         </div>

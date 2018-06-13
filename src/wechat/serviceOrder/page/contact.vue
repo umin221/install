@@ -77,7 +77,7 @@
                 method: 'POST',
                 data: self.contact,
                 success: function(dataObj) {
-                  var contactObj = KND.Util.toArray(data.SiebelMessage['Contact']);
+                  var contactObj = KND.Util.toArray(dataObj.SiebelMessage['Contact']);
                   if (contactObj.length > 0) {
                     api.get({ // 联系人关联服务单
                       key: 'contact',

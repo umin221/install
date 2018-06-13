@@ -110,7 +110,7 @@
         var val = '';
         if (item['KL Detail Type LIC'] === 'Trompil Batch') {
           val = '开孔进度更新';
-        } else if (item['KL Detail Type LIC'] === 'Lock Body Install') {
+        } else if (item['KL Detail Type LIC'] === 'Lock Body Install Batch') {
           val = '锁体进度更新';
         } else if (item['KL Detail Type LIC'] === 'Door Hanging Acc Batch') {
           val = '挂门进度更新';
@@ -171,7 +171,7 @@
           }
           if (lineObj['Spot Check Amount'] && lineObj['Qualified Amount']) {
             if ((lineObj['Spot Check Amount'] !== lineObj['Qualified Amount']) && (!lineObj['Unqualified Solve Amount'] || !lineObj['Unqualified Desc'])) {
-              Toast('请填写异常处理数量与异常处理描述！');
+              Toast('请填写异常处理数量与异常描述！');
               return;
             }
           }

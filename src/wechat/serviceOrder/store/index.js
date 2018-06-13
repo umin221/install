@@ -1023,15 +1023,19 @@ export default new Vuex.Store({
               PageSize: PAGESIZE
             },
             success: (data) => {
-              let contacts = KND.Util.toArray(data.items);
-              commit(more ? 'addContact' : 'setContact', contacts);
-              if (callback) {
-                callback(contacts);
+              if (data.items) {
+                let contacts = KND.Util.toArray(data.items);
+                commit(more ? 'addContact' : 'setContact', contacts);
+                if (callback) {
+                  callback(contacts);
+                }
               }
             },
             error: (error) => {
+              var contacts = [];
+              commit(more ? 'addContact' : 'setContact', contacts);
               if (callback) {
-                callback();
+                callback(contacts);
               };
               console.log(error);
             }

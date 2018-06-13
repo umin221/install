@@ -262,16 +262,17 @@
         this.ACendPickerValue = this.ACendPickerValue.replace(/\d+:\d+:\d+/, (a, b) => {
           this.setACEndPicker(this.ACendPickerValue.substr(0, this.ACendPickerValue.length - 3));
         });
-        if (this.ACstartPickerValue === '') {
+        */
+        var StartedTime = self.planObj['Started'];
+        var DoneTime = self.planObj['Done'];
+        if (!StartedTime) {
           Toast('请选择实际开始时间');
           return;
         }
-        if (this.ACendPickerValue === '') {
+        if (!DoneTime) {
           Toast('请选择实际结束时间');
           return;
-        }*/
-        var StartedTime = self.planObj['Started'];
-        var DoneTime = self.planObj['Done'];
+        }
         if (new Date(StartedTime).getTime() > new Date(DoneTime).getTime()) {
           Toast('实际开始时间和实际结束时间都不能大于当前时间');
           return;

@@ -167,7 +167,7 @@
           }
           if (lineObj['Spot Check Amount'] && lineObj['Qualified Amount']) {
             if ((lineObj['Spot Check Amount'] !== lineObj['Qualified Amount']) && (!lineObj['Unqualified Solve Amount'] || !lineObj['Unqualified Desc'])) {
-              Toast('请填写异常处理数量与异常处理描述！');
+              Toast('请填写异常处理数量与异常描述！');
               return;
             }
           }
