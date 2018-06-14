@@ -594,10 +594,13 @@
                     self.batchCode = data.items.Id; // 新增批次返回的ID
                     if (self.pcObj['KL Partner Name']) { // 返回数据中没有公司名字 有值就添加
                       data.items['KL Partner Name'] = self.pcObj['KL Partner Name'];
+                      data.items['KL Partner Contact Name'] = self.pcObj['KL Partner Contact Name'];
+                      data.items['KL Partner Contact Cellular Phone'] = self.pcObj['KL Partner Contact Cellular Phone'];
                     }
-                    if (self.pcObj['Calculated Activity Status'] === 'Declined') { // 审批驳回记录状态
+                    /* if (self.pcObj['Calculated Activity Status'] === 'Declined') { // 审批驳回记录状态
                       data.items['Calculated Activity Status'] = 'Declined';
-                    }
+                    }*/
+                    data.items['Calculated Activity Status'] = nameVal;
                     self.getPcObj(data.items); // 保存store
                     // 提交图片
                     let uploadAttach = id => {
