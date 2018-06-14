@@ -144,6 +144,8 @@
           status: self.tabStatus,
           list: self.tabVal
         });
+        self.tabValMenu = self.tabVal;
+        self.tabStatusMenu = self.tabStatus;
       });
     },
     // 列表刷新
@@ -182,6 +184,8 @@
       return {
         tabVal: '',
         tabStatus: '',
+        tabValMenu: '',
+        tabStatusMenu: '',
         // 活跃tab
         selected: 'pending',
         userInfo: '',
@@ -207,9 +211,11 @@
         var self = this;
         this.setTeam(item.key === 'team');
         self.loadBottomFn({
-          status: self.tabStatus,
-          list: self.tabVal
+          status: self.tabStatusMenu,
+          list: self.tabValMenu
         });
+        // 切换已提交
+        this.selected = self.tabValMenu;
       },
       // 已完成顶部加载
       loadTopFn(param) {
