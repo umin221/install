@@ -83,7 +83,7 @@
                       key: 'contact',
                       method: 'POST',
                       data: {
-                        contactId: self.contact['Contact Id'],
+                        contactId: dataObj.PrimaryRowId,
                         contactName: self.contact['Contact Last Name'],
                         itemId: self.contact.Id
                       },
