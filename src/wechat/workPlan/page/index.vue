@@ -42,40 +42,42 @@
           </li>
         </ul>
       </div>
-      <div class="planList">
-        <!--<mt-cell-swipe  v-for="(item, index) in currentDayData" :key="index" ref="body"
-          @click.native="toDetail(index)"
-          class="planListItem lock-line-cell enable"
-          :title="item.Type"
-          :label="item['KL Detail Type']"
-          :right="operation(item, item.Id, index)">
-          <div>
-            <p>{{formatDateTime(item.Planned)}} - {{formatDateTime(item['Planned Completion'])}}</p>
-            <p class="text">{{item.Status}}</p>
-          </div>
-        </mt-cell-swipe>-->
-        <mt-cell-swipe v-for="(item, index) in currentDayData" ref="body"
-                       class="planListItem lock-line-cell enable"
-                       @click.native="toDetail(index)"
-                       :key=index
-                       :right="operation(item, item.Id, index)"
-                       is-link>
-          <div class="co-flex co-jc" slot="title">
-            <span class="co-f1">{{item.Type}}</span>
-            <span class="co-f1" >{{formatDateTime(item.Planned)}} - {{formatDateTime(item['Planned Completion'])}}</span>
+      <lazy :time="400">
+        <div class="planList">
+          <!--<mt-cell-swipe  v-for="(item, index) in currentDayData" :key="index" ref="body"
+            @click.native="toDetail(index)"
+            class="planListItem lock-line-cell enable"
+            :title="item.Type"
+            :label="item['KL Detail Type']"
+            :right="operation(item, item.Id, index)">
+            <div>
+              <p>{{formatDateTime(item.Planned)}} - {{formatDateTime(item['Planned Completion'])}}</p>
+              <p class="text">{{item.Status}}</p>
+            </div>
+          </mt-cell-swipe>-->
+          <mt-cell-swipe v-for="(item, index) in currentDayData" ref="body"
+                         class="planListItem lock-line-cell enable"
+                         @click.native="toDetail(index)"
+                         :key=index
+                         :right="operation(item, item.Id, index)"
+                         is-link>
+            <div class="co-flex co-jc" slot="title">
+              <span class="co-f1">{{item.Type}}</span>
+              <span class="co-f1" >{{formatDateTime(item.Planned)}} - {{formatDateTime(item['Planned Completion'])}}</span>
 
-          </div>
-          <div class="co-flex co-jc" slot="title">
-            <span class="co-f1">{{item['KL Detail Type']}}</span>
-            <span class="co-f1">{{item.Status}}</span>
-          </div>
-          <div class="co-flex co-jc" slot="title">
-            <span class="co-f1">{{item['KL Task Batch Name']}}</span>
-            <span class="co-f1"></span>
-          </div>
-        </mt-cell-swipe>
+            </div>
+            <div class="co-flex co-jc" slot="title">
+              <span class="co-f1">{{item['KL Detail Type']}}</span>
+              <span class="co-f1">{{item.Status}}</span>
+            </div>
+            <div class="co-flex co-jc" slot="title">
+              <span class="co-f1">{{item['KL Task Batch Name']}}</span>
+              <span class="co-f1"></span>
+            </div>
+          </mt-cell-swipe>
 
-      </div>
+        </div>
+      </lazy>
       </div>
       <mt-datetime-picker
         ref="picker"
@@ -93,6 +95,7 @@
 </template>
 <script type="es6">
   import {mapState, mapActions, mapMutations} from 'vuex';
+  import lazy from 'public/components/cus-lazy';
 
   const NAMESPACE = 'index';
   // 当前时间对象
@@ -115,6 +118,7 @@
 
   export default {
     name: NAMESPACE,
+    components: {lazy},
     data() {
       return {
         headTitle: '工作计划',

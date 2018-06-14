@@ -42,24 +42,26 @@
               :edit="false">
       </attach>
 
-      <div class="install-order" v-show="!isPending">
-        <title-group>安装订单</title-group>
-        <mt-cell-swipe class="multiple"
-                       @click.native="toOrderFn(item)"
-                       v-for="(item, index) in orders"
-                       :right="readonly || isCompleted ? [] : [{
+      <lazy :time="400">
+        <div class="install-order" v-show="!isPending">
+          <title-group>安装订单</title-group>
+          <mt-cell-swipe class="multiple"
+                         @click.native="toOrderFn(item)"
+                         v-for="(item, index) in orders"
+                         :right="readonly || isCompleted ? [] : [{
                                  content: '删除',
                                  style: { background: 'red', color: '#fff', 'font-size': '15px', 'line-height': '54px' },
                                  handler: () => deleteFn(item, index)
                                }]"
-                       :key="item.Id">
-          <div class="mint-cell-title co-flex co-jc" slot="title">
-            <span class="co-f1">订单编号: {{item['Order Number']}}</span>
-            <span>{{item['Status']}}</span>
-          </div>
-          <div class="mint-cell-sub-title" slot="title">安装数量: {{item['KL Install Amount']}}</div>
-        </mt-cell-swipe>
-      </div>
+                         :key="item.Id">
+            <div class="mint-cell-title co-flex co-jc" slot="title">
+              <span class="co-f1">订单编号: {{item['Order Number']}}</span>
+              <span>{{item['Status']}}</span>
+            </div>
+            <div class="mint-cell-sub-title" slot="title">安装数量: {{item['KL Install Amount']}}</div>
+          </mt-cell-swipe>
+        </div>
+      </lazy>
     </div>
 
     <!--buttons-->

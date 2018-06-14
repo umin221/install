@@ -15,6 +15,7 @@ import fallback from 'public/components/cus-fallback';
 import attach from 'public/components/cus-attach';
 import empty from 'public/components/cus-empty';
 import buttonGroup from 'public/components/cus-button-group';
+import lazy from 'public/components/cus-lazy';
 import App from '../../App';
 import store from './store';
 
@@ -26,6 +27,8 @@ Vue.component('attach', attach);
 Vue.component('empty', empty);
 // For Buttons
 Vue.component('button-group', buttonGroup);
+// For lazy loader
+Vue.component('lazy', lazy);
 
 Vue.config.productionTip = false;
 /* eslint-disable no-new */

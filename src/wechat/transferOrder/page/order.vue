@@ -50,26 +50,28 @@
                    <!--is-link></mt-cell>-->
         </div>
 
-        <div class="lock-line">
-          <lock-line v-for="(g, key) in group"
-                     :title="g.label"
-                     :key="key"
-                     :add="g.add"
-                     @click="toLineFn(undefined, key)">
-            <mt-cell-swipe v-for="(line, index) in getRows(g.group)" class="lock-line-cell enable"
-                     @click.native="toLineFn(line)"
-                     :key="line['Id']"
-                     :right="getSwipeBtn(line, index)"
-                     is-link>
-              <div class="co-flex co-jc" slot="title">
-                <span v-show="editable" class="co-f1 icon-copy" @click.stop="copyFn(line)"></span>
-                <span class="co-f2">{{line['KL Product Model No']}}</span>
-                <span class="co-f2" v-show="line['KL Hole Direction']">开向:{{line['KL Hole Direction']}}</span>
-                <span class="co-f2">数量:{{line['Quantity Requested']}}</span>
-              </div>
-            </mt-cell-swipe>
-          </lock-line>
-        </div>
+        <lazy :time="400">
+          <div class="lock-line">
+            <lock-line v-for="(g, key) in group"
+                       :title="g.label"
+                       :key="key"
+                       :add="g.add"
+                       @click="toLineFn(undefined, key)">
+              <mt-cell-swipe v-for="(line, index) in getRows(g.group)" class="lock-line-cell enable"
+                       @click.native="toLineFn(line)"
+                       :key="line['Id']"
+                       :right="getSwipeBtn(line, index)"
+                       is-link>
+                <div class="co-flex co-jc" slot="title">
+                  <span v-show="editable" class="co-f1 icon-copy" @click.stop="copyFn(line)"></span>
+                  <span class="co-f2">{{line['KL Product Model No']}}</span>
+                  <span class="co-f2" v-show="line['KL Hole Direction']">开向:{{line['KL Hole Direction']}}</span>
+                  <span class="co-f2">数量:{{line['Quantity Requested']}}</span>
+                </div>
+              </mt-cell-swipe>
+            </lock-line>
+          </div>
+        </lazy>
 
         <!--buttons-->
         <button-group v-show="editable">

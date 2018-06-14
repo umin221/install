@@ -55,26 +55,28 @@
         <div style="height: 0.5rem;background: #eaeaea;"></div>
         <div class="mint-content-info" :class="{disable: !editable}" style="padding-bottom: 50px;background-color: #eaeaea;">
 
-          <div class="lock-line">
-            <lock-line v-for="(g, key) in group"
-                       :title="g.label"
-                       :key="key"
-                       :add="g.add"
-                       @click="toLineFn(undefined, key)">
-              <mt-cell-swipe v-for="(line, index) in getRows(g.group)" class="lock-line-cell enable"
-                             @click.native="toLineFn(line)"
-                             :key="line['Id']"
-                             :right="getSwipeBtn(line, index)"
-                             is-link>
-                <div class="co-flex co-jc" slot="title">
-                  <span v-show="isConfirming" class="co-f1 icon-copy" @click.stop="copyFn(line)"></span>
-                  <span class="co-f2">{{line['KL Product Model No']}}</span>
-                  <span class="co-f2" v-show="line['KL Hole Direction']">开向:{{line['KL Hole Direction']}}</span>
-                  <span class="co-f2">数量:{{line['Quantity Requested']}}</span>
-                </div>
-              </mt-cell-swipe>
-            </lock-line>
-          </div>
+          <lazy :time="400">
+            <div class="lock-line">
+              <lock-line v-for="(g, key) in group"
+                         :title="g.label"
+                         :key="key"
+                         :add="g.add"
+                         @click="toLineFn(undefined, key)">
+                <mt-cell-swipe v-for="(line, index) in getRows(g.group)" class="lock-line-cell enable"
+                               @click.native="toLineFn(line)"
+                               :key="line['Id']"
+                               :right="getSwipeBtn(line, index)"
+                               is-link>
+                  <div class="co-flex co-jc" slot="title">
+                    <span v-show="isConfirming" class="co-f1 icon-copy" @click.stop="copyFn(line)"></span>
+                    <span class="co-f2">{{line['KL Product Model No']}}</span>
+                    <span class="co-f2" v-show="line['KL Hole Direction']">开向:{{line['KL Hole Direction']}}</span>
+                    <span class="co-f2">数量:{{line['Quantity Requested']}}</span>
+                  </div>
+                </mt-cell-swipe>
+              </lock-line>
+            </div>
+          </lazy>
 
         </div>
       </toggle>
@@ -193,6 +195,7 @@
   import vp from 'public/plugin/validator';
   import cusField from 'public/components/cus-field';
   import lockLine from '../../transferOrder/components/cusLockLine';
+  import lazy from 'public/components/cus-lazy';
   Vue.use(vp);
   let userInfo = {};
   let geocoder = '';
@@ -202,7 +205,7 @@
   const NameSpace = 'detail';
   export default {
     name: 'detail',
-    components: {toggle, lockLine, cusField},
+    components: {toggle, lockLine, cusField, lazy},
     created() {
       let me = this;
       me.id = me.$route.query.id;
