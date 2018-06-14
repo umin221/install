@@ -20,7 +20,7 @@ let apiList = {
       'PageSize': option.paging.PageSize
     };
 //    默认获取非草稿订单，类型为安装订单
-    var searchSpec = ['[Order Entry - Orders.Status]<>"Draft" AND [Order Entry - Orders.Order Type]="Install Order"'];
+    var searchSpec = ['[Order Entry - Orders.Order Type]="Install Order"'];
     // 状态条件
     var status = data.Status || '';
     // 搜索条件
@@ -47,11 +47,14 @@ let apiList = {
     }
     // 订单状态过滤
     if (status) {
-      searchSpec.push('(' + KND.Util.condition2D({Status: data.Status.split(',')}, 'Order Entry - Orders', ' OR ', '=') + ')');
+      searchSpec.push(KND.Util.condition2D({Status: data.Status.split(',')}, 'Order Entry - Orders', ' OR ', '='));
+    } else {
+      let status = ['Draft', 'Rejected', 'Door Factory Return'];
+      searchSpec.push(KND.Util.condition2D({Status: status}, 'Order Entry - Orders', ' AND ', '<>'));
     }
     // 订单搜索条件过滤
     if (search) {
-      searchSpec.push('(' + KND.Util.condition2D(search, 'Order Entry - Orders', ' OR ', ' LIKE ') + ')');
+      searchSpec.push(KND.Util.condition2D(search, 'Order Entry - Orders', ' OR ', ' LIKE '));
     }
     boby.SearchSpec = searchSpec.join(' AND ');
     return {
