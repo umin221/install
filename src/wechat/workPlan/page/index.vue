@@ -32,12 +32,12 @@
       <!-- 日期 -->
       <div class="bodyDiv">
         <ul class="days" v-for="(value,index1) in daysUL" :key="index1">
-          <li @click="pick(day,index+index1*7)" v-for="(day, index) in value" :key="index">
+          <li @click="pick(day)" v-for="(day, index) in value" :key="index">
             <!--本月-->
-            <div class="dateItem" :class="{'selected':(isSelected[(index+index1*7)] || (new Date(day).getFullYear() == new Date().getFullYear() && day.getMonth() == new Date().getMonth() && day.getDate() == new Date().getDate() && isSelected.length ==0))}">
+            <div class="dateItem" :class="{'selected': day !== 'spaces' && day.format('yyyy-MM-dd') === selectDate.format('yyyy-MM-dd')}">
               <span v-if="day==='spaces'"></span>
               <span v-else >{{ day.getDate() }}</span>
-              <b  :class="[isHavePlan(day,index+index1*7)]"></b>
+              <b  :class="[isHavePlan(day,index)]"></b>
            </div>
           </li>
         </ul>
@@ -81,6 +81,7 @@
         ref="picker"
         v-model="pickerValue"
         type="date"
+        :startDate="startDate"
         year-format="{value} 年"
         month-format="{value} 月"
         date-format="{value} 日"
@@ -94,6 +95,23 @@
   import {mapState, mapActions, mapMutations} from 'vuex';
 
   const NAMESPACE = 'index';
+  // 当前时间对象
+  const now = new Date();
+
+  // 页面初始化
+  let init = function(hook) {
+    let me = this;
+    let date = me.newYear ? new Date(me.newYear, me.newMonth - 1, me.newDay) : now;
+    // 获取当天数据数据
+    me.getCurrentDayData(date.format('MM/dd/yyyy'));
+    // 第一次进入功能需要获取数据
+    if (hook === 'created') {
+      // 记录用户点击日期
+      me.setSelectDate(date);
+      me.initData(date);
+      me.startGetData(date);
+    }
+  };
 
   export default {
     name: NAMESPACE,
@@ -102,111 +120,79 @@
         headTitle: '工作计划',
         days: [], // 用于临时存储数据
         daysUL: [], // 当月所有数据
-        params: { // 跳转参数
+        params: { // 页面跳转参数
           selectDay: '',
           type: ''
         },
-        isSelected: [], // 全部数据, true代表选中
-        isBan: [], // 没有用到
-        isXiu: [], // 没有用到
-        restDays: { // 没有用到
-          year: '',
-          month: '',
-          day: '',
-          resttype: '',
-          restdate: ''
-        },
-        restDaysList: [], // 没有用到
-        banList: [], // 没有用到
-        xiuList: [], // 没有用到
-        alldayData: [], // 对应每天的数据标识，是否显示黑点还是红点
-        selectIndex: '', // 当前选中的索引
         pickerValue: '', // DatetimePicker组件默认值
         beforeSpaces: [], // 前面需要空几天
-        isShowBtn: true // 是否显示新建按钮
+        startDate: new Date(new Date(now).setFullYear(now.getFullYear() - 1)), // 日期控件最小时间
+        isShowBtn: true, // 是否显示新建按钮
+        monthData: [] // 当月所有计划数据
       };
     },
     created() {
-      var self = this;
-      var date = '';
-      if (this.newYear) {
-        date = new Date(this.formatDate(self.newYear, self.newMonth, self.newDay));
-        self.initData(this.formatDate(self.newYear, self.newMonth, 1), true);
-      } else {
-        date = new Date();
-        self.initData(self.formatDate(date.getFullYear(), date.getMonth() + 1, 1), true);
-      }
-      // 给定DatetimePicker组件默认值
-      self.pickerValue = date.getFullYear() + '-' + date.getMonth() + 1 + '-' + 1;
-      let m = date.getMonth() + 1;
-      if (m < 10) m = `0${m}`;
-      let d = date.getDate();
-      if (d < 10) d = `0${d}`;
-      this.getCurrentDayData(m + '/' + d + '/' + date.getFullYear());
-      self.startGetData(self.formatDate(date.getFullYear(), date.getMonth() + 1, 1));
+      init.call(this, 'created');
     },
     activated() {
-      var self = this;
-      var date = '';
-      if (this.newYear) {
-        date = new Date(this.formatDate(self.newYear, self.newMonth, self.newDay));
-      } else {
-        date = new Date();
-      }
-      // 给定DatetimePicker组件默认值
-      self.pickerValue = date.getFullYear() + '-' + date.getMonth() + 1 + '-' + 1;
-      let m = date.getMonth() + 1;
-      if (m < 10) m = `0${m}`;
-      let d = date.getDate();
-      if (d < 10) d = `0${d}`;
-      this.getCurrentDayData(m + '/' + d + '/' + date.getFullYear());
+      init.call(this);
     },
     computed: {
-      ...mapState(NAMESPACE, ['newYear', 'newMonth', 'newDay', 'currentYear', 'currentMonth', 'currentDay', 'firstWeek', 'listData', 'currentDayData'])
+      ...mapState(NAMESPACE, ['selectDate', 'newYear', 'newMonth', 'newDay', 'currentYear', 'currentMonth', 'currentDay', 'firstWeek', 'listData', 'currentDayData'])
     },
     methods: {
       ...mapActions(NAMESPACE, ['setYear', 'setMonth', 'setDay', 'setWeek', 'getListData', 'setCurrentDayData', 'getCurrentDayData', 'deletePlan']),
-      ...mapMutations(NAMESPACE, ['setNewYear', 'setNewMonth', 'setNewDay']),
-      // 去掉年月日
+      ...mapMutations(NAMESPACE, ['setSelectDate']),
+      /**
+       * 日期格式化，只返回时分
+       * @param {String} time 必填 日期字符串
+       * @return {String} 时:分 例 15:30
+       */
       formatDateTime(time) {
         return new Date(time).format('hh:mm');
-//        return time.replace(/\d+\/\d+\/\d+\s/, '');
       },
-      // 开始数据请求
-      startGetData(cur) {
-        let date = '';
-        if (cur) {
-          date = new Date(cur);
-        } else {
-          date = new Date();
-        }
-        var self = this;
-        var year = date.getFullYear();
-        var month = date.getMonth() + 1;
-        if (month < 10) month = `0${month}`;
-        var day = this.getcurMonthDays(year, month);
-        if (day < 10) day = `0${day}`;
-        var parmas = {'start': `${month}/01/${year}`, 'end': `${month}/${day}/${year}`};
+      /**
+       * 日期格式化
+       * @param {Object} date 必填 日期对象或日期字符串
+       * @param {String} format 必填 日期格式 例：yyyy-MM-dd
+       * @return {String} 格式化后的日期字符串
+       */
+      format(date, format) {
+        return new Date(date).format(format);
+      },
+      /**
+       * 获取整月数据
+       * @param {Date} date 必填 日期对象
+       */
+      startGetData(date) {
+        let me = this;
+        let yam = date.format('MM/dd/yyyy');
+        let day = date.format('dd');
+        let maxDay = me.getcurMonthDays(date);
+        // 构造某月查询参数，start 为第一天，end 为最后一天
+        let parmas = {'start': yam.replace(`/${day}/`, '/01/'), 'end': yam.replace(`/${day}/`, `/${maxDay}/`)};
         let param = Object.extend(true, {
           callback: (data) => {
-            self.isData(cur, data);
+            // 当月所有计划数据
+            me.monthData = data;
           }
         }, parmas);
-        self.getListData(param); // 获取整月数据
+        // 获取整月数据
+        me.getListData(param);
       },
-      // 新建计划
+      /**
+       * 新建计划
+       */
       createPlan() {
-        var currentYear = this.currentYear;
-        var currentMonth = this.currentMonth;
-        var day = this.selectIndex - (this.beforeSpaces.length - 1);
-        this.setNewYear(currentYear);
-        this.setNewMonth(currentMonth);
-        this.setNewDay(day);
         this.$router.push({
           path: './add'
         });
       },
+      /**
+       * 计划左滑操作
+       */
       operation(item, id, index) {
+        // 页面跳转参数
         var params = Object.assign({}, {
           'id': id,
           'index': index,
@@ -216,12 +202,6 @@
         });
         // 如果状态是未开始才有操作按钮
         if (item['Status INT'] === 'Not Started') {
-          var currentYear = this.currentYear;
-          var currentMonth = this.currentMonth;
-          var day = this.selectIndex - (this.beforeSpaces.length - 1);
-          this.setNewYear(currentYear);
-          this.setNewMonth(currentMonth);
-          this.setNewDay(day);
           return [
             {
               content: '编辑',
@@ -245,21 +225,19 @@
           return [];
         }
       },
-      // 删除计划
+      /**
+       * 删除计划
+       */
       deletePlanBox(params) {
-        var self = this;
+        var me = this;
         MessageBox.confirm('你确定删除吗?').then(action => {
-          self.deletePlan(params);
+          me.deletePlan(params);
         });
       },
-      // 跳转详情
+      /**
+       * 跳转计划详情
+       */
       toDetail(index) {
-        var currentYear = this.currentYear;
-        var currentMonth = this.currentMonth;
-        var day = this.selectIndex - (this.beforeSpaces.length - 1);
-        this.setNewYear(currentYear);
-        this.setNewMonth(currentMonth);
-        this.setNewDay(day);
         this.$router.push({
           path: './detail',
           query: {
@@ -267,299 +245,177 @@
           }
         });
       },
-      // 打开日期面板
+      /**
+       * 打开年/月选择面板
+       */
       openPicker() {
+        // 给定DatetimePicker组件默认值
+        this.pickerValue = now;
         this.$refs.picker.$el.lastChild.lastChild.children[2].style.display = 'none'; // 隐藏日选择
         this.$refs.picker.open();
       },
-      // 确认日期选择
+      /**
+       * 选择月份
+       */
       handleConfirm(date) {
         this.pickPreNext(date.getFullYear(), date.getMonth(), 42);
       },
-      // 格式化日期
-      formatDate(year, month, day) {
-        const y = year;
-        let m = month;
-        if (m < 10) m = `0${m}`;
-        let d = day;
-        if (d < 10) d = `0${d}`;
-        return `${y}/${m}/${d}`;
-      },
-      // 判断是否有数据
-      isData(cur, data) {
-        // 循环当月总天数
-        var curMonthDays = this.getcurMonthDays(this.currentYear, this.currentMonth);
-        this.alldayData = new Array(curMonthDays).fill([], 0, curMonthDays);
-        for (let i = 1; i <= curMonthDays; i += 1) {
-          if (data) {
-            for (var j = 0; j < data.length; j++) {
-              // if (new Date(data[j].Planned).getDate() === i) {
-              //   this.alldayData[i - 1] += '/' + data[j]['Status INT'];
-              // }
-              if (new Date(data[j].Planned) <= new Date(this.formatDate(this.currentYear, this.currentMonth, i) + ' ' + '23:59:59') && new Date(data[j]['Planned Completion']) >= new Date(this.formatDate(this.currentYear, this.currentMonth, i) + ' ' + '00:00:00')) {
-                this.alldayData[i - 1] += '/' + data[j]['Status INT'];
-              }
-            }
-          }
-        }
-      },
-      // 初始化日期
-      initData(cur, init) {
-        let date = '';
-        if (cur) {
-          date = new Date(cur);
-        } else {
-          date = new Date();
-        }
-        this.setDay(date.getDate());
-        this.setYear(date.getFullYear());
-        this.setMonth(date.getMonth() + 1);
-        this.setWeek(date.getDay());
-        const str = this.formatDate(this.currentYear, this.currentMonth, 1);
-        this.days.length = 0;
+      /**
+       * 初始化日期
+       */
+      initData(iDate) {
+        let me = this;
+        const date = new Date(`${iDate.format('yyyy/MM')}/01`);
+        // 设置当前查看日期
+        me.setDay(iDate.getDate());
+        me.setYear(iDate.getFullYear());
+        me.setMonth(iDate.getMonth() + 1);
+        me.setWeek(date.getDay());
+        me.days.length = 0;
         // 没有的日期用 "spaces" 代替
-        var beforeSpaces = new Array(this.firstWeek - 1).fill('spaces', 0, this.firstWeek - 1);
-        this.beforeSpaces = beforeSpaces;
+        var beforeSpaces = new Array(me.firstWeek - 1).fill('spaces', 0, me.firstWeek - 1);
+        me.beforeSpaces = beforeSpaces;
         beforeSpaces.forEach((item, index) => {
-          this.days.push(item);
+          me.days.push(item);
         });
         // 把当前日期放入数组
-        const d = new Date(str);
-        this.days.push(d);
-        this.isSevenDay();
+        me.days.push(date);
+        // 计算满7天存入日历
+        me.isSevenDay();
         // 循环当月总天数
-        var curMonthDays = this.getcurMonthDays(this.currentYear, this.currentMonth);
-        this.alldayData = new Array(curMonthDays).fill([], 0, curMonthDays);
-        for (let i = 1; i <= curMonthDays; i += 1) {
-          const d = new Date(str);
+        var curMonthDays = me.getcurMonthDays(new Date(me.currentYear, me.currentMonth, 0));
+        for (let i = 1; i <= curMonthDays; i++) {
+          let d = new Date(date);
           if (i < curMonthDays) {
             // 小于当月最大天数，放入数组
             d.setDate(d.getDate() + i);
-            this.days.push(d);
+            me.days.push(d);
           } else {
             // 不足7天用 "spaces" 代替
-            for (let j = this.days.length; j < 7; j++) {
-              this.days.push('spaces');
-            }
+            for (let j = me.days.length; j < 7; j++) me.days.push('spaces');
           }
-          this.isSevenDay();
-          var initDay = init ? new Date().getDate() : this.currentDay;
-          if (i === initDay && this.isToDay(this.currentYear, this.currentMonth, initDay)) {
-            this.selectIndex = this.firstWeek + i - 2;
-          } else if (this.$route.query.day) {
-            this.selectIndex = this.$route.query.day * 1 + (this.beforeSpaces.length - 1);
-            this.isSelected = new Array(42).fill(false, 0, 42);
-            this.isSelected[this.$route.query.day * 1 + (this.beforeSpaces.length - 1)] = true;
-          }
+          // 计算满7天存入日历
+          me.isSevenDay();
         }
       },
-      setRestOrWork(type) {
-        if (this.onlySelect()) {
-          this.params.type = type;
-        }
-      },
-      // 是否有7天数据，有的话push给 "daysUL"
+      /**
+       * 是否有7天数据，有的话push给 "daysUL"
+       * 如果没有7天不在此填充，后续补充空格
+       */
       isSevenDay() {
         if (this.days.length % 7 === 0) {
           this.daysUL.push(this.days);
           this.days = [];
         }
       },
-      // 是否的当天
-      isToDay(year, month, day) {
-        var toDate = new Date();
-        return toDate.getFullYear() === year && toDate.getMonth() + 1 === month && toDate.getDate() === day;
+      /**
+       * 是否当月
+       * @param {String} date 必填 日期对象
+       * @returns {Blooean} true/false
+       */
+      isToMonth(date) {
+        return now.format('yyyy-MM') === date.format('yyyy-MM');
       },
-      // 是否的当月
-      isToMonth(year, month) {
-        var toDate = new Date();
-        var day = toDate.getDate();
-        if (toDate.getFullYear() === year && toDate.getMonth() + 1 === month) {
-          this.selectIndex = day + this.beforeSpaces.length;
-          return true;
-        } else {
-          return false;
-        }
+      /**
+       * 获取某月总天数
+       * @param {Date} date 必填 日期对象
+       * @returns {String} 该月的总天数
+       */
+      getcurMonthDays(date) {
+        return new Date(new Date(new Date(date).setMonth(date.getMonth() + 1)).setDate(0)).getDate();
       },
-      // 获取当月有多少天
-      getcurMonthDays(year, month) {
-        var curMonthDays = new Date(year, month, 0).getDate();
-        return curMonthDays;
-      },
-      // 上一個月&下一个月   传入当前年份和月份
+      /**
+       * 页面点击 上一個月&下一个月
+       * @param {String} year 必填 年
+       * @param {String} month 必填 月
+       * @param {String} num 必填 日
+       */
       pickPreNext(year, month, num) {
-        this.setNewYear('');
-        this.setNewMonth('');
-        this.setNewDay('');
-        this.daysUL = [];
-        this.isSelected = [];
-        this.selectIndex = '';
-        const d = new Date(this.formatDate(year, month === 0 ? 1 : month, 1));
-        d.setDate(num);
-        var curmnth = 0;
-        if (month === 0) {
-          curmnth = d.getMonth();
-        } else {
-          curmnth = d.getMonth() + 1;
-        }
-        if (this.isToMonth(d.getFullYear(), curmnth)) {
-          this.initData(this.formatDate(d.getFullYear(), curmnth, 1), true);
-          let m = curmnth;
-          if (m < 10) m = `0${m}`;
-          let day = new Date().getDate();
-          if (day < 10) day = `0${day}`;
-          // 请求当天的数据
-          this.getCurrentDayData(m + '/' + day + '/' + d.getFullYear());
-          this.isShowBtn = true;
-        } else {
-          this.initData(this.formatDate(d.getFullYear(), curmnth, 1), true);
-          this.isShowBtn = false;
-          this.setCurrentDayData([]); // 清空数据
-        }
-        this.startGetData(this.formatDate(d.getFullYear(), curmnth, 1));
+        let me = this;
+        const date = new Date(year, month - 1, num);
+        // 是否本月
+        let toMonth = me.isShowBtn = me.isToMonth(date);
+        // 清空月数据
+        me.daysUL = [];
+        // 清空天数据
+        me.setCurrentDayData([]);
+        // 初始化日历
+        me.initData(date);
+        // 如果是当月 获取选择天的数据
+        if (toMonth) me.pick(new Date(date.setDate(now.getDate())));
+        // 获取整月数据
+        me.startGetData(date);
       },
-      // 这个方法没有地方用到
-      dealResult(currentYear, currentMonth) {
-        this.banList = [];
-        this.xiuList = [];
-        this.isBan = [];
-        this.isXiu = [];
-        let zhouji = new Date(this.formatDate(currentYear, currentMonth, 1)).getDay();
-        if (zhouji === 0) {
-          zhouji = 7;
-        }
-        for (let i = 0; i < this.restDaysList.length;i++) {
-          this.restDays = this.restDaysList[i];
-          if (this.restDays.resttype === 'W') {
-            let ban = this.restDays.day - 1 + (zhouji - 1);
-            this.banList.push(ban);
-          }
-          if (this.restDays.resttype === 'R') {
-            let xiu = this.restDays.day - 1 + (zhouji - 1);
-            this.xiuList.push(xiu);
-          }
-        }
-        for (let m = 0; m < 42; m++) {    // banlist 里面放置的都是在日历上处于几号位，而不是工作日的日期，
-          let nothave = true;           // 所以得把这些位置号拎出来，给它们于不同的样式
-          for (let k = 0; k < this.banList.length; k++) {
-            if (m === this.banList[k]) {
-              this.isBan.push(true);
-              nothave = false;
-              break;
-            }
-          }
-          if (nothave) {
-            this.isBan.push(false);
-          }
-        }
-        for (let n = 0; n < 42; n++) {   // 同上，来处理休息日
-          let nothave = true;
-          for (let k = 0; k < this.xiuList.length; k++) {
-            if (n === this.xiuList[k]) {
-              this.isXiu.push(true);
-              nothave = false;
-              break;
-            }
-          }
-          if (nothave) {
-            this.isXiu.push(false);
-          }
-        }
+      /**
+       * 用户点击日期事件
+       * @param {String} day 必填 用户点击的日期对象
+       */
+      pick(date) {
+        let me = this;
+        // 点击的为空白区域，视为无效点击
+        if (date === 'spaces') return;
+        // 记录用户点击日期
+        me.setSelectDate(date);
+        // 页面跳转参数 记录点击日期
+        me.params.selectDay = date.format('yyyy/MM/dd');
+        me.setDay(date.getDate());
+        me.setYear(date.getFullYear());
+        me.setMonth(date.getMonth() + 1);
+        // 判断是否可以新建计划
+        me.isCreatePlan(date);
+        // 清空数据
+        me.setCurrentDayData([]);
+        // 获取当天的计划
+        me.getCurrentDayData(date.format('MM/dd/yyyy'));
       },
-      // 返回今天(没有调用)
-      returnNow() {
-        this.daysUL = [];
-        this.initData(null);
-      },
-      // 当前选择日期
-      pick(date, index) {
-        // 如果当前日期为 ‘spaces’ 直接返回
-        if (date === 'spaces') {
-          return;
-        }
-        this.selectIndex = index;
-        this.isSelected = [];
-        this.params.selectDay = this.formatDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
-        this.setDay(date.getDate());
-        this.setYear(date.getFullYear());
-        this.setMonth(date.getMonth() + 1);
-        for (let i = 0; i < 42; i++) {
-          if (index === i) {
-            this.isSelected.push(true);
-            continue;
-          }
-          this.isSelected.push(false);
-        }
-        this.isCreatePlan(date);
-        let m = date.getMonth() + 1;
-        if (m < 10) m = `0${m}`;
-        let day = date.getDate();
-        if (day < 10) day = `0${day}`;
-        this.setCurrentDayData([]); // 清空数据
-        // 请求当天的数据
-        this.getCurrentDayData(m + '/' + day + '/' + date.getFullYear());
-      },
-      // 判断是否可以新建计划，小于当前日期不可新建
+      /**
+       * 判断是否可以新建计划
+       * 未选择日期 或 小于当前日期不可新建
+       * @param {String} date 必填 日期对象
+       */
       isCreatePlan(date) {
-        // 当前年月日
-        var nowDate = new Date();
-        var year = nowDate.getFullYear();
-        var month = nowDate.getMonth() + 1;
-        var day = nowDate.getDate();
-        // 点击的年月日数据
-        var tapDateTime = new Date(this.formatDate(date.getFullYear(), date.getMonth() + 1, date.getDate())).getTime();
-        var currDate = new Date(this.formatDate(year, month, day)).getTime();
-        // 如果当前日期大于点击的日期，则不能新建
-        if (currDate > tapDateTime && this.selectIndex) {
-          this.isShowBtn = false;
-        } else {
-          this.isShowBtn = true;
-        }
+        this.isShowBtn = date && new Date(new Date(date).setDate(date.getDate() + 1)) > now;
       },
-      // 是否显示红点
-      isHavePlan(day, index) {
-        var noArray = this.alldayData[index - this.beforeSpaces.length];
-        /* if (day !== 'spaces' && noArray && noArray.length > 0 && noArray.indexOf('Done') > -1 && noArray.indexOf('Not Started') === -1) {
-          return 'red';
-        } else if (day !== 'spaces' && noArray && noArray.length > 0 && noArray.indexOf('Not Started') > -1) {
-          return 'flag';
-        } else {
-          return 'none';
-        }*/
-        /*
-        * 2018/05/08
-        * qjm
-        * 修改内容：工作计划还会存在其他的工作任务 会同步到工作计划中，之前判断的的逻辑只是工作计划中的状态
-        * */
-        var val = 'none';
-//        console.log('day:' + day);
-//        console.log(noArray);
-       /* console.log(noArray.indexOf('Done'));
-        console.log(noArray.indexOf('Not Started'));*/
-        /*
-          day 代表当前日期 如果 day === 'spaces' 说明是空格，没有日期
-          noArray 当天的所有数据状态集合 noArray.length > 0 说明有数据 没有数据为undefined
-          noArray.indexOf('Done') 当天数据是否有完成状态的数据
-          noArray.indexOf('Not Started') 当天数据是否有未开始状态的数据
-        */
-        if (day !== 'spaces' && noArray && noArray.length > 0) {
-          val = 'flag';
+      /**
+       * 计算某天所有的任务状态
+       * @param {String} date 必填 日期对象
+       */
+      calcDayState(date) {
+        let state = '';
+        // 当月所有计划数据
+        let data = this.monthData;
+        if (data) {
+          for (var j = 0; j < data.length; j++) {
+            // 判断某天是否有计划，并记录所有计划状态
+            // 计划开始时间 <= 某天晚时间 && 计划完成时间 >= 某天最早时间
+            if (new Date(data[j].Planned) <= new Date(`${date.format('yyyy/MM/dd')} 23:59:59`) && new Date(data[j]['Planned Completion']) >= new Date(`${date.format('yyyy/MM/dd')} 00:00:00`)) {
+              state += '/' + data[j]['Status INT'];
+            }
+          }
         }
-        /*
-          必须满足一下条件才显示红点
-          1、 day 不能等于 'spaces'
-          2、 noArray 必须为true
-          3、noArray.length> 0 当天必须有数据
-          4、noArray.indexOf('Done') > -1 必须存在完成状态的数据
-          5、noArray.indexOf('Not Started') === -1 当天不能有未开始状态的数据
-        */
-        if (day !== 'spaces' && noArray && noArray.length > 0 && noArray.indexOf('Done') > -1 && noArray.indexOf('Not Started') === -1) {
-          val = 'red';
+        return state;
+      },
+      /**
+       * 日历每天的点颜色标记
+       * 红色：某天有未完成的计划
+       * 灰色：已完成某天所有计划
+       * @param {String} day 必填 日期对象
+       */
+      isHavePlan(day) {
+        let style = 'none';
+        // 空白块不需要计算，不显示小点
+        if (day === 'spaces') return style;
+        // 计算某天所有的任务状态
+        let state = this.calcDayState(day);
+        // 该天有任务，日历下显示小点
+        if (state) {
+          // 默认灰点
+          style = 'flag';
+          // 如果有未完成的计划 展示红点
+          if (state.replace(/\/Done/g, '')) style = 'red';
         }
-        return val;
+        return style;
       }
-    },
-    mounted() {
     }
   };
 

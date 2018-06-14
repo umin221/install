@@ -6,7 +6,9 @@ import api from '../api/api';
 Vue.use(Vuex);
 
 // 缓存页面
-app.state.alive = ['index'];
+// app.state.alive = ['index'];
+// 当前时间对象
+const now = new Date();
 
 export default new Vuex.Store({
   modules: {
@@ -17,6 +19,7 @@ export default new Vuex.Store({
         newYear: '',
         newMonth: '',
         newDay: '',
+        selectDate: now, // 当前选择的日期，默认当天
         currentYear: 1970,   // 年份
         currentMonth: 1,  // 月份
         currentDay: 1,    // 日期
@@ -95,14 +98,16 @@ export default new Vuex.Store({
         }
       },
       mutations: {
-        setNewYear(state, year) {
-          state.newYear = year;
-        },
-        setNewMonth(state, month) {
-          state.newMonth = month;
-        },
-        setNewDay(state, day) {
-          state.newDay = day;
+        /**
+         * 设置选择日期
+         * @param {Date} date 必填 日期对象
+         */
+        setSelectDate(state, date) {
+          state.selectDate = date;
+          state.newYear = date.getFullYear();
+          state.newMonth = date.getMonth();
+          state.newDay = date.getDate();
+          if (state.newMonth) state.newMonth++;
         },
         currentYear(state, year) {
           state.currentYear = year;

@@ -46,22 +46,22 @@
         :endHour="startPickerHour"
         @confirm="startPickerConfirm">
       </mt-datetime-picker>
-      <mt-datetime-picker
-        ref="endPicker"
-        type="time"
-        @confirm="endPickerConfirm"
-        :startHour="startHour"
-        :endHour="startPickerHour">
-      </mt-datetime-picker>
+      <!--<mt-datetime-picker-->
+        <!--ref="endPicker"-->
+        <!--type="time"-->
+        <!--@confirm="endPickerConfirm"-->
+        <!--:startHour="startHour"-->
+        <!--:endHour="startPickerHour">-->
+      <!--</mt-datetime-picker>-->
     <mt-datetime-picker
       ref="pickerEnd"
       v-model="pickerVisibleEnd"
       :endDate="eDate"
       type="datetime"
-      year-format="{value} 年"
-      month-format="{value} 月"
-      date-format="{value} 日"
-      hour-format="{value} 时"
+      year-format="{value}"
+      month-format="{value}月"
+      date-format="{value}日"
+      hour-format="{value}时"
       class="datetime"
       @confirm="handleChangePlan">
     </mt-datetime-picker>
