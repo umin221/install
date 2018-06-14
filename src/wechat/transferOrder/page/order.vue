@@ -50,7 +50,7 @@
                    <!--is-link></mt-cell>-->
         </div>
 
-        <lazy :time="400">
+        <lazy :time="500">
           <div class="lock-line">
             <lock-line v-for="(g, key) in group"
                        :title="g.label"

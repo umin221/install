@@ -42,7 +42,7 @@
               :edit="false">
       </attach>
 
-      <lazy :time="400">
+      <lazy :time="500">
         <div class="install-order" v-show="!isPending">
           <title-group>安装订单</title-group>
           <mt-cell-swipe class="multiple"

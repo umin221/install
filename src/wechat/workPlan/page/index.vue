@@ -42,7 +42,7 @@
           </li>
         </ul>
       </div>
-      <lazy :time="400">
+      <lazy :time="500">
         <div class="planList">
           <!--<mt-cell-swipe  v-for="(item, index) in currentDayData" :key="index" ref="body"
             @click.native="toDetail(index)"

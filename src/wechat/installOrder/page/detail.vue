@@ -55,7 +55,7 @@
         <div style="height: 0.5rem;background: #eaeaea;"></div>
         <div class="mint-content-info" :class="{disable: !editable}" style="padding-bottom: 50px;background-color: #eaeaea;">
 
-          <lazy :time="400">
+          <lazy :time="500">
             <div class="lock-line">
               <lock-line v-for="(g, key) in group"
                          :title="g.label"
