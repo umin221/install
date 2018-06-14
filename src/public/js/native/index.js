@@ -148,7 +148,7 @@ import queue from '../base/queue';
      * 扫一扫
      * @param {String} option.desc
      * @param {Number} option.needResult 默认为0，扫描结果由企业微信处理，1则直接返回扫描结果，
-     * @param {String} option.scanType 可以指定扫二维码还是一维码，默认二者都有
+     * @param {String} option.scanType 可以指定扫二维码还是一维码，默认扫条码 ["qrCode", "barCode"]
      * @response {String} res.errMsg scanQRCode:ok
      * @response {String} res.resultStr xxxx 扫描结果
      */
@@ -156,7 +156,7 @@ import queue from '../base/queue';
       wx.scanQRCode(Object.assign({
         desc: 'scanQRCode desc',
         needResult: 1,
-        scanType: ['qrCode', 'barCode'],
+        scanType: ['barCode'],
         success: function(res) {
           console.log(res);
         },
