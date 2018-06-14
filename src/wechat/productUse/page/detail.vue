@@ -34,7 +34,7 @@
         <mt-button class="single"
                    @click.native="submitFn('Approved')">确认</mt-button>
       </button-group>
-      <button-group v-if="(orderEntry['Status LIC'] === 'Draft'||orderEntry['Status LIC'] === 'Rejected' || orderEntry['Status LIC'] === 'WMS Rejected') && option !== 'approval'">
+      <button-group v-if="(userInfo['Id'] === item['Primary Position Contact Id'] && orderEntry['Status LIC'] === 'Draft'||orderEntry['Status LIC'] === 'Rejected' || orderEntry['Status LIC'] === 'WMS Rejected') && option !== 'approval'">
         <mt-button class="single"
                    @click.native="submitApproval">编辑</mt-button>
       </button-group>

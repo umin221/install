@@ -17,7 +17,7 @@
         <div slot="title" class="list-text">
           <span>产品条形码:</span><span>{{item['Serial Number']}}</span>
         </div>
-        <div slot="title" class="list-text"><span></span><span>{{item.Province}}{{item.City}}{{item['Street Address']}}{{item['Street Address 2']}}{{item['Street Address 3']}}{{item['Street Address 4']}}</span></div>
+        <div slot="title" class="list-text"><span></span><span>{{item.Province}}{{item.City}} {{item['Street Address']}}  {{item['Street Address 2']}}  {{item['Street Address 3']}}  {{item['Street Address 4']}}</span></div>
       </mt-cell-swipe>
       <button-group>
         <mt-button class="single"

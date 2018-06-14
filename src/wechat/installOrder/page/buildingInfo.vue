@@ -129,6 +129,7 @@
     }
     return isMun;
   };
+  let numTest = /^[1-9]\d*$/;
   const NameSpace = 'buildingInfo';
   export default {
     name: 'buildingInfo',
@@ -270,6 +271,18 @@
       },*/
       submitFn: function() {
         var self = this;
+        if (!numTest.test(self.buildingNum)) {
+          Toast('楼栋数必须为正整数');
+          return;
+        }
+        if (!numTest.test(self.layerNum)) {
+          Toast('层数必须为正整数');
+          return;
+        }
+        if (!numTest.test(self.roomNum)) {
+          Toast('房间数必须为正整数');
+          return;
+        }
         api.get({
           key: 'setBuild',
           method: 'POST',

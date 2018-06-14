@@ -70,10 +70,10 @@
       <button-group>
         <mt-button class="single"
                    v-show="showZs"
-                   @click.native="nextPageFn" v-text="butText"></mt-button>
+                   @click.native="toSaveFn(4)" v-text="butText"></mt-button>
         <mt-button class="single"
                    v-show="!showZs"
-                   @click.native="submitFn">提交</mt-button>
+                   @click.native="toSaveFn(3)">提交</mt-button>
       </button-group>
       <mt-datetime-picker
         ref="picker"
@@ -173,7 +173,7 @@
           self.companyId = self.pcObj['KL Partner Id'];
           self.companyName = self.pcObj['KL Partner Name'];
           self.ContactName = self.pcObj['KL Partner Contact Name'];
-          self.ContactWorkPhone = self.pcObj['KL Partner Contact Work Phone'] || self.pcObj['KL Property Contact Cellular Phone'];
+          self.ContactWorkPhone = self.pcObj['KL Partner Contact Cellular Phone'];
           self.getPlanList(self.batchCode); // 详细计划
           self.getInstallerList(self.batchCode); // 委外联系人
           self.getQueryMedias(self.batchCode); // 附件
@@ -488,7 +488,7 @@
               self.companyId = data['KL Partner Id'];
               self.companyName = data['KL Partner Name'];
               self.ContactName = data['KL Partner Contact Name'];
-              self.ContactWorkPhone = data['KL Partner Contact Work Phone'] || data['KL Property Contact Cellular Phone'];
+              self.ContactWorkPhone = data['KL Partner Contact Cellular Phone'];
               self.getPcObj(data); // 保存store
               if (self.pcObj['Calculated Activity Status'] === 'Declined') {
                 self.butText = '提交';
@@ -606,57 +606,62 @@
                     if (self.attach.list.length > 0) {
                       uploadAttach(self.id);
                     }
-                    if (num === '1' || num === 2 || num === 5) { // 保存或者详细计划时不选择委外 则把之前的数据清空
-                      // 判断是否选择委外
-                      var insId = ''; // 判断是否有委外联系人  有则清空
-                      if (self.installerList.length > 0) {
-                        insId = self.installerList[0]['Party UId'];
-                      };
-                      if (!self.box1) {
-                        if (self.companyId) { // 清空合作伙伴
-                          self.companyId = '';
-                          self.companyName = '';
-                          var parma = {
-                            'Id': self.id,
-                            'KL Partner Id': ''
-                          };
-                          api.get({ // 提交数据
-                            key: 'getUPData',
-                            method: 'PUT',
-                            data: parma,
-                            success: function(data) {
-                            }
-                          });
-                        }
-                        if (insId) { // 清空联系人
-                          api.get({
-                            key: 'selIntaller',
-                            method: 'POST',
-                            data: {
-                              'body': {
-                                'SiebelMessage': {
-                                  'MessageId': '',
-                                  'MessageType': 'Integration Object',
-                                  'IntObjectName': 'Base KL Installation Task',
-                                  'IntObjectFormat': 'Siebel Hierarchical',
-                                  'ViewMode': 'AllView',
-                                  'ListOfBase KL Installation Task': {
-                                    'KL Installation Task': {
-                                      'Id': self.id,
-                                      'ListOfContact': {}
-                                    }
-                                  }
-                                }
-                              }
-                            },
-                            success: function(data) {
-                              if (!data.ERROR) {
-                                self.installerList = [];
-                              }
-                            }
-                          });
-                        }
-                      }
+                    if (num === '1' || num === 2 || num === 5) {
+                      /**
+                       *  2018/05/10
+                       *  根据变更需求 合同伙伴由支持专员分配 ，就不存在 编辑合同伙伴删除委外联系人
+                       *  qjm
+                       // 保存或者详细计划时不选择委外 则把之前的数据清空
+                       // 判断是否选择委外
+                       var insId = ''; // 判断是否有委外联系人  有则清空
+                       if (self.installerList.length > 0) {
+                         insId = self.installerList[0]['Party UId'];
+                       };
+                       if (!self.box1) {
+                         if (self.companyId) { // 清空合作伙伴
+                           self.companyId = '';
+                           self.companyName = '';
+                           var parma = {
+                             'Id': self.id,
+                             'KL Partner Id': ''
+                           };
+                           api.get({ // 提交数据
+                             key: 'getUPData',
+                             method: 'PUT',
+                             data: parma,
+                             success: function(data) {
+                             }
+                           });
+                         }
+                         if (insId) { // 清空联系人
+                           api.get({
+                             key: 'selIntaller',
+                             method: 'POST',
+                             data: {
+                               'body': {
+                                 'SiebelMessage': {
+                                   'MessageId': '',
+                                   'MessageType': 'Integration Object',
+                                   'IntObjectName': 'Base KL Installation Task',
+                                   'IntObjectFormat': 'Siebel Hierarchical',
+                                   'ViewMode': 'AllView',
+                                   'ListOfBase KL Installation Task': {
+                                     'KL Installation Task': {
+                                       'Id': self.id,
+                                       'ListOfContact': {}
+                                     }
+                                   }
+                                 }
+                               }
+                             },
+                             success: function(data) {
+                               if (!data.ERROR) {
+                                 self.installerList = [];
+                               }
+                             }
+                           });
+                         }
+                       }*/
                       if (num === '1') {
                         let planType = self.itemTask['KL Detail Type']; // 取统一批次
                         self.$router.push({
@@ -688,6 +693,10 @@
                           }
                         });
                       }
+                    } else if (num === 3) {
+                      self.submitFn();
+                    } else if (num === 4) {
+                      self.nextPageFn();
                     }
                   }
                 }

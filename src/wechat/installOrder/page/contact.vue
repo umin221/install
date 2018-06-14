@@ -94,7 +94,7 @@
       saveFn() {
         tools.valid.call(this, () => {
           let c = this.contact;
-          c['Phone #'] = c['Login Name'];
+          c['Cellular Phone #'] = c['Login Name'];
           // 保存联系人
           this.upsertContact(this.contact);
         });
