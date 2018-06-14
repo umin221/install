@@ -418,6 +418,7 @@
           // 如果有未完成的计划 展示红点S
           state = state.replace(/\/Done/g, '');
           state = state.replace(/\/Ignore/g, '');
+          state = state.replace(/\/Closed/g, '');
           if (state) style = 'red';
         }
         return style;
