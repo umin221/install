@@ -415,8 +415,10 @@
         if (state) {
           // 默认灰点
           style = 'flag';
-          // 如果有未完成的计划 展示红点
-          if (state.replace(/\/Done/g, '')) style = 'red';
+          // 如果有未完成的计划 展示红点S
+          state = state.replace(/\/Done/g, '');
+          state = state.replace(/\/Ignore/g, '');
+          if (state) style = 'red';
         }
         return style;
       }

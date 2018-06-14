@@ -34,7 +34,7 @@
         <mt-button class="single"
                    @click.native="submitFn('Approved')">确认</mt-button>
       </button-group>
-      <button-group v-if="(userInfo['Id'] === item['Primary Position Contact Id'] && orderEntry['Status LIC'] === 'Draft' || orderEntry['Status LIC'] === 'Rejected' || orderEntry['Status LIC'] === 'WMS Rejected') && option !== 'approval'">
+      <button-group v-if="show_edit(orderEntry)">
         <mt-button class="single"
                    @click.native="submitApproval">编辑</mt-button>
       </button-group>
@@ -96,6 +96,14 @@
       ...mapActions(NameSpace, ['getOrderEntry']),
       ...mapActions('add', ['toApproval']),
       ...mapMutations('add', ['selectProduct', 'initSelect', 'setId']),
+      show_edit(orderEntry) {
+        var self = this;
+        if (userInfo['Id'] === orderEntry['Primary Position Contact Id'] && (orderEntry['Status LIC'] === 'Draft' || orderEntry['Status LIC'] === 'Rejected' || orderEntry['Status LIC'] === 'WMS Rejected') && self.option !== 'approval') {
+          return true;
+        } else {
+          return false;
+        }
+      },
       toDate(time) {
         if (time) {
           return KND.Util.format(time, 'yyyy-MM-dd hh:mm:ss');
