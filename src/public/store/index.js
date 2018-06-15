@@ -103,7 +103,7 @@ export const app = {
       let data = option.data;
       let MediaId = data.MediaId;
       // 企业微信 与 公众号 非同一个上传接口
-      let url = appNo === 'wechat' ? `${config.host}/weixin-service/authorized/upload_attachment` : `${proxy}/webchat/api/external/uploadattachment`;
+      let url = appNo === 'wechat' ? `${config.host}/weixin-service/authorized/upload_attachment` : `${proxy}/webchat/download/external/uploadattachment`;
       option.success = option.success || (data => console.log(data));
       option.error = option.error || (data => console.log(data));
       // 提交 siebel
