@@ -136,7 +136,7 @@
       previewFileFn(item) {
         KND.Native.previewFile({
           url: item.src,
-          name: item.AgreeFileName,
+          name: `${item.AgreeFileName}.${item.AgreeFileExt}`,
           size: item.AgreeFileSize
         });
       },
