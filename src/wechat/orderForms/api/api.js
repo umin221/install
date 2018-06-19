@@ -40,13 +40,17 @@ let ApiList = {
   },
   getSearchList: option => {
     option.data.team = option.data.obj.team ? 'Manager' : 'Sales Rep';
+    var searchSpec = '[Order Entry - Orders.Order Type LIC]= "Service Order" AND [Order Entry - Orders.Order Number] ~LIKE "*' + option.data.obj.orNumber + '*"';
+    if (option.data.team === 'Manager') {
+      searchSpec += ' OR [Order Entry - Orders.KL Primary Owner] ~LIKE "*' + option.data.obj.orNumber + '*"';
+    }
     return {
       method: 'post',
       url: 'service/EAI Siebel Adapter/QueryPage',
       data: {
         'body': {
           'OutputIntObjectName': 'Base Order Entry',
-          'SearchSpec': '[Order Entry - Orders.Order Type LIC]= "Service Order" AND [Order Entry - Orders.Order Number] ~LIKE "*' + option.data.obj.orNumber + '*" OR [Order Entry - Orders.KL Primary Owner] ~LIKE "*' + option.data.obj.orNumber + '*"',
+          'SearchSpec': searchSpec, // '[Order Entry - Orders.Order Type LIC]= "Service Order" AND [Order Entry - Orders.Order Number] ~LIKE "*' + option.data.obj.orNumber + '*" OR [Order Entry - Orders.KL Primary Owner] ~LIKE "*' + option.data.obj.orNumber + '*"',
           'StartRowNum': option.paging.StartRowNum,
           'ViewMode': option.data.team,
           'PageSize': option.paging.PageSize

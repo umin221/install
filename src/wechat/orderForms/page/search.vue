@@ -1,6 +1,7 @@
 <template>
   <div class="search">
     <cus-search v-model="value"
+                :show="true"
                 placeholder="请输入订单号或者负责人">
 
         <cus-loadmore ref="result"
@@ -35,7 +36,7 @@
     let list = args.pop();
     let param = Object.extend(true, {
       callback: (data) => {
-        me.$refs[list][event](data.length);
+        me.$refs[list][event](data.SiebelMessage['Order Entry - Orders'].length);
       }
     }, args.pop() || {});
     me.getSearchList(param);

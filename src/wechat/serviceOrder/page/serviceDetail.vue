@@ -103,7 +103,7 @@
                   <toggle :title="false"
                           label="完工确认单"
                           @ck="showAttach({id:item.Id, index:index, type:'Job Sheet',len:JobSheet[index].list.length})">
-                    <empty v-show="!item['KL Child SR Order']"></empty>
+                    <empty v-if="!item['KL Child SR Order'] && JobSheet[index].list.length === 0"></empty>
                     <div v-if="item['KL Child SR Order']">
                       <div class="enter-order">
                         <div>保修期</div>
@@ -121,12 +121,12 @@
                       <div class="enter-order">
                         <div>总金额：{{item['KL Child SR Order']['Order Total']}}</div>
                       </div>
-                      <attach ioName="KL Service Request Attachment IO" ref="attach"
-                              :attach="JobSheet[index].list"
-                              :edit="JobSheet[index].edit"
-                              :title="JobSheet[index].title">
-                      </attach>
                     </div>
+                    <attach ioName="KL Service Request Attachment IO" ref="attach"
+                            :attach="JobSheet[index].list"
+                            :edit="JobSheet[index].edit"
+                            :title="JobSheet[index].title">
+                    </attach>
                   </toggle>
                 </div>
               </toggle>
@@ -164,7 +164,7 @@
                     </ul>
                   </toggle>
                   <toggle :title="false" label="完工确认单">
-                    <empty v-show="!ServiceRequest['Order Entry - Orders']"></empty>
+                    <empty v-if="!ServiceRequest['Order Entry - Orders'] && attach2.list.length === 0"></empty>
                     <div v-if="ServiceRequest['Order Entry - Orders']">
                       <div class="enter-order">
                         <div>保修期</div>
@@ -183,12 +183,12 @@
                       <div class="enter-order">
                         <div>总金额：{{orderEntry['Order Total']}}</div>
                       </div>
-                      <attach ioName="KL Service Request Attachment IO" ref="attach"
-                              :attach="attach2.list"
-                              :edit="attach2.edit"
-                              :title="attach2.title">
-                      </attach>
                     </div>
+                    <attach ioName="KL Service Request Attachment IO" ref="attach"
+                            :attach="attach2.list"
+                            :edit="attach2.edit"
+                            :title="attach2.title">
+                    </attach>
                   </toggle>
                 </div>
               </toggle>

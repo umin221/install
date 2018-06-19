@@ -1,6 +1,7 @@
 <template>
   <div class="search">
     <cus-search v-model="value"
+                :show="true"
                 placeholder="请输入服务单编号">
 
         <cus-loadmore ref="result"

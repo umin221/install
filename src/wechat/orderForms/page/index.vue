@@ -95,7 +95,8 @@
     let list = args.pop();
     let param = Object.extend(true, {
       callback: (data) => {
-        me.$refs[list][event](data.length);
+        console.log(data);
+        me.$refs[list][event](data.SiebelMessage['Order Entry - Orders'].length);
       }
     }, args.pop() || {});
     me.getList(param);
