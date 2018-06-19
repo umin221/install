@@ -1,7 +1,7 @@
 <template>
   <div>
     <mt-header fixed title="安装及售后服务">
-      <router-link to="switch" slot="right" v-if="isManager">
+      <router-link to="switch" slot="right">
         <mt-button>切换用户</mt-button>
       </router-link>
     </mt-header>
@@ -48,9 +48,9 @@
     name: NameSpace,
     activated() {
       let me = this;
-      let userId = KND.Util['getParam']('userID');
+//      let userId = KND.Util['getParam']('userID');
       // 管理员权限，可切换用户
-      me.isManager = (userId && userId.length > 10) || config.manager.indexOf(userId) !== -1;
+//      me.isManager = (userId && userId.length > 10) || config.manager.indexOf(userId) !== -1;
       // 获取用户信息
       KND.Native.getUserInfo((userInfo) => {
         console.log(userInfo);

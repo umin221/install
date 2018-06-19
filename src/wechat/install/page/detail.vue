@@ -150,7 +150,7 @@
         tools.valid.call(me, () => {
           let assets = me.assets;
           // 最少字符限制
-          if (assets.length < 10) {
+          if (assets.serial.length < 10) {
             Toast('条码至少是10个字符');
             return;
           }
@@ -176,8 +176,8 @@
        */
       toScanFn() {
         let me = this;
-        tools.cordova.scan(result => {
-          me.assets['serial'] = result.text;
+        tools.cordova.zBarScan(result => {
+          me.assets['serial'] = result;
         });
       },
       // 选择确认

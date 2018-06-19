@@ -388,9 +388,9 @@
       toScanFn() {
         let room = this.sheetObject;
         // this.$router.push('detail');
-        tools.cordova.scan(result => {
-          if (result.text) {
-            room.serial = result.text;
+        tools.cordova.zBarScan(result => {
+          if (result) {
+            room.serial = result;
             this.$router.push({
               name: 'detail',
               query: {

@@ -127,6 +127,34 @@ class Cordova {
   };
 
   /**
+   * 使用zbar库扫码
+   * @param {Object} option 启用配置
+   * @param {String} success 成功回调
+   * @param fail
+   */
+  zBarScan(option, success, fail) {
+    let defaultOpt = {
+      text_title: "条码扫描", // Android only
+      text_instructions: "请对准条码", // Android only
+      camera: "back", // defaults to "back"
+      flash: "auto", // defaults to "auto". See Quirks
+      drawSight: true //defaults to true, create a red sight/line in the center of the scanner view.
+    };
+    if (typeof option === 'function') {
+      success = option;
+    } else {
+      defaultOpt = Object.assign(defaultOpt, option);
+    }
+    if (cloudSky) {
+      cloudSky.zBar.scan(defaultOpt, success, function(s) {
+        console.log(s);
+      });
+    } else {
+      success('6917878030623');
+    }
+  };
+
+  /**
    * APP进入后台
    */
   goHome() {
@@ -184,10 +212,20 @@ class Cordova {
    * 获取当前app版本
    */
   getAppVersion() {
+//    let me = this;
     let platform = this.platform.IOS ? 'ios' : 'android';
     if (cordova) {
       cordova.getAppVersion.getVersionNumber().then(version => {
-        if (version !== config[platform].version) console.log('app需要更新，请前往公众号更新');
+        if (version !== config[platform].version) {
+          console.log('app需要更新，请前往公众号更新');
+//          me.confirm('发现新版本', result => {
+//            if (result === 2) {
+//            } else {
+//              console.log('--------取消更新--------');
+//            }
+//          }, '请确认', ['取消', '更新']);
+        }
+
         this.app.version = version
       });
     }
