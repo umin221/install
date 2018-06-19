@@ -7,19 +7,19 @@
                  @click="journalFn()">日志</mt-button>
     </mt-header>
     <div class="mint-content zsBatch">
-      <div :class="{'readonly':read}">
+      <div :class="{'readonly':isEidt}">
         <cus-field :label="nextText" :tag="nextText"
                    v-valid.require.positiveInteger
                    v-model="line['Completed Install Amount']"></cus-field>
-        <cus-field label="备注说明"
-                   type="textarea"
-                   v-model="line['Description']"></cus-field>
       </div>
       <attach ioName="KL Installation Log Attachment" ref="attach"
               :attach="attach.list"
               :edit="!read"
               :title="attach.title">
       </attach>
+      <cus-field label="备注说明"
+                 type="textarea"
+                 v-model="line['Description']"></cus-field>
       <button-group>
         <mt-button class="single"
                    @click="submitFn">提交</mt-button>
@@ -86,15 +86,17 @@
   export default {
     name: 'updateDoorNext',
     created() {
-      // let param = this.$route.query;
+      let param = this.$route.query;
       this.item = this.itemTask;
       this.id = this.item.Id;
-      console.dir('=====' + this.id);
+      this.azNum = param.azNum;
     },
     data: () => {
       return {
         id: '',
         item: '',
+        azNum: '', // 安装总房间数
+        isEidt: false, // 是否可以编辑数量
         is_show: false,
         nextText: '',
         type: 'add', // add 新增 / edit 编辑 / read 只读
@@ -145,6 +147,8 @@
         } else if (item['KL Detail Type LIC'] === 'Transfer Batch') {
           self.nextText = '完成数量';
           val = '真锁移交';
+          self.line['Completed Install Amount'] = self.azNum;
+          self.isEidt = true; // 真锁移交 数量不能编辑
         } else {
           self.nextText = '回收数量';
           val = '替代锁回收';
@@ -166,12 +170,16 @@
       },
       submitFn() {
         var self = this;
+        var lineObj = self.line;
+        if (!lineObj['Completed Install Amount']) {
+          Toast('数量不能为空！');
+          return;
+        }
         tools.valid.call(this, () => {
           if ((self.item['KL Detail Type LIC'] === 'Substitution Lock Trans Batch' || self.item['KL Detail Type LIC'] === 'Transfer Batch') && self.attach.list.length === 0) {
             Toast('附件不能为空！');
             return;
           }
-          var lineObj = self.line;
           MessageBox({
             title: '提示',
             message: ' 确认提交？一经提交不可修改',
@@ -200,19 +208,33 @@
                     self.attach.list = [];
                     // 更新状态
                     if (self.item['KL Detail Type LIC'] === 'Transfer Batch') { // 零星真锁移交时更新完成
-                      api.get({ // 更改按钮状态
+                      api.get({ // 更改资产
                         key: 'getUPStatus',
                         method: 'POST',
                         data: {
                           'body': {
-                            'ProcessName': 'KL Install Task Complete Action Workflow',
-                            'RowId': self.id
+                            'ProcessName': 'KL Install Order Asset Lock Transfer Process - Sample',
+                            'Object Id': self.id
                           }
                         },
                         success: function(data) {
                           if (!data.ERROR) {
-                            Toast('提交成功');
-                            KND.Util.back();
+                            api.get({ // 更改按钮状态
+                              key: 'getUPStatus',
+                              method: 'POST',
+                              data: {
+                                'body': {
+                                  'ProcessName': 'KL Install Task Complete Action Workflow',
+                                  'RowId': self.id
+                                }
+                              },
+                              success: function(data) {
+                                if (!data.ERROR) {
+                                  Toast('提交成功');
+                                  KND.Util.back();
+                                }
+                              }
+                            });
                           }
                         }
                       });

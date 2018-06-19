@@ -228,6 +228,7 @@
         // is_show_sx: false, // 是否显示面板锁体
         shipmentVal: false, // 发运开关，判断值
         active: 'tab-container',
+        azNum: 0, // 批次安装总房间数
         // 锁体
         lockBody: [],
         // 面板
@@ -321,6 +322,16 @@
                 self.taskDataList = KND.Util.toArray(self.taskData[self.taskIndex]['KL Installation Task']);
                 if (self.taskDataList.length === 0) {
                   self.taskDataList = KND.Util.toArray(self.taskData[self.taskIndex]);
+                }
+              }
+              for (var i = 0; i < taskData.length; i++) {
+                if (taskData[i]['KL Detail Type LIC'] === 'Lock Installation') { // 真锁安装
+                  var taskDataInfo = taskData[i]['KL Installation Task'];
+                  for (var j = 0; j < taskDataInfo.length; j++) {
+                    if (taskDataInfo[j]['KL Detail Type LIC'] === 'Lock Installation Summary') { // 真锁安装汇总
+                      self.azNum = taskDataInfo[j]['KL Completed Install Amount'];
+                    }
+                  }
                 }
               }
             }
@@ -1079,6 +1090,7 @@
                 name: 'updateDoorNext',
                 query: {
                   type: 'add',
+                  azNum: self.azNum,
                   item: item
                 }
               });
@@ -1169,6 +1181,7 @@
                     name: 'updateDoorNext',
                     query: {
                       type: 'add',
+                      azNum: self.azNum,
                       item: item
                     }
                   });
