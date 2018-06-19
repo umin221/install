@@ -37,6 +37,7 @@
   let rc = {
     'Field Service Engineer': 'engineer', // 安装工程师
     'Field Service Manager': 'engineer', // 安装主管
+    'FS Department Manager': 'engineer', // 部长
     'Agent': 'agent', // 客服
     'Agent Manager': 'agent', // 客服主管
     'Door Factory Engineer': 'factory', // 门厂技术
