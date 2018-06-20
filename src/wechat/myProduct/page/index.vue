@@ -83,19 +83,17 @@
   export default {
     name: NAMESPACE,
     created() {
-      console.dir('000');
       let me = this;
       KND.Native.getUserInfo((info) => {
-        me.setManager(info['KL Primary Position Type LIC'] === 'Field Service Manager');
+        me.setManager(info['KL Primary Position Type LIC']);
         me.loadTopFn({status: '配件库', list: 'PartsList'});
       });
     },
     // 数据初始化
     activated() {
-      console.dir('111');
       let me = this;
       KND.Native.getUserInfo((info) => {
-        me.setManager(info['KL Primary Position Type LIC'] === 'Field Service Manager');
+        me.setManager(info['KL Primary Position Type LIC']);
         me.loadTopFn({status: '配件库', list: 'PartsList'});
       });
     },
@@ -111,7 +109,7 @@
     methods: {
       ...mapActions(NAMESPACE, ['getList']),
       ...mapMutations(NAMESPACE, ['setManager', 'setTeam', 'setList']),
-      ...mapMutations('detail', ['setList']),
+      ...mapMutations('detail', {'setDetailList': 'setList'}),
       // 切换头部菜单
       menuFn(item) {
         this.setTeam(item.key === 'team');
@@ -141,7 +139,7 @@
         }, param.list, 'onBottomLoaded');
       },
       toDetail(InvId, ProductId) {
-        this.setList();
+        this.setDetailList();
         this.$router.push({
           name: 'detail',
           query: {

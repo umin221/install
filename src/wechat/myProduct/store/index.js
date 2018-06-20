@@ -30,14 +30,15 @@ export default new Vuex.Store({
         addData(state, {dataList, list}) {
           state[list].push(...dataList);
         },
-        setManager(state, isManager) {
+        setManager(state, position) {
           mapps = config.mapp['product'];
-          state.isManager = isManager;
+          // 管理人员(mapp中配置)，可查看团队配件
+          state.isManager = config.mapp.r2f[position] === 'manager';
         },
         setList(state) {
           // 清空列表数据
-          state.DestinationList = [];
-          state.SourceList = [];
+          state.PartsList = [];
+          state.badPartsList = [];
         },
         setTeam(state, isTeam) {
           state.isTeam = isTeam;
@@ -52,7 +53,7 @@ export default new Vuex.Store({
 
           data['Status'] = mapp['status'];
           // ViewMode 随当前状态切换
-          data['ViewMode'] = state.isManager ? (state.isTeam ? 'Manager' : 'Personal') : 'Personal';
+          data['ViewMode'] = state.isTeam ? 'Manager' : 'Personal';
           api.get({
             key: 'getList',
             data: data,
