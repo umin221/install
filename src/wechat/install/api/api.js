@@ -285,7 +285,7 @@ let apiList = {
           });
         };
         // 生产环境走sso登陆认证
-        if (config.env === 'prod') {
+        if (config.env === 'PROD') {
           // 员工登陆
           get({
             key: 'queryEmployeeInfo',
@@ -313,12 +313,16 @@ let apiList = {
     let data = option.data;
     return {
       url: 'https://www.kinlong.cn/sso/users/access/',
-      data: {
-        'X-Idaas-Rest-Subject-Type': 'USERCREDENTIAL',
-        'X-Idaas-Rest-Subject-Username': data['Login Name'],
-        'X-Idaas-Rest-Subject-Password': data['KL Outsource Password'],
-        'X-Idaas-Rest-New-Token-Type-To-Create': 'USERTOKEN'
-      }
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Basic c2llYmVsT0F1dGh3ZWJjbGllbnQ6c2llYmVsT0F1dGh3ZWJjbGllbnQ='
+      },
+      data: KND.Util.param({
+        'grant_type': 'password',
+        'username': data['Login Name'],
+        'password': data['KL Outsource Password'],
+        'scope': 'UserProfile.users'
+      })
     };
   }
 
