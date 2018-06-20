@@ -30,7 +30,7 @@ let now = util.now;
 let buildCreateField = field => {
   let property = {};
   for (var i in field) {
-    property[i] = field[i] || 'VARCHAR(200)';
+    property[i] = field[i] || 'VARCHAR(50)';
   };
   return property;
 };
@@ -170,16 +170,16 @@ class Helper {
         me.invokeSQL('ct', 'user', buildCreateField({user_id: null, data: null, state: null, create_date: null})).then(result => {
           console.log('创建数据库表 user...');
         }),
-        me.invokeSQL('ct', 'batch', buildCreateField({data: 'VARCHAR(20000)', state: null, create_date: null})).then(result => {
+        me.invokeSQL('ct', 'batch', buildCreateField({data: 'VARCHAR(255)', state: null, create_date: null})).then(result => {
           console.log('创建数据库表 batch...');
         }),
-        me.invokeSQL('ct', 'building', buildCreateField({order_id: null, task_id: null, data: 'VARCHAR(2000)', state: null, create_date: null})).then(result => {
+        me.invokeSQL('ct', 'building', buildCreateField({order_id: null, task_id: null, data: 'VARCHAR(255)', state: null, create_date: null})).then(result => {
           console.log('创建数据库表 building...');
         }),
-        me.invokeSQL('ct', 'assets', buildCreateField({order_id: null, task_id: null, building_num: null, data: 'VARCHAR(20000)', state: null, create_date: null})).then(result => {
+        me.invokeSQL('ct', 'assets', buildCreateField({order_id: null, task_id: null, building_num: null, data: 'VARCHAR(255)', state: null, create_date: null})).then(result => {
           console.log('创建数据库表 assets...');
         }),
-        me.invokeSQL('ct', 'order_line', buildCreateField({order_id: null, data: 'VARCHAR(2000)', state: null, create_date: null})).then(result => {
+        me.invokeSQL('ct', 'order_line', buildCreateField({order_id: null, data: 'VARCHAR(255)', state: null, create_date: null})).then(result => {
           console.log('创建数据库表 order_line...');
         }),
         me.invokeSQL('ct', 'install_record_remote', buildCreateField({task_id: null, serial_num: null, building_num: null, super: null, state: null, create_date: null})).then(result => {
