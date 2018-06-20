@@ -80,8 +80,8 @@
         let position = info['KL Primary Position Type LIC'];
         // 设置用户权限
         me.setAuthority(position);
-        // 主管可查看团队视图
-        me.viewTeam = position === 'Field Service Manager';
+        // 管理人员(mapp中配置)，可查看团队视图，mapp 中配置
+        me.viewTeam = config.mapp.r2f[position] === 'manager';
         // 获取列表数据
         me.loadTopFn('pending');
       });

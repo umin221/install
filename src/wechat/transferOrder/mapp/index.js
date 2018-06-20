@@ -2,6 +2,10 @@
  * Local Config
  */
 config.mapp = {
+  'r2f': {
+    'FS Department Manager': 'manager',
+    'Field Service Manager': 'manager'
+  },
   'manager': {
     'pending': {status: 'Pending Approval', label: '待处理'},
     'process': {status: 'Accepted', label: '处理中'},

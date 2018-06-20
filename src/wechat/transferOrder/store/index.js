@@ -52,14 +52,14 @@ export default new Vuex.Store({
           state.process = [];
           state.completed = [];
         },
-        // 根据用户职位，设置用户权限
+        // 根据用户职位，设置用户权限，isManager 控制是否可分配 交接单
         setAuthority(state, position) {
           // 总部支持主管 & 总部支持专员，具备管理权限，可查看&分配未完成的交接单。
           let isManager = position === 'HQ Support Assistant' || position === 'HQ Support Manager';
           // 交接单管理权限，控制是否可查看未交接交接单，分配交接单
           state.isManager = isManager;
-          // 只有安装人员可操作安装订单
-          state.isEngineer = position === 'Field Service Manager' || position === 'Field Service Engineer';
+          // 安装工程师 或 管理人员(mapp中配置)可操作安装订单
+          state.isEngineer = position === 'Field Service Engineer' || config.mapp.r2f[position] === 'manager';
         }
       },
       actions: {
