@@ -1,7 +1,7 @@
 <!--交接单列表-->
 <template>
   <div>
-    <cus-header fixed :title="isTeam ? '团队的交接单' : '我的交接单'" :menu="viewTeam ? [isTeam ? {title:'我的交接单', key:'my'} : {title:'查看我的团队', key:'team'}] : undefined">
+    <cus-header fixed :title="isTeam ? '团队的交接单' : '我的交接单'" :menu="isManager ? [isTeam ? {title:'我的交接单', key:'my'} : {title:'查看我的团队', key:'team'}] : undefined">
       <fallback slot="left"></fallback>
       <mt-button @click.native="toSearchFn" slot="right">
         <i class="xs-icon icon-search"></i>
@@ -80,8 +80,6 @@
         let position = info['KL Primary Position Type LIC'];
         // 设置用户权限
         me.setAuthority(position);
-        // 管理人员(mapp中配置)，可查看团队视图，mapp 中配置
-        me.viewTeam = config.mapp.r2f[position] === 'manager';
         // 获取列表数据
         me.loadTopFn('pending');
       });
@@ -91,9 +89,7 @@
         // 活跃tab
         selected: 'pending',
         // 下拉状态
-        topStatus: '',
-        // 是否可查看团队交接单
-        viewTeam: false
+        topStatus: ''
       };
     },
     computed: {

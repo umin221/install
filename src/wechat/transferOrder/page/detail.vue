@@ -27,7 +27,7 @@
         </toggle>
       </div>
 
-      <div v-show="isManager && !isCompleted">
+      <div v-show="isDispatch && !isCompleted">
         <mt-cell title="销售方式"
                  :value="form['Sales Type']"></mt-cell>
         <mt-cell title="指派安装工程师"
@@ -67,7 +67,7 @@
     <!--buttons-->
     <button-group v-show="!isTeam && !isCompleted">
       <mt-button type="primary" v-show="isPending" @click.native="$router.push('reject')">驳回</mt-button>
-      <mt-button v-show="isManager && !isCompleted"  @click.native="assignFn">确认分配</mt-button>
+      <mt-button v-show="isDispatch && !isCompleted"  @click.native="assignFn">确认分配</mt-button>
       <mt-button v-show="!isPending && isEngineer" @click.native="generateOrderFn">生成安装订单</mt-button>
     </button-group>
   </div>
@@ -104,7 +104,7 @@
       };
     },
     computed: {
-      ...mapState('index', ['isTeam', 'isEngineer', 'isManager']),
+      ...mapState('index', ['isTeam', 'isEngineer', 'isDispatch']),
       ...mapState(NAMESPACE, ['form', 'orders']),
       ...mapState('engineer', ['select']),
       // 未交接交接单

@@ -22,7 +22,9 @@ export default new Vuex.Store({
       state: {
         // 列表&导航，安装支持专员不在移动端使用，只查看安装工程师列表视图
         navs: config.mapp['employee'],
-        // 是否主管权限，可分配交接单给工程师
+        // 可否分配交接单给工程师
+        isDispatch: false,
+        // 可否查看团队交接单
         isManager: false,
         // 查看团队，此状态下所有信息只可查看，不可编辑
         isTeam: false,
@@ -52,14 +54,20 @@ export default new Vuex.Store({
           state.process = [];
           state.completed = [];
         },
-        // 根据用户职位，设置用户权限，isManager 控制是否可分配 交接单
+        /**
+         * 根据用户职位，设置用户权限
+         * @param {String} position 必填 用户职位
+         * isDispatch true/false 可否指派交接单
+         * isManager true/false 可否查看团队交接单
+         */
         setAuthority(state, position) {
+          // 管理人员(mapp中配置)，可查看团队交接单
+          let isManager = config.mapp.r2f[position] === 'manager';
           // 总部支持主管 & 总部支持专员，具备管理权限，可查看&分配未完成的交接单。
-          let isManager = position === 'HQ Support Assistant' || position === 'HQ Support Manager';
-          // 交接单管理权限，控制是否可查看未交接交接单，分配交接单
+          state.isDispatch = position === 'HQ Support Assistant' || position === 'HQ Support Manager';
           state.isManager = isManager;
           // 安装工程师 或 管理人员(mapp中配置)可操作安装订单
-          state.isEngineer = position === 'Field Service Engineer' || config.mapp.r2f[position] === 'manager';
+          state.isEngineer = position === 'Field Service Engineer' || isManager;
         }
       },
       actions: {
