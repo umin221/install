@@ -121,6 +121,12 @@
   }, {
     userID: '18010190', position: '产品安装工程师', area: '北方安装四组', name: '郭飞红'
   }, {
+    userID: '17033065', position: '产品安装工程师', area: '北方安装四组', name: '肖江华'
+  }, {
+    userID: '16113004', position: '产品安装工程师', area: '北方安装四组', name: '张帆'
+  }, {
+    userID: '17023096', position: '产品安装工程师', area: '北方安装四组', name: '李玉栋'
+  }, {
     userID: '16043215', position: '门厂技术组', area: '门厂技术主管（代）', name: '胡清秀'
   }, {
     userID: '17053018', position: '门厂技术组', area: '门厂技术工程师', name: '韦吉辉'

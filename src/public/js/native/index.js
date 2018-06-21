@@ -12,8 +12,6 @@ import queue from '../base/queue';
   let util = context['Util'];
   // 会话缓存
   let session = context.Session;
-  // 用户ID
-  let userID;
   // 缓存超时
   let exp = config.cacheExp;
 
@@ -28,21 +26,21 @@ import queue from '../base/queue';
     constructor() {
       util.log('Native init...');
 
-      userID = this.getUserID();
       Object.defineProperty(this, 'userID', {
         enumerable: false,
         configurable: true,
         get: () => {
-          console.info('当前用户ID：' + userID);
-          return userID;
+          console.info('当前用户ID：' + this._userID);
+          return this._userID;
         },
         set: (val) => {
           session.remove('userInfo');
           console.info('设置用户ID：' + val);
-          userID = val;
+          this._userID = val;
           session.set('userID', val);
         }
       });
+      this.userID = this.getUserID();
     };
 
     /**
@@ -51,14 +49,15 @@ import queue from '../base/queue';
      * @response {Object} data 用户信息 包含职位等数据
      */
     getUserInfo(callback) {
-      util.log('获取用户信息 ' + userID);
+      let uid = this.userID;
       let user = util.parse(session.get('userInfo'));
-      if (user && user['Login Name'] === userID) {
+      util.log('获取用户信息 ' + uid);
+      if (user && user['Login Name'] === uid) {
         callback(user);
       } else {
         this.ajax({
           method: 'get',
-          url: 'data/KL Employee Interface BO/Employee/?searchspec=[Login Name] = "' + userID + '" &PageSize=2&StartRowNum=0',
+          url: 'data/KL Employee Interface BO/Employee/?searchspec=[Login Name] = "' + uid + '" &PageSize=2&StartRowNum=0',
           success: data => {
             session.set('userInfo', JSON.stringify(data.items));
             callback(data.items);
@@ -76,13 +75,12 @@ import queue from '../base/queue';
      */
     getUserID() {
       // 优先获取会话中的用户id
-      let userID = session.get('userID');
-      if (userID) return userID;
+      let uid = session.get('userID');
+      if (uid) return uid;
       // url 获取用户id
-      userID = util['getParam']('userID');
+      uid = util['getParam']('userID');
       // 企业微信，虚拟组织下的用户无法正常获取用户信息，无法做审批操作
-      userID = userID && userID.length < 10 ? userID : 'GUESTERM';
-      return userID;
+      return uid && uid.length < 10 ? uid : 'GUESTERM';
     };
 
     /**
@@ -208,11 +206,12 @@ import queue from '../base/queue';
      * @param {Object} option 必填 ajax setting
      */
     online(option) {
+      let uid = this.userID;
       let auth = config.authorization;
       // post data
       let setting = Object.extend(true, {
         headers: {
-          'Authorization': `Basic ${btoa(userID + ':' + (auth === 'ACCOUNT' ? userID : auth))}`
+          'Authorization': `Basic ${btoa(uid + ':' + (auth === 'ACCOUNT' ? uid : auth))}`
         },
         timeout: 30000,
         method: 'post'

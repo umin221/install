@@ -29,8 +29,8 @@
   // 用户功能
   let r2f = {
     engineer: af,
-    factory: {installOrder: true},
-    agent: {serviceOrder: true, workPlan: true},
+    factory: {installOrder: true, workPlan: true},
+    agent: {serviceOrder: true},
     default: {workPlan: true}
   };
   // 职位
