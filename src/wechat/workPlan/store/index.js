@@ -147,7 +147,7 @@ export default new Vuex.Store({
         endPickerValue: '',  // 计划结束时间
         ACstartPickerValue: '', // 实际开始时间
         ACendPickerValue: '',  // 实际结束时间
-        startHour: '00' // 结束时间最小选择范围
+        startHour: 0 // 结束时间最小选择范围
       },
       mutations: {
         workDesc(state, workDesc) {
@@ -155,7 +155,7 @@ export default new Vuex.Store({
         },
         dayAll(state, isAll) {
           state.allDay = isAll;
-          state.startHour = '00'; // 取消结束时间限制
+          state.startHour = 0; // 取消结束时间限制
         },
         startPicker(state, time) {
           state.startPickerValue = time;

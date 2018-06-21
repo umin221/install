@@ -178,7 +178,7 @@
         let param = Object.extend(true, {
           callback: (data) => {
             // 当月所有计划数据
-            me.monthData = data;
+            me.monthData = KND.Util.toArray(data);
           }
         }, parmas);
         // 获取整月数据

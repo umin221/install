@@ -33,8 +33,8 @@ let apiList = {
 //    门厂技术安装员
     if (position === 'Door Factory Engineer' || position === 'Door Factory Manager') {
       boby.ViewMode = 'Sales Rep';
-//      安装主管(我的安装订单) 安装工程师(我的安装订单)
-    } else if ((position === 'Field Service Manager' || position === 'Field Service Engineer') && !isTeam) {
+//      安装主管(我的安装订单) 安装工程师(我的安装订单) 部长
+    } else if ((position === 'Field Service Manager' || position === 'Field Service Engineer' || position === 'FS Department Manager') && !isTeam) {
       var id = data.infoUser['Id'];
       var pid = data.infoUser['Primary Position Id'];
       // 查询负责人是自己的订单 或者 门厂负责人是自己的订单

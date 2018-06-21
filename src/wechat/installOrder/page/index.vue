@@ -198,8 +198,8 @@
 //      是否门厂技术，包括门厂技术主管
       isDoorEmp() {
         let code = this.userInfo['KL Primary Position Type LIC'];
-        // 安装工程师、门厂技术主管
-        this.setManager(code === 'Field Service Manager' || code === 'Door Factory Manager');
+        // 安装工程师、门厂技术主管 部长
+        this.setManager(code === 'Field Service Manager' || code === 'Door Factory Manager' || code === 'FS Department Manager');
         return code === 'Door Factory Engineer' || code === 'Door Factory Manager';
       }
     },

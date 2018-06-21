@@ -111,7 +111,8 @@
       let me = this;
       KND.Native.getUserInfo((info) => {
         userName = info;
-        me.setManager(info['KL Primary Position Type LIC'] === 'Field Service Manager');
+        me.setManager(info['KL Primary Position Type LIC']);
+        // me.setManager(info['KL Primary Position Type LIC'] === 'Field Service Manager');
       });
       // me.pendingLoadTop(me.isTeam);
       me.loadBottomFn({

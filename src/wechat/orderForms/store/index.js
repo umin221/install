@@ -69,7 +69,9 @@ export default new Vuex.Store({
         },
         setManager(state, isManager) {
           mapps = config.mapp['manager'];
-          state.isManager = isManager;
+          // state.isManager = isManager;
+          // 管理人员(mapp中配置)，可查看团队配件
+          state.isManager = config.mapp.r2f[isManager] === 'manager';
         },
         setTeam(state, isTeam) {
           state.isTeam = isTeam;

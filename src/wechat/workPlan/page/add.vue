@@ -64,8 +64,8 @@
     data() {
       return {
         headTitle: '新建计划',
-        startPickerHour: '00',
-        startPickerMinutes: '00',
+        startPickerHour: 0,
+        startPickerMinutes: 0,
         newTimes: new Date(), // 当前年月日
         showWorkDescript: false,
         showWorkType: false, // 项目类型是否显示
@@ -157,8 +157,8 @@
           self.startPickerHour = today;
           self.startPickerMinutes = minutes;
         } else {
-          self.startPickerHour = '00';
-          self.startPickerMinutes = '00';
+          self.startPickerHour = 0;
+          self.startPickerMinutes = 0;
         }
         this.$refs.startPicker.open();
       },
@@ -192,6 +192,7 @@
         this.setStartPicker(date);
         // 限制结束时间只能是开始时间之后
         date.replace(/^\d{2}/, (val, index) => {
+          val = parseInt(val, 10);
           this.setStartHour(val);
         });
         // 如果开始时间 > 结束时间，则清空结束时间
@@ -243,12 +244,12 @@
         var id = '';
         if (this.$route.path === '/edit') {
           id = this.currentDayData[this.$route.query.index]['Id'];
-          this.startPickerValue = this.startPickerValue.replace(/\d+:\d+:\d+/, (a, b) => {
+         /* this.startPickerValue = this.startPickerValue.replace(/\d+:\d+:\d+/, (a, b) => {
             this.setStartPicker(this.startPickerValue.substr(0, this.startPickerValue.length - 3));
           });
           this.endPickerValue = this.endPickerValue.replace(/\d+:\d+:\d+/, (a, b) => {
             this.setEndPicker(this.endPickerValue.substr(0, this.endPickerValue.length - 3));
-          });
+          });*/
         } else {
           id = new Date().getTime();
         }
