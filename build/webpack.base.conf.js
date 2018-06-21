@@ -43,7 +43,7 @@ const getCompileModules = () => {
   return modules;
 };
 
-const exclude = {'sign': false, 'public': false};
+const exclude = {'sign': false, 'public': false, 'demo': false};
 const createEntry = () => {
   let entry = {};
   let modules = getCompileModules();
