@@ -232,7 +232,8 @@
   })();
   let textCall = function(callNum) {
     let me = this;
-    let phoneReg = new RegExp('^[1][3,4,5,7,8][0-9]{9}$');
+    // let phoneReg = new RegExp('^[1][3,4,5,7,8][0-9]{9}$');
+    let phoneReg = new RegExp('^((\\+?[0-9]{1,4})|(\\(\\+86\\)))?(1)\\d{10}$');
     let workPhoneReg = new RegExp('^(([0\\+]\\d{2,3})?(0\\d{2,3}))(\\d{7,8})((\\d{3,}))?$');
     if (phoneReg.test(callNum)) {
       me.callPhone = callNum;
