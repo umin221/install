@@ -242,19 +242,41 @@ let apiList = {
    * @param {String} option.data['Product Id'] 必填 面板 final product id
    * @param {String} option.data['KL Product Model No Lock Body'] 必填 锁体型号 S070B
    * @param {String} option.data['KL Product Model No Panel'] 必填 面板型号 SZ3010
+   * @param {String} option.data['Login Name'] 必填 委外账号
+   * @param {String} option.data['Personal Address Id'] 必填 房间 Personal Address Id
    * @returns {{url: string}}
    */
   installOrderAssets: option => {
+    let data = option.data;
+    delete option.data;
     return {
-      method: 'put',
-      url: 'data/KL Install Order Asset/KL Install Order Asset'
-      // data: {
-      //  'Id': '',
-      //  'Serial Number': '',
-      //  'Product Id': '',
-      //  'KL Product Model No Lock Body': '',
-      //  'KL Product Model No Panel': ''
-      // }
+      url: 'service/Workflow Process Manager/RunProcess/',
+      data: {
+        'body': {
+          'ProcessName': 'KL Install Order Asset Room Upsert Process', // 详情ID
+          'Login': data['Login Name'], // 委外账号
+          'SiebelMessage': {
+            'MessageId': '',
+            'MessageType': 'Integration Object',
+            'IntObjectName': 'Base KL Install Order Asset Address',
+            'IntObjectFormat': 'Siebel Hierarchical',
+            'ListOfBase KL Install Order Asset Address': {
+              'Base KL Install Order Asset Address': {
+                'Id': data['Personal Address Id'],
+                'ListOfKL Install Order Asset': {
+                  'KL Install Order Asset': {
+                    'Id': data['Id'],
+                    'Serial Number': data['Serial Number'],
+                    'Product Id': data['Product Id'],
+                    'KL Product Model No Lock Body': data['KL Product Model No Lock Body'],
+                    'KL Product Model No Panel': data['KL Product Model No Panel']
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     };
   },
 

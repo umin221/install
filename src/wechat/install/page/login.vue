@@ -32,9 +32,6 @@
 
   // 缓存登陆id，后续使用此账号提交数据
   let setUser = user => {
-    let userID = KND.Util.parse(user)['Login Name'];
-    KND.Native.userID = userID;
-    KND.Session.set('userID', userID);
     KND.Session.set('userInfo', user);
   };
 
@@ -78,13 +75,11 @@
       loginFn() {
         let me = this;
         // 当前登陆用户
-        let loginName = me.username.trim();
+        let uid = me.username.trim();
         tools.valid.call(me, () => {
-          // 设置当前用户id
-          KND.Session.set('userID', loginName);
           me.queryUserInfo({
             data: {
-              'Login Name': loginName,
+              'Login Name': uid,
               'KL Outsource Password': me.password.trim(),
               'KL Status': 'Active'
             },

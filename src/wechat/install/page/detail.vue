@@ -147,6 +147,8 @@
       // 保存资产信息
       saveFn() {
         let me = this;
+        // 用户信息
+        let user = KND.Util.parse(KND.Session.get('userInfo'));
         tools.valid.call(me, () => {
           let assets = me.assets;
           // 最少字符限制
@@ -162,7 +164,9 @@
                 'Serial Number': assets['serial'],
                 'Product Id': assets['Product Id'],
                 'KL Product Model No Lock Body': assets['KL Product Model No Lock Body'],
-                'KL Product Model No Panel': assets['KL Product Model No Panel']
+                'KL Product Model No Panel': assets['KL Product Model No Panel'],
+                'Personal Address Id': assets['Personal Address Id'],
+                'Login Name': user['Login Name']
               },
               super: assets
             });
