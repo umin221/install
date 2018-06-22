@@ -24,7 +24,7 @@ let name;
 switch (env) {
   case 'PROD':
     envConfig.attachServer = 'http://crm.kinlong.cn:9001'; // 附件接口服务 PROD环境
-    envConfig.context = '/crm/prod/api/';
+    envConfig.context = '/crm/prd/api/';
     envConfig.authorization = 'HELLO'; // 认证模式 认证密码
     break;
   case 'SIT':
