@@ -1,5 +1,6 @@
 'use strict';
 Object.assign(config, {
+  host: 'https://www.kinlong.cn',
   offline: true,
   android: {
 //  最新app版本号
