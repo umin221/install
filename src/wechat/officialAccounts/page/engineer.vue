@@ -16,7 +16,7 @@
   const NameSpace = 'engineer';
 
   // app 下载id
-  let app = { DEV: '550', SIT: '550', UAT: '600' };
+  let app = { DEV: '550', SIT: '550', UAT: '600', PROD: '700' };
   //
   export default {
     name: NameSpace,

@@ -1,7 +1,7 @@
-/**
- * sit 测试用户清单
- * @type {*[]}
- */
+  /**
+   * sit 测试用户清单
+   * @type {*[]}
+   */
   let SIT = [{
     userID: '16043202', position: '安装主管', area: '华东安装四组', name: '张世虎'
   }, {
@@ -73,7 +73,7 @@
   }];
 
   /**
-   * uat 测试用户清单
+   * uat/prod 测试用户清单
    * @type {*[]}
    */
   let UAT = [{
@@ -152,4 +152,4 @@
     userID: '16023067', position: '订单管理中心', area: '副总监', name: '郑豫江'
   }];
 
-  export default {DEV: SIT, SIT, UAT};
+  export default {DEV: SIT, SIT, UAT, PROD: UAT};
