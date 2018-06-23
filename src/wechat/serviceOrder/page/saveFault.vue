@@ -257,32 +257,32 @@ export default {
        */
       let me = this;
       tools.valid.call(this, () => {
+        if (me.returnSelect.length > 0) { // 检验维修配件输入正整数
+          for (let i = 0; i < me.returnSelect.length; i++) {
+            if (me.returnSelect[i].num < 1) {
+              Toast('维修配件请填写正确的数量');
+              return;
+            }
+            if (me.returnSelect[i].isBn) { // 保内 价格等于0
+              me.returnSelect[i]['Unit Price'] = 0;
+            }
+            var listPrice = me.returnSelect[i]['Unit Price'];
+            if (!testVal.test(listPrice)) {
+              Toast('必须为正数');
+              return;
+            }
+          }
+        }
         if (!me.attach.list.length) {
           Toast('请上传维修记录表');
           return;
         }
+        // 人为损坏 总金额要大于0
+        if (me['Service']['KL Responsbility LIC'] === 'Human' && (me.Product === 0 || me.Product === '0.00' || !me.Product)) {
+          Toast('此单为【人为损坏】，费用必须大于0！');
+          return;
+        }
         MessageBox.confirm('确认提交，数据一经提交不可修改。', '提示').then(action => {
-          if (me.returnSelect.length > 0) { // 检验维修配件输入正整数
-            for (let i = 0; i < me.returnSelect.length; i++) {
-              if (me.returnSelect[i].num < 1) {
-                Toast('维修配件请填写正确的数量');
-                return;
-              }
-              if (me.returnSelect[i].isBn) { // 保内 价格等于0
-                me.returnSelect[i]['Unit Price'] = 0;
-              }
-              var listPrice = me.returnSelect[i]['Unit Price'];
-              if (!testVal.test(listPrice)) {
-                Toast('必须为正数');
-                return;
-              }
-            }
-          }
-          // 人为损坏 总金额要大于0
-          if (me['Service']['KL Responsbility LIC'] === 'Human' && (me.Product === 0 || me.Product === '0.00' || !me.Product)) {
-            Toast('此单为【人为损坏】，费用必须大于0！');
-            return;
-          }
           let uploadAttach = id => {
             _upload.call(me,
               me.$refs.attach.getServerIds(),
@@ -388,8 +388,10 @@ export default {
         for (let i = 0;i < me.returnSelect.length;i++) {
           if (val[0] === '保内') {
             me.switchStatus.push(true);
+            me.returnSelect[i].isBn = true;
           } else {
             me.switchStatus.push(false);
+            me.returnSelect[i].isBn = false;
           }
         }
 //        me.setSelectBn(val[0] === '保内');
