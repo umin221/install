@@ -426,7 +426,14 @@
         }
       },
       showClose(item) {
-        var val = (item['Calculated Activity Status'] === 'HQ Reject' || item['Calculated Activity Status'] === 'Declined' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Close Reject') && item['KL Detail Type LIC'] !== 'Transfer Summary';
+        // var val = (item['Calculated Activity Status'] === 'HQ Reject' || item['Calculated Activity Status'] === 'Declined' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Close Reject') && item['KL Detail Type LIC'] !== 'Transfer Summary';
+        var val = false;
+        if (item['KL Detail Type LIC'] !== 'Transfer Summary') { // 非汇总
+          val = (item['Calculated Activity Status'] === 'HQ Reject' || item['Calculated Activity Status'] === 'Declined' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Close Reject');
+          if (item['KL Detail Type LIC'] === 'Transfer Batch') { // 真锁零星移交不能关闭
+            val = false;
+          }
+        }
         console.dir(val);
         return val;
       },
