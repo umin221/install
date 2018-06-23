@@ -99,28 +99,6 @@ export default {
     me.serviceId = service.id;
     me.Service = service.Service;
     me.serviceType = service.type;
-//    let isBn = me.Service['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
-//    me.setIsBn(isBn);
-//    let EntryOrders = KND.Util.toArray(service.Service['Order Entry - Orders']);
-//    if (me.returnSelect.length) {
-//      for (let i = 0;i < EntryOrders.length;i++) {
-//        if (EntryOrders[i]['Status LIC'] === 'Draft') {
-//          me.EntryOrdersId = EntryOrders[i].Id;
-//          let LineItems = KND.Util.toArray(EntryOrders[i]['Order Entry - Line Items']);
-//          for (let j = 0; j < LineItems.length; j++) {
-//            me.switchStatus.push(LineItems[j]['KL Warranty Flag'] === 'Y');
-//            me.selectProduct({
-//              'Name': LineItems[j].Product,
-//              'num': parseInt(LineItems[j]['Quantity Requested'], 0),
-//              'KL Translated Name': LineItems[j]['KL Product Name Join'],
-//              'List Price': LineItems[j]['Adjusted List Price - Display'],
-//              'Id': LineItems[j]['Product Id']
-//            });
-//          }
-//          return;
-//        }
-//      }
-//    }
     if (me.serviceId) {
       me.getServiceR({
         Id: me.serviceId,
@@ -188,61 +166,6 @@ export default {
         }
       }
     });
-  },
-  activated() {
-//    let me = this;
-//    let service = me.$route.query;
-//    if (service.Service.Id) {
-//      me.setA({
-//        data: service,
-//        type: 'dataService'
-//      });
-//      me.serviceType = me.dataService.type;
-//      me.Service = me.dataService.Service;
-//      let isBn = me.Service['Product Warranty Flag'] === 'Y' ? '保内' : '保外';
-//      me.setIsBn(isBn);
-//      let type = me.serviceType === 'child' ? 'KL Child SR Order' : 'Order Entry - Orders';
-//      let EntryOrders = KND.Util.toArray(service.Service[type]);
-//      if (EntryOrders.length) {
-//        for (let i = 0; i < EntryOrders.length; i++) {
-//          if (EntryOrders[i]['Status'] === '草稿') {
-//            me.EntryOrdersId = EntryOrders[i].Id;
-//            if (!me.returnSelect.length) {
-//              me.getOrderDetail({
-//                id: me.EntryOrdersId
-//  //            callback: function(data) {
-//  //              for (let i = 0; i < data.length;i++) {
-//  //                me.switchStatus.push(data[i]['KL Warranty Flag'] === 'Y');
-//  //              }
-//  //            }
-//              });
-//              return;
-//            }
-//          }
-//        }
-//      }
-//    } else {
-//      me.switchStatus = [];
-//      for (let i = 0;i < me.returnSelect.length;i++) {
-//        if (me.isBn === '保内') {
-//          me.switchStatus.push(true);
-//        } else {
-//          me.switchStatus.push(false);
-//        }
-//      }
-//    }
-//    me.getLov({
-//      type: 'KL_SR_ATT_TYPE',
-//      parent: '',
-//      success: function(data) {
-//        let items = data.items;
-//        for (let i = 0; i < items.length;i++) {
-//          if (items[i].Name === 'Job Sheet') {
-//            me.val = items[i].Value;
-//          }
-//        }
-//      }
-//    });
   },
   data: () => {
     return {
@@ -355,6 +278,11 @@ export default {
               }
             }
           }
+          // 人为损坏 总金额要大于0
+          if (me['Service']['KL Responsbility LIC'] === 'Human' && (me.Product === 0 || me.Product === '0.00' || !me.Product)) {
+            Toast('此单为【人为损坏】，费用必须大于0！');
+            return;
+          }
           let uploadAttach = id => {
             _upload.call(me,
               me.$refs.attach.getServerIds(),
@@ -365,7 +293,7 @@ export default {
               });
           };
           uploadAttach(me['Service'].Id); // 上传附件
-          // me.submitOrder();
+         // me.submitOrder();
         });
       });
     },

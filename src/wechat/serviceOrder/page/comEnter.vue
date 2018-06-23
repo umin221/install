@@ -416,6 +416,9 @@
         let uploadAttach = id => {
           _upload.call(me, me.$refs.attach.getServerIds(), id);
         };
+        if (!me.AssetNumber || !me.SerialNumber) { // 产品条形码为空  Asset Number传空
+          me.AssetNumber = '';
+        }
         let form = {
           'Id': serviceId,
           'Asset Number': me.AssetNumber, // 产品ID
@@ -441,7 +444,7 @@
           }
         };
         if (!me.AssetNumber || !me.SerialNumber) {
-          delete form['Asset Number'];
+          // delete form['Asset Number'];
           me.upDateService(form);
         } else {
           let address = {
