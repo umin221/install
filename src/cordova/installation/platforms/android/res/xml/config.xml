@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.kinlong.siebelprod" version="1.0.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <preference name="loglevel" value="DEBUG" />
+    <feature name="Whitelist">
+        <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin" />
+        <param name="onload" value="true" />
+    </feature>
+    <feature name="NetworkStatus">
+        <param name="android-package" value="org.apache.cordova.networkinformation.NetworkManager" />
+    </feature>
+    <feature name="Notification">
+        <param name="android-package" value="org.apache.cordova.dialogs.Notification" />
+    </feature>
+    <feature name="BackbuttonPlugin">
+        <param name="android-package" value="com.badrit.Backbutton.BackbuttonPlugin" />
+    </feature>
+    <feature name="HotCodePush">
+        <param name="android-package" value="com.nordnetab.chcp.main.HotCodePushPlugin" />
+        <param name="onload" value="true" />
+    </feature>
+    <feature name="AppVersion">
+        <param name="android-package" value="uk.co.whiteoctober.cordova.AppVersion" />
+    </feature>
+    <feature name="CsZBar">
+        <param name="android-package" value="org.cloudsky.cordovaPlugins.ZBar" />
+    </feature>
+    <preference name="loadUrlTimeoutValue" value="60000" />
+    <allow-intent href="market:*" />
+    <icon density="ldpi" src="res/android/icon/mdpi.png" />
+    <icon density="mdpi" src="res/android/icon/mdpi.png" />
+    <icon density="hdpi" src="res/android/icon/xhdpi.png" />
+    <icon density="xhdpi" src="res/android/icon/xxhdpi.png" />
+    <icon density="xxhdpi" src="res/android/icon/xxxhdpi.png" />
+    <icon density="xxxhdpi" src="res/android/icon/xxxhdpi.png" />
+    <name>Kinlong</name>
+    <description>
+        A sample Apache Cordova application that responds to the deviceready event.
+    </description>
+    <author email="dev@cordova.apache.org" href="http://cordova.io">
+        Apache Cordova Team
+    </author>
+    <content src="install/index.html" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+    <preference name="WebViewBounce" value="false" />
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="StatusBarBackgroundColor" value="#00599f" />
+    <chcp>
+        <auto-download enabled="false" />
+        <auto-install enabled="false" />
+        <config-file url="https://www.kinlong.cn/crm/prd/cordova/www/chcp.json" />
+    </chcp>
+</widget>

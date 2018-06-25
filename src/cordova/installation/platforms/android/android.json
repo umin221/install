@@ -1,0 +1,228 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {
+            "res/xml/config.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<feature name=\"Whitelist\"><param name=\"android-package\" value=\"org.apache.cordova.whitelist.WhitelistPlugin\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"NetworkStatus\"><param name=\"android-package\" value=\"org.apache.cordova.networkinformation.NetworkManager\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Notification\"><param name=\"android-package\" value=\"org.apache.cordova.dialogs.Notification\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"BackbuttonPlugin\"><param name=\"android-package\" value=\"com.badrit.Backbutton.BackbuttonPlugin\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"HotCodePush\"><param name=\"android-package\" value=\"com.nordnetab.chcp.main.HotCodePushPlugin\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"AppVersion\"><param name=\"android-package\" value=\"uk.co.whiteoctober.cordova.AppVersion\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"CsZBar\"><param name=\"android-package\" value=\"org.cloudsky.cordovaPlugins.ZBar\" /></feature>",
+                            "count": 1
+                        }
+                    ]
+                }
+            },
+            "config.xml": {
+                "parents": {
+                    "/*": [
+                        {
+                            "xml": "<preference name=\"loadUrlTimeoutValue\" value=\"60000\" />",
+                            "count": 1
+                        }
+                    ]
+                }
+            },
+            "AndroidManifest.xml": {
+                "parents": {
+                    "/manifest": [
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.INTERNET\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />",
+                            "count": 1
+                        }
+                    ],
+                    "/*": [
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-feature android:name=\"android.hardware.camera\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-feature android:name=\"android.hardware.camera.autofocus\" android:required=\"false\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-feature android:name=\"android.hardware.camera.flash\" android:required=\"false\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-feature android:name=\"android.hardware.camera.front\" android:required=\"false\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.CAMERA\" />",
+                            "count": 1
+                        }
+                    ],
+                    "/manifest/application": [],
+                    "application": [
+                        {
+                            "xml": "<activity android:configChanges=\"orientation|keyboardHidden|keyboard|screenSize|locale\" android:name=\"org.cloudsky.cordovaPlugins.ZBarScannerActivity\" android:screenOrientation=\"fullUser\" android:theme=\"@android:style/Theme.Black.NoTitleBar.Fullscreen\" />",
+                            "count": 1
+                        }
+                    ]
+                }
+            },
+            "res/values/strings.xml": {
+                "parents": {
+                    "/resources": [],
+                    "/*": [
+                        {
+                            "xml": "<string name=\"csZbarScannerTitle\">Scan QR Code</string>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<string name=\"csZbarScannerInstructions\">Please point your camera at the QR code.</string>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<color name=\"csZbarScannerTextColor\">#ffffff</color>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<color name=\"csZbarScannerTextBackground\">#88000000</color>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<color name=\"csZbarScannerBackground\">#000000</color>",
+                            "count": 1
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "installed_plugins": {
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.coracle.app"
+        },
+        "cordova-plugin-network-information": {
+            "PACKAGE_NAME": "com.coracle.app"
+        },
+        "cordova-plugin-dialogs": {
+            "PACKAGE_NAME": "com.coracle.app"
+        },
+        "cordova-plugin-backbutton": {
+            "PACKAGE_NAME": "com.coracle.app"
+        },
+        "cordova-hot-code-push-plugin": {
+            "PACKAGE_NAME": "com.coracle.app"
+        },
+        "cordova-plugin-app-version": {
+            "PACKAGE_NAME": "com.coracle.app"
+        },
+        "cordova-plugin-cszbar": {
+            "PACKAGE_NAME": "com.kinlong.siebeltest"
+        }
+    },
+    "dependent_plugins": {},
+    "modules": [
+        {
+            "file": "plugins/cordova-plugin-network-information/www/network.js",
+            "id": "cordova-plugin-network-information.network",
+            "clobbers": [
+                "navigator.connection",
+                "navigator.network.connection"
+            ]
+        },
+        {
+            "file": "plugins/cordova-plugin-network-information/www/Connection.js",
+            "id": "cordova-plugin-network-information.Connection",
+            "clobbers": [
+                "Connection"
+            ]
+        },
+        {
+            "file": "plugins/cordova-plugin-dialogs/www/notification.js",
+            "id": "cordova-plugin-dialogs.notification",
+            "merges": [
+                "navigator.notification"
+            ]
+        },
+        {
+            "file": "plugins/cordova-plugin-dialogs/www/android/notification.js",
+            "id": "cordova-plugin-dialogs.notification_android",
+            "merges": [
+                "navigator.notification"
+            ]
+        },
+        {
+            "file": "plugins/cordova-plugin-backbutton/www/Backbutton.js",
+            "id": "cordova-plugin-backbutton.Backbutton",
+            "clobbers": [
+                "navigator.Backbutton"
+            ]
+        },
+        {
+            "file": "plugins/cordova-hot-code-push-plugin/www/chcp.js",
+            "id": "cordova-hot-code-push-plugin.chcp",
+            "clobbers": [
+                "chcp"
+            ]
+        },
+        {
+            "file": "plugins/cordova-plugin-app-version/www/AppVersionPlugin.js",
+            "id": "cordova-plugin-app-version.AppVersionPlugin",
+            "clobbers": [
+                "cordova.getAppVersion"
+            ]
+        },
+        {
+            "file": "plugins/cordova-plugin-cszbar/www/zbar.js",
+            "id": "cordova-plugin-cszbar.zBar",
+            "clobbers": [
+                "cloudSky.zBar"
+            ]
+        }
+    ],
+    "plugin_metadata": {
+        "cordova-plugin-whitelist": "1.3.3",
+        "cordova-plugin-network-information": "2.0.1",
+        "cordova-plugin-dialogs": "2.0.1",
+        "cordova-plugin-backbutton": "0.3.0",
+        "cordova-hot-code-push-plugin": "1.5.3",
+        "cordova-plugin-app-version": "0.1.9",
+        "cordova-plugin-cszbar": "1.3.2"
+    }
+}

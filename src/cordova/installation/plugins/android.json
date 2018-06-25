@@ -1,0 +1,33 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {}
+    },
+    "installed_plugins": {
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.coracle.app"
+        },
+        "cordova-plugin-network-information": {
+            "PACKAGE_NAME": "com.coracle.app"
+        },
+        "cordova-plugin-dialogs": {
+            "PACKAGE_NAME": "com.coracle.app"
+        },
+        "cordova-plugin-backbutton": {
+            "PACKAGE_NAME": "com.coracle.app"
+        },
+        "cordova-hot-code-push-plugin": {
+            "PACKAGE_NAME": "com.coracle.app"
+        },
+        "cordova-plugin-app-version": {
+            "PACKAGE_NAME": "com.coracle.app"
+        },
+        "cordova-plugin-cszbar": {
+            "PACKAGE_NAME": "com.kinlong.siebeltest"
+        }
+    },
+    "dependent_plugins": {}
+}

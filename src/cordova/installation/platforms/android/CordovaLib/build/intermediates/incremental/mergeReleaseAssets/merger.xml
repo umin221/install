@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="main"><source path="/Users/imac-ret/Develop/KND/nproject/20180103kinlong/code/app/src/cordova/installation/platforms/android/CordovaLib/assets"/></dataSet><dataSet config="release"><source path="/Users/imac-ret/Develop/KND/nproject/20180103kinlong/code/app/src/cordova/installation/platforms/android/CordovaLib/src/release/assets"/></dataSet></merger>
