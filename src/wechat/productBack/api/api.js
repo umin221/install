@@ -125,6 +125,15 @@ let apiList = {
       }
     };
   },
+  deleteLine: option => {
+    return {
+      method: 'DELETE',
+      url: 'data/Order Entry/Order Entry - Orders/' + option.data.obj.headerId + '/Order Entry - Line Items/' + option.data.obj.lineId,
+      data: {
+        'body': {}
+      }
+    };
+  },
   toApproval: option => {
     let id = option.data.id;
     delete option.data.id;
