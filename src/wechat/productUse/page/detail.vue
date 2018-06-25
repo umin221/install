@@ -212,7 +212,7 @@
           });
         }
         var item = {
-          Id: me.orderEntry['KL Install Order Opty Name'],
+          Id: me.orderEntry['KL Install Order Id'],
           'KL Agreement Opportunity Name': me.orderEntry['KL Install Order Opty Name']
         };
         this.setProject(item);
