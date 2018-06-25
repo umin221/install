@@ -93,7 +93,7 @@
     },
     methods: {
       ...mapActions(NameSpace, ['getOrderEntry']),
-      ...mapActions('add', ['toApproval']),
+      ...mapActions('add', ['toApproval', 'setProject']),
       ...mapMutations('add', ['selectProduct', 'initSelect', 'setId']),
       show_edit(orderEntry) {
         var self = this;
@@ -211,6 +211,11 @@
             'lineId': me.lineItems[i]['Id']
           });
         }
+        var item = {
+          Id: me.orderEntry['KL Install Order Opty Name'],
+          'KL Agreement Opportunity Name': me.orderEntry['KL Install Order Opty Name']
+        };
+        this.setProject(item);
         me.$router.push({
           name: 'add',
           query: {
