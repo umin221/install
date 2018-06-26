@@ -61,12 +61,12 @@
                          :key=index
                          :right="operation(item, item.Id, index)"
                          is-link>
-            <div class="co-flex co-jc" slot="title">
+            <div class="co-flex co-jc title" slot="title">
               <span class="co-f1">{{item.Type}}</span>
               <span class="co-f1" >{{formatDateTime(item.Planned)}} - {{formatDateTime(item['Planned Completion'])}}</span>
 
             </div>
-            <div class="co-flex co-jc" slot="title">
+            <div class="co-flex co-jc sub-title" slot="title">
               <span class="co-f1">{{item['KL Detail Type']}}</span>
               <span class="co-f1">{{item.Status}}</span>
             </div>
@@ -559,5 +559,12 @@
   }
   .submitBtn{
     background: #d9d9d9;
+  }
+  .mint-cell .title {
+    line-height:24px;
+    color: #333;
+  }
+  .mint-cell .sub-title {
+    font-size: 0.65rem;
   }
 </style>

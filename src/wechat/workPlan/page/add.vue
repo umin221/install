@@ -15,11 +15,12 @@
         <mt-cell title="工作描述" is-link :class="heartVisible"  @click.native="tapWorkDescript">
           <span>{{workDescDate.Value}}</span>
         </mt-cell>
-      <mt-cell title="全天活动" class="margin10 borderBottom">
+        <mt-cell title="全天活动" class="margin10 borderBottom">
           <mt-switch :value="allDay" @change.native="changeSwitch" :disabled="switchDisabled"></mt-switch>
         </mt-cell>
-         <mt-cell title="开始时间" class="borderBottom" :class="heartVisible" is-link  @click.native='openStartTime'><span>{{initDate()}} {{startPickerValue}}</span></mt-cell>
-         <mt-cell title="结束时间" :class="heartVisible" is-link @click.native='openEndTime'><span>{{initDate()}} {{endPickerValue}}</span></mt-cell>
+        <mt-cell title="开始时间" class="borderBottom" :class="heartVisible" is-link  @click.native='openStartTime'><span>{{initDate()}} {{startPickerValue}}</span></mt-cell>
+        <mt-cell title="结束时间" :class="heartVisible" is-link @click.native='openEndTime'><span>{{initDate()}} {{endPickerValue}}</span></mt-cell>
+        <mt-field label="备注" placeholder="可补充工作描述明细" type="textarea" rows="4" v-model="Description"></mt-field>
         <button-group v-if='saveBtn'>
         <mt-button class="single"
                    @click.native="handleSave">保存</mt-button>
@@ -66,6 +67,7 @@
         headTitle: '新建计划',
         startPickerHour: 0,
         startPickerMinutes: 0,
+        Description: '', // 备注
         newTimes: new Date(), // 当前年月日
         showWorkDescript: false,
         showWorkType: false, // 项目类型是否显示
@@ -296,6 +298,7 @@
           data: {
             'Id': id, // 对应的id
             'Type': '日常活动', // 工作类型
+            'Description': this.Description, // 描述
             'KL Detail Type': this.workDescDate.Value, // 工作描述
             'Planned': month + '/' + day + '/' + year + ' ' + this.startPickerValue + ':00', // 计划开始时间
             'Planned Completion': month + '/' + day + '/' + year + ' ' + this.endPickerValue + ':00' // 计划结束时间

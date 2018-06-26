@@ -23,8 +23,8 @@
         <mt-cell title="批次名称" class="borderBottom" v-if="descpc()">
           <span>{{descpc()}}</span>
         </mt-cell>
-         <mt-cell title="计划开始时间" class="borderBottom"><span >{{initDateStart()}}</span></mt-cell>
-         <mt-cell title="计划结束时间" class="borderBottom"><span >{{initDateEnd()}}</span></mt-cell>
+        <mt-cell title="计划开始时间" class="borderBottom"><span >{{initDateStart()}}</span></mt-cell>
+        <mt-cell title="计划结束时间" class="borderBottom"><span >{{initDateEnd()}}</span></mt-cell>
          <!--<mt-cell title="实际开始时间" :class="heartVisible" is-link class="borderBottom" @click.native='openStartTime'><span>{{initDate('Start')}} {{ACstartPickerValue}}</span></mt-cell>
          <mt-cell title="实际结束时间" :class="heartVisible" is-link @click.native='openEndTime'><span>{{initDate('End')}} {{ACendPickerValue}}</span></mt-cell>
        --> <cus-field label="实际开始时间"
@@ -35,6 +35,7 @@
                    @click.native="openCompletion('pickerEnd', 'Done')"
                    :class="heartVisible"
                    :value="Done" is-link></cus-field>
+        <mt-field label="备注" type="textarea" rows="4" class="disable" :value="description()"></mt-field>
         <button-group>
         <mt-button class="submitBtn" v-if='saveBtn'
                    @click.native="handleSave">更新</mt-button>
@@ -214,6 +215,10 @@
       // 描述字段
       descpc() {
         return this.currentDayData[this.index]['KL Task Batch Name'];
+      },
+      // 备注字段
+      description() {
+        return this.currentDayData[this.index]['Description'];
       },
       // 点击选开始时间
       openStartTime() {
