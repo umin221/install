@@ -417,8 +417,10 @@ export default new Vuex.Store({
             state.Action = systemSort(Action1, 'Created')[0];
           }
           if (state.role === 'custom') {
-            if (form.Owner === state.meg['Emp #'] || !form.Owner) {
-              if ((form['KL Status LIC'] === 'Not Started' || form['KL Status LIC'] === 'To Be Assigned') && form['SR Type'] === '上门维修') {
+            if (form.Owner === state.meg['Emp #'] || form['KL Dispatcher Login'] === state.meg['Emp #']) {
+              // 根据需求 修改  客服可以任何状态重新派工
+              // if ((form['KL Status LIC'] === 'Not Started' || form['KL Status LIC'] === 'To Be Assigned') && form['SR Type'] === '上门维修') {
+              if (form['SR Type'] === '上门维修') {
                 state.BtnStatu = 'status4';
               }
             }
@@ -442,8 +444,15 @@ export default new Vuex.Store({
           console.log(state.BtnStatu);
           if (form['Order Entry - Orders']) {
             state.orderEntry = form['Order Entry - Orders'];
-            if (form['Order Entry - Orders']['Order Entry - Line Items']) {
-              state.orderEntryItem = KND.Util.toArray(form['Order Entry - Orders']['Order Entry - Line Items']);
+            var orderList = KND.Util.toArray(form['Order Entry - Orders']);
+            orderList = JSON.parse(JSON.stringify(orderList));
+            if (orderList.length > 1) {
+              orderList.sort((a, b) => new Date(a['Created']) < new Date(b['Created']));
+            }
+            console.dir(orderList);
+            var orderEntry = KND.Util.toArray(orderList[0]['Order Entry - Line Items']);
+            if (orderEntry) {
+              state.orderEntryItem = orderEntry;
             }
           }
           if (form['KL Child Service Request']) {
@@ -593,18 +602,13 @@ export default new Vuex.Store({
         //     }
         //   });
         // },
-        addChildService({commit, dispatch}, {parentId, contactId, lastName, locationId, srNumber}) {
+        addChildService({commit, dispatch}, obj) {
           api.get({
             key: 'addChildService',
-            data: {
-              parentId,
-              contactId,
-              lastName,
-              locationId
-            },
+            data: obj,
             success: function(data) {
               if (data) {
-                dispatch('getDetail', srNumber);
+                dispatch('getDetail', obj.srNumber);
               }
             },
             error: function(data) {

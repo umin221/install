@@ -705,7 +705,7 @@ let ApiList = {
         'Id': '1', // 新建传1
         'Parent Service Request Id': option.data.parentId,  // 父服务请求的Id，一定要填
         'Contact Id': option.data.contactId, // 父服务请求的联系人Id
-        'Contact Last Name': option.data.lastName,  // 父服务请求的联系人名字
+        // 'Contact Last Name': option.data.lastName,  // 父服务请求的联系人名字
         'Personal Location Id': option.data.locationId  // 父服务请求的主要维修地址Id
       }
     };

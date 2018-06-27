@@ -170,8 +170,9 @@
                         <div>保修期</div>
                         <div>产品名称</div>
                         <div>数量</div>
+
                       </div>
-                      <div v-if="orderEntry['Order Entry - Line Items']">
+                      <div>
                         <div  v-for="(item, index) in orderEntryItem">
                           <div class="enter-order">
                             <div>{{item['KL Warranty Flag'] === "Y" ? "保内": "保外"}}</div>
