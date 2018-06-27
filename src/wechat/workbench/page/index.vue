@@ -25,19 +25,19 @@
   import {mapState} from 'vuex';
 
   // 所有功能
-  const af = {workPlan: true, transferOrder: true, installOrder: true, serviceOrder: true, orderForms: true, myProduct: true, productUse: true, productBack: true, outsourcing: true};
+  const AF = {workPlan: true, transferOrder: true, installOrder: true, serviceOrder: true, orderForms: true, myProduct: true, productUse: true, productBack: true, outsourcing: true};
   // 用户功能
   let r2f = {
-    engineer: af,
+    af: AF,
     factory: {installOrder: true, workPlan: true},
     agent: {serviceOrder: true},
     default: {workPlan: true}
   };
   // 职位
   let rc = {
-    'Field Service Engineer': 'engineer', // 安装工程师
-    'Field Service Manager': 'engineer', // 安装主管
-    'FS Department Manager': 'engineer', // 部长
+    'Field Service Engineer': 'af', // 安装工程师
+    'Field Service Manager': 'af', // 安装主管
+    'FS Department Manager': 'af', // 部长
     'Agent': 'agent', // 客服
     'Agent Manager': 'agent', // 客服主管
     'Door Factory Engineer': 'factory', // 门厂技术
