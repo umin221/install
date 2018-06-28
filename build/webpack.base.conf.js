@@ -22,6 +22,11 @@ const createLintingRule = () => ({
 });
 
 const getCompileModules = () => {
+  /*
+    * workPlan  — 工作计划，transferOrder — 安装交接单，installOrder  — 安装订单，serviceOrder  — 维修工单，orderForms  — 维修订单
+    * myProduct  — 我的配件，productUse  — 配件领用，productBack — 配件退入，outsourcing — 委外人员管理，install — app，officialAccounts — 公众号
+    * controller — 待办跳转公共模块，demo — mintUI 部分模板
+    */
   /**
    * transferOrder outsourcing demo workbench workPlan installOrder serviceOrder orderForms controller install officialAccounts
    * myProduct productUse productBack
