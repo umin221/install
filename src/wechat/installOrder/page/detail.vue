@@ -46,7 +46,7 @@
           </div>
         </toggle>
         <div slot="title" class="mint-content-div enable">
-          <div class="mint-content-xt" @click="executionFn" v-show="executionShow()">订单执行</div>
+          <div class="mint-content-xt" @click="executionFn" v-show="executionShow">订单执行</div>
           <div class="mint-content-xt" @click="punchClock">打卡</div>
           <div class="mint-content-xt" @click="butXttd">协同团队</div>
         </div>
@@ -210,10 +210,10 @@
       let me = this;
       me.id = me.$route.query.id;
 
-      this.detail();
       KND.Native.getUserInfo((info) => {
         userInfo = info;
         console.log(userInfo);
+        this.detail();
       });
     },
     data: () => {
@@ -274,6 +274,12 @@
           me[g.group].push(line);
         };
         return lines.length;
+      },
+      // 控制订单执行按钮显示隐藏
+      executionShow() {
+        var self = this;
+        // 职位 === 安装工程师、安装主管  处理中状态=In Installing,Sales Confirmed
+        return (self.detailData['Calculated Order Status'] === 'In Installing' || self.detailData['Calculated Order Status'] === 'Sales Confirmed') && (userInfo['KL Primary Position Type LIC'] === 'Field Service Engineer' || userInfo['KL Primary Position Type LIC'] === 'Field Service Manager');
       }
     },
     beforeRouteEnter(to, from, next) {
@@ -340,15 +346,6 @@
             console.dir(self.taskDataST);
           }
         });
-      },
-      executionShow() {
-        var self = this;
-        var isVal = false;
-        // 职位 === 安装工程师、安装主管  处理中状态=In Installing,Sales Confirmed
-        if ((self.detailData['Calculated Order Status'] === 'In Installing' || self.detailData['Calculated Order Status'] === 'Sales Confirmed') && (userInfo['KL Primary Position Type LIC'] === 'Field Service Engineer' || userInfo['KL Primary Position Type LIC'] === 'Field Service Manager')) {
-          return true;
-        }
-        return isVal;
       },
       rightLine(index, item) {
         if (index === (item.length - 1)) {
