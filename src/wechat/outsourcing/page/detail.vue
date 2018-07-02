@@ -37,7 +37,7 @@
                    v-model="form['KL Partner Credentials Type']"
                    @click.native="showLovFn('KL Partner Credentials Type')"
                    :is-link="!read"></cus-field>
-        <cus-field label="证件号码" placeholder="请输入证件号码" tag="证件号码" type="number"
+        <cus-field label="证件号码" placeholder="请输入证件号码" tag="证件号码"
                    :edit=!read
                    v-valid.require
                    v-model="form['KL Partner Credentials Number']"></cus-field>
