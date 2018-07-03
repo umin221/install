@@ -347,7 +347,9 @@
           .mint-swipe-items-wrap{
             .days{
               ul{
-                display: flex;
+                display:-moz-box;
+                display:-webkit-box;
+                // display: flex;
                 li{
                   flex: 1;
                   font-size: 0.7rem;

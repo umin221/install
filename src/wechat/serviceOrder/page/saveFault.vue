@@ -320,7 +320,8 @@ export default {
           'Id': '001',
           'Product': 'AP003', // 产品编码
           'Unit Price': me.fee,
-          'KL Warranty Flag': 'N'
+          'KL Warranty Flag': 'N',
+          'KL EBS Update Flag': 'Y'
         };
         lineItems.push(obj); // 上门费用不为空 则当成一个维修配件
       }
