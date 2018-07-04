@@ -113,6 +113,8 @@
   }, {
     userID: '16033164', position: '安装主管', area: '南方安装一组', name: '叶亮'
   }, {
+    userID: '13030608', position: '产品安装工程师', area: '南方安装一组', name: '林明喜'
+  }, {
     userID: '16043218', position: '安装主管', area: '北方安装一组', name: '谢应发'
   }, {
     userID: '16053242', position: '安装主管（代）', area: '北方安装一组', name: '窦校太'
