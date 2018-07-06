@@ -37,7 +37,7 @@
                  is-link></mt-cell>
       </div>
 
-      <attach ioName="KL Agreement Attachment IO" title="合同附件" ref="attach"
+      <attach ioName="KL Agreement Attachment IO" title="附件" ref="attach"
               :attach="getAttach()"
               :edit="false">
       </attach>
@@ -197,7 +197,7 @@
       getAttach() {
 //        需要展示附件的类型
         let fileType = ['doc', 'docx', 'xls', 'xlsx', 'pdf', 'jpg', 'png'];
-        return KND.Util.toArray(this.form['KL Agreement Attachment']).filter(item => {
+        return KND.Util.toArray(this.form['KL Agreement Attachment'] || this.form['KL Sample Attachment']).filter(item => {
           return fileType.indexOf(item['AgreeFileExt'].toLowerCase()) !== -1;
         });
       }
