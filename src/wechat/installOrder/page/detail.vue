@@ -150,7 +150,14 @@
                               class="itemTask"
                               :value="itemTask['KL Completed Install Amount']+'/'+itemTask['KL Install Amount Requested']">
                       <span v-if="showClose(itemTask)" @click.stop="closeTask(itemTask, true)" class="batchClose"></span>
-                      <span v-if="(itemTask['Calculated Activity Status'] === 'HQ Reject' || itemTask['Calculated Activity Status'] === 'Declined' || itemTask['Calculated Activity Status'] === 'Planning' || itemTask['Calculated Activity Status'] === 'In Progress' || itemTask['Calculated Activity Status'] === 'Close Reject') && itemTask['KL Detail Type LIC'] === 'Transfer Summary' && detailData['KL Delivery Sales Type'] === '工程'" @click.stop="closeTask(itemTask, true)" class="batchClose"></span>
+                      <span v-if="(itemTask['Calculated Activity Status'] === 'HQ Reject' ||
+                      itemTask['Calculated Activity Status'] === 'Declined' ||
+                      itemTask['Calculated Activity Status'] === 'Planning' ||
+                      itemTask['Calculated Activity Status'] === 'In Progress' ||
+                      itemTask['Calculated Activity Status'] === 'Close Reject')
+                       && itemTask['KL Detail Type LIC'] === 'Transfer Summary'
+                       && detailData['KL Delivery Sales Type'] === '工程'"
+                            @click.stop="closeTask(itemTask, true)" class="batchClose"></span>
                     </mt-field>
                     <mt-field label="物业联系人"
                               class="itemTask"
@@ -423,15 +430,16 @@
         }
       },
       showClose(item) {
+        let me = this;
         // var val = (item['Calculated Activity Status'] === 'HQ Reject' || item['Calculated Activity Status'] === 'Declined' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Close Reject') && item['KL Detail Type LIC'] !== 'Transfer Summary';
         var val = false;
         if (item['KL Detail Type LIC'] !== 'Transfer Summary') { // 非汇总
           val = (item['Calculated Activity Status'] === 'HQ Reject' || item['Calculated Activity Status'] === 'Declined' || item['Calculated Activity Status'] === 'Planning' || item['Calculated Activity Status'] === 'In Progress' || item['Calculated Activity Status'] === 'Close Reject');
-          if (item['KL Detail Type LIC'] === 'Transfer Batch') { // 真锁零星移交不能关闭
+          if (item['KL Detail Type LIC'] === 'Transfer Batch' && me.detailData['KL Delivery Sales Type'] !== '工程') { // 真锁零星移交不能关闭
             val = false;
           }
         }
-        console.dir(val);
+        console.dir(':::::' + val);
         return val;
       },
       getClose() { // 关闭整个任务

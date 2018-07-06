@@ -317,7 +317,7 @@ export default {
       }
       if (me.fee) {
         if (me.fee === 0 || me.fee === '0' || me.fee === '0.00' || me.fee < 0) {
-          Toast('上车费用必须大于0！');
+          Toast('上门费用必须大于0！');
           return;
         }
         obj = {

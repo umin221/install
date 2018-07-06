@@ -41,7 +41,7 @@
           {'id': 'submitService', 'vul': '我要报修', 'icon': 'demo'},
           {'id': 'myRepair', 'vul': '我的报修', 'icon': 'plan'},
           {'id': 'personal', 'vul': '个人中心', 'icon': 'transfer'},
-          {'id': 'repairPolicy', 'vul': '报修政策', 'icon': 'install'},
+          {'id': 'repairPolicy', 'vul': '报修须知', 'icon': 'install'},
           {'id': 'engineer', 'vul': '工程师通道', 'icon': 'service'}
 //          {'id': 'telValidate', 'vul': '用户绑定', 'icon': 'service'}
         ]
