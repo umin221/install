@@ -493,7 +493,8 @@ export default new Vuex.Store({
         }
       },
       actions: {
-        getDetail({commit}, srNumber) {
+        getDetail({state, commit}, srNumber) {
+          state.Action = {};
           api.get({
             key: 'getDetail',
             data: {

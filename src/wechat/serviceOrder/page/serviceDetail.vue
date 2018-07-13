@@ -261,56 +261,6 @@
                       type="fading-circle"
                       color="#26a2ff"></mt-spinner>
         </mt-cell>
-
-        <!--工单操作 记录故障-->
-<!--        <mt-cell class="xs-icon icon-saver" title="记录故障">
-          <div v-if="!ServiceRequest['KL Child Service Request']">
-            <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause']"
-                       @click="fillIn('ServiceRequest')">已填写</mt-button>
-            <mt-button v-else-if="Action['Status INT']==='Arrived' && !ServiceRequest['SR Rootcause']"
-                       @click="clickPosition('comEnter')">填写</mt-button>
-            <mt-button v-else style="background: gainsboro">填写</mt-button>
-          </div>
-          <div v-else>
-            <mt-button v-if="childService['SR Rootcause']"
-                       @click="fillIn('childService')">已填写</mt-button>
-            <mt-button v-else
-              @click.native="childCom(childService)">填写</mt-button>
-          </div>
-        </mt-cell>-->
-
-        <!--工单操作 完工确认-->
-<!--        <mt-cell class="xs-icon icon-finish" title="完工确认">
-          <div v-if="!ServiceRequest['KL Child Service Request']">
-            <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause'] && !ServiceRequest['KL Parent SR Complete Flag']"
-                       @click.native="clickPosition('failureRecord')">填写</mt-button>
-            <mt-button v-else-if="ServiceRequest['KL Parent SR Complete Flag']"
-                       @click.native="moreOrder">再记一单</mt-button>
-            <mt-button v-else style="background: gainsboro">填写</mt-button>
-          </div>
-          <div v-else>
-            <mt-button v-if="childService['SR Rootcause'] && childService['KL Status LIC'] !== 'Completed'"
-                       @click.native="childRecord(childService)">填写</mt-button>
-            <mt-button v-else-if="childService['KL Status LIC'] === 'Completed'"
-                       @click.native="moreOrder">再记一单</mt-button>
-            <mt-button v-else style="background: gainsboro">填写</mt-button>
-          </div>
-        </mt-cell>-->
-
-        <!--工单操作 结束-->
-<!--        <mt-cell class="completeEnd xs-icon icon-ending" title="结束">
-          <div v-if="!ServiceRequest['KL Child Service Request']">
-            <mt-button v-if="ServiceRequest['KL Parent SR Complete Flag']"
-                       @click.native="clickPosition('end')">确认</mt-button>
-            <mt-button v-else style="background: gainsboro">确认</mt-button>
-          </div>
-          <div v-else>
-            <mt-button v-if="childService['KL Status LIC'] === 'Completed'"
-                       @click.native="clickPosition('end')">确认</mt-button>
-            <mt-button v-else style="background: gainsboro">确认</mt-button>
-          </div>
-        </mt-cell>-->
-
         <div class="work-order">
           <!--子服务请求-->
           <div class="child-work-order"
@@ -353,7 +303,7 @@
             <mt-cell class="xs-icon icon-saver" title="记录故障">
               <mt-button v-if="Action['Status INT']==='Arrived'&& ServiceRequest['SR Rootcause']"
                          @click="fillIn(ServiceRequest.Id)">已填写</mt-button>
-              <mt-button v-else-if="Action['Status INT']==='Arrived' && !ServiceRequest['SR Rootcause']"
+              <mt-button v-else-if="show_comEnter()"
                          @click="clickPosition('comEnter')">填写</mt-button>
               <mt-button v-else style="background: gainsboro">填写</mt-button>
             </mt-cell>
@@ -507,6 +457,10 @@
         } else {
           return '';
         }
+      },
+      show_comEnter() {
+        console.dir(this.Action['Status INT'] === 'Arrived' && !this.ServiceRequest['SR Rootcause']);
+        return this.Action['Status INT'] === 'Arrived' && !this.ServiceRequest['SR Rootcause'];
       },
       childItem(item) {
         return KND.Util.toArray(item);

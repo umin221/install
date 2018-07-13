@@ -20,6 +20,7 @@
           <cus-field label="门厂名称" :value="form['Partner Name']"></cus-field>
           <cus-field label="门厂联系人" :value="form['Partner Contact Name']"></cus-field>
           <cus-field label="门厂技术员" :value="form['Door Factory Engineer']"></cus-field>
+          <cus-field label="销售代表" :value="form['Created By Name']"></cus-field>
           <cus-field label="开孔方式" :value="form['Hole Type']"></cus-field>
           <cus-field label="门厂是否安装锁体" :value="k2v[form['HBS Check Box 1']]"></cus-field>
           <cus-field label="是否安装替代锁" :value="k2v[form['HBS Check Box 2']]"></cus-field>
@@ -36,11 +37,14 @@
                  @click.native="toEngineer"
                  is-link></mt-cell>
       </div>
-
-      <attach ioName="KL Agreement Attachment IO" title="附件" ref="attach"
+      <attach v-if="form['KL Sample Flag'] === 'Y'" ioName="KL Sample Attachment IO" title="附件" ref="attach"
               :attach="getAttach()"
               :edit="false">
       </attach>
+      <attach v-if="form['KL Sample Flag'] !== 'Y'" ioName="KL Agreement Attachment IO" title="附件" ref="attach"
+              :attach="getAttach()"
+              :edit="false">
+      </attach> <!--工程附件 KL Sample Flag = Y 样品-->
 
       <lazy :time="500">
         <div class="install-order" v-show="!isPending">

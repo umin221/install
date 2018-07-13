@@ -11,8 +11,10 @@
       <cus-field label="产品型号" tag="产品型号" class="disable"
                  @click.native="showLovFn('agreementItem')"
                  :value="productName || line['KL Product Model No']"
-                 v-valid.require
-                 is-link></cus-field>
+                 v-valid.require></cus-field>
+      <cus-field label="产品描述" tag="产品描述" class="disable"
+                 :value="line['KL Product Description']"
+                 :editable="false"></cus-field>
       <cus-field label="数量" tag="数量"
                  type="number"
                  v-valid.require.number
