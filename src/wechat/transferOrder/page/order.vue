@@ -31,7 +31,8 @@
                    v-model="order['KL Delivery Partner Contact Name']"></cus-field>
           <cus-field label="联系电话" tag="联系电话" placeholder="请输入手机号码"
                    v-if="isDoorFactoryOpen"
-                   v-valid.require.phone
+                     v-valid.require.positiveInteger
+                     type="number"
                    v-model="order['KL Delivery Partner Contact Phone']"></cus-field>
           <mt-cell title="是否门厂安装锁体" v-show="isProject && isDoorFactoryOpen">
             <mt-switch v-model="box1"></mt-switch>
