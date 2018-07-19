@@ -249,6 +249,7 @@
       // 保存订单行
       saveFn() {
         tools.valid.call(this, () => {
+          this.line['KL Agreement Item Id'] = '';
           this.saveOrderLine(this.line);
         });
       },
