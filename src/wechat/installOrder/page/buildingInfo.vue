@@ -17,7 +17,7 @@
       <div style="height: 5px"></div>-->
       <div style="background: white;padding-bottom: 10px;">
         <mt-cell>
-          <div slot="title" class="list-text"><span class="list-text-span">楼层信息</span></div>
+          <div slot="title" class="list-text"><span class="list-text-span">安装楼栋数量信息</span></div>
         </mt-cell>
         <div class="cus-cell-call">
             <div class="cus-title">楼栋数<span class="cus-title-span">默认栋，如1栋</span></div>
@@ -32,7 +32,7 @@
           </div>
         </div>
         <div class="cus-cell-call">
-          <div class="cus-title">房间数/层<span class="cus-title-span">房号，楼层号+001，如1001</span></div>
+          <div class="cus-title">房间数/层<span class="cus-title-span">默认间，如1间</span></div>
           <div class="cus-title" style="text-align: right;margin-bottom: 10px;">
             <div class="cus-title-div" ><span @click="reduceVal('roomNum')" style="border-right: 1px solid #ebebeb;">-</span><input v-model="roomNum" type="number" class="numberCalss"/><span @click="plusVal('roomNum')" style="border-left: 1px solid #ebebeb;">+</span></div><span>&nbsp;</span>
           </div>
@@ -275,12 +275,27 @@
           Toast('楼栋数必须为正整数');
           return;
         }
+        if (self.buildingNum > 10) {
+          self.buildingNum = 1;
+          Toast('楼栋数不能大于10');
+          return;
+        }
         if (!numTest.test(self.layerNum)) {
           Toast('层数必须为正整数');
           return;
         }
+        if (self.layerNum > 100) {
+          self.layerNum = 1;
+          Toast('层数不能大于100');
+          return;
+        }
         if (!numTest.test(self.roomNum)) {
           Toast('房间数必须为正整数');
+          return;
+        }
+        if (self.roomNum > 50) {
+          self.roomNum = 1;
+          Toast('房间数不能大于50');
           return;
         }
         api.get({
