@@ -9,6 +9,8 @@
   }, {
     userID: '17023092', position: '产品安装工程师', area: '华东安装四组', name: '刘耀'
   }, {
+    userID: '16093003', position: '产品安装工程师', area: '南方安装四组', name: '李林'
+  }, {
     userID: '16043218', position: '安装主管', area: '北方安装一组', name: '谢应发'
   }, {
     userID: '17023093', position: '产品安装工程师', area: '北方安装一组', name: '贾思杰'
@@ -96,6 +98,10 @@
     userID: '17063028', position: '安装主管（代）', area: '', name: '向卫'
   }, {
     userID: '16043226', position: '安装主管（代）', area: '', name: '江伟华'
+  }, {
+    userID: '17023092', position: '产品安装工程师', area: '华东安装四组', name: '刘耀'
+  }, {
+    userID: '16093003', position: '产品安装工程师', area: '南方安装四组', name: '李林'
   }, {
     userID: '16043106', position: '安装主管（代）', area: '华东安装三组', name: '贺香龙'
   }, {
