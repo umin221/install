@@ -418,7 +418,7 @@ export default new Vuex.Store({
           }
           if (state.role === 'custom') {
             // 没有 Owner || Owner === 当前登陆人 || 记录派工客服 === 当前登陆人
-            if (!form.Owner || form.Owner === state.meg['s #'] || form['KL Dispatcher Login'] === state.meg['Emp #']) {
+            if (!form.Owner || form.Owner === state.meg['Emp #'] || form['KL Dispatcher Login'] === state.meg['Emp #']) {
               // 根据需求 修改  客服可以任何状态重新派工
               // if ((form['KL Status LIC'] === 'Not Started' || form['KL Status LIC'] === 'To Be Assigned') && form['SR Type'] === '上门维修') {
               if (form['SR Type'] === '上门维修') {
