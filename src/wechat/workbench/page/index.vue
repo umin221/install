@@ -38,6 +38,7 @@
     'Field Service Engineer': 'af', // 安装工程师
     'Field Service Manager': 'af', // 安装主管
     'FS Department Manager': 'af', // 部长
+    'FS Department Director': 'af', // 郑总
     'Agent': 'agent', // 客服
     'Agent Manager': 'agent', // 客服主管
     'Door Factory Engineer': 'factory', // 门厂技术

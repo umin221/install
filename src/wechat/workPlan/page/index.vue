@@ -326,7 +326,7 @@
        * @returns {String} 该月的总天数
        */
       getcurMonthDays(date) {
-        return new Date(new Date(new Date(date).setMonth(date.getMonth() + 1)).setDate(0)).getDate();
+        return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
       },
       /**
        * 页面点击 上一個月&下一个月
